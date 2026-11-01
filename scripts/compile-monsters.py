@@ -36,18 +36,32 @@ ids={
   "赤兎": "rabbit",
   "鉄の番人": "iron",
   "テラー": "terror",
-  "奈落の監視者": "watcher"
+  "奈落の監視者": "watcher",
+  "オーガ": "ogre", "屍兵": "zombie", "ハーピー": "harpy", "大毒蛇": "viper", "鎧蟻": "armorant", "闇の司祭": "darkpriest", "迷宮の妖術師": "sorcerer", "ガーゴイル": "gargoyle", "牛頭の門番": "minogate",
+  "墓所の亡者": "wight", "トロル": "troll", "人狼": "werewolf", "大蠍": "scorpion", "忍びの者": "ninja", "高位の魔術師": "highmage", "火蜥蜴": "salamander", "粘液の塊": "blob", "屍術師": "necromancer",
+  "亡霊": "wraith", "石巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "毒茸の群れ": "fungus", "闇エルフの術師": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
+  "毒竜": "gasdragon", "牛頭の戦士": "minotaur", "肉の巨像": "fleshgolem", "忍びの頭目": "ninjachief", "死霊魔導士": "deathmage", "地獄の猟犬": "hellhound", "這い寄る大蟲": "crawler", "双頭の巨人": "ettin",
+  "小悪魔": "lesserdemon", "雷竜": "bluedragon", "死の騎士": "deathknight", "魔女": "witch", "多頭竜": "hydra", "影の暗殺者": "assassin", "邪眼": "evileye", "魔将軍": "demongeneral",
+  "大悪魔": "greaterdemon", "霜の巨人": "frostgiant", "夜の貴族": "vampirelord", "赤竜": "reddragon", "上忍": "masterninja", "リッチ": "lich", "魔界の猟犬": "fiendhound", "古竜": "ancientdragon",
+  "魔王の近衛": "royalguard", "堕天使": "fallenangel", "死神": "reaper", "混沌の竜": "chaosdragon", "混沌の落とし子": "chaosspawn", "大魔導師": "archmage", "迷宮の主": "labyrinthlord"
 }
+BOSSES=['guardian','general','watcher','minogate','necromancer','vampire','ettin','demongeneral','ancientdragon','labyrinthlord']
+# 敵の呪文：名前→(id,対象,ダイス)。全体は生存する味方全員に個別ダイス。
+MONSTER_SPELLS={'ハリト':('halito','単体',[1,8,0]),'マハリト':('mahalito','全体',[4,6,0]),'ダルト':('dalto','全体',[5,6,0]),'マダルト':('madalto','全体',[6,8,0]),'ティルトウェイト':('tiltowait','全体',[8,8,0])}
 data=[]
 for r in rows:
  id=ids[r['確定名']]
- assert r['呪文']=='なし' or re.fullmatch(r'ハリト/単体/\d+%',r['呪文']), 'Unsupported spell'
+ sp=None if r['呪文']=='なし' else re.fullmatch(r'(\S+?)/(単体|全体)/(\d+)%',r['呪文'])
+ assert r['呪文']=='なし' or (sp and sp[1] in MONSTER_SPELLS and MONSTER_SPELLS[sp[1]][1]==sp[2]), 'Unsupported spell'
  assert r['耐性'] in ['なし','毒無効','炎半減'], 'Unsupported resistance'
  group=[int(n) for n in re.findall(r'\d+',r['群れの数'])];group=group if len(group)==2 else group*2
- d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=int(r['出現階層'][0]),level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':'poison' if name=='毒' else 'paralysis','chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in ['guardian','general','watcher'],icon='♛' if id in ['guardian','general','watcher'] else '◈')
+ d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=int(re.match(r'\d+',r['出現階層'])[0]),level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':'poison' if name=='毒' else 'paralysis','chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
  m=re.search(r'列上限(\d+)体',r['仲間呼び']);d['summonCap']=int(m[1]) if m else 4
  d['breath']=None if r['ブレス']=='なし' else {'element':r['ブレス'].split('/')[0],'dice':dice(r['ブレス'].split('/')[2]),'chance':pct(r['ブレス'])}
- d['spell']=pct(r['呪文']);assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
+ d['spell']=pct(r['呪文']);d['spellInfo']=None if not sp else {'id':MONSTER_SPELLS[sp[1]][0],'name':sp[1],'target':'all' if sp[2]=='全体' else 'one','dice':MONSTER_SPELLS[sp[1]][2]};assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
+for f in sorted({d['floor'] for d in data}):
+ assert sum(1 for d in data if d['floor']==f and d['boss'])==1, f'floor {f} needs exactly one boss'
+ assert any(d['floor']==f and not d['boss'] for d in data), f'floor {f} needs normal monsters'
 
 output='// Generated from data/monsters.csv by scripts/compile-monsters.py.\nconst ENEMIES='+json.dumps(data,ensure_ascii=False,indent=2)+';\n'
 path=root/'dist/monster-data.js'
