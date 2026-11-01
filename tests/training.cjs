@@ -1,10 +1,10 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 function game(saved=null){
  let timers=[],els={},storage=saved;
- const el=()=>({style:{},setAttribute(){},addEventListener(){},append(){},replaceChildren(){},classList:{toggle(){}},value:'0',showModal(){this.open=true},close(){this.open=false}});
+ const el=()=>({style:{},dataset:{},children:[],setAttribute(){},addEventListener(){},append(...items){this.children.push(...items)},replaceChildren(...items){this.children=items},classList:{toggle(){}},value:'0',showModal(){this.open=true},close(){this.open=false}});
  const ctx={crypto:require('node:crypto').webcrypto,structuredClone,document:{addEventListener(){},querySelector:k=>els[k]??=el(),querySelectorAll:()=>[],createElement:el},localStorage:{getItem:()=>storage,setItem:(k,v)=>{storage=v}},setTimeout:f=>(timers.push(f),timers.length),clearTimeout(){timers=[]},Math:Object.create(Math)};
  vm.createContext(ctx);
- for(const f of ['weapons','monster-data','balance','spells','items','flags','traps','combatui','party','monsters','recruits','game'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f+'.js'),'utf8'),ctx);
+ for(const f of ['weapons','monster-data','balance','spells','items','flags','traps','combatui','party','monsters','recruits','game','training'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f+'.js'),'utf8'),ctx);
  return {run:code=>vm.runInContext(code,ctx),saved:()=>storage,drain:()=>{for(let n=0;timers.length;n++){if(n>300)throw Error('timer loop');timers.shift()()}}};
 }
 let g=game();
@@ -57,3 +57,112 @@ g=game();g.run("s.area='town';s.pos=0;var st=[0,1,2].map(i=>generateRecruit('状
 assert.equal(g.run('changeRecruitParty(st[0].members.id,true)'),false);assert.equal(g.run('changeRecruitParty(st[1].members.id,true)'),true);assert.equal(g.run('changeRecruitParty(st[2].members.id,true)'),true);
 assert.equal(g.run('deleteRecruit(st[0].members.id)'),true);assert.equal(g.run('trainingRoster().some(r=>r.members.id===st[0].members.id)'),false);
 console.log('PASS lost recruits cannot join but can be deleted; dead/ash can join');
+
+// Wipes must preserve complete records separately from the playable roster.
+function corpseParty(count=6){
+ const g=game();
+ g.run(`Math.random=()=>.5;[3,2,0,1,0,2,1].slice(0,${count+1}).forEach((job,i)=>{
+  const r=generateRecruit('遺体'+i,job);registerRecruit(r);if(i<${count})changeRecruitParty(r.members.id,true);
+ });enterDungeon();`);
+ g.drain();return g;
+}
+g=corpseParty();
+g.run(`fresh(3);s.pos=17;s.gold=321;s.cleared=true;s.light=true;s.watchful=true;s.dumapicUses=4;
+ s.inventory[0].push('helm','healingPotion');s.armor[0].head=1;s.members[0].xp=123;
+ s.members[0].extra={history:[1,2]};s.mp[1]=3;s.ailments[0]={poison:true,paralysis:2};
+ var reserveBefore=JSON.stringify(s.reserve),liveRecords=partyRecords(),recordsBefore=structuredClone(liveRecords);
+ recordsBefore.forEach(r=>{r.hp=0;r.members.status='dead'});
+ log('全滅直前');hurt(999);`);
+assert.equal(g.run('s.corpses.length'),1);
+assert.equal(g.run('s.gold'),0);
+assert.equal(g.run('s.corpses[0].floor'),3);
+assert.equal(g.run('s.corpses[0].cell'),17);
+assert.equal(g.run('s.corpses[0].gold'),321);
+assert.match(g.run('s.corpses[0].id'),/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i);
+assert.equal(g.run('JSON.stringify(s.corpses[0].records)===JSON.stringify(recordsBefore)'),true);
+assert.equal(g.run("displayVitals.hp.every(h=>h>0)&&displayVitals.members.every(m=>m.status==='ok')"),true,'death must not leak before its log');
+assert.equal(g.run("logQueue.at(-1).hp.every(h=>h===0)&&logQueue.at(-1).members.every(m=>m.status==='dead')"),true);
+g.run('defeat();');assert.equal(g.run('s.corpses.length'),1,'repeated defeat must not duplicate corpses');
+const duringWipe=g.saved();
+assert.equal(JSON.parse(duringWipe).partyIds.length,0);
+assert.equal(JSON.parse(duringWipe).roster.length,1,'pending wipe save contains only the existing reserve');
+g.drain();
+function assertWipeTown(g){
+ assert.equal(g.run('s.area'),'town');assert.equal(g.run('s.done'),false);
+ assert.equal(g.run('s.members.length'),0);assert.equal(g.run('s.gold'),0);
+ assert.equal(g.run('PARTY_FIELDS.every(key=>s[key].length===0)'),true);
+ assert.equal(g.run('s.enemy'),null);assert.equal(g.run('s.pendingStairs'),false);
+ assert.equal(g.run('s.pendingBoss'),null);assert.equal(g.run('idle()'),true);
+ assert.equal(g.run('Object.keys(s.floors).length'),0);
+ assert.equal(g.run('s.cells.some(c=>c.open)'),false);
+ assert.equal(g.run('s.light||s.watchful||s.dumapicUses>0'),false);
+ assert.equal(g.run("$('#entrance').disabled"),true);
+}
+assertWipeTown(g);
+assert.equal(g.run('JSON.stringify(s.reserve)===reserveBefore'),true);
+assert.equal(g.run('s.cleared'),true);
+g.run("s.corpses[0].records[0].members.name='遺体(<印>)';renderTraining();");
+assert.equal(g.run("$('#recruitlist').children[0].textContent"),'迷宮に残された遺体：地下3階（遺体(<印>)、遺体1、遺体2、遺体3、遺体4、遺体5）');
+assert.equal(g.run("$('#recruitlist').children[0].innerHTML"),undefined,'names must be rendered as text');
+const corpses=g.run('JSON.stringify(s.corpses)');
+g.run("liveRecords[0].members.extra.history.push(9);liveRecords[0].inventory.push('sword');save();");
+assert.equal(g.run('JSON.stringify(s.corpses)'),corpses,'corpse records must be independent copies');
+let restored=game(g.saved());assertWipeTown(restored);
+assert.equal(restored.run('JSON.stringify(s.corpses)'),corpses);
+restored=game(duringWipe);assertWipeTown(restored);
+assert.equal(restored.run('s.corpses.length'),1);
+assert.equal(restored.run('s.reserve.length'),1);
+assert.equal(restored.run("s.corpses[0].records.every(r=>r.members.status==='dead'&&r.hp===0)"),true);
+restored=game(restored.saved());assertWipeTown(restored);
+assert.equal(restored.run('s.corpses.length'),1,'reloading completed wipe must not create another corpse');
+console.log('PASS wipe snapshots, UUID/location/gold, complete corpse records, empty party, reserve isolation, training text and reload during/after logs');
+
+// Corpses survive new labyrinths and additional wipes without entering the reserve.
+g.run('var firstCorpse=JSON.stringify(s.corpses[0]);changeRecruitParty(s.reserve[0].members.id,true);enterDungeon();');g.drain();
+g.run('fresh(2);s.pos=10;s.gold=45;hurt(999);');g.drain();
+assertWipeTown(g);assert.equal(g.run('s.corpses.length'),2);
+assert.equal(g.run('JSON.stringify(s.corpses[0])===firstCorpse'),true);
+assert.equal(g.run('s.corpses[1].floor'),2);assert.equal(g.run('s.corpses[1].cell'),10);
+assert.equal(g.run('s.corpses[1].gold'),45);assert.equal(g.run('s.corpses[1].records.length'),1);
+assert.equal(g.run('s.corpses[0].id!==s.corpses[1].id'),true);
+assert.equal(g.run('trainingRoster().length'),0);
+g.run('defeat();');assert.equal(g.run('s.corpses.length'),2,'empty party cannot leave another corpse');
+assert.equal(game(g.saved()).run('s.corpses.length'),2);
+console.log('PASS corpses persist across dungeon regeneration, multiple wipes and empty-party calls');
+
+for(const [name,action,count] of [
+ ['exploration poison','s.ailments.forEach(a=>a.poison=true);cell(1)',6],
+ ['battle poison',"s.ailments.forEach(a=>a.poison=true);s.enemy={units:[{id:'slime',uid:0,row:0,hp:999}]};attack()",6],
+ ['floor blast','s.cells[1].trap=true;Math.random=()=>.3;cell(1)',6],
+ ['floor needle','s.cells[1].trap=true;Math.random=()=>0;cell(1)',1],
+ ['chest needle',"s.cells[0].chest={trap:'needle',gold:999};Math.random=()=>0;openChest()",1],
+ ['enemy attack',"s.enemy={units:[{id:'slime',uid:0,row:0,hp:999}],initiative:'normal'};s.commands=['guard'];Math.random=()=>.999;attack()",1],
+]){
+ const g=corpseParty(count);
+ g.run(`s.pos=0;s.hp=s.members.map(()=>1);s.gold=17;
+ s.cells.forEach(c=>{c.type='';c.trap=false;c.flag=false;c.open=false;delete c.chest});${action};`);
+ assert.equal(g.run('s.corpses.length'),1,name);
+ assert.equal(g.run('s.corpses[0].records.length'),count,name);
+ assert.equal(g.run('s.corpses[0].cell'),name.startsWith('floor')?1:0,name);
+ assert.equal(g.run('s.corpses[0].gold'),17,name);
+ g.drain();assertWipeTown(g);
+ assert.equal(g.run('s.corpses.length'),1,name);
+ assert.equal(g.run('s.gold'),0,name+' cannot gain a chest reward after death');
+}
+console.log('PASS end-to-end wipes from movement/battle poison, floor traps, chest trap and enemy attack');
+
+const legacySource=corpseParty();
+for(const format of ['roster','parallel','three-member']){
+ const legacy=JSON.parse(legacySource.run(format==='roster'?'JSON.stringify(rosterSaveState())':'JSON.stringify(s)'));
+ delete legacy.corpses;
+ if(format==='three-member'){
+  delete legacy.partyVersion;
+  for(const key of ['members','hp','mp','inventory','equipped','armor','ailments'])legacy[key]=legacy[key].slice(0,3);
+ }
+ const g=game(JSON.stringify(legacy));
+ assert.equal(g.run('s.corpses.length'),0,format);
+ assert.equal(g.run('s.members.length'),6,format);
+ g.run('renderTraining();save();');assert.equal(game(g.saved()).run('s.corpses.length'),0,format);
+}
+assert.equal(game().run('s.corpses.length'),0);
+console.log('PASS missing corpses defaults to [] for new and old roster/parallel/three-member saves');

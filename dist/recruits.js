@@ -19,14 +19,15 @@ function generateRecruit(name, job) {
 function trainingRoster(){return [...partyRecords(),...(s.reserve||[])]}
 // Combat retains its parallel arrays. Save files keep a single roster plus ordered IDs.
 function rosterSaveState() {
- const records=trainingRoster(), seen=new Set();
+ const records=s.defeatPending?(s.reserve||[]):trainingRoster(), seen=new Set();
  for(const r of records){if(!r.members.id||seen.has(r.members.id))r.members.id=crypto.randomUUID();seen.add(r.members.id)}
- const snapshot={...s,rosterVersion:1,roster:records,partyIds:s.members.map(m=>m.id)};
+ const snapshot={...s,rosterVersion:1,roster:records,partyIds:s.defeatPending?[]:s.members.map(m=>m.id),corpses:structuredClone(s.corpses||[])};
  for(const key of PARTY_FIELDS)delete snapshot[key];
  delete snapshot.reserve;
  return snapshot;
 }
 function restoreRoster(state) {
+ if(state)state.corpses??=[];
  if(state?.rosterVersion!==1)return state;
  const records=new Map(state.roster.map(r=>[r.members.id,r]));
  const ids=[...new Set(state.partyIds)].filter(id=>records.has(id)).slice(0,6);
