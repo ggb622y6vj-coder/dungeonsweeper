@@ -58,6 +58,7 @@ function prepareTrial(g, opt) {
     s.hp = s.members.map(m => m.maxHP);
     s.mp = s.members.map(m => m.maxMP);
     s.ailments = s.members.map(() => ({poison:false, paralysis:0}));
+    s.corpses = [];
     if (${opt.floor} > 1) fresh(${opt.floor});
     s.area = 'dungeon';
     resetPartyCommands();
@@ -131,6 +132,17 @@ function resolveBattle(g, maxRounds = 200) {
     const retreat = g.run('s.hp.reduce((a,b) => a+b, 0) < .25 * s.members.reduce((a,m) => a+m.maxHP, 0) && escapeChance() > 0');
     if (retreat) g.run('flee()');
     else { planTurn(g); g.run('attack()'); }
+    // Capture the party before the defeat log finishes and finishDefeat clears it.
+    if (g.run('!!s.defeatPending')) {
+      const result = g.run(`({
+        alive: s.hp.filter(h => h > 0).length,
+        deaths: (s.corpses?.at(-1)?.records || []).length,
+        total: s.hp.reduce((a,b) => a+b, 0),
+        cleared: simBattleFinished
+      })`);
+      g.drain();
+      return { ...result, outcome: 'wipe', rounds: rounds + 1 };
+    }
     // A failed escape already spends a turn. Do not also attack this round.
     g.drain();
     rounds++;

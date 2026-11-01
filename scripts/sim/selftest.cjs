@@ -111,6 +111,11 @@ gAI.run('s.enemy=simTestCombat; s.ailments=s.ailments.map(()=>({poison:true,para
 const wipe = resolveBattle(gAI);
 assert.equal(wipe.outcome, 'wipe');
 assert.equal(wipe.deaths, 6);
+assert.equal(wipe.alive, 0);
+assert.equal(wipe.total, 0);
+assert.equal(gAI.run('s.members.length'), 0, 'game defeat completion clears the party after the wipe snapshot');
+gAI.run(`s.members=structuredClone(simBase.map(r=>r.members));
+  for(const key of PARTY_FIELDS) s[key]=structuredClone(simBase.map(r=>r[key]));`);
 gAI.run(`s.done=false; s.hp=s.members.map(m=>m.maxHP); s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));
   s.enemy={units:[{...makeEnemy('slime',0),row:0,hp:0,rewarded:true}],lootXP:0,lootGold:0};
   finishMonsterBattle();`);
