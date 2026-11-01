@@ -3977,9 +3977,9 @@ const ENEMIES=[
     "floor": 9,
     "level": 21,
     "hp": [
-      18,
+      16,
       8,
-      36
+      32
     ],
     "ac": -4,
     "hit": 14,
@@ -4018,7 +4018,7 @@ const ENEMIES=[
         8,
         0
       ],
-      "chance": 0.35
+      "chance": 0.25
     },
     "spell": 0,
     "spellInfo": null
