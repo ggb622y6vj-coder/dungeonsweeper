@@ -43,6 +43,7 @@ function registerRecruit(record) {
 function changeRecruitParty(id, join) {
  const roster=trainingRoster(), index=roster.findIndex(r=>r.members.id===id);
  if(index<0)return false;
+ if(join&&roster[index].members.status==='lost')return false;
  let order=s.members.map((_,i)=>i);
  if(join){if(index<order.length||order.length>=6)return false;order.push(index)}
  else {if(index>=order.length)return false;order=order.filter(i=>i!==index)}
