@@ -224,8 +224,30 @@ console.log('PASS exploration poison death once with HP snapshot, silent nonfata
 run(`s=structuredClone(sixInitial);ensureProfile();if(s.magicPlans.length!==6)throw Error('six-member magic plans');s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==6)throw Error('short plan padding');s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==3)throw Error('legacy three-member magic plans');`);
 console.log('PASS magic plans pad to party length and preserve legacy three-member saves');
 
-run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(1).includes(plate)||!chestItemPool(2).includes(plate))throw Error('floor chest price cap');var oldRandom=Math.random;var foundPlate=false;Math.random=()=>.999;for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool[Math.random()*pool.length|0].id==='plate')foundPlate=true}Math.random=oldRandom;if(foundPlate)throw Error('plate dropped on floor 1');`);
+run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(1).includes(plate)||!chestItemPool(3).includes(plate))throw Error('floor chest price cap');var oldRandom=Math.random;var foundPlate=false;Math.random=()=>.999;for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool[Math.random()*pool.length|0].id==='plate')foundPlate=true}Math.random=oldRandom;if(foundPlate)throw Error('plate dropped on floor 1');`);
 console.log('PASS chest item pool price cap and 10,000 floor 1 draws');
+
+run(`{
+let savedState=structuredClone(s),savedRandom=Math.random;
+try{
+  s=structuredClone(sixInitial);ensureProfile();s.area='town';s.floor=1;s.gold=10000;
+  let legacyIds=['shortbow','longbow','compositebow','dagger','thiefblade','sword','staff','mace','longsword','battleaxe','greatsword','oakstaff','runestaff','starstaff','ironmace','warhammer','sacredmace','cap','helm','robe','leather','chain','plate','boots','greaves','wardrobe'];
+  if(legacyIds.some(id=>!weapon(id)))throw Error('legacy equipment ids lost');
+  renderShop();let shop=$('#shopitems').innerHTML;
+  if(shop.includes('flamesword')||shop.includes('magichelm'))throw Error('shop:false item visible');
+  let gold=s.gold,count=s.inventory[0].length;buy('flamesword',0);
+  if(s.gold!==gold||s.inventory[0].length!==count)throw Error('shop:false item bought');
+  s.floor=1;let old=Math.random,available=new Set();
+  for(let n=0;n<100;n++){let rolls=[0,n/100];Math.random=()=>rolls.shift()??.99;dropMedicine();available.add(s.inventory[0].at(-1));s.inventory[0].pop()}
+  Math.random=old;
+  if(available.has('greaterPotion')||available.has('elixir')||available.has('paralysisCure'))throw Error('medicine below minFloor');
+  if(!chestItemPool(4).some(w=>w.id==='knightsword')||chestItemPool(1).some(w=>w.id==='knightsword'))throw Error('equipment minFloor pool');
+  s.members[0].job=0;s.members[0].level=1;s.members[0].str=10;s.inventory[0]=['flamesword'];s.equipped[0]=0;
+  s.enemy={units:[{id:'slime',uid:0,row:0,hp:100,rewarded:false}]};Math.random=()=>.525;
+  let result=physicalAttack(0,s.enemy.units[0]);if(result.hitsCount!==1)throw Error('weapon hitBonus not applied');
+}finally{s=savedState;Math.random=savedRandom;displayCombat=undefined;displayVitals=null;logQueue=[];clearTimeout(logTimer);logTimer=null;renderShop();}
+}`);
+console.log('PASS expanded equipment ids, shop:false gate, floor loot gates, and hitBonus');
 
 run(`{let savedChestState=structuredClone(s),savedChestRandom=Math.random;try{s=structuredClone(sixInitial);ensureProfile();s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.members.forEach(m=>m.job=0);s.inventory=s.members.map(()=>['sword']);s.equipped=[0,0,0];s.armor=s.members.map(()=>({}));s.floor=1;s.gold=0;let dagger=WEAPONS.find(w=>w.id==='dagger');chestItemPool=()=>[dagger];let rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.some(a=>a.length!==1)||logQueue.filter(x=>x.text==='短剣を見つけたが、誰も扱えないので置いていった。').length!==1)throw Error('unusable chest item');s.inventory[0]=Array(10).fill('sword');s.members[0].job=3;let beforeFull=s.inventory.map(a=>a.length),beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.map(a=>a.length).join()!==beforeFull.join()||logQueue.slice(beforeLog).filter(x=>x.text==='アイテムがいっぱいで装備品を持ち帰れなかった。').length!==1)throw Error('full chest inventory');s.inventory[0]=['sword'];beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory[0].at(-1)!=='dagger'||logQueue.slice(beforeLog).filter(x=>x.text==='短剣を入手。戦士Ⅰが受け取った。').length!==1)throw Error('normal chest item');}finally{s=savedChestState;Math.random=savedChestRandom;}}`);
 console.log('PASS chest item unusable, full inventory and normal receipt logs');
