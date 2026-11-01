@@ -245,3 +245,6 @@ drain();run(`{let savedXPState=structuredClone(s);try{
   }
 }finally{s=savedXPState;}}`);drain();
 console.log('PASS XP split 100/3=33, 100/1=100, dead exclusion, minimum 1, zero reward, no survivors, per-person log and duplicate guard');
+
+// 10-floor trap configuration and scaling regression.
+drain();run(`if(trapPower(1)!==1||trapPower(5)!==2||trapPower(10)!==3.25||trapPower(11)!==3.25)throw Error('trap power bounds');for(let f=1;f<=10;f++){fresh(f);if(size()!==Math.min(12,6+2*f)||trapCount(f,size())!==[9,15,23,24,26,27,29,30,31,31][f-1])throw Error('floor config '+f)}s.members=s.members.slice(0,1);s.hp=[100];s.ailments=[{poison:false,paralysis:0}];Math.random=()=>0;s.floor=1;let needle=s.cells[s.pos];needle.trap=true;triggerFloorTrap(needle);if(s.hp[0]!==100-7)throw Error('floor 1 needle baseline');s.hp[0]=100;s.floor=10;needle.trap=true;triggerFloorTrap(needle);if(s.hp[0]!==100-Math.floor(7*3.25))throw Error('floor 10 needle scaling');s.hp[0]=100;triggerChestTrap({trap:'needle'});if(s.hp[0]!==100-Math.floor(7*3.25))throw Error('chest needle scaling');`);drain();console.log('PASS 10-floor trap configuration and scaling');
