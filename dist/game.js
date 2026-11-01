@@ -103,9 +103,9 @@ magicUI();medicineUI();flagUI();partyUI();
 function coloredLog(text){
  const foes=[...ENEMIES.flatMap(e=>[e.name,e.unknown]),'毒スライム','亡霊騎士','地獄の猟犬','オーク戦士','深層の魔将'];
  const spells=MAGIC.map(x=>x.name);
- const flagNames=Object.values(FLAG_NAMES);const names=[...foes,...NAMES,...spells,...flagNames].sort((a,b)=>b.length-a.length);
+ const flagNames=Object.values(FLAG_NAMES);const names=[...foes,...NAMES,...spells,...flagNames].filter(Boolean).sort((a,b)=>b.length-a.length);
  const escape=t=>t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const pattern=new RegExp(names.join('|')+'|\\d+(?:\\.\\d+)?(?:ダメージ|回復)','g');
+ const pattern=new RegExp(names.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')+'|\\d+(?:\\.\\d+)?(?:ダメージ|回復)','g');
  let result='',last=0;
  for(const match of text.matchAll(pattern)){
   const word=match[0],at=match.index;
