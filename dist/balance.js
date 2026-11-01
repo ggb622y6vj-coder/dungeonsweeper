@@ -7,6 +7,8 @@ const CLASSES = [
 ];
 const SPELLS={blast:{name:'呪文',cost:4,dice:[3,6,0]},heal:{name:'回復',cost:3,dice:[2,6,4]}};
 const LEVEL_CAP=30;
+const MAX_FLOOR=10;
+function trapPower(floor){return 1+0.25*(Math.min(floor,MAX_FLOOR)-1)}
 function trapCount(floor,size){return Math.min(Math.floor(size*size*0.22),Math.round(size*size*(0.14+0.01*(floor-1))))}
 // 各レベルの増分を個別に抽選し保存。描画や再読み込みで再抽選しない。
 function ensureProgression(){
