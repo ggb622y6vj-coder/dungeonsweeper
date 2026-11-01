@@ -54,6 +54,43 @@ function dropWeapon(){if(Math.random()>=.05)return;let pool=chestItemPool(s.floo
 function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||w.shop===false||!Number.isFinite(w.price)||!w.classes.includes(jobOf(i))||s.gold<w.price||s.inventory[i].length>=10)return;s.gold-=w.price;s.inventory[i].push(id);$('#shopnotice').textContent=`${NAMES[i]}が${w.name}を購入した。`;render();renderShop()}
 function equip(i,slot){if(!idle()||!s.inventory[i][slot]||!weapon(s.inventory[i][slot]).classes.includes(jobOf(i)))return;let w=weapon(s.inventory[i][slot]);if(w.kind==='medicine')return;if(w.part){if(s.armor[i][w.part]===slot)delete s.armor[i][w.part];else s.armor[i][w.part]=slot}else s.equipped[i]=slot;render();renderInventory()}
 function sell(i,slot){if(s.area!=='town'||!idle()||isEquipped(i,slot)||!s.inventory[i][slot])return;let w=weapon(s.inventory[i][slot]);s.gold+=w.sell;s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let p in s.armor[i])if(s.armor[i][p]>slot)s.armor[i][p]--;render();renderInventory();renderShop()}
+// 寺院の費用・成功率は本作の暫定式。成功率は百分率で返す。
+function templeCost(m){return m.status==='dead'?100*m.level:m.status==='ash'?250*m.level:0}
+function templeChance(m){return m.status==='dead'?Math.max(50,Math.min(95,50+3*m.level)):m.status==='ash'?Math.max(40,Math.min(90,40+3*m.level)):0}
+function templeRaise(id){
+ if(s.area!=='town'||!idle())return false;
+ const r=trainingRoster().find(r=>r.members.id===id);
+ if(!r||!['dead','ash'].includes(r.members.status))return false;
+ const m=r.members,cost=templeCost(m);
+ if(s.gold<cost)return false;
+ s.gold-=cost;
+ const success=Math.random()*100<templeChance(m);
+ m.status=success?'ok':m.status==='dead'?'ash':'lost';
+ const i=s.members.findIndex(m=>m.id===id),hp=success?1:0;
+ if(i>=0)s.hp[i]=hp;else r.hp=hp;
+ const result={id,name:m.name||CLASSES[m.job??0].name,success,status:m.status,cost};
+ render();renderTemple(result);
+ return result;
+}
+function renderTemple(result=null){
+ $('#templegold').textContent=`金貨 ${s.gold} G`;
+ if(result)$('#templenotice').textContent=result.success?`${result.name}は蘇生した。HPが1になった。`:`${result.name}の蘇生に失敗した。${result.status==='ash'?'灰になった。':'ロストした。'}`;
+ const list=$('#templemembers');list.replaceChildren();
+ const records=trainingRoster().filter(r=>['dead','ash'].includes(r.members.status));
+ if(!records.length){const p=document.createElement('p');p.textContent='蘇生が必要な冒険者はいません。';list.append(p)}
+ for(const r of records){
+  const m=r.members,row=document.createElement('div'),info=document.createElement('div'),name=document.createElement('b'),detail=document.createElement('small'),price=document.createElement('span'),button=document.createElement('button');
+  row.className='shopitem';
+  name.textContent=m.name||CLASSES[m.job??0].name;
+  detail.textContent=`${s.members.some(p=>p.id===m.id)?'パーティ':'控え'} · Lv.${m.level} · ${m.status==='dead'?'死亡':'灰'} · 成功率 ${templeChance(m)}%`;
+  price.textContent=`${templeCost(m)} G`;button.textContent='蘇生';
+  button.disabled=s.area!=='town'||!idle()||s.gold<templeCost(m);
+  button.onclick=()=>templeRaise(m.id);
+  info.append(name,detail);row.append(info,price,button);list.append(row);
+ }
+}
+$('#templeopen').onclick=()=>{if(s.area!=='town'||!idle())return;$('#templenotice').textContent='';renderTemple();$('#templedialog').showModal()};
+$('#templeclose').onclick=()=>$('#templedialog').close();
 function renderShop(){if(!s.members.length)return;let selected=+$('#shopmember').value||0;$('#shopmember').innerHTML=NAMES.map((name,i)=>`<option value="${i}">${name}</option>`).join('');$('#shopmember').value=String(selected);let i=+$('#shopmember').value||0;$('#shopgold').textContent=`金貨 ${s.gold} G`;$('#shopitems').innerHTML=WEAPONS.filter(w=>w.shop!==false&&w.classes.includes(jobOf(i))).map(w=>`<div class="shopitem"><div><b>${w.name}</b><small>${itemDescription(w)}</small></div><span>${w.price} G</span><button data-buy="${w.id}" ${s.gold<w.price||s.inventory[i].length>=10?'disabled':''}>購入</button></div>`).join('')}
 function renderInventory(){let i=inventoryMember;$('#inventorytitle').textContent=`${NAMES[i]}のアイテム ${s.inventory[i].length}/10`;renderEquipmentSummary(i);renderTransfer(i);$('#inventoryslots').innerHTML=Array.from({length:10},(_,slot)=>{let id=s.inventory[i][slot],w=weapon(id);return `<div class="slot"><small>${slot+1}</small>${w?`<b>${w.name}</b><span>${itemDescription(w)}</span>${w.kind==='medicine'?`<button data-use-medicine="${slot}" ${!canChooseMedicine(i)?'disabled':''}>使う</button>`:`<button data-equip="${slot}" ${isEquipped(i,slot)&&!w.part?'disabled':''}>${isEquipped(i,slot)?w.part?'外す':'装備中':'装備'}</button>`}${s.area==='town'?`<button data-sell="${slot}" ${isEquipped(i,slot)?'disabled':''}>売却 ${w.sell} G</button>`:''}`:'<span>—</span>'}</div>`}).join('')}
 function openInventory(i){if(!idle())return;inventoryMember=i;renderInventory();$('#inventorydialog').showModal()}
