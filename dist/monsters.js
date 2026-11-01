@@ -9,7 +9,13 @@ function finishMonsterBattle(){
  awardVictory(combat);
  if(combat.chestBattle&&defeated.length){s.cells[s.pos].chest={gold:combat.lootGold,opened:false};fixChestTrap(s.cells[s.pos].chest);log('宝箱が現れた。開けるか、放棄するか。')}
  s.enemy=null;
- if(combat.boss&&defeated.some(e=>enemyDefinition(e.id).boss)){s.relic=true;s.cells[s.boss].type='down';s.pendingStairs='down';log('守護者の一団を撃破！ 下り階段が現れた。');log(`地下${s.floor+1}階に移動しますか？`)}
+ if(combat.boss&&defeated.some(e=>enemyDefinition(e.id).boss)){
+  s.relic=true;
+  if(s.floor===MAX_FLOOR&&defeated.some(e=>e.id==='labyrinthlord')){
+   s.cells[s.boss].type='';s.pendingStairs=false;s.cleared=true;s.clearNotice=true;
+   log('迷宮の主は倒れた。迷宮に静寂が戻った……');
+  }else if(s.floor<MAX_FLOOR){s.cells[s.boss].type='down';s.pendingStairs='down';log('守護者の一団を撃破！ 下り階段が現れた。');log(`地下${s.floor+1}階に移動しますか？`)}
+ }
  else if(!defeated.length)log('敵はいなくなった。');
 }
 function migrateMonsterBattle(){
