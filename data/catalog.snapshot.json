@@ -1,0 +1,2380 @@
+{
+  "classes": [
+    {
+      "id": "fighter",
+      "name": "戦士",
+      "hp": 32,
+      "mp": 0,
+      "attack": 3,
+      "ac": 6,
+      "hit": 4,
+      "hpGrowth": [
+        1,
+        6,
+        3
+      ],
+      "xpFactor": 0.8,
+      "mpGrowth": [
+        0,
+        1,
+        0
+      ],
+      "attackEvery": 1
+    },
+    {
+      "id": "mage",
+      "name": "魔法使い",
+      "hp": 24,
+      "mp": 20,
+      "attack": 0,
+      "ac": 9,
+      "hit": 1,
+      "hpGrowth": [
+        1,
+        4,
+        2
+      ],
+      "xpFactor": 1.2,
+      "mpGrowth": [
+        1,
+        2,
+        0
+      ],
+      "attackEvery": 2
+    },
+    {
+      "id": "priest",
+      "name": "僧侶",
+      "hp": 26,
+      "mp": 15,
+      "attack": 1,
+      "ac": 7,
+      "hit": 2,
+      "hpGrowth": [
+        1,
+        5,
+        2
+      ],
+      "xpFactor": 1,
+      "mpGrowth": [
+        1,
+        2,
+        0
+      ],
+      "attackEvery": 2
+    },
+    {
+      "id": "thief",
+      "name": "盗賊",
+      "hp": 25,
+      "mp": 0,
+      "attack": 1,
+      "ac": 8,
+      "hit": 3,
+      "hpGrowth": [
+        1,
+        5,
+        2
+      ],
+      "xpFactor": 0.85,
+      "mpGrowth": [
+        0,
+        1,
+        0
+      ],
+      "attackEvery": 2
+    }
+  ],
+  "weapons": [
+    {
+      "range": "ranged",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "shortbow",
+      "name": "短弓",
+      "dice": [
+        1,
+        6,
+        0
+      ],
+      "classes": [
+        0,
+        3
+      ],
+      "price": 45,
+      "sell": 22,
+      "drop": true
+    },
+    {
+      "range": "ranged",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "longbow",
+      "name": "長弓",
+      "dice": [
+        1,
+        8,
+        1
+      ],
+      "classes": [
+        0,
+        3
+      ],
+      "price": 95,
+      "sell": 47,
+      "drop": true
+    },
+    {
+      "range": "ranged",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "compositebow",
+      "name": "合成弓",
+      "dice": [
+        2,
+        4,
+        1
+      ],
+      "classes": [
+        0,
+        3
+      ],
+      "price": 160,
+      "sell": 80,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "dagger",
+      "name": "短剣",
+      "dice": [
+        1,
+        4,
+        1
+      ],
+      "classes": [
+        3
+      ],
+      "price": 15,
+      "sell": 7,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "thiefblade",
+      "name": "盗賊の小剣",
+      "dice": [
+        1,
+        6,
+        2
+      ],
+      "classes": [
+        3
+      ],
+      "price": 60,
+      "sell": 30,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "sword",
+      "name": "剣",
+      "dice": [
+        1,
+        6,
+        2
+      ],
+      "classes": [
+        0
+      ],
+      "price": 20,
+      "sell": 10,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "staff",
+      "name": "杖",
+      "dice": [
+        1,
+        3,
+        0
+      ],
+      "classes": [
+        1
+      ],
+      "price": 12,
+      "sell": 6,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "mace",
+      "name": "メイス",
+      "dice": [
+        1,
+        6,
+        0
+      ],
+      "classes": [
+        2
+      ],
+      "price": 18,
+      "sell": 9,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "longsword",
+      "name": "長剣",
+      "dice": [
+        1,
+        8,
+        3
+      ],
+      "classes": [
+        0
+      ],
+      "price": 60,
+      "sell": 30,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "battleaxe",
+      "name": "戦斧",
+      "dice": [
+        2,
+        6,
+        1
+      ],
+      "classes": [
+        0
+      ],
+      "price": 110,
+      "sell": 55,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "greatsword",
+      "name": "大剣",
+      "dice": [
+        2,
+        8,
+        2
+      ],
+      "classes": [
+        0
+      ],
+      "price": 190,
+      "sell": 95,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "oakstaff",
+      "name": "樫の杖",
+      "dice": [
+        1,
+        6,
+        1
+      ],
+      "classes": [
+        1
+      ],
+      "price": 45,
+      "sell": 22,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "runestaff",
+      "name": "ルーンの杖",
+      "dice": [
+        2,
+        4,
+        2
+      ],
+      "classes": [
+        1
+      ],
+      "price": 100,
+      "sell": 50,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "starstaff",
+      "name": "星鉄の杖",
+      "dice": [
+        2,
+        6,
+        2
+      ],
+      "classes": [
+        1
+      ],
+      "price": 180,
+      "sell": 90,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "ironmace",
+      "name": "鉄のメイス",
+      "dice": [
+        1,
+        8,
+        1
+      ],
+      "classes": [
+        2
+      ],
+      "price": 50,
+      "sell": 25,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "warhammer",
+      "name": "戦槌",
+      "dice": [
+        2,
+        5,
+        2
+      ],
+      "classes": [
+        2
+      ],
+      "price": 105,
+      "sell": 52,
+      "drop": true
+    },
+    {
+      "range": "melee",
+      "hitBonus": 0,
+      "minAttacks": 1,
+      "id": "sacredmace",
+      "name": "聖銀のメイス",
+      "dice": [
+        2,
+        6,
+        3
+      ],
+      "classes": [
+        2
+      ],
+      "price": 185,
+      "sell": 92,
+      "drop": true
+    }
+  ],
+  "armor": [
+    {
+      "id": "cap",
+      "name": "革帽子",
+      "part": "head",
+      "ac": 1,
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "price": 30,
+      "sell": 15
+    },
+    {
+      "id": "helm",
+      "name": "鉄兜",
+      "part": "head",
+      "ac": 2,
+      "classes": [
+        0,
+        2
+      ],
+      "price": 90,
+      "sell": 45
+    },
+    {
+      "id": "robe",
+      "name": "ローブ",
+      "part": "body",
+      "ac": 1,
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "price": 25,
+      "sell": 12
+    },
+    {
+      "id": "leather",
+      "name": "革鎧",
+      "part": "body",
+      "ac": 2,
+      "classes": [
+        0,
+        2,
+        3
+      ],
+      "price": 65,
+      "sell": 32
+    },
+    {
+      "id": "chain",
+      "name": "鎖帷子",
+      "part": "body",
+      "ac": 3,
+      "classes": [
+        0,
+        2
+      ],
+      "price": 130,
+      "sell": 65
+    },
+    {
+      "id": "plate",
+      "name": "板金鎧",
+      "part": "body",
+      "ac": 5,
+      "classes": [
+        0
+      ],
+      "price": 300,
+      "sell": 150
+    },
+    {
+      "id": "boots",
+      "name": "革靴",
+      "part": "feet",
+      "ac": 1,
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "price": 30,
+      "sell": 15
+    },
+    {
+      "id": "greaves",
+      "name": "鉄の脛当て",
+      "part": "feet",
+      "ac": 2,
+      "classes": [
+        0,
+        2
+      ],
+      "price": 100,
+      "sell": 50
+    },
+    {
+      "id": "wardrobe",
+      "name": "守りの法衣",
+      "part": "body",
+      "ac": 3,
+      "classes": [
+        1,
+        2
+      ],
+      "price": 180,
+      "sell": 90
+    }
+  ],
+  "medicines": [
+    {
+      "id": "healingPotion",
+      "name": "傷薬",
+      "kind": "medicine",
+      "spell": "dios",
+      "description": "ディオス相当：味方1人のHPを1d8回復",
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sell": 8,
+      "weight": 70
+    },
+    {
+      "id": "antidote",
+      "name": "解毒剤",
+      "kind": "medicine",
+      "spell": "latumofis",
+      "description": "ラツモフィス相当：味方1人の毒を解除",
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "sell": 6,
+      "weight": 30
+    }
+  ],
+  "spells": [
+    {
+      "id": "dumapic",
+      "name": "デュマピック",
+      "job": 1,
+      "level": 1,
+      "mp": 2,
+      "guaranteed": true,
+      "where": "field",
+      "target": "front",
+      "effect": "survey",
+      "value": null,
+      "description": "前方の未探索マスを85%の精度で調査。解除・探索はしない。使用ごとにMP倍増、帰還でリセット"
+    },
+    {
+      "id": "identifyfoe",
+      "name": "識別",
+      "job": 1,
+      "level": 1,
+      "mp": 3,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "all",
+      "effect": "identifyfoe",
+      "value": null,
+      "description": "敵全列の正体を見破る"
+    },
+    {
+      "id": "halito",
+      "name": "ハリト",
+      "job": 1,
+      "level": 1,
+      "mp": 2,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "enemy",
+      "effect": "damage",
+      "value": [
+        1,
+        8
+      ],
+      "description": "敵1体に火炎1d8"
+    },
+    {
+      "id": "katino",
+      "name": "カティノ",
+      "job": 1,
+      "level": 1,
+      "mp": 3,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "sleep",
+      "value": null,
+      "description": "選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止"
+    },
+    {
+      "id": "dilto",
+      "name": "ディルト",
+      "job": 1,
+      "level": 3,
+      "mp": 3,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "debuff",
+      "value": 2,
+      "description": "選択した列の敵のAC＋2。戦闘終了まで"
+    },
+    {
+      "id": "mahalito",
+      "name": "マハリト",
+      "job": 1,
+      "level": 5,
+      "mp": 7,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "damage",
+      "value": [
+        4,
+        6
+      ],
+      "description": "選択した列の敵に火炎4d6"
+    },
+    {
+      "id": "morlis",
+      "name": "モーリス",
+      "job": 1,
+      "level": 7,
+      "mp": 5,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "debuff",
+      "value": 3,
+      "description": "選択した列の敵のAC＋3。戦闘終了まで"
+    },
+    {
+      "id": "dalto",
+      "name": "ダルト",
+      "job": 1,
+      "level": 7,
+      "mp": 10,
+      "guaranteed": false,
+      "where": "battle",
+      "target": "group",
+      "effect": "damage",
+      "value": [
+        6,
+        6
+      ],
+      "description": "選択した列の敵に冷気6d6"
+    },
+    {
+      "id": "mamorlis",
+      "name": "マモーリス",
+      "job": 1,
+      "level": 9,
+      "mp": 8,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "all",
+      "effect": "debuff",
+      "value": 3,
+      "description": "敵全体のAC＋3。戦闘終了まで"
+    },
+    {
+      "id": "lakanito",
+      "name": "ラカニト",
+      "job": 1,
+      "level": 11,
+      "mp": 16,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "death",
+      "value": null,
+      "description": "選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死には無効"
+    },
+    {
+      "id": "malor",
+      "name": "マロール",
+      "job": 1,
+      "level": 13,
+      "mp": 20,
+      "guaranteed": true,
+      "where": "field",
+      "target": "floor",
+      "effect": "warp",
+      "value": null,
+      "description": "訪問済み階の上り階段へ転移。未訪問階は選択不可"
+    },
+    {
+      "id": "tiltowait",
+      "name": "ティルトウェイト",
+      "job": 1,
+      "level": 13,
+      "mp": 30,
+      "guaranteed": false,
+      "where": "battle",
+      "target": "all",
+      "effect": "damage",
+      "value": [
+        10,
+        15
+      ],
+      "description": "敵全体に10d15"
+    },
+    {
+      "id": "dios",
+      "name": "ディオス",
+      "job": 2,
+      "level": 1,
+      "mp": 2,
+      "guaranteed": true,
+      "where": "both",
+      "target": "ally",
+      "effect": "heal",
+      "value": [
+        1,
+        8
+      ],
+      "description": "生存する味方1人のHPを1d8回復"
+    },
+    {
+      "id": "kalki",
+      "name": "カルキ",
+      "job": 2,
+      "level": 1,
+      "mp": 3,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "party",
+      "effect": "buff",
+      "value": 1,
+      "description": "味方全員のAC−1。戦闘終了まで"
+    },
+    {
+      "id": "matu",
+      "name": "マツ",
+      "job": 2,
+      "level": 3,
+      "mp": 5,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "party",
+      "effect": "buff",
+      "value": 2,
+      "description": "味方全員のAC−2。戦闘終了まで"
+    },
+    {
+      "id": "watchful",
+      "name": "警戒結界",
+      "job": 2,
+      "level": 3,
+      "mp": 4,
+      "guaranteed": true,
+      "where": "field",
+      "target": "party",
+      "effect": "watchful",
+      "value": null,
+      "description": "町へ戻るまで敵の奇襲を防ぐ。味方の先制率は変わらない"
+    },
+    {
+      "id": "calfo",
+      "name": "カルフォ",
+      "job": 2,
+      "level": 3,
+      "mp": 3,
+      "guaranteed": false,
+      "where": "chest",
+      "target": "chest",
+      "effect": "identify",
+      "value": null,
+      "description": "宝箱の罠を95%の精度で識別。解除はしない"
+    },
+    {
+      "id": "lomilwa",
+      "name": "ロミルワ",
+      "job": 2,
+      "level": 5,
+      "mp": 5,
+      "guaranteed": true,
+      "where": "field",
+      "target": "party",
+      "effect": "light",
+      "value": null,
+      "description": "町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま"
+    },
+    {
+      "id": "dialko",
+      "name": "ディアルコ",
+      "job": 2,
+      "level": 5,
+      "mp": 4,
+      "guaranteed": false,
+      "where": "both",
+      "target": "ally",
+      "effect": "cure",
+      "value": null,
+      "description": "生存する味方1人の麻痺・睡眠を治す"
+    },
+    {
+      "id": "dial",
+      "name": "ディアル",
+      "job": 2,
+      "level": 7,
+      "mp": 5,
+      "guaranteed": true,
+      "where": "both",
+      "target": "ally",
+      "effect": "heal",
+      "value": [
+        4,
+        4
+      ],
+      "description": "生存する味方1人のHPを4d4回復"
+    },
+    {
+      "id": "latumofis",
+      "name": "ラツモフィス",
+      "job": 2,
+      "level": 7,
+      "mp": 4,
+      "guaranteed": false,
+      "where": "both",
+      "target": "ally",
+      "effect": "antidote",
+      "value": null,
+      "description": "生存する味方1人の毒を治す"
+    },
+    {
+      "id": "dialma",
+      "name": "ディアルマ",
+      "job": 2,
+      "level": 9,
+      "mp": 8,
+      "guaranteed": true,
+      "where": "both",
+      "target": "ally",
+      "effect": "heal",
+      "value": [
+        8,
+        3
+      ],
+      "description": "生存する味方1人のHPを8d3回復"
+    },
+    {
+      "id": "lorto",
+      "name": "ロルト",
+      "job": 2,
+      "level": 11,
+      "mp": 12,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "group",
+      "effect": "damage",
+      "value": [
+        6,
+        6
+      ],
+      "description": "選択した列の敵に6d6"
+    },
+    {
+      "id": "madi",
+      "name": "マディ",
+      "job": 2,
+      "level": 11,
+      "mp": 15,
+      "guaranteed": false,
+      "where": "both",
+      "target": "ally",
+      "effect": "restore",
+      "value": null,
+      "description": "生存する味方1人のHP・状態異常を全回復。蘇生不可"
+    },
+    {
+      "id": "malikto",
+      "name": "マリクト",
+      "job": 2,
+      "level": 13,
+      "mp": 24,
+      "guaranteed": true,
+      "where": "battle",
+      "target": "all",
+      "effect": "damage",
+      "value": [
+        12,
+        6
+      ],
+      "description": "敵全体に12d6"
+    }
+  ],
+  "monsters": [
+    {
+      "id": "slime",
+      "name": "洞窟スライム",
+      "unknown": "不定形",
+      "floor": 1,
+      "level": 2,
+      "hp": [
+        1,
+        6,
+        3
+      ],
+      "ac": 9,
+      "hit": 1,
+      "attack": [
+        1,
+        4,
+        0
+      ],
+      "xp": 6,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        1,
+        4,
+        2
+      ],
+      "race": "不定形",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "◉",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "skeleton",
+      "name": "骸骨の衛兵",
+      "unknown": "動く死体",
+      "floor": 1,
+      "level": 2,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        1,
+        6,
+        1
+      ],
+      "xp": 12,
+      "groupSize": [
+        2,
+        3
+      ],
+      "gold": [
+        2,
+        4,
+        2
+      ],
+      "race": "不死",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "☠",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "wolf",
+      "name": "灰狼",
+      "unknown": "素早い牙",
+      "floor": 1,
+      "level": 2,
+      "hp": [
+        2,
+        5,
+        3
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        1,
+        6,
+        2
+      ],
+      "xp": 14,
+      "groupSize": [
+        2,
+        3
+      ],
+      "gold": [
+        2,
+        5,
+        2
+      ],
+      "race": "獣",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♞",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "goblin",
+      "name": "迷宮ゴブリン",
+      "unknown": "小鬼",
+      "floor": 1,
+      "level": 2,
+      "hp": [
+        2,
+        6,
+        5
+      ],
+      "ac": 5,
+      "hit": 4,
+      "attack": [
+        1,
+        8,
+        0
+      ],
+      "xp": 17,
+      "groupSize": [
+        2,
+        3
+      ],
+      "gold": [
+        2,
+        6,
+        2
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0.4,
+      "summon": 0.1,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "bat",
+      "name": "洞窟蝙蝠",
+      "unknown": "羽ばたく影",
+      "floor": 1,
+      "level": 3,
+      "hp": [
+        1,
+        6,
+        2
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        1,
+        4,
+        0
+      ],
+      "xp": 13,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        1,
+        6,
+        2
+      ],
+      "race": "獣",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♞",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "rat",
+      "name": "大鼠",
+      "unknown": "小さな獣",
+      "floor": 1,
+      "level": 3,
+      "hp": [
+        1,
+        6,
+        2
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        1,
+        5,
+        0
+      ],
+      "xp": 15,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        1,
+        6,
+        2
+      ],
+      "race": "獣",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0.4,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♞",
+      "summonCap": 6,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "spider",
+      "name": "毒蜘蛛",
+      "unknown": "虫",
+      "floor": 1,
+      "level": 3,
+      "hp": [
+        1,
+        6,
+        2
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        1,
+        6,
+        0
+      ],
+      "xp": 17,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        1,
+        6,
+        2
+      ],
+      "race": "虫",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "✥",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "scout",
+      "name": "盗賊の斥候",
+      "unknown": "怪しい人影",
+      "floor": 1,
+      "level": 3,
+      "hp": [
+        1,
+        6,
+        2
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        1,
+        6,
+        0
+      ],
+      "xp": 19,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        1,
+        6,
+        2
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0.4,
+      "summon": 0,
+      "steal": 0.1,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "apprentice",
+      "name": "迷宮の見習い",
+      "unknown": "杖を持つ人影",
+      "floor": 1,
+      "level": 4,
+      "hp": [
+        1,
+        6,
+        2
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        1,
+        6,
+        0
+      ],
+      "xp": 21,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        1,
+        6,
+        2
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": true,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0.5
+    },
+    {
+      "id": "guardian",
+      "name": "迷宮の守護者",
+      "unknown": "武装した人影",
+      "floor": 1,
+      "level": 4,
+      "hp": [
+        4,
+        8,
+        14
+      ],
+      "ac": 3,
+      "hit": 6,
+      "attack": [
+        2,
+        6,
+        2
+      ],
+      "xp": 75,
+      "groupSize": [
+        1,
+        1
+      ],
+      "gold": [
+        4,
+        10,
+        20
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": true,
+      "icon": "♛",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "poisonslime",
+      "name": "毒スライム",
+      "unknown": "不定形",
+      "floor": 2,
+      "level": 4,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 9,
+      "hit": 2,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 15,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "不定形",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "◉",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "ghostknight",
+      "name": "亡霊騎士",
+      "unknown": "動く死体",
+      "floor": 2,
+      "level": 4,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 22,
+      "groupSize": [
+        3,
+        4
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "不死",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "☠",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "firefly",
+      "name": "火蜻蛉",
+      "unknown": "巨大な虫",
+      "floor": 2,
+      "level": 4,
+      "hp": [
+        2,
+        6,
+        0
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        2,
+        5,
+        0
+      ],
+      "xp": 24,
+      "groupSize": [
+        1,
+        3
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "虫",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "炎半減",
+      "boss": false,
+      "icon": "✥",
+      "summonCap": 4,
+      "breath": {
+        "element": "炎",
+        "dice": [
+          2,
+          6,
+          0
+        ],
+        "chance": 0.6
+      },
+      "spell": 0
+    },
+    {
+      "id": "orc",
+      "name": "オーク戦士",
+      "unknown": "鬼",
+      "floor": 2,
+      "level": 4,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 8,
+      "hit": 2,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 26,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0.2,
+      "summon": 0.1,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "bigspider",
+      "name": "大蜘蛛",
+      "unknown": "巨大な虫",
+      "floor": 2,
+      "level": 5,
+      "hp": [
+        2,
+        10,
+        0
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 28,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "虫",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "✥",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "mage",
+      "name": "洞窟の魔術師",
+      "unknown": "杖を持つ人影",
+      "floor": 2,
+      "level": 5,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 30,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0.5
+    },
+    {
+      "id": "bandit",
+      "name": "山賊の頭目",
+      "unknown": "怪しい人影",
+      "floor": 2,
+      "level": 5,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 32,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0.1,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "ghoul",
+      "name": "腐肉食い",
+      "unknown": "動く死体",
+      "floor": 2,
+      "level": 5,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 34,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "不死",
+      "swings": 1,
+      "rear": false,
+      "flee": 0.1,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "☠",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "stone",
+      "name": "石の番人",
+      "unknown": "震える石像",
+      "floor": 2,
+      "level": 6,
+      "hp": [
+        2,
+        6,
+        4
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        2,
+        6,
+        0
+      ],
+      "xp": 36,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        2,
+        6,
+        4
+      ],
+      "race": "構造体",
+      "swings": 1,
+      "rear": true,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "◆",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0.5
+    },
+    {
+      "id": "general",
+      "name": "深層の魔将",
+      "unknown": "武装した人影",
+      "floor": 2,
+      "level": 6,
+      "hp": [
+        3,
+        8,
+        5
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        7,
+        0
+      ],
+      "xp": 75,
+      "groupSize": [
+        1,
+        1
+      ],
+      "gold": [
+        2,
+        15,
+        0
+      ],
+      "race": "悪魔",
+      "swings": 2,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ],
+      "resistance": "なし",
+      "boss": true,
+      "icon": "♛",
+      "summonCap": 4,
+      "breath": {
+        "element": "炎",
+        "dice": [
+          2,
+          8,
+          0
+        ],
+        "chance": 0.6
+      },
+      "spell": 0
+    },
+    {
+      "id": "acidslime",
+      "name": "酸性スライム",
+      "unknown": "不定形",
+      "floor": 3,
+      "level": 6,
+      "hp": [
+        3,
+        6,
+        6
+      ],
+      "ac": 8,
+      "hit": 3,
+      "attack": [
+        3,
+        6,
+        0
+      ],
+      "xp": 30,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "不定形",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        },
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "◉",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "archer",
+      "name": "骸骨の射手",
+      "unknown": "動く死体",
+      "floor": 3,
+      "level": 6,
+      "hp": [
+        3,
+        6,
+        6
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        3,
+        6,
+        0
+      ],
+      "xp": 47,
+      "groupSize": [
+        2,
+        3
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "不死",
+      "swings": 1,
+      "rear": true,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "☠",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "blackwolf",
+      "name": "黒牙狼",
+      "unknown": "素早い牙",
+      "floor": 3,
+      "level": 6,
+      "hp": [
+        3,
+        6,
+        6
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        3,
+        9,
+        0
+      ],
+      "xp": 49,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "魔獣",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♞",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "shaman",
+      "name": "オーク呪術師",
+      "unknown": "鬼",
+      "floor": 3,
+      "level": 6,
+      "hp": [
+        3,
+        6,
+        0
+      ],
+      "ac": 7,
+      "hit": 3,
+      "attack": [
+        3,
+        6,
+        0
+      ],
+      "xp": 51,
+      "groupSize": [
+        1,
+        4
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0.1,
+      "summon": 0.1,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0.5
+    },
+    {
+      "id": "venomspider",
+      "name": "猛毒蜘蛛",
+      "unknown": "巨大な虫",
+      "floor": 3,
+      "level": 7,
+      "hp": [
+        3,
+        8,
+        0
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        7,
+        0
+      ],
+      "xp": 53,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "虫",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "✥",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "thief",
+      "name": "影の盗人",
+      "unknown": "怪しい人影",
+      "floor": 3,
+      "level": 7,
+      "hp": [
+        3,
+        5,
+        0
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        6,
+        0
+      ],
+      "xp": 55,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "人型",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0.1,
+      "drain": 0,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♟",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "dragon",
+      "name": "炎竜",
+      "unknown": "竜",
+      "floor": 3,
+      "level": 7,
+      "hp": [
+        3,
+        6,
+        0
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        8,
+        0
+      ],
+      "xp": 57,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "竜",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "炎半減",
+      "boss": false,
+      "icon": "♜",
+      "summonCap": 4,
+      "breath": {
+        "element": "炎",
+        "dice": [
+          2,
+          8,
+          0
+        ],
+        "chance": 0.5
+      },
+      "spell": 0
+    },
+    {
+      "id": "rabbit",
+      "name": "赤兎",
+      "unknown": "獣",
+      "floor": 3,
+      "level": 7,
+      "hp": [
+        3,
+        4,
+        0
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        5,
+        0
+      ],
+      "xp": 59,
+      "groupSize": [
+        2,
+        4
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "獣",
+      "swings": 1,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0.03,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "♞",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "iron",
+      "name": "鉄の番人",
+      "unknown": "不気味な立像",
+      "floor": 3,
+      "level": 8,
+      "hp": [
+        3,
+        10,
+        0
+      ],
+      "ac": 6,
+      "hit": 5,
+      "attack": [
+        3,
+        7,
+        0
+      ],
+      "xp": 61,
+      "groupSize": [
+        1,
+        2
+      ],
+      "gold": [
+        3,
+        6,
+        6
+      ],
+      "race": "構造体",
+      "swings": 1,
+      "rear": true,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ],
+      "resistance": "毒無効",
+      "boss": false,
+      "icon": "◆",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0.6
+    },
+    {
+      "id": "terror",
+      "name": "テラー",
+      "unknown": "幽霊",
+      "floor": 3,
+      "level": 8,
+      "hp": [
+        3,
+        10,
+        0
+      ],
+      "ac": 6,
+      "hit": 4,
+      "attack": [
+        3,
+        6,
+        0
+      ],
+      "xp": 50,
+      "groupSize": [
+        1,
+        1
+      ],
+      "gold": [
+        3,
+        10,
+        0
+      ],
+      "race": "不死",
+      "swings": 1,
+      "rear": true,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0.1,
+      "death": 0,
+      "statuses": [],
+      "resistance": "なし",
+      "boss": false,
+      "icon": "☠",
+      "summonCap": 4,
+      "breath": null,
+      "spell": 0
+    },
+    {
+      "id": "watcher",
+      "name": "奈落の監視者",
+      "unknown": "武装した人影",
+      "floor": 3,
+      "level": 8,
+      "hp": [
+        4,
+        6,
+        9
+      ],
+      "ac": 5,
+      "hit": 5,
+      "attack": [
+        3,
+        6,
+        2
+      ],
+      "xp": 83,
+      "groupSize": [
+        1,
+        1
+      ],
+      "gold": [
+        3,
+        10,
+        0
+      ],
+      "race": "悪魔",
+      "swings": 2,
+      "rear": false,
+      "flee": 0,
+      "summon": 0,
+      "steal": 0,
+      "drain": 0,
+      "death": 0,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.15
+        }
+      ],
+      "resistance": "なし",
+      "boss": true,
+      "icon": "♛",
+      "summonCap": 4,
+      "breath": {
+        "element": "氷",
+        "dice": [
+          2,
+          8,
+          0
+        ],
+        "chance": 0.6
+      },
+      "spell": 0.1
+    }
+  ],
+  "traps": [
+    {
+      "id": "needle",
+      "name": "針",
+      "weight": 25
+    },
+    {
+      "id": "blast",
+      "name": "爆発",
+      "weight": 25
+    },
+    {
+      "id": "poison",
+      "name": "毒霧",
+      "weight": 20
+    },
+    {
+      "id": "paralysis",
+      "name": "麻痺の針",
+      "weight": 15
+    },
+    {
+      "id": "teleport",
+      "name": "転移",
+      "weight": 15
+    }
+  ]
+}

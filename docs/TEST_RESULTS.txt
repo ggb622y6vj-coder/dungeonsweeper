@@ -1,0 +1,31 @@
+PASS town loop, stairs yes/no, map persistence, buy/equip/sell/capacity, trap consumption, heal, random encounters, drops, combined log
+PASS XP deferred to town, multi-level growth, full refill, persistence, AC, target selection, multiple enemies, reward once, MP spending and save migration
+PASS armor equip/remove/sale guard, 10x10 and 12x12 floors and enemy scaling
+PASS direct chest, once-only rewards, poison, paralysis, town cure
+PASS floor round trips, exploration persistence, charge persistence and town entrance
+PASS mandatory chest decision, abandonment without reward, legacy score cleanup
+PASS escape success, failure, level formula, no reward, boss restriction
+PASS 24 spells, one-time migration, group targeting, debuff, nonstacking AC, sleep turns, restore, no revive, fixed chest identification, light and visited warp
+PASS fixed CSV XP on all floors, persistent random thresholds, class order, migration, group bounds and unique IDs, floor guardian, slow MP growth
+PASS single/group/last kill log synchronization, guard and spell reset, log colors and escaping
+PASS strafe all directions, orientation, walls, battle/stairs locks, spell color, compact party and title visibility
+PASS three rows, independent member targeting, group spell isolation, hidden exploration controls, medicine effects, slot shifts, battle action/reset, drops and save compatibility
+PASS guardian gates / same-tile stairs, floor round trips and town reset, profile retention, XP +15% migration once, first living target and empty-row action
+PASS typed flags, independent procs, no recoloring, half MP in combat and field, exclusive curses
+PASS 0.5-50% flags, five floor traps, safe teleport and sequential command entry/review
+PASS automatic single-row targets, battle spell modal closure and main-screen targets, field spell placement, linked flag labels
+PASS review table, back to final member, hidden flee in review, aligned target grid
+PASS chest Calfo availability, all-facing diagonal sight and wall boundaries
+PASS six-person defaults/migration, reordered jobs and gear, bench/restore/save, doubled survey/accuracy/reset, thief success/failure, front/rear combat and six XP/commands
+PASS item transfer/capacity/equipped guard, slot remapping, field reorder identity, combat locks and party entry
+PASS numbered/revisited/strafe rates, initiative bounds/back/ward, ward MP/migration/floor/town, enemy opening and snapshots, banner cleanup, party free turn once, 0.5-50% curve
+PASS failed escape consumes party surprise without enemy retaliation
+PASS status tags follow displayed HP/ailments through damage and recovery
+PASS ranged shop/class/rear damage/UI, melee rear restriction, battle survey disabled/no spend and once-per-return level popup
+PASS trap warning before damage and chest reveal after log playback
+PASS STR migration and per-swing attack count
+PASS silent exploration poison and deferred victory rewards
+PASS identification failure, success, persistence and spell effect
+PASS monster floor pools, guardians, flee rewards, mixed victory, summon cap/timing, multi-hit/rear, spell/breath, statuses, instant death, drain, theft, resistances and save migration
+PASS dispel success/failure, undead only, no MP or XP
+31 monster definitions validated
