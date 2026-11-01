@@ -5,7 +5,7 @@ function args(argv) {
   const out = {};
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i];
-    if (!['--jobs', '--level', '--floor', '--n', '--boss'].includes(key)) throw Error(`不明な引数: ${key}`);
+    if (!['--jobs', '--level', '--floor', '--n', '--boss', '--gear'].includes(key)) throw Error(`不明な引数: ${key}`);
     if (Object.hasOwn(out, key.slice(2))) throw Error(`重複した引数: ${key}`);
     if (key === '--boss') { out.boss = true; continue; }
     if (!argv[i + 1] || argv[i + 1].startsWith('--')) throw Error(`値が必要です: ${key}`);
@@ -15,9 +15,10 @@ function args(argv) {
   const jobs = out.jobs.split(',').map(Number);
   const level = Number(out.level), floor = Number(out.floor), n = Number(out.n);
   if (!Number.isInteger(level) || level < 1 || level > 30) throw Error('--level は1〜30で指定してください');
-  if (!Number.isInteger(floor) || floor < 1 || floor > 3) throw Error('--floor は1〜3で指定してください');
+  if (!Number.isInteger(floor) || floor < 1 || floor > 10) throw Error('--floor は1〜10で指定してください');
   if (!Number.isInteger(n) || n < 1 || n > 100000) throw Error('--n は1〜100000で指定してください');
-  return { jobs, level, floor, n, boss: !!out.boss };
+  if (out.gear !== undefined && !['shop', 'drop'].includes(out.gear)) throw Error('--gear はshopまたはdropで指定してください');
+  return { jobs, level, floor, n, boss: !!out.boss, gear: out.gear };
 }
 
 // One reproducible stream per invocation; never rewind it between trials.
@@ -68,6 +69,25 @@ function prepareTrial(g, opt) {
   g.run('encounter(s.pos, false);');
   g.drain();
   return initialHP;
+}
+
+function gearParty(g, floor, gear) {
+  if (!gear) return;
+  g.run(`(() => {
+    const items = WEAPONS.filter(w => (w.minFloor || 1) <= ${floor} && (${gear === 'drop' ? 'true' : 'w.shop !== false'}));
+    const score = w => w.dice ? w.dice[0] * (w.dice[1] + 1) / 2 + w.dice[2] + (w.hitBonus || 0) * 0.5 : 0;
+    for (let i = 0; i < s.members.length; i++) {
+      const job = jobOf(i), rear = i >= 3;
+      const weapons = items.filter(w => w.dice && w.classes.includes(job) && (!rear || w.range === 'ranged'));
+      weapons.sort((a,b) => score(b) - score(a) || a.price - b.price);
+      if (weapons[0]) { s.inventory[i].push(weapons[0].id); s.equipped[i] = s.inventory[i].length - 1; }
+      const armor = items.filter(w => w.part && w.classes.includes(job));
+      for (const part of ['head','body','feet']) {
+        const candidates = armor.filter(w => w.part === part).sort((a,b) => b.ac - a.ac || a.price - b.price);
+        if (candidates[0]) { s.inventory[i].push(candidates[0].id); s.armor[i][part] = s.inventory[i].length - 1; }
+      }
+    }
+  })()`);
 }
 
 function planTurn(g) {
@@ -124,6 +144,7 @@ function resolveBattle(g, maxRounds = 200) {
 function simulate(opt) {
   const g = game(null, seededRandom());
   createParty(g, opt.jobs);
+  gearParty(g, opt.floor, opt.gear);
   let wins = 0, wipes = 0, deaths = 0, hpLoss = 0, rounds = 0;
   for (let trial = 0; trial < opt.n; trial++) {
     const initialHP = prepareTrial(g, opt);
@@ -143,4 +164,4 @@ if (require.main === module) {
   try { process.stdout.write(JSON.stringify(simulate(args(process.argv.slice(2)))) + '\n'); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }
-module.exports = { args, simulate, seededRandom, createParty, prepareTrial, planTurn, resolveBattle };
+module.exports = { args, simulate, seededRandom, createParty, gearParty, prepareTrial, planTurn, resolveBattle };

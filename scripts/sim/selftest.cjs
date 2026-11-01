@@ -1,15 +1,26 @@
 // Kept beside the simulator because task 010 explicitly excludes tests/ edits.
 const assert = require('node:assert/strict');
 const { game } = require('./harness.cjs');
-const { args, simulate, seededRandom, createParty, prepareTrial, planTurn, resolveBattle } = require('./combat.cjs');
+const { args, simulate, seededRandom, createParty, gearParty, prepareTrial, planTurn, resolveBattle } = require('./combat.cjs');
 const opt = args(['--jobs','0,0,2,3,1,2','--level','1','--floor','3','--n','2']);
 for (const argv of [[], ['--jobs',''], ['--jobs','0,'], ['--wat','1'], ['--boss','--boss'],
-  ['--jobs','0','--level','1','--floor','4','--n','1']]) assert.throws(() => args(argv));
+  ['--jobs','0','--level','1','--floor','11','--n','1'], ['--gear','bad']]) assert.throws(() => args(argv));
+const floor10 = args(['--jobs','0,0,2,3,1,2','--level','15','--floor','10','--boss','--gear','drop','--n','1']);
+assert.equal(floor10.floor, 10);
+assert.equal(floor10.gear, 'drop');
 
 const g = game(null, seededRandom());
 createParty(g, opt.jobs);
 assert.equal(g.run('JSON.stringify(s.members.map((m,i) => jobOf(i)))'), JSON.stringify(opt.jobs));
 assert.equal(g.run('s.reserve.length'), 0);
+assert.equal(g.run('s.inventory.every(a => a.length === 1)'), true, 'gear omitted must retain starter inventory');
+gearParty(g, 10, 'drop');
+assert.equal(g.run("s.inventory[0].map(id=>weapon(id).name).includes('聖剣')"), true, 'drop gear should consider minFloor 9 equipment');
+assert.equal(g.run("s.inventory[3].map(id=>weapon(id).name).some(n=>['魔弓','竜骨の弓'].includes(n))"), true, 'rear thief should receive a ranged weapon');
+const shopGear = game(null, seededRandom());
+createParty(shopGear, opt.jobs);
+gearParty(shopGear, 10, 'shop');
+assert.equal(shopGear.run("s.inventory[0].map(id=>weapon(id).name).includes('炎の剣')"), false, 'shop gear excludes shop:false items');
 const formations = new Set();
 for (let i = 0; i < 10; i++) {
   const total = prepareTrial(g, opt);
@@ -92,6 +103,8 @@ assert.equal(resolveBattle(g).outcome, 'win');
 
 const report = simulate(opt);
 assert.deepEqual(simulate(opt), report, 'same invocation must be reproducible');
+assert.deepEqual(simulate({...opt, gear: undefined}), report, 'omitted gear keeps the original deterministic result');
+assert(Object.values(simulate(floor10)).every(Number.isFinite), 'floor 10 boss simulation with drop gear must run');
 for (const value of Object.values(report)) assert(Number.isFinite(value));
 assert(report.winRate + report.wipeRate <= 1);
 assert(report.deathsPerBattle >= 0 && report.deathsPerBattle <= 6);
