@@ -102,7 +102,8 @@ function templeRaise(id){
  s.gold-=cost;
  const success=Math.random()*100<templeChance(m);
  m.status=success?'ok':m.status==='dead'?'ash':'lost';
- const i=s.members.findIndex(m=>m.id===id),hp=success?1:0;
+ const i=s.members.findIndex(m=>m.id===id),hp=success?m.maxHP:0;
+ if(success){if(i>=0)s.mp[i]=m.maxMP;else r.mp=m.maxMP;}
  if(i>=0)s.hp[i]=hp;else r.hp=hp;
  const result={id,name:m.name||CLASSES[m.job??0].name,success,status:m.status,cost};
  render();renderTemple(result);
@@ -110,7 +111,7 @@ function templeRaise(id){
 }
 function renderTemple(result=null){
  $('#templegold').textContent=`金貨 ${s.gold} G`;
- if(result)$('#templenotice').textContent=result.success?`${result.name}は蘇生した。HPが1になった。`:`${result.name}の蘇生に失敗した。${result.status==='ash'?'灰になった。':'ロストした。'}`;
+ if(result)$('#templenotice').textContent=result.success?`${result.name}は蘇生した。HP・MPが全快した。`:`${result.name}の蘇生に失敗した。${result.status==='ash'?'灰になった。':'ロストした。'}`;
  const list=$('#templemembers');list.replaceChildren();
  const records=trainingRoster().filter(r=>['dead','ash'].includes(r.members.status));
  if(!records.length){const p=document.createElement('p');p.textContent='蘇生が必要な冒険者はいません。';list.append(p)}

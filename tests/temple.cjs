@@ -29,8 +29,9 @@ for (const reserve of [false, true]) {
     assert.equal(g.run('result.id===id'), true);
     assert.equal(g.run('s.gold'), 10000 - cost);
     const after = JSON.parse(g.run('JSON.stringify(trainingRoster()[0])'));
-    before.members.status = expected; before.hp = expected === 'ok' ? 1 : 0;
-    assert.deepEqual(after, before, 'only status and HP change; MP, XP, equipment and identity stay intact');
+    before.members.status = expected; before.hp = expected === 'ok' ? before.members.maxHP : 0;
+    if (expected === 'ok') before.mp = before.members.maxMP;
+    assert.deepEqual(after, before, 'only status and HP/MP on success change; XP, equipment and identity stay intact');
     const restored = reload(g);
     assert.equal(restored.run('s.gold'), 10000 - cost);
     assert.equal(restored.run('s.members.length'), reserve ? 0 : 1);
@@ -40,11 +41,12 @@ for (const reserve of [false, true]) {
       if (reserve) restored.run('changeRecruitParty(s.reserve[0].members.id,true)');
       restored.run('enterDungeon()'); restored.drain();
       assert.equal(restored.run('s.area'), 'dungeon');
-      assert.equal(restored.run('s.hp[0]'), 1);
+      assert.equal(restored.run('s.hp[0]'), restored.run('s.members[0].maxHP'));
+      assert.equal(restored.run('s.mp[0]'), restored.run('s.members[0].maxMP'));
     }
   }
 }
-console.log('PASS temple: all four outcomes for party/reserve, fees, HP1, MP/XP preservation, save/reload and dungeon reentry');
+console.log('PASS temple: all four outcomes for party/reserve, fees, full HP/MP, XP preservation, save/reload and dungeon reentry');
 
 for (const [status, level, cost, chance] of [
   ['dead', 1, 100, 53], ['dead', 5, 500, 65], ['dead', 15, 1500, 95], ['dead', 30, 3000, 95],
@@ -111,7 +113,8 @@ assert.match(ui.run("$('#templemembers').children[1].children[0].children[1].tex
 assert.equal(ui.run("$('#templemembers').children[0].children[0].children[0].textContent"), '蘇生([対象');
 ui.run(`s.gold=1000;renderTemple();var raiseButton=$('#templemembers').children[0].children[2];
   changeRecruitParty(id,false);Math.random=()=>0;raiseButton.onclick();`);
-assert.equal(ui.run("s.reserve.find(r=>r.members.id===id).hp"), 1, 'button resolves stable ID after benching');
+assert.equal(ui.run("s.reserve.find(r=>r.members.id===id).hp"), ui.run("s.reserve.find(r=>r.members.id===id).members.maxHP"), 'button resolves stable ID after benching and restores full HP');
+assert.equal(ui.run("s.reserve.find(r=>r.members.id===id).mp"), ui.run("s.reserve.find(r=>r.members.id===id).members.maxMP"), 'reserve MP is restored to maximum');
 assert.equal(ui.run("$('#templemembers').children.length"), 1);
 assert.equal(ui.run("$('#templegold').textContent"), '金貨 500 G');
 assert.match(ui.run("$('#templenotice').textContent"), /蘇生した/);
