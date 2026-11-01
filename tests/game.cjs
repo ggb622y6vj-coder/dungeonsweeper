@@ -218,3 +218,6 @@ if(s.hp[0]!==0||logQueue.filter(e=>e.text===poisonDeathText).length!==1||!logQue
 s=savedPoisonState;Math.random=savedPoisonRandom;mode=savedPoisonMode;refreshNames();`);
 }
 console.log('PASS exploration poison death once with HP snapshot, silent nonfatal movement and combat poison logs');
+
+run(`s=structuredClone(sixInitial);ensureProfile();if(s.magicPlans.length!==6)throw Error('six-member magic plans');s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==6)throw Error('short plan padding');s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==3)throw Error('legacy three-member magic plans');`);
+console.log('PASS magic plans pad to party length and preserve legacy three-member saves');
