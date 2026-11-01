@@ -3565,9 +3565,9 @@ const ENEMIES=[
     "floor": 8,
     "level": 19,
     "hp": [
-      16,
+      14,
       8,
-      40
+      35
     ],
     "ac": -3,
     "hit": 13,
@@ -3977,9 +3977,9 @@ const ENEMIES=[
     "floor": 9,
     "level": 21,
     "hp": [
-      20,
+      18,
       8,
-      40
+      36
     ],
     "ac": -4,
     "hit": 14,
