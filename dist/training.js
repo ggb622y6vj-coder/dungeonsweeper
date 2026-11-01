@@ -15,6 +15,9 @@ function showRecruitPreview(){
 }
 function renderTraining(){
  const list=$('#recruitlist');list.replaceChildren();const roster=trainingRoster();
+ for(const corpse of s.corpses||[]){
+  const p=document.createElement('p');p.textContent=`迷宮に残された遺体：地下${corpse.floor}階（${corpse.records.map(r=>r.members.name).join('、')}）`;list.append(p);
+ }
  $('#trainingcount').textContent=`登録 ${roster.length}人 / パーティ ${s.members.length}/6人。先頭3人が前衛です。`;
  if(!roster.length){const p=document.createElement('p');p.textContent='名前と職業を選んで、最初の冒険者を作成してください。';list.append(p)}
  for(const r of roster){
