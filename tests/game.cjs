@@ -221,3 +221,6 @@ console.log('PASS exploration poison death once with HP snapshot, silent nonfata
 
 run(`s=structuredClone(sixInitial);ensureProfile();if(s.magicPlans.length!==6)throw Error('six-member magic plans');s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==6)throw Error('short plan padding');s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==3)throw Error('legacy three-member magic plans');`);
 console.log('PASS magic plans pad to party length and preserve legacy three-member saves');
+
+run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(1).includes(plate)||!chestItemPool(2).includes(plate))throw Error('floor chest price cap');var oldRandom=Math.random;var foundPlate=false;Math.random=()=>.999;for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool[Math.random()*pool.length|0].id==='plate')foundPlate=true}Math.random=oldRandom;if(foundPlate)throw Error('plate dropped on floor 1');`);
+console.log('PASS chest item pool price cap and 10,000 floor 1 draws');
