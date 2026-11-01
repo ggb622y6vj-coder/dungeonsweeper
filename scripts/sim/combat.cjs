@@ -83,9 +83,13 @@ function planTurn(g) {
         if (target !== undefined && id) { s.magicPlans[i] = {id,target}; return 'spell'; }
       }
       if (jobOf(i) === 1 && s.mp[i] >= 6) {
-        const id = ['tiltowait','lakanito','dalto','mahalito','katino','halito']
+        const targetGroup = enemyGroups().find(g => g.units.some(e => e.hp > 0));
+        const target = targetGroup?.units.find(e => e.hp > 0)?.uid;
+        const spellOrder = ['tiltowait','lakanito','dalto','mahalito'];
+        if (!s.enemy.boss && (targetGroup?.units.filter(e => e.hp > 0).length || 0) >= 2) spellOrder.push('katino');
+        spellOrder.push('halito');
+        const id = spellOrder
           .find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
-        const target = enemyGroups().flatMap(g => g.units).find(e => e.hp > 0)?.uid;
         if (id && target !== undefined) { s.magicPlans[i] = {id,target}; return 'spell'; }
       }
       if (canWeaponAttack(i)) {
