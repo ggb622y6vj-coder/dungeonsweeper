@@ -224,8 +224,15 @@ console.log('PASS exploration poison death once with HP snapshot, silent nonfata
 run(`s=structuredClone(sixInitial);ensureProfile();if(s.magicPlans.length!==6)throw Error('six-member magic plans');s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==6)throw Error('short plan padding');s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==3)throw Error('legacy three-member magic plans');`);
 console.log('PASS magic plans pad to party length and preserve legacy three-member saves');
 
-run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(1).includes(plate)||!chestItemPool(3).includes(plate))throw Error('floor chest price cap');var oldRandom=Math.random;var foundPlate=false;Math.random=()=>.999;for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool[Math.random()*pool.length|0].id==='plate')foundPlate=true}Math.random=oldRandom;if(foundPlate)throw Error('plate dropped on floor 1');`);
-console.log('PASS chest item pool price cap and 10,000 floor 1 draws');
+run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(2).some(x=>x.item===plate)||!chestItemPool(3).some(x=>x.item===plate))throw Error('floor chest minFloor');`);
+console.log('PASS chest item pool respects plate minFloor');
+
+run(`{let oldRandom=Math.random;try{
+for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool.some(x=>x.item.price>150||(x.item.minFloor??1)>1))throw Error('floor 1 loot cap')}
+let foundFlame=false,foundHoly=false;for(let i=0;i<10000;i++){Math.random=()=>((i*7919)%10000)/10000;let item=weightedLoot(chestItemPool(5));if(item.id==='flamesword')foundFlame=true;Math.random=()=>((i*7919+173)%10000)/10000;item=weightedLoot(chestItemPool(10));if(item.id==='holysword')foundHoly=true}if(!foundFlame||!foundHoly)throw Error('deep floor weighted loot reachability');
+for(let floor of [1,5,10]){let chance=CHEST_LOOT.itemChance[floor-1],items=0;for(let i=0;i<10000;i++){s.floor=floor;s.inventory=s.members.map(()=>[]);s.gold=0;let rolls=[(i+.5)/10000,.99,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.some(a=>a.length))items++}if(Math.abs(items/10000-chance)>.02)throw Error('chest item chance floor '+floor+': '+items/10000)}
+}finally{Math.random=oldRandom;}}`);
+console.log('PASS weighted chest loot floor gates, deep items, and 10,000-draw item chance rates');
 
 run(`{
 let savedState=structuredClone(s),savedRandom=Math.random;
@@ -241,7 +248,7 @@ try{
   for(let n=0;n<100;n++){let rolls=[0,n/100];Math.random=()=>rolls.shift()??.99;dropMedicine();available.add(s.inventory[0].at(-1));s.inventory[0].pop()}
   Math.random=old;
   if(available.has('greaterPotion')||available.has('elixir')||available.has('paralysisCure'))throw Error('medicine below minFloor');
-  if(!chestItemPool(4).some(w=>w.id==='knightsword')||chestItemPool(1).some(w=>w.id==='knightsword'))throw Error('equipment minFloor pool');
+  if(!chestItemPool(4).some(x=>x.item.id==='knightsword')||chestItemPool(1).some(x=>x.item.id==='knightsword'))throw Error('equipment minFloor pool');
   s.members[0].job=0;s.members[0].level=1;s.members[0].str=10;s.inventory[0]=['flamesword'];s.equipped[0]=0;
   s.enemy={units:[{id:'slime',uid:0,row:0,hp:100,rewarded:false}]};Math.random=()=>.525;
   let result=physicalAttack(0,s.enemy.units[0]);if(result.hitsCount!==1)throw Error('weapon hitBonus not applied');
@@ -249,7 +256,7 @@ try{
 }`);
 console.log('PASS expanded equipment ids, shop:false gate, floor loot gates, and hitBonus');
 
-run(`{let savedChestState=structuredClone(s),savedChestRandom=Math.random;try{s=structuredClone(sixInitial);ensureProfile();s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.members.forEach(m=>m.job=0);s.inventory=s.members.map(()=>['sword']);s.equipped=[0,0,0];s.armor=s.members.map(()=>({}));s.floor=1;s.gold=0;let dagger=WEAPONS.find(w=>w.id==='dagger');chestItemPool=()=>[dagger];let rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.some(a=>a.length!==1)||logQueue.filter(x=>x.text==='短剣を見つけたが、誰も扱えないので置いていった。').length!==1)throw Error('unusable chest item');s.inventory[0]=Array(10).fill('sword');s.members[0].job=3;let beforeFull=s.inventory.map(a=>a.length),beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.map(a=>a.length).join()!==beforeFull.join()||logQueue.slice(beforeLog).filter(x=>x.text==='アイテムがいっぱいで装備品を持ち帰れなかった。').length!==1)throw Error('full chest inventory');s.inventory[0]=['sword'];beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory[0].at(-1)!=='dagger'||logQueue.slice(beforeLog).filter(x=>x.text==='短剣を入手。戦士Ⅰが受け取った。').length!==1)throw Error('normal chest item');}finally{s=savedChestState;Math.random=savedChestRandom;}}`);
+run(`{let savedChestState=structuredClone(s),savedChestRandom=Math.random;try{s=structuredClone(sixInitial);ensureProfile();s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.members.forEach(m=>m.job=0);s.inventory=s.members.map(()=>['sword']);s.equipped=[0,0,0];s.armor=s.members.map(()=>({}));s.floor=1;s.gold=0;let dagger=WEAPONS.find(w=>w.id==='dagger');chestItemPool=()=>[{item:dagger,weight:1}];let rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.some(a=>a.length!==1)||logQueue.filter(x=>x.text==='短剣を見つけたが、誰も扱えないので置いていった。').length!==1)throw Error('unusable chest item');s.inventory[0]=Array(10).fill('sword');s.members[0].job=3;let beforeFull=s.inventory.map(a=>a.length),beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.map(a=>a.length).join()!==beforeFull.join()||logQueue.slice(beforeLog).filter(x=>x.text==='アイテムがいっぱいで装備品を持ち帰れなかった。').length!==1)throw Error('full chest inventory');s.inventory[0]=['sword'];beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory[0].at(-1)!=='dagger'||logQueue.slice(beforeLog).filter(x=>x.text==='短剣を入手。戦士Ⅰが受け取った。').length!==1)throw Error('normal chest item');}finally{s=savedChestState;Math.random=savedChestRandom;}}`);
 console.log('PASS chest item unusable, full inventory and normal receipt logs');
 
 // Isolate reward cases from the shared combat fixtures and their random overrides.

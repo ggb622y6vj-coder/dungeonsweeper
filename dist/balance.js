@@ -8,6 +8,7 @@ const CLASSES = [
 const SPELLS={blast:{name:'呪文',cost:4,dice:[3,6,0]},heal:{name:'回復',cost:3,dice:[2,6,4]}};
 const LEVEL_CAP=30;
 const MAX_FLOOR=10;
+const CHEST_LOOT={itemChance:[.20,.22,.25,.28,.30,.32,.35,.38,.40,.45],priceCap:[150,200,350,500,1800,2200,3000,3600,6000,6000]};
 function trapPower(floor){return 1+0.25*(Math.min(floor,MAX_FLOOR)-1)}
 function trapCount(floor,size){return Math.min(Math.floor(size*size*0.22),Math.round(size*size*(0.14+0.01*(floor-1))))}
 // 各レベルの増分を個別に抽選し保存。描画や再読み込みで再抽選しない。
