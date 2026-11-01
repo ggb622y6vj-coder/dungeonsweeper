@@ -40,7 +40,8 @@ with sync_playwright() as p:
   # Town healing and stable-only inn: exercise the real return/stay handlers.
   page.evaluate("s.enemy=null;s.members.forEach(m=>{m.status='ok';m.xp=650});s.hp=s.members.map(()=>1);s.mp=s.members.map(()=>0);monsterHurt(0,999,s.commands,'敵');render()")
   page.wait_for_function('!logBusy()')
-  page.locator('#backtown').click()
+  page.evaluate('s.pos=s.start;s.pendingStairs=true;render()')
+  page.locator('#bossyes').click()
   assert page.evaluate("s.area==='town'&&s.members.every(m=>m.level===1)")
   assert page.evaluate("s.hp[0]===0&&s.mp[0]===0&&s.members[0].status==='dead'")
   assert page.evaluate('s.members.every((m,i)=>i===0||(s.hp[i]===m.maxHP&&s.mp[i]===m.maxMP))')
