@@ -7,6 +7,8 @@
 | dist/index.html | HTML全画面・CSS・dialog・script読込順 |
 | dist/game.js | 中央状態s、迷宮生成、移動、戦闘、描画、保存、ログ、商店・宝箱 |
 | dist/combatui.js | 順番コマンド、対象選択、行動確認 |
+| dist/recruits.js | キャラクター生成、登録・編成・抹消、登録簿の保存復元 |
+| dist/training.js | 訓練所のUIと確認ダイアログ |
 | dist/party.js | 職業識別、6人移行、酒場、並べ替え、譲渡、装備概要、盗賊開封 |
 | dist/balance.js | 職業、経験値曲線と移行 |
 | dist/weapons.js | 武器17・防具9。防具もWEAPONS配列に追加 |
@@ -51,3 +53,11 @@ ensureProfile→ensureStats/ensureSixParty/ensureMagic/ensureProgression等が�
 ## テストの限界
 
 tests/game.cjsはブラウザではない。DOMの見た目、タッチ操作、dialogのフォーカス、スクロール、モバイルサイズは実ブラウザで確認が必要。テストのPASSは原作仕様の正しさや全ての境界条件を証明しない。
+
+## 訓練所導入後の保存形式
+
+`rosterVersion: 1` のセーブは `roster` に全登録者のPARTY_FIELDSレコードを保存し、`partyIds` に参加者のIDを隊列順に保存する。保存時に従来のmembers/hp等とreserveは重複して書き込まない。`restoreRoster` は起動時に戦闘処理が使用する並行配列と控えに復元する。実行中は既存処理がこれらの配列を更新し、保存時に最新値から登録簿を組み立てるため、戦闘・装備・レベルアップ後の値を失わない。
+
+新規ゲームは空のパーティから開始。旧形式は既存の移行経路で読み取れるが、新機能は旧データ破棄を必要としない。迷宮再生成で登録者を初期化しない。生成時STRはbaseStrとして記録し、成長・レベル吸収に使用する。
+
+`node tests/training.cjs` は生成範囲・400人のID/個体差・編成・装備保持・保存復元・成長/吸収・戦闘/呪文・全員抹消を検証。`tests/training-browser.py` は実Chromiumで訓練所操作と戦闘コマンド、保存復元、空パーティの導線をPC/スマートフォン幅で検証する。
