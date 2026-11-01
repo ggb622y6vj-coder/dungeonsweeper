@@ -185,3 +185,36 @@ resetMonstersTest('guardian');s.floor=3;delete s.enemy.dataVersion;migrateMonste
 s=structuredClone(savedMonstersState);s.enemy=null;logQueue=[];clearTimeout(logTimer);logTimer=null;displayCombat=undefined;displayVitals=null;
 }`);console.log('PASS monster floor pools, guardians, flee rewards, mixed victory, summon cap/timing, multi-hit/rear, spell/breath, statuses, instant death, drain, theft, resistances and save migration');
 drain();run(`{s.done=false;s.hp=s.members.map(()=>20);s.enemy={units:[{id:'skeleton',uid:0,row:0,hp:10},{id:'wolf',uid:1,row:1,hp:10}]};let priest=s.members.findIndex((m,i)=>jobOf(i)===2),mp=s.mp[priest];Math.random=()=>0;dispelUndead(priest);if(s.enemy.units[0].hp!==0||s.enemy.units[1].hp!==10||s.enemy.pendingXP||s.mp[priest]!==mp)throw Error('dispel effect');s.enemy.units[0].hp=10;s.enemy.units[0].rewarded=false;s.enemy.units[0].escaped=false;Math.random=()=>.999;dispelUndead(priest);if(s.enemy.units[0].hp!==10)throw Error('dispel failure');}`);console.log('PASS dispel success/failure, undead only, no MP or XP');
+
+// Exercise movement itself: stale flags/chests or queued logs must not block cell().
+drain();
+run(`var savedPoisonState=structuredClone(s),savedPoisonRandom=Math.random,savedPoisonMode=mode;
+s.area='dungeon';s.enemy=null;s.done=false;s.pendingBoss=null;s.pendingStairs=false;
+mode='move';s.logs=[];s.hp=s.members.map(()=>20);
+s.ailments=s.members.map(()=>({poison:false,paralysis:0}));
+s.cells.forEach(c=>{c.type='';c.trap=false;c.flag=false;c.open=true;delete c.chest});
+s.pos=0;s.hp[0]=2;s.ailments[0].poison=true;Math.random=()=>.99;`);
+try {
+  run(`cell(1);
+if(s.pos!==1||s.hp[0]!==0)throw Error('poison death on movement');
+var poisonDeathText=NAMES[0]+'は毒で倒れた。';
+var poisonDeathEntries=logQueue.filter(e=>e.text===poisonDeathText);
+if(poisonDeathEntries.length!==1||poisonDeathEntries[0].hp[0]!==0)throw Error('poison death log / snapshot');
+if(logQueue.some(e=>e.text.includes('毒で2ダメージ')))throw Error('exploration poison damage log');`);
+  drain();
+  run(`cell(0);
+if(s.pos!==0||s.hp[0]!==0||logQueue.some(e=>e.text===poisonDeathText))throw Error('duplicate poison death');
+if(s.logs.filter(t=>t===poisonDeathText).length!==1)throw Error('rendered poison death count');
+s.logs=[];s.hp[0]=10;cell(1);
+if(s.pos!==1||s.hp[0]!==8)throw Error('nonfatal poison on movement');
+if(logQueue.some(e=>e.text.includes('毒')))throw Error('nonfatal poison queued log');`);
+  drain();
+  run(`if(s.logs.some(t=>t.includes('毒')))throw Error('nonfatal poison rendered log');
+s.hp[0]=2;tickAilments();
+if(s.hp[0]!==0||logQueue.filter(e=>e.text===poisonDeathText).length!==1||!logQueue.some(e=>e.text===NAMES[0]+'は毒で2ダメージ。'))throw Error('combat poison death and damage logs');`);
+  drain();
+} finally {
+  run(`clearTimeout(logTimer);logTimer=null;logQueue=[];displayVitals=null;displayCombat=undefined;
+s=savedPoisonState;Math.random=savedPoisonRandom;mode=savedPoisonMode;refreshNames();`);
+}
+console.log('PASS exploration poison death once with HP snapshot, silent nonfatal movement and combat poison logs');
