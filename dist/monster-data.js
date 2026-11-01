@@ -4335,9 +4335,9 @@ const ENEMIES=[
     "floor": 10,
     "level": 25,
     "hp": [
-      26,
+      44,
       8,
-      60
+      110
     ],
     "ac": -6,
     "hit": 16,
@@ -4357,7 +4357,7 @@ const ENEMIES=[
       300
     ],
     "race": "悪魔",
-    "swings": 3,
+    "swings": 4,
     "rear": false,
     "flee": 0,
     "summon": 0,
@@ -4370,7 +4370,7 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.15,
+    "spell": 0.35,
     "spellInfo": {
       "id": "tiltowait",
       "name": "ティルトウェイト",
