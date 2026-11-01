@@ -17,89 +17,105 @@ assert.equal(g.run('s.inventory.every(a => a.length === 1)'), true, 'gear omitte
 gearParty(g, 10, 'drop');
 assert.equal(g.run("s.inventory[0].map(id=>weapon(id).name).includes('聖剣')"), true, 'drop gear should consider minFloor 9 equipment');
 assert.equal(g.run("s.inventory[3].map(id=>weapon(id).name).some(n=>['魔弓','竜骨の弓'].includes(n))"), true, 'rear thief should receive a ranged weapon');
+const equippedDrop = g.run('JSON.stringify({inventory:s.inventory,equipped:s.equipped,armor:s.armor})');
+prepareTrial(g, {...opt, level:9, floor:4});
+assert.equal(g.run('JSON.stringify({inventory:s.inventory,equipped:s.equipped,armor:s.armor})'), equippedDrop,
+  'drop gear must survive per-trial party restoration');
+const gBase = game(null, seededRandom());
+createParty(gBase, opt.jobs);
+assert.equal(gBase.run('JSON.stringify(s.members.map((m,i) => jobOf(i)))'), JSON.stringify(opt.jobs));
+assert.equal(gBase.run('s.reserve.length'), 0);
+assert.equal(gBase.run('s.inventory.every(a => a.length === 1)'), true, 'gear omitted must retain starter inventory');
+const noGearResult = simulate({...opt, level:9, floor:4, n:30, gear:undefined});
+const dropGearResult = simulate({...opt, level:9, floor:4, n:30, gear:'drop'});
+assert.notDeepEqual(dropGearResult, noGearResult, 'drop gear must affect a fixed-seed simulation');
 const shopGear = game(null, seededRandom());
 createParty(shopGear, opt.jobs);
 gearParty(shopGear, 10, 'shop');
 assert.equal(shopGear.run("s.inventory[0].map(id=>weapon(id).name).includes('炎の剣')"), false, 'shop gear excludes shop:false items');
+assert.notDeepEqual(simulate({...opt, level:9, floor:4, n:30, gear:'shop'}), noGearResult,
+  'shop gear must affect a fixed-seed simulation');
 const formations = new Set();
 for (let i = 0; i < 10; i++) {
-  const total = prepareTrial(g, opt);
-  assert.equal(total, g.run('s.members.reduce((a,m) => a+m.maxHP, 0)'));
-  formations.add(g.run('JSON.stringify(s.enemy?.units.map(e => [e.id,e.hp]))'));
-  assert.equal(g.run('s.members.length'), 6);
-  assert.equal(g.run('s.members.every(m => m.level === 1)'), true);
-  assert.equal(g.run("s.members[4].known.includes('halito')"), true);
-  assert.equal(g.run('s.mp.every((mp,i) => mp === s.members[i].maxMP)'), true);
+  const total = prepareTrial(gBase, opt);
+  assert.equal(total, gBase.run('s.members.reduce((a,m) => a+m.maxHP, 0)'));
+  formations.add(gBase.run('JSON.stringify(s.enemy?.units.map(e => [e.id,e.hp]))'));
+  assert.equal(gBase.run('s.members.length'), 6);
+  assert.equal(gBase.run('s.members.every(m => m.level === 1)'), true);
+  assert.equal(gBase.run("s.members[4].known.includes('halito')"), true);
+  assert.equal(gBase.run('s.mp.every((mp,i) => mp === s.members[i].maxMP)'), true);
 }
 assert(formations.size > 1, 'trials must not repeat one RNG sequence');
 
 // Force an opening attack to verify that prepareTrial returns pre-ambush HP.
-g.run(`var simOriginalInitiative=rollInitiative, simOriginalEnemyTurn=enemyTurn;
+gBase.run(`var simOriginalInitiative=rollInitiative, simOriginalEnemyTurn=enemyTurn;
   rollInitiative=()=> 'enemy'; enemyTurn=()=>{s.hp[0]-=5};`);
-const beforeAmbush = prepareTrial(g, opt);
-assert.equal(beforeAmbush - g.run('s.hp.reduce((a,b)=>a+b,0)'), 5);
-g.run(`enemyTurn=()=>{s.enemy.units.forEach(e=>{e.hp=0;e.rewarded=true;e.escaped=true});finishMonsterBattle()}`);
-prepareTrial(g, opt);
-assert.equal(resolveBattle(g).outcome, 'win', 'enemy retreat during an ambush is a completed battle');
-g.run('rollInitiative=simOriginalInitiative; enemyTurn=simOriginalEnemyTurn');
+const beforeAmbush = prepareTrial(gBase, opt);
+assert.equal(beforeAmbush - gBase.run('s.hp.reduce((a,b)=>a+b,0)'), 5);
+gBase.run(`enemyTurn=()=>{s.enemy.units.forEach(e=>{e.hp=0;e.rewarded=true;e.escaped=true});finishMonsterBattle()}`);
+prepareTrial(gBase, opt);
+assert.equal(resolveBattle(gBase).outcome, 'win', 'enemy retreat during an ambush is a completed battle');
+gBase.run('rollInitiative=simOriginalInitiative; enemyTurn=simOriginalEnemyTurn');
 
 for (let i = 0; i < 10; i++) {
-  prepareTrial(g, {...opt, level:6, floor:1, boss:true});
-  assert.equal(g.run('s.members.every(m => m.level === 6)'), true);
-  assert.equal(g.run(`s.members.every((m,i) => {
+  prepareTrial(gBase, {...opt, level:6, floor:1, boss:true});
+  assert.equal(gBase.run('s.members.every(m => m.level === 6)'), true);
+  assert.equal(gBase.run(`s.members.every((m,i) => {
     const base = simBase[i].members, c = memberClass(i);
     return m.maxHP >= base.maxHP + 5 * (c.hpGrowth[0] + c.hpGrowth[2]) &&
       m.maxHP <= base.maxHP + 5 * (c.hpGrowth[0] * c.hpGrowth[1] + c.hpGrowth[2]);
   })`), true, 'growth must start from Lv1 every trial');
   // Mimic battle rewards, drain, gear drops and ailments before the next reset.
-  g.run("s.members[0].level=2; s.members[0].xp=999999; s.inventory[0].push('healingPotion'); s.ailments[0].poison=true");
+  gBase.run("s.members[0].level=2; s.members[0].xp=999999; s.inventory[0].push('healingPotion'); s.ailments[0].poison=true");
 }
-prepareTrial(g, opt);
-assert.equal(g.run('s.members[0].xp'), 0);
-assert.equal(g.run('s.inventory[0].length'), 1);
-assert.equal(g.run('s.ailments.some(a => a.poison)'), false);
+prepareTrial(gBase, opt);
+assert.equal(gBase.run('s.members[0].xp'), 0);
+assert.equal(gBase.run('s.inventory[0].length'), 1);
+assert.equal(gBase.run('s.ailments.some(a => a.poison)'), false);
 
 // AI uses professions and stable row IDs; the mage gets the front living unit UID.
-g.run(`s.enemy = {units:[{...makeEnemy('slime',8),row:12}], flagEffect:{}, initiative:'party'};
+const gAI = game(null, seededRandom());
+createParty(gAI, opt.jobs);
+gAI.run(`s.enemy = {units:[{...makeEnemy('slime',8),row:12}], flagEffect:{}, initiative:'party'};
   var simTestCombat=s.enemy; simBattleFinished=false; s.hp=s.members.map(m=>m.maxHP); s.mp=s.members.map(m=>m.maxMP);`);
-planTurn(g);
-assert.equal(g.run('s.attackRows[0]'), 12);
-assert.equal(g.run('s.commands[3]'), 'guard');
-assert.equal(g.run('s.commands[4]'), 'spell');
-assert.equal(g.run('s.magicPlans[4].target'), 8);
-assert.equal(g.run('s.magicPlans[4].id'), 'halito', 'a single living target must not attract katino');
-g.run(`s.enemy.units.push({...makeEnemy('slime',9),row:12});`);
-planTurn(g);
-assert.equal(g.run('s.magicPlans[4].id'), 'katino', 'katino remains available against two or more living enemies');
-g.run('s.enemy.boss=true');
-planTurn(g);
-assert.equal(g.run('s.magicPlans[4].id'), 'halito', 'boss encounters must not use katino');
-g.run('s.enemy.boss=false; s.enemy.units.pop()');
-g.run('s.hp[0]=1');
-planTurn(g);
-assert.equal(g.run('s.magicPlans[2].id'), 'dios');
-assert.equal(g.run('s.magicPlans[2].target'), 0);
-g.run('s.mp[4]=5');
-planTurn(g);
-assert.equal(g.run('s.commands[4]'), 'guard');
+planTurn(gAI);
+assert.equal(gAI.run('s.attackRows[0]'), 12);
+assert.equal(gAI.run('s.commands[3]'), 'guard');
+assert.equal(gAI.run('s.commands[4]'), 'spell');
+assert.equal(gAI.run('s.magicPlans[4].target'), 8);
+assert.equal(gAI.run('s.magicPlans[4].id'), 'halito', 'a single living target must not attract katino');
+gAI.run(`s.enemy.units.push({...makeEnemy('slime',9),row:12});`);
+planTurn(gAI);
+assert.equal(gAI.run('s.magicPlans[4].id'), 'katino', 'katino remains available against two or more living enemies');
+gAI.run('s.enemy.boss=true');
+planTurn(gAI);
+assert.equal(gAI.run('s.magicPlans[4].id'), 'halito', 'boss encounters must not use katino');
+gAI.run('s.enemy.boss=false; s.enemy.units.pop()');
+gAI.run('s.hp[0]=1');
+planTurn(gAI);
+assert.equal(gAI.run('s.magicPlans[2].id'), 'dios');
+assert.equal(gAI.run('s.magicPlans[2].target'), 0);
+gAI.run('s.mp[4]=5');
+planTurn(gAI);
+assert.equal(gAI.run('s.commands[4]'), 'guard');
 
 // Failed fleeing spends one turn, including a party initiative, with no attack.
-g.run('s.hp=s.hp.map(()=>1); Math.random=()=>.999; var simEnemyHP=s.enemy.units[0].hp;');
-assert.throws(() => resolveBattle(g, 1), /未決着/);
-assert.equal(g.run('s.enemy.initiative'), 'normal');
-assert.equal(g.run('s.hp.every(h=>h===1)'), true);
-assert.equal(g.run('s.enemy.units[0].hp'), g.run('simEnemyHP'));
-g.run('Math.random=()=>0');
-assert.equal(resolveBattle(g).outcome, 'escape');
-g.run('s.enemy=simTestCombat; s.ailments=s.ailments.map(()=>({poison:true,paralysis:0}))');
-const wipe = resolveBattle(g);
+gAI.run('s.hp=s.hp.map(()=>1); Math.random=()=>.999; var simEnemyHP=s.enemy.units[0].hp;');
+assert.throws(() => resolveBattle(gAI, 1), /未決着/);
+assert.equal(gAI.run('s.enemy.initiative'), 'normal');
+assert.equal(gAI.run('s.hp.every(h=>h===1)'), true);
+assert.equal(gAI.run('s.enemy.units[0].hp'), gAI.run('simEnemyHP'));
+gAI.run('Math.random=()=>0');
+assert.equal(resolveBattle(gAI).outcome, 'escape');
+gAI.run('s.enemy=simTestCombat; s.ailments=s.ailments.map(()=>({poison:true,paralysis:0}))');
+const wipe = resolveBattle(gAI);
 assert.equal(wipe.outcome, 'wipe');
 assert.equal(wipe.deaths, 6);
-g.run(`s.done=false; s.hp=s.members.map(m=>m.maxHP); s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));
+gAI.run(`s.done=false; s.hp=s.members.map(m=>m.maxHP); s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));
   s.enemy={units:[{...makeEnemy('slime',0),row:0,hp:0,rewarded:true}],lootXP:0,lootGold:0};
   finishMonsterBattle();`);
-g.drain();
-assert.equal(resolveBattle(g).outcome, 'win');
+gAI.drain();
+assert.equal(resolveBattle(gAI).outcome, 'win');
 
 const report = simulate(opt);
 assert.deepEqual(simulate(opt), report, 'same invocation must be reproducible');

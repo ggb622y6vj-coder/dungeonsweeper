@@ -88,6 +88,9 @@ function gearParty(g, floor, gear) {
       }
     }
   })()`);
+  // Keep the selected loadout when prepareTrial restores party state.
+  // The snapshot is taken after equipping, while growth is still reset from Lv1 each trial.
+  g.run('simBase = structuredClone(partyRecords())');
 }
 
 function planTurn(g) {
