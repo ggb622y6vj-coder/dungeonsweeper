@@ -282,3 +282,4 @@ drain();run(`if(trapPower(1)!==1||trapPower(5)!==2||trapPower(10)!==3.25||trapPo
 require('./final-boss.cjs');
 
 require('./death-status.cjs');
+require('./temple.cjs');
