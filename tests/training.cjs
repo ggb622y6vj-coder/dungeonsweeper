@@ -166,3 +166,102 @@ for(const format of ['roster','parallel','three-member']){
 }
 assert.equal(game().run('s.corpses.length'),0);
 console.log('PASS missing corpses defaults to [] for new and old roster/parallel/three-member saves');
+
+// 031: regenerate each floor from the same seed with corpses on stairs, boss and traps.
+g=game();
+g.run(`
+ var rescueSeed=1;
+ Math.random=()=>{rescueSeed=(Math.imul(rescueSeed,1664525)+1013904223)>>>0;return rescueSeed/4294967296};
+ for(let floor=1;floor<=3;floor++)for(let n=1;n<=1000;n++){
+  const seed=floor*10000+n;
+  s.corpses=[];rescueSeed=seed;fresh(floor);
+  const start=s.start,boss=s.boss,traps=s.cells.flatMap((c,i)=>c.trap?[i]:[]);
+  const locations=[start,boss,traps[0],traps[1],traps[0]];
+  s.corpses=locations.map((cell,i)=>({id:'corpse-'+i,floor,cell,records:[],gold:i}));
+  s.corpses.push({id:'other-floor',floor:floor+1,cell:start,records:[],gold:99});
+  rescueSeed=seed;fresh(floor);
+  if(s.start!==start||s.boss!==boss)throw Error('generation seed changed');
+  if(s.cells.filter(c=>c.trap).length!==traps.length)throw Error('corpse relocation changed trap count');
+  if(s.cells[start].type!=='stairs'||s.cells[boss].type!=='boss')throw Error('special cell overwritten');
+  for(const [i,corpse] of s.corpses.slice(0,5).entries()){
+   if(corpse.cell===start||corpse.cell===boss||s.cells[corpse.cell].trap||s.cells[corpse.cell].type!=='')throw Error('unsafe corpse');
+   if(i<2){
+    const from=locations[i],to=corpse.cell;
+    if(Math.abs(from%size()-to%size())+Math.abs((from/size()|0)-(to/size()|0))!==1)throw Error('not nearest normal cell');
+   }else if(corpse.cell!==locations[i])throw Error('ordinary corpse moved');
+  }
+  if(s.corpses[5].cell!==start)throw Error('other floor corpse moved');
+  if([start,...around(start)].some(i=>s.cells[i].trap))throw Error('unsafe entrance');
+  const reached=new Set([start]),pending=[start];
+  while(pending.length){const p=pending.shift();for(let i=0;i<s.cells.length;i++)if(adjacent(p,i)&&!s.cells[i].trap&&!reached.has(i)){reached.add(i);pending.push(i)}}
+  if(!reached.has(boss))throw Error('guardian safe route broken');
+  if(JSON.stringify(JSON.parse(localStorage.getItem('ash-v1')).corpses)!==JSON.stringify(s.corpses))throw Error('relocation not saved');
+ }
+`);
+console.log('PASS rescue generation: 1000 maps per floor (1–3F), nearest relocation, trap counts, safe entrance/route, other floors and persistence');
+
+// Wipe -> reserve rescue party -> visible bones -> recover -> reload -> temple.
+g=corpseParty(2);
+g.run(`s.gold=321;s.inventory[0].push('helm','healingPotion');s.armor[0].head=1;
+ s.members[0].xp=42;s.mp[1]=2;hurt(999);`);g.drain();
+const rescuedRecords=g.run('JSON.stringify(s.corpses[0].records)');
+const rescuedIds=g.run('s.corpses[0].records.map(r=>r.members.id).join()');
+g.run('changeRecruitParty(s.reserve[0].members.id,true);enterDungeon();');g.drain();
+assert.equal(g.run('s.members.length'),1);
+assert.equal(g.run('s.reserve.length'),0);
+g.run('var rescueCell=s.corpses[0].cell;');
+assert.equal(g.run('s.cells[rescueCell].open'),false);
+function corpseMarkup(g){return g.run("$('#board').innerHTML.match(new RegExp('<button[^>]*data-i=\"'+rescueCell+'\"[^>]*>[\\\\s\\\\S]*?</button>'))[0]");}
+assert.match(corpseMarkup(g),/🦴/);
+assert.match(corpseMarkup(g),/遺体/);
+g.run('s.cells[rescueCell].flag="power";render()');assert.match(corpseMarkup(g),/🦴/);
+g.run('mode="move";cell(rescueCell)');g.drain();
+assert.equal(g.run('s.corpses.length'),1,'a flagged corpse cell must still block movement');
+g.run('s.cells[rescueCell].flag=false;save()');
+g=game(g.saved());
+g.run('var rescueCell=s.corpses[0].cell;Math.random=()=>.99;');
+assert.match(corpseMarkup(g),/🦴/);
+assert.equal(g.run('adjacent(s.pos,rescueCell)'),true);
+g.run('cell(rescueCell);');g.drain();
+assert.equal(g.run('s.corpses.length'),0);
+assert.equal(g.run('s.gold'),321);
+assert.equal(g.run('s.members.length'),1);
+assert.equal(g.run('JSON.stringify(s.reserve)'),rescuedRecords,'recover every field without reviving or altering equipment');
+assert.equal(g.run("s.reserve.every(r=>r.hp===0&&r.members.status==='dead')"),true);
+assert.equal(g.run("s.logs.filter(t=>t==='遺体を回収した。').length"),1);
+assert.doesNotMatch(corpseMarkup(g),/🦴/);
+g.run('cell(s.start)');g.drain();g.run('answerStairs(false)');g.drain();g.run('cell(rescueCell)');g.drain();
+assert.equal(g.run('s.gold'),321,'revisiting must not duplicate rewards');
+assert.equal(g.run('s.reserve.length'),2);
+g=game(g.saved());
+assert.equal(g.run('s.corpses.length'),0);
+assert.equal(g.run('s.reserve.map(r=>r.members.id).join()'),rescuedIds);
+assert.equal(g.run('s.gold'),321);
+g.run('enterTown();Math.random=()=>0;var rescuedId=s.reserve[0].members.id;var raised=templeRaise(rescuedId);');
+assert.equal(g.run('raised.success'),true);
+assert.equal(g.run('s.reserve[0].members.status'),'ok');
+assert.equal(g.run('s.reserve[0].hp'),1);
+assert.equal(g.run('s.gold'),221);
+assert.equal(g.run('changeRecruitParty(rescuedId,true)'),true);
+console.log('PASS rescue: real wipe, replacement party, hidden/flagged/reloaded bone icon, full dead records/gold recovered once, temple and rejoining');
+
+// Several wipes may share a cell; collect all before rolling the normal encounter.
+g=corpseParty(1);
+g.run('s.gold=123;hurt(999)');g.drain();
+g.run(`changeRecruitParty(s.reserve[0].members.id,true);enterDungeon();`);g.drain();
+g.run(`var rescueCell=s.corpses[0].cell;
+ var extra=generateRecruit('追加遺体',2);extra.members.status='dead';extra.hp=0;
+ s.corpses.push({id:'same-cell',floor:1,cell:rescueCell,records:[extra],gold:45},
+  {id:'other-cell',floor:1,cell:s.boss,records:[],gold:99},
+  {id:'other-floor',floor:2,cell:rescueCell,records:[],gold:88});
+ var realEncounter=encounter, encounterSawRecovery=false;
+ encounter=(...args)=>{encounterSawRecovery=s.reserve.length===2&&s.gold===168&&s.corpses.length===2;return realEncounter(...args)};
+ Math.random=()=>0;cell(rescueCell);`);
+assert.equal(g.run('encounterSawRecovery'),true);
+assert.equal(g.run('s.corpses.map(c=>c.id).join()'),'other-cell,other-floor');
+assert.equal(g.run("logQueue.findIndex(e=>e.text==='遺体を回収した。')<logQueue.findIndex(e=>e.encounter)"),true);
+assert.equal(g.run("logQueue.find(e=>e.text==='遺体を回収した。').enemy"),null);
+g.drain();
+assert.equal(g.run('s.reserve.length'),2);
+assert.equal(g.run('s.gold'),168);
+console.log('PASS rescue: overlapping corpses collected together, other cells/floors retained, normal encounter and snapshot order preserved');
