@@ -41,8 +41,8 @@ combat.run(`s.ailments=s.members.map(()=>({poison:true,paralysis:4}));var before
 assert.equal(combat.run('s.area'), 'town');
 assert.equal(combat.run('s.hp[2]'), 0);
 assert.equal(combat.run('s.mp[2]'), 1, 'dead members do not refill MP');
-assert.equal(combat.run('s.mp[1]===beforeTownMP[1]'), true, 'town return preserves MP');
-assert.equal(combat.run('s.hp.every((h,i)=>h===beforeTownHP[i])'), true, 'town return preserves HP');
+assert.equal(combat.run("s.mp.every((mp,i)=>mp===(s.members[i].status==='ok'?s.members[i].maxMP:beforeTownMP[i]))"), true, 'town return refills only ok members MP');
+assert.equal(combat.run("s.hp.every((h,i)=>h===(s.members[i].status==='ok'?s.members[i].maxHP:beforeTownHP[i]))"), true, 'town return refills only ok members HP');
 assert.equal(combat.run('s.ailments.some(a=>a.poison||a.paralysis)'), false);
 assert.match(combat.run("$('#party').innerHTML"), /ailment-dead.*死亡/);
 const town = reload(combat);
@@ -101,6 +101,13 @@ assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
 assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
 assert.equal(states.run('[0,1,2].map(ailmentLabel).join()'), '死亡,灰,ロスト');
 assert.equal(states.run('s.ailments.some(a=>a.poison||a.paralysis)'), false);
+states.run("s.members.forEach(m=>m.xp=650);s.gold=0;stayAtInn('stable');");
+assert.equal(states.run('s.members.slice(0,3).map(m=>m.level).join()'), '1,1,1');
+assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
+assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
+assert.equal(states.run('s.members.slice(3).every(m=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length)'), true, 'every ok member levels at the stable');
+assert.equal(states.run('s.gold'), 0);
+states.run("$('#leveldialog').close();");
 for (const i of [0,1,2]) {
   const g = reload(states);
   g.run(`setPartyFromRoster(trainingRoster(),[${i},3]);enterDungeon();`);
