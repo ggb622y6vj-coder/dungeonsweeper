@@ -107,6 +107,26 @@ with sync_playwright() as p:
             page.wait_for_function('!!globalThis.KeyNav && !logBusy()')
             return context, page
 
+        # 046: two fighters reserve the same front row. The second attack
+        # silently moves to the next living row, through real command entry.
+        save = fixture(enemy=combat())
+        save['enemy']['units'][0]['hp'] = 1
+        context, page = load(save)
+        for i in (0, 1):
+            tab_to(page, '[data-command-choice="fight"]'); press(page, 'Space')
+            tab_to(page, '[data-row-choice="7"]'); press(page, 'Space')
+        for i in range(2, 6):
+            tab_to(page, '[data-command-choice="guard"]'); press(page, 'Space')
+        assert page.evaluate('s.attackRows.slice(0,2).every(k=>String(k)==="7")')
+        tab_to(page, '#attack'); press(page, 'Space')
+        assert page.evaluate('s.enemy.units[0].hp===0 && s.enemy.units[1].hp<999')
+        assert page.evaluate('s.logs.filter(t=>t.includes("の攻撃。")).length===2')
+        assert page.evaluate('!s.logs.some(t=>t.includes("全滅している"))')
+        # Exact log count excludes any additional target-switch announcement.
+        assert page.evaluate('s.logs.length===8')  # turn + four guards + two attacks + kill
+        assert '全滅している' not in page.locator('#log').inner_text()
+        context.close()
+
         # Six members: fight, group spell, ally spell, guard, medicine, guard.
         context, page = load(fixture(enemy=combat()))
         press(page, 'Space')

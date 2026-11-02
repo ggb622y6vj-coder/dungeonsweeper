@@ -211,3 +211,12 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 ## 045 ディスペルの敵Lv係数を Wizardry 式に
 
 `dist/monsters.js` に `dispelChance(casterLv,enemyLv)=clamp(0.05,0.95,0.5+0.05×casterLv−0.10×enemyLv+0.05×K)`（`DISPEL_LEVEL_OFFSET` K=12）を追加し、`dispelUndead` で使用。K は全不死14種のLv中央値（2,4,5,6,7,8,9,11,13,15,15,18,18,20 → (11+13)/2=12）。敵Lv=K のとき旧式と一致。6F亡霊（Lv11）に僧侶Lv12で 55%→60%。経験値なしの仕様は不変。`tests/game.cjs` に Lv12対Lv10/11/12（70/60/50%）と上下限のテストを追加。シムAIはディスペルを使わないためシム結果は不変。
+
+
+## 046 戦う対象列の自動切替
+
+`partyAction()` は予約した列に生存対象がいなければ、`reachableEnemyGroups(i)` の最前の生存グループへ無言で切り替える。近接は現在の前2列・射程武器は全列という既存ルールを維持し、到達可能な生存グループがない場合だけ従来の全滅ログを表示する。予約列の安定ID・呪文の自動切替処理は変更しない。
+
+`tests/attack-retarget.cjs` を追加し `tests/game.cjs` からも実行。2人の同一列予約、次列への攻撃、ログ非追加、スナップショット順、安定ID、近接／射程武器の範囲、対象なし、呪文切替を検証する。既存の守護者戦テストは随伴だけを倒す入力を1人の攻撃へ変更し、ログ同期テストの撃破ログ期待値を現行の「敵を倒した。」へ合わせた。
+
+`tests/battle-keys-browser.py` に1280/390pxで実際に2人が同じ前列を選んで戦い、次列への攻撃とログ数を確認するケースを追加。HTTPサーバー・Chromium起動を試みたが、ソケット権限制限（Operation not permitted）で停止したため実ブラウザ検証は未完了。Node全18本、敵CSV整合チェック、sim/selftest、ブラウザテストのPython構文確認はPASS。公開は未実施。
