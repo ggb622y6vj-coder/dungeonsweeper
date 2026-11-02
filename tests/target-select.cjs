@@ -105,7 +105,7 @@ for (const battle of [false, true]) {
     if (action === 'Spell' && !battle) assert.equal(g.run('spellSelected'), 'dios');
     if (action === 'Medicine') assert.equal(g.run("$('#medicineitem').value"), '0');
     if (battle) {
-      g.run(`start${action}();$('#commandentry').onclick(commandEvent('[data-command-back]'))`);
+      g.run(`start${action}();$('#commandentry').onclick(commandEvent('#allytargetcancel'))`);
       assert.equal(state(g), before);
       assert.equal(g.run('allyTargetPick'), null);
       assert.equal(g.run('pendingSpell'), null);

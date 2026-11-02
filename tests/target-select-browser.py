@@ -9,6 +9,14 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 
+def layout(page):
+    return page.evaluate("""()=>({party:document.querySelector('#party').getBoundingClientRect().y,partyBottom:document.querySelector('#party').getBoundingClientRect().bottom,command:document.querySelector('#commandentry')?.getBoundingClientRect().y})""")
+
+def assert_layout(before, after, battle=False):
+    assert abs(before['party']-after['party']) <= 1, (before, after)
+    if battle:
+        assert abs(before['command']-after['command']) <= 1, (before, after)
+
 def snapshot(page):
     return page.evaluate("JSON.stringify([s.hp,s.mp,s.inventory,s.commands,s.magicPlans,s.itemPlans,commandIndex,commandConfirmed])")
 
@@ -53,10 +61,14 @@ def finished(page):
     assert page.evaluate('allyTargetPick===null && pendingSpell===null')
     assert page.locator('#party [data-ally-target]').count() == 0
     assert page.locator('#party .targetable,#party .untargetable').count() == 0
-    assert not page.locator('#allytargetbar').is_visible()
+    assert page.locator('#allytargetbar').is_hidden()
+    assert page.locator('#allytargetbattlebar').is_hidden()
     assert not page.locator('#statsdialog').is_visible()
     assert page.locator('#party').get_attribute('role') == 'button'
 
+
+screenshot_dir = Path(os.environ.get('TARGET_SELECT_SCREENSHOT_DIR', '/workspace/sim'))
+screenshot_dir.mkdir(parents=True, exist_ok=True)
 
 chrome_path = os.environ.get('CHROME_PATH')
 if not chrome_path:
@@ -99,8 +111,11 @@ with sync_playwright() as p:
         for begin in (spell, medicine):
             reset(page)
             before_mp = page.evaluate('s.mp[1]')
+            before_layout = layout(page)
             before_boxes = page.locator('#party .card').evaluate_all('(els)=>els.map(e=>({w:e.offsetWidth,h:e.offsetHeight}))')
             begin(page)
+            assert_layout(before_layout, layout(page))
+            assert page.locator('#allytargetbar').bounding_box()['y'] >= page.locator('#party').bounding_box()['y'] + page.locator('#party').bounding_box()['height']
             assert page.locator('#party .targetable').count() == 2
             assert page.locator('#party .untargetable').count() == 4
             assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
@@ -126,8 +141,9 @@ with sync_playwright() as p:
                 bounds = box.bounding_box()
                 assert bounds['width'] >= 44 and bounds['height'] >= 44
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
-            page.screenshot(path=f'/tmp/target-select-{begin.__name__}-{width}.png')
+            page.screenshot(path=str(screenshot_dir / f'ts-{width}-below-field-{begin.__name__}.png'))
             tap_target()
+            assert_layout(before_layout, layout(page))
             finished(page)
             page.wait_for_function('!logBusy()')
             assert page.evaluate('s.hp[2]') == 6
@@ -138,7 +154,7 @@ with sync_playwright() as p:
         for begin, select, button in ((spell, 'magictarget', 'magiccast'), (medicine, 'medicinetarget', 'medicineuse')):
             reset(page)
             begin(page)
-            assert page.locator(f'#allytargetfallback #{select}').is_visible()
+            assert page.locator(f'{"#allytargetbattlefallback" if page.locator("#battle").is_visible() else "#allytargetfallback"} #{select}').is_visible()
             assert page.locator(f'#{select} option').evaluate_all('(els)=>els.map(e=>e.value)') == ['1', '2']
             page.locator(f'#{select}').select_option('2')
             page.locator(f'#{button}').click()
@@ -148,17 +164,38 @@ with sync_playwright() as p:
 
         # Battle picks reserve actions, leave resources intact, and advance once.
         for begin, plan in ((spell, 'magicPlans'), (medicine, 'itemPlans')):
-            for fallback in (False, True):
+            for fallback in (False, True, 'buttons') if begin == spell else (False, True):
                 reset(page, True)
                 resources = page.evaluate('JSON.stringify([s.hp,s.mp,s.inventory])')
+                before_layout = layout(page)
+                before_back = page.locator('[data-command-back]').bounding_box()
+                assert abs(before_back['height']-48) <= 0.5, before_back
                 begin(page, True)
-                if fallback and begin == spell:
+                assert_layout(before_layout, layout(page), battle=True)
+                cancel_button = page.locator('#commandentry #allytargetcancel')
+                assert cancel_button.count() == 1
+                cancel_box = cancel_button.bounding_box()
+                assert abs(before_back['x']-cancel_box['x']) <= 2
+                assert abs(before_back['width']-cancel_box['width']) <= 2
+                assert abs(before_back['height']-cancel_box['height']) <= 2
+                assert cancel_box['height'] >= 44
+                assert page.locator('#commandentry [data-command-back]').count() == 0
+                assert page.locator('[id=allytargetcancel]').count() == 1
+                assert page.locator('#allytargetbattlebar').is_visible()
+                assert page.locator('#allytargetbattlebar').bounding_box()['y'] >= page.locator('#battle').bounding_box()['y'] + page.locator('#battle').bounding_box()['height']
+                assert page.locator('#allytargetbar').is_hidden()
+                page.screenshot(path=str(screenshot_dir / f'ts-{width}-below-battle-{begin.__name__}.png'))
+                if fallback == 'buttons':
                     page.locator('[data-spell-target="2"]').click()
+                elif fallback and begin == spell:
+                    page.locator('#allytargetspellselect').select_option('2')
+                    page.locator('#allytargetspelluse').click()
                 elif fallback:
                     page.locator('#medicinetarget').select_option('2')
                     page.locator('#medicineuse').click()
                 else:
                     tap_target()
+                assert_layout(before_layout, layout(page), battle=True)
                 finished(page)
                 assert page.evaluate(f's.{plan}[1].target') == 2
                 assert page.evaluate('commandIndex') == 1
@@ -168,20 +205,34 @@ with sync_playwright() as p:
                 assert page.locator('#commandreviewpopup').is_visible()
                 page.locator('[data-command-back]').click()
                 assert page.evaluate('commandIndex') == 1
+                back_after = page.locator('#commandentry > [data-command-back]').bounding_box()
+                assert abs(back_after['height']-48) <= 0.5, back_after
 
         # Cancel button/Escape/back do not reserve or spend; field choices survive.
         for battle in (False, True):
             for begin, dialog in ((spell, 'magicdialog'), (medicine, 'medicinedialog')):
-                for cancel in ('button', 'escape', 'back') if battle else ('button', 'escape'):
+                for cancel in ('button', 'escape'):
                     reset(page, battle)
                     before = snapshot(page)
+                    before_layout = layout(page)
+                    back_before = page.locator('#commandentry > [data-command-back]').bounding_box() if battle else None
                     begin(page, battle)
+                    assert_layout(before_layout, layout(page), battle=battle)
+                    if battle:
+                        assert page.evaluate("document.querySelector('#commandentry').lastElementChild.id") == 'allytargetcancel'
+                        assert page.locator('[data-command-back]').count() == 0
                     if cancel == 'escape':
                         page.keyboard.press('Escape')
                     else:
-                        page.locator('#allytargetcancel' if cancel == 'button' else '[data-command-back]').click()
+                        page.locator('#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel').click()
+                    assert_layout(before_layout, layout(page), battle=battle)
                     finished(page)
                     assert snapshot(page) == before
+                    if battle:
+                        back_again = page.locator('#commandentry > [data-command-back]').bounding_box()
+                        for k in ('x', 'y', 'width', 'height'):
+                            assert abs(back_before[k]-back_again[k]) <= 2, (back_before, back_again)
+                        assert abs(back_again['height']-48) <= 0.5, back_again
                     assert page.locator(f'#{dialog}').is_visible() == (not battle)
                     if not battle:
                         if begin == spell:
@@ -191,15 +242,31 @@ with sync_playwright() as p:
                             assert page.locator('#medicineitem').input_value() == '0'
                             page.locator('#medicinepick').click()
                         assert page.locator('#party .targetable').count() == 2
-                        page.locator('#allytargetcancel').click()
+                        page.locator('#allytargetfieldcancel').click()
 
         # Medicine changes preserve the selected slot when cancelled.
         reset(page, True)
         page.locator('[data-command-choice="item"]').click()
         page.locator('#medicineitem').select_option('1')
         assert '解毒剤' in page.locator('#allytargetprompt').inner_text()
-        page.locator('#allytargetcancel').click()
+        page.locator('#commandentry #allytargetcancel').click()
         finished(page)
+
+        # Tab proceeds through eligible cards, the bar controls, then cancel.
+        for battle in (False, True):
+            reset(page, battle)
+            spell(page, battle)
+            page.keyboard.press('Tab')
+            assert page.evaluate('document.activeElement.dataset.allyTarget') == '2'
+            page.keyboard.press('Tab')
+            expected_select = '#allytargetbattlefallback select' if battle else '#allytargetfallback select'
+            assert page.locator(expected_select).evaluate('(el)=>document.activeElement===el')
+            page.keyboard.press('Tab')
+            page.keyboard.press('Tab')
+            cancel_selector = '#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel'
+            assert page.locator(cancel_selector).evaluate('(el)=>document.activeElement===el')
+            page.locator(cancel_selector).click()
+            finished(page)
 
         # Keyboard Tab skips dead members; Enter and Space both commit.
         for key in ('Enter', 'Space'):
