@@ -483,9 +483,9 @@ const ENEMIES=[
     "ac": 9,
     "hit": 2,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 15.0,
     "groupSize": [
@@ -533,9 +533,9 @@ const ENEMIES=[
     "ac": 8,
     "hit": 2,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 22.0,
     "groupSize": [
@@ -578,8 +578,8 @@ const ENEMIES=[
     "ac": 8,
     "hit": 2,
     "attack": [
-      2,
-      5,
+      1,
+      8,
       0
     ],
     "xp": 24.0,
@@ -631,9 +631,9 @@ const ENEMIES=[
     "ac": 8,
     "hit": 2,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 26.0,
     "groupSize": [
@@ -676,9 +676,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 28.0,
     "groupSize": [
@@ -721,9 +721,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 30.0,
     "groupSize": [
@@ -775,9 +775,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 32.0,
     "groupSize": [
@@ -825,9 +825,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 34.0,
     "groupSize": [
@@ -875,9 +875,9 @@ const ENEMIES=[
     "ac": 6,
     "hit": 4,
     "attack": [
-      2,
-      6,
-      0
+      1,
+      8,
+      1
     ],
     "xp": 36.0,
     "groupSize": [
@@ -987,9 +987,9 @@ const ENEMIES=[
     "ac": 8,
     "hit": 3,
     "attack": [
-      3,
+      2,
       6,
-      0
+      2
     ],
     "xp": 30.0,
     "groupSize": [
@@ -1041,9 +1041,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      3,
+      2,
       6,
-      0
+      2
     ],
     "xp": 47.0,
     "groupSize": [
@@ -1086,9 +1086,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      3,
-      9,
-      0
+      2,
+      8,
+      2
     ],
     "xp": 49.0,
     "groupSize": [
@@ -1131,9 +1131,9 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      3,
+      2,
       6,
-      0
+      2
     ],
     "xp": 51.0,
     "groupSize": [
@@ -1230,9 +1230,9 @@ const ENEMIES=[
     "ac": 6,
     "hit": 4,
     "attack": [
-      3,
+      2,
       6,
-      0
+      2
     ],
     "xp": 55.0,
     "groupSize": [
