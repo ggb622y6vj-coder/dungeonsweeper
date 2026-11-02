@@ -163,3 +163,14 @@ Node全15本、compile-monsters --check、sim/selftest、JS/Python構文チェ�
 検証済み：Nodeテスト全15本、compile-monsters --check、sim/selftest、JS/Python構文、git diff --check。既存テストのチェックの削除・緩和はなし。新規fixtureの1ターンと勝利→帰還→レベルアップは既存Nodeハーネスでも実データを確認した（ブラウザ検証の代用ではない）。
 
 レビュー修正（041）：(1) 戦闘コマンド欄と列・呪文対象・薬一覧のA/D/W/Sは、同じ表示行・列の帯を優先する（`KeyNav.gridMove`、該当なしなら038の中心距離）。中心距離だけだと2列の「戦う」でDを押すと全幅の「戻る」へ飛んでいた。町など他のレイヤーの038の動きは変更なし。(2) 薬の一覧ボタンの表示は、薬ダイアログを開いた時点のキーボード／ポインター状態で決める（`hidden`）。html.keynav-keyboardに連動させるとpointerdownで一覧が消えてボタンがずれ、クリックが外れていた（target-select-browserの回帰）。(3) Nodeハーネスに`documentElement`がないため参照をoptional chainingに。ブラウザ全13本は1280/390でPASS、battle-keys-browser.pyは10回連続PASS、JSエラーなし。
+
+
+## 敵物理命中のLv差補正（042）
+
+`dist/game.js` の敵打撃へ `clamp(trunc((敵Lv−被弾者Lv)/3),−3,+3)` を加算。適正LvではCSV命中値を維持する本作独自の調整。自然出目1/20、味方命中、図鑑、キーボード関連、セーブ形式は変更なし。
+
+`tests/monster-level-hit.cjs` を追加し `tests/game.cjs` に接続。Lv差・切捨て・上下限・並替え後の対象Lv・出目1/20・実際の敵打撃経路を検証。固定シードで並べた均等d20標本では6Fの7種がLv5の戦士へLv12比で5〜10ポイント高い命中率。
+
+全10階の指定Lv・職業・n=400シムは全階許容範囲内。除数3を維持。Node全16本、CSV整合性、sim/selftest、git diff --checkはPASS。ブラウザ全13本はレビュー時に1280/390pxでPASS（Codex sandboxでは起動不可のためレビュー側で実施）。表のLvでは通常敵の補正は0で全階シム値は不変。守護者は6F〜9Fで+1・10Fで+2、6F守護者戦の全滅率は28.25%→35.75%（受入基準の対象外、要確認）。
+
+階別比較・計測条件・専用ログの所在は [042検証記録](042-MONSTER-LEVEL-HIT.md) を参照。
