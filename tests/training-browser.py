@@ -1,7 +1,18 @@
 from playwright.sync_api import sync_playwright
-import sys
+import os,sys
+from pathlib import Path
+
+chrome_path=os.environ.get('CHROME_PATH')
+if not chrome_path:
+ for candidate in ('/usr/bin/chromium','/usr/bin/google-chrome','/usr/bin/chromium-browser'):
+  if Path(candidate).exists():
+   chrome_path=candidate
+   break
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ launch_options={'headless':True,'args':['--no-sandbox']}
+ if chrome_path:
+  launch_options['executable_path']=chrome_path
+ browser=p.chromium.launch(**launch_options)
  for width in (1280,390):
   ctx=browser.new_context(viewport={'width':width,'height':900},has_touch=width<700)
   page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
