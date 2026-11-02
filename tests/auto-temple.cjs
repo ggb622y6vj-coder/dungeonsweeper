@@ -114,12 +114,37 @@ g.run(`tavernOrder[3]=3;setTownPartyFromRoster(tavernRoster,tavernOrder)`);
 assert.equal(g.run("JSON.stringify(s.members.map(m=>m.id))"),g.run('before'),'tampered save cannot add dead member');
 assert.equal(g.run("$('#taverndialog').open"),true,'rejected save leaves tavern open');
 assert.equal(g.run("$('#townnotice').textContent"),'死亡したメンバーは加入できません。');
-assert.equal(g.run("$('#tavernnotice').textContent"),'死亡したメンバーは加入できません。','rejection shown inside the tavern dialog');
+assert.equal(g.run("$('#tavernnotice').textContent"),'死亡したメンバーは加入できません。','new impaired member is rejected in the tavern');
+g.run(`s.members[0].status='dead';setTownPartyFromRoster(tavernRoster,[0,1,2,-1,-1,-1])`);
+assert.equal(g.run("$('#tavernnotice').textContent"),'死亡したメンバーを外してください。','already-enrolled impaired member gets a separate message');
+assert.equal(g.run("JSON.stringify(s.members.map(m=>m.id))"),g.run('before'),'kept enrolled impaired member blocks the save');
+assert.equal(g.run("setTownPartyFromRoster(tavernRoster,[-1,1,2,-1,-1,-1])"),true,'removing the enrolled impaired member lets the save pass');
+assert.equal(g.run("s.members.length"),2);assert.equal(g.run("$('#tavernnotice').textContent"),'');assert.equal(g.run("$('#townnotice').textContent"),'');
+g.run(`s.reserve.find(r=>r.members.status==='dead'&&r.members.id===JSON.parse(before)[0]).members.status='ok';tavernRoster=[...partyRecords(),...s.reserve];var back=tavernRoster.findIndex(r=>r.members.id===JSON.parse(before)[0]);if(!setTownPartyFromRoster(tavernRoster,[back,0,1,-1,-1,-1]))throw Error('restore failed');tavernRoster=[...partyRecords(),...s.reserve]`);
 assert.equal(g.run('setTownPartyFromRoster(tavernRoster,[0,1,2,4])'),false,'ash member also rejected by tavern roster setter');
 assert.equal(g.run("JSON.stringify(s.members.map(m=>m.id))"),g.run('before'));
 g.run('tavernOrder=[2,1,0,-1,-1,-1];if(!setTownPartyFromRoster(tavernRoster,tavernOrder))throw Error(\'valid reshuffle failed\')');
 assert.equal(g.run("s.members.map(m=>m.name).join(',')"),'酒場2,酒場1,酒場0','valid party reorder still works');
 console.log('PASS tavern: dead/ash options disabled, tampered save rejected, valid party reorder retained');
+
+// Legacy save loaded in town: carry impaired members, align all parallel arrays, save, and show only temple report.
+{
+ let base=sixParty();base.run(`s.area='town';s.members[1].status='dead';s.members[1].legacyMark=0;s.hp[1]=0;s.members[4].status='lost';s.hp[4]=0;s.templeReport=[];save()`);
+ let loaded=boot(base.saved());
+ assert.equal(loaded.run('s.members.length'),4);assert.equal(loaded.run('s.reserve.length'),2);
+ assert.equal(loaded.run('PARTY_FIELDS.every(k=>s[k].length===4)'),true);
+ assert.equal(loaded.run('[s.commands,s.magicPlans,s.itemPlans,s.attackRows].every(a=>a.length===4)'),true);
+ assert.equal(loaded.run("s.reserve.map(r=>r.members.status).join()"),'dead,lost');
+ assert.equal(loaded.run("$('#templecarrydialog').open"),true);assert.equal(!!loaded.run("$('#leveldialog').open"),false);
+ assert.equal(JSON.parse(loaded.run("localStorage.getItem('ash-v1')")).partyIds.length,4);
+ loaded.run("$('#templecarrydialog').close()");assert.equal(!!loaded.run("$('#leveldialog').open"),false,'load carry does not show level report');
+ loaded.run("$('#entrance').onclick()");assert.equal(loaded.run("s.area==='dungeon'"),true,'dungeon entry remains available');
+ let clean=boot(base.run(`s.members[1].status='ok';s.hp[1]=s.members[1].maxHP;s.members[4].status='ok';s.hp[4]=s.members[4].maxHP;s.templeReport=[];s.area='town';save();localStorage.getItem('ash-v1')`));
+ assert.equal(!!clean.run("$('#templecarrydialog').open"),false,'healthy town load has no dialog');
+ let dungeon=boot(base.run(`s.area='dungeon';s.templeReport=[];save();localStorage.getItem('ash-v1')`));
+ assert.equal(!!dungeon.run("$('#templecarrydialog').open"),false,'dungeon load is unchanged');assert.equal(dungeon.run('s.members.length'),6);
+}
+console.log('PASS legacy town load carries impaired members, saves aligned party, suppresses level report; healthy and dungeon loads do not carry');
 
 // Wipe (defeat) keeps the corpse flow: nothing is carried to the reserve.
 g=sixParty();
