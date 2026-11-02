@@ -129,6 +129,11 @@ function planTurn(g) {
         }
       }
       if (jobOf(i) === 1 && !s.ailments[i].silence && s.mp[i] >= 6) {
+        const makanito = magic('makanito');
+        if (s.mp[i] >= makanito.mp && !spellReason(i, makanito) &&
+            s.enemy.units.filter(e => e.hp > 0 && thresholdDeathApplies(e, makanito.value)).length >= 3) {
+          s.magicPlans[i] = {id:'makanito',target:null}; return 'spell';
+        }
         const targetGroup = enemyGroups().find(g => g.units.some(e => e.hp > 0));
         const target = targetGroup?.units.find(e => e.hp > 0)?.uid;
         const spellOrder = ['tiltowait','lakanito','dalto','mahalito'];
@@ -142,7 +147,7 @@ function planTurn(g) {
       // Prefer curing fear, then damage; retain the normal healing priorities above.
       if (s.ailments[i].fear > 0) {
         const priority = {cure:0,damage:1,buff:2};
-        const spells = MAGIC.filter(x => x.job === jobOf(i) && !spellReason(i,x))
+        const spells = MAGIC.filter(x => x.job === jobOf(i) && !spellReason(i,x) && x.effect !== 'threshold-death')
           .sort((a,b) => (priority[a.effect] ?? 3) - (priority[b.effect] ?? 3));
         for (const x of spells) {
           const target = x.target === 'ally' ? i : ['enemy','group'].includes(x.target)
