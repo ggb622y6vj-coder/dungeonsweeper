@@ -152,7 +152,7 @@ function templeRaise(id){
  const success=petrified||Math.random()*100<templeChance(m);
  m.status=success?'ok':m.status==='dead'?'ash':'lost';
  const i=s.members.findIndex(m=>m.id===id),hp=success?m.maxHP:0;
- if(success&&!petrified){if(i>=0)s.mp[i]=m.maxMP;else r.mp=m.maxMP;}
+ if(success){if(i>=0)s.mp[i]=m.maxMP;else r.mp=m.maxMP;}
  if(petrified){const ailments={poison:false,paralysis:0,sleep:0};if(i>=0)s.ailments[i]=ailments;else r.ailments=ailments;}
  if(i>=0)s.hp[i]=hp;else r.hp=hp;
  const result={id,name:m.name||CLASSES[m.job??0].name,success,status:m.status,cost,petrified};
