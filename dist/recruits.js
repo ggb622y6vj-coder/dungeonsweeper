@@ -39,7 +39,7 @@ function restoreRoster(state) {
 }
 function registerRecruit(record) {
  if(s.area!=='town'||!idle()||!record||trainingRoster().some(r=>r.members.id===record.members.id))return false;
- (s.reserve??=[]).push(structuredClone(record));render();return true;
+ (s.reserve??=[]).push(structuredClone(record));if(typeof recordLibrarySpells==='function')recordLibrarySpells(record.members.known||[]);render();return true;
 }
 function changeRecruitParty(id, join) {
  const roster=trainingRoster(), index=roster.findIndex(r=>r.members.id===id);
