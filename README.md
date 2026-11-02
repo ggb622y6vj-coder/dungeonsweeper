@@ -26,6 +26,7 @@ node tests/game.cjs
 python3 scripts/compile-monsters.py --check
 node tests/training.cjs
 node tests/auto-reorder.cjs
+node tests/petrify.cjs
 ```
 
 町の「図書館」で撃破済みモンスターと入手済みアイテムを閲覧できます。収集率はモンスター88種・装備52品、薬5品はアイテムタブの別枠です。記録は全滅や登録抹消でも残ります。図鑑の回帰テストは `node tests/game.cjs` に含まれ、単独では `node tests/library.cjs` で実行できます。
@@ -49,6 +50,7 @@ node tests/game.cjs
 ```sh
 python3 tests/training-browser.py
 python3 tests/auto-reorder-browser.py
+python3 tests/petrify-browser.py
 ```
 
 これは独立したブラウザコンテキストでPC・スマートフォン幅を検証します。アプリ自体に追加依存はありません。

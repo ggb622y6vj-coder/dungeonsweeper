@@ -286,5 +286,6 @@ require('./temple.cjs');
 require('./library.cjs');
 require('./target-select.cjs');
 require('./auto-reorder.cjs');
+require('./petrify.cjs');
 
 const html=fs.readFileSync(require('path').join(__dirname,'../dist/index.html'),'utf8');if(/id=["'](?:room|inncost|innopen|inndialog|stable)["']/.test(html)||html.includes('宿屋')||html.includes('馬小屋'))throw Error('inn remains in UI');console.log('PASS inn removed from town UI');

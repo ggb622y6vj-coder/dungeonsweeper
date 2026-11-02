@@ -1914,7 +1914,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "stone",
+        "chance": 0.05
+      }
+    ],
     "resistance": "毒無効",
     "boss": false,
     "icon": "◆",
@@ -2494,7 +2499,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "stone",
+        "chance": 0.08
+      }
+    ],
     "resistance": "毒無効",
     "boss": false,
     "icon": "◆",
@@ -3539,6 +3549,10 @@ const ENEMIES=[
       {
         "type": "paralysis",
         "chance": 0.3
+      },
+      {
+        "type": "stone",
+        "chance": 0.1
       }
     ],
     "resistance": "なし",
@@ -4264,6 +4278,10 @@ const ENEMIES=[
       {
         "type": "paralysis",
         "chance": 0.1
+      },
+      {
+        "type": "stone",
+        "chance": 0.05
       }
     ],
     "resistance": "なし",

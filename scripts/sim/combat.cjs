@@ -45,7 +45,18 @@ function createParty(g, jobs) {
   // Observe the real completion path, even if enemies all flee during an ambush.
   g.run(`var simBase = structuredClone(partyRecords());
     var simBattleFinished = false, simFinishMonsterBattle = finishMonsterBattle;
-    finishMonsterBattle = function() { simBattleFinished = true; return simFinishMonsterBattle(); };`);
+    finishMonsterBattle = function() { simBattleFinished = true; return simFinishMonsterBattle(); };
+    // Keep petrified HP and real deaths even if an opening ambush wipes the
+    // party and the game's log drain removes it before resolveBattle starts.
+    var simWipeResult = null, simDefeat = defeat;
+    defeat = function() {
+      simDefeat();
+      if(s.defeatPending) simWipeResult = {
+        alive: activeMembers().length,
+        deaths: s.corpses.at(-1).records.filter(r => r.members.status !== 'stone').length,
+        total: s.hp.reduce((a,b) => a+b, 0), cleared: false
+      };
+    };`);
 }
 
 function prepareTrial(g, opt) {
@@ -63,6 +74,7 @@ function prepareTrial(g, opt) {
     s.area = 'dungeon';
     resetPartyCommands();
     simBattleFinished = false;
+    simWipeResult = null;
     s.cells[s.pos].type = ${opt.boss ? "'boss'" : "'stairs'"};
   `);
   // Include damage from the initial enemy ambush in HP loss.
@@ -98,10 +110,14 @@ function planTurn(g) {
   g.run(`
     s.magicPlans = s.members.map(() => null);
     s.commands = s.members.map((m,i) => {
-      if (s.hp[i] <= 0 || s.ailments[i].paralysis > 0) return 'guard';
+      if (partyIncapacitated(i)) return 'guard';
       if (jobOf(i) === 2) {
+        const stone = s.members.findIndex(m => m.status === 'stone');
+        if (stone >= 0 && m.known.includes('madi') && !spellReason(i, magic('madi'))) {
+          s.magicPlans[i] = {id:'madi',target:stone}; return 'spell';
+        }
         const target = s.hp.map((_,j) => j)
-          .filter(j => s.hp[j] > 0 && s.hp[j] / s.members[j].maxHP < .45)
+          .filter(j => activeMember(j) && s.hp[j] / s.members[j].maxHP < .45)
           .sort((a,b) => s.hp[a] / s.members[a].maxHP - s.hp[b] / s.members[b].maxHP)[0];
         const id = ['dialma','dial','dios'].find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
         if (target !== undefined && id) { s.magicPlans[i] = {id,target}; return 'spell'; }
@@ -127,19 +143,16 @@ function planTurn(g) {
 
 function resolveBattle(g, maxRounds = 200) {
   let rounds = 0;
+  const openingWipe = g.run('(()=>{const result=simWipeResult;simWipeResult=null;return result})()');
+  if (openingWipe) return { ...openingWipe, outcome: 'wipe', rounds };
   while (g.run('!!s.enemy && !s.done')) {
     if (rounds >= maxRounds) throw Error(`${maxRounds}ラウンド以内に決着しませんでした（未決着を勝利には数えません）`);
-    const retreat = g.run('s.hp.reduce((a,b) => a+b, 0) < .25 * s.members.reduce((a,m) => a+m.maxHP, 0) && escapeChance() > 0');
+    const retreat = g.run('activeMembers().reduce((n,i) => n+s.hp[i], 0) < .25 * s.members.reduce((a,m) => a+m.maxHP, 0) && escapeChance() > 0');
     if (retreat) g.run('flee()');
     else { planTurn(g); g.run('attack()'); }
     // Capture the party before the defeat log finishes and finishDefeat clears it.
     if (g.run('!!s.defeatPending')) {
-      const result = g.run(`({
-        alive: s.hp.filter(h => h > 0).length,
-        deaths: (s.corpses?.at(-1)?.records || []).length,
-        total: s.hp.reduce((a,b) => a+b, 0),
-        cleared: simBattleFinished
-      })`);
+      const result = g.run('(()=>{const result=simWipeResult;simWipeResult=null;return result})()');
       g.drain();
       return { ...result, outcome: 'wipe', rounds: rounds + 1 };
     }
@@ -148,8 +161,8 @@ function resolveBattle(g, maxRounds = 200) {
     rounds++;
   }
   const result = g.run(`({
-    alive: s.hp.filter(h => h > 0).length,
-    deaths: s.hp.filter(h => h <= 0).length,
+    alive: activeMembers().length,
+    deaths: s.members.filter((m,i) => m.status !== 'stone' && !activeMember(i)).length,
     total: s.hp.reduce((a,b) => a+b, 0),
     cleared: simBattleFinished
   })`);

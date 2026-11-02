@@ -1,3 +1,33 @@
+033 石化 — 2026-11-02（基点: 032 / d562680）
+
+PASS tests/auto-reorder.cjs
+PASS tests/auto-temple.cjs
+PASS tests/death-status.cjs
+PASS tests/final-boss.cjs
+PASS tests/game.cjs
+PASS tests/library.cjs
+PASS tests/monster-dice.cjs
+PASS tests/petrify.cjs
+PASS tests/target-select.cjs
+PASS tests/temple.cjs
+PASS tests/training.cjs
+PASS python3 scripts/compile-monsters.py --check（88体、指定4体のstoneと既存麻痺を検証）
+PASS node scripts/sim/selftest.cjs
+PASS 全ブラウザスクリプトのPython構文検査
+PASS git diff --check
+
+petrify.cjs: 固定乱数の邪眼命中、石化→後退のスナップショット、HP保持・ailments解除、
+通常／後衛攻撃計1,000回・複数回攻撃・単体／全体呪文・ブレスの対象除外、
+探索・毒・罠・全滅（5経路）・遺体回収／途中再読込、マディ／無効治療ログ、
+帰還／町ロード搬送、訓練所／酒場加入禁止、寺院費用・100%解除・再加入を確認。
+sim selftest: 石化者の行動と通常治療対象除外、マディ、死亡数と保持HP、奇襲全滅記録。
+
+PASS ブラウザ 8本 × Chromium 1280/390px（executor 実行）:
+  auto-reorder / auto-temple / load-carry / petrify（新規）/ target-select /
+  tavern / town-layout / training — JSエラー・横スクロール無し。
+
+--- 032以前の検証記録 ---
+
 032 自動後退 — 2026-11-02
 並び順はOK例の前衛3枠の繰上げを採用（ACDBEF → CDEABF）。
 既存の検証項目を維持し、死亡者の実データ参照をメンバーIDへ変更。

@@ -13,11 +13,14 @@ function ensureSixParty(){
  for(let [job,name] of [[0,'戦士Ⅱ'],[0,'戦士Ⅲ'],[3,'盗賊']]){let c=CLASSES[job],id='member-'+s.members.length;s.members.push({id,job,name,level:1,xp:0,maxHP:c.hp,maxMP:c.mp,attack:c.attack,ac:c.ac});s.hp.push(c.hp);s.mp.push(c.mp);s.inventory.push([['sword','staff','mace','dagger'][job]]);s.equipped.push(0);s.armor.push({});s.ailments.push({poison:false,paralysis:0})}
  let order=[0,3,4,2,1,5];for(let key of PARTY_FIELDS)s[key]=order.map(i=>s[key][i]);s.partyVersion=1;resetPartyCommands();refreshNames();
 }
+// Eligible for enemy/trap targeting and counted as a survivor (paralysis is still alive).
+function activeMember(i){return s.hp[i]>0&&!['dead','ash','lost','stone'].includes(s.members[i]?.status)}
+function activeMembers(){return s.members.flatMap((_,i)=>activeMember(i)?[i]:[])}
+function partyIncapacitated(i){return !activeMember(i)||s.ailments[i]?.paralysis>0}
 // Only fill vacant front-line roles. The remaining members retain their order,
 // so a cured rear member never jumps forward merely because they recovered.
-function partyIncapacitated(i){return ['dead','ash','lost','stone'].includes(s.members[i].status)||s.hp[i]<=0||s.ailments[i]?.paralysis>0}
 function autoReorderParty(reason){
- if(s.defeatPending||s.done||!s.hp.some(h=>h>0))return false;
+ if(s.defeatPending||s.done||!activeMembers().length)return false;
  const oldMembers=s.members.slice(),indices=oldMembers.map((_,i)=>i);
  if(!indices.some(i=>i<3&&partyIncapacitated(i))||!indices.some(i=>i>=3&&!partyIncapacitated(i)))return false;
  const front=indices.filter(i=>!partyIncapacitated(i)).slice(0,3);
@@ -51,10 +54,10 @@ let tavernOrder=[],tavernRoster=[];
 function partyRecords(){return s.members.map((m,i)=>Object.fromEntries(PARTY_FIELDS.map(key=>[key,s[key][i]])))}
 function setPartyFromRoster(roster,order){let active=order.filter(i=>i>=0);if(s.area!=='town'||!idle()||active.length>6||new Set(active).size!==active.length||active.some(i=>!Number.isInteger(i)||!roster[i]))return false;for(let key of PARTY_FIELDS)s[key]=active.map(i=>roster[i][key]);s.reserve=roster.filter((r,i)=>!active.includes(i));displayVitals=null;resetPartyCommands();refreshNames();render();return true}
 function setTownPartyFromRoster(roster,order){let active=order.filter(i=>i>=0);if(active.some(i=>Number.isInteger(i)&&i<s.members.length&&roster[i]&&roster[i].members?.status!=='ok')){$('#townnotice').textContent=$('#tavernnotice').textContent='死亡したメンバーを外してください。';return false}if(active.some(i=>Number.isInteger(i)&&roster[i]&&roster[i].members?.status!=='ok')){$('#townnotice').textContent=$('#tavernnotice').textContent='死亡したメンバーは加入できません。';return false}$('#tavernnotice').textContent='';if(['死亡したメンバーは加入できません。','死亡したメンバーを外してください。'].includes($('#townnotice').textContent))$('#townnotice').textContent='';return setPartyFromRoster(roster,order)}
-function tavernStatusName(m){return ({dead:'（死亡）',ash:'（灰）',lost:'（ロスト）'})[m.status]||''}
+function tavernStatusName(m){return ({dead:'（死亡）',ash:'（灰）',lost:'（ロスト）',stone:'（石化）'})[m.status]||''}
 function renderTavern(){ $('#tavernslots').innerHTML=tavernOrder.map((id,slot)=>`<label>${slot<3?'前衛':'後衛'} ${slot%3+1}<select data-tavern-slot="${slot}"><option value="-1" ${id<0?'selected':''}>空き</option>${tavernRoster.map((r,i)=>`<option value="${i}" ${id===i?'selected':''} ${r.members.status!=='ok'?'disabled':''}>${r.members.name}${tavernStatusName(r.members)} · Lv.${r.members.level}</option>`).join('')}</select></label>`).join('');$('#tavernsave').disabled=false}
 function partyUI(){ $('#tavernopen').onclick=()=>{if(s.area!=='town'||!idle())return;tavernRoster=[...partyRecords(),...(s.reserve||[])];tavernOrder=Array.from({length:6},(_,i)=>i<s.members.length?i:-1);$('#tavernnotice').textContent='';renderTavern();$('#taverndialog').showModal()};$('#tavernclose').onclick=()=>$('#taverndialog').close();$('#tavernslots').onchange=e=>{let slot=Number(e.target.dataset.tavernSlot),id=Number(e.target.value),other=id<0?-1:tavernOrder.indexOf(id);if(!Number.isInteger(slot))return;if(other>=0)tavernOrder[other]=tavernOrder[slot];tavernOrder[slot]=id;renderTavern()};$('#tavernsave').onclick=()=>{if(setTownPartyFromRoster(tavernRoster,tavernOrder))$('#taverndialog').close()};$('#chestthief').onclick=thiefOpenChest}
-function thiefMember(){return s.members.findIndex((m,i)=>jobOf(i)===3&&s.hp[i]>0&&!s.ailments[i].paralysis)}
+function thiefMember(){return s.members.findIndex((m,i)=>jobOf(i)===3&&!partyIncapacitated(i))}
 function thiefOpenChest(){let c=currentChest(),i=thiefMember();if(!c||i<0||logBusy()||s.enemy||s.done)return;fixChestTrap(c);if(Math.random()<.85){log(NAMES[i]+'が宝箱の罠を解除した。');rewardChest(c)}else{c.opened=true;log(NAMES[i]+'は宝箱の解除に失敗した！');triggerChestTrap(c);delete s.cells[s.pos].chest;log('宝箱は失われた。')}render()}
 
 function renderEquipmentSummary(i){$('#equipmentsummary').innerHTML=[['武器',s.equipped[i]],['頭',s.armor[i].head],['胴体',s.armor[i].body],['足',s.armor[i].feet]].map(([label,slot])=>`<div><small>${label}</small><b>${weapon(s.inventory[i][slot])?.name||'−'}</b></div>`).join('')}
