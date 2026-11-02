@@ -30,10 +30,12 @@ function migrateMonsterBattle(){
 function monsterResists(e,effect){return effect==='poison'&&enemyDefinition(e.id).resistance.includes('毒無効')}
 function afflictMonster(e,effect){if(monsterResists(e,effect))return false;e[effect]=true;return true}
 
-// Dispel checks every living undead separately. The exact original formula is undocumented here.
+// The undead-level median is 12; this keeps the formula centered on the intended party level range.
+const DISPEL_LEVEL_OFFSET=12;
+function dispelChance(casterLevel,targetLevel){return Math.max(.05,Math.min(.95,.5+.05*casterLevel-.10*targetLevel+.05*DISPEL_LEVEL_OFFSET))}
 function dispelUndead(i){
  log(`${NAMES[i]}は呪いを解こうとした。`);
  let targets=s.enemy.units.filter(e=>e.hp>0&&enemyDefinition(e.id).race==='不死');
  if(!targets.length){log('効果はなかった。');return}
- for(const e of targets){let chance=Math.max(.05,Math.min(.95,.5+.05*(s.members[i].level-monsterLevel(e))));if(Math.random()<chance){let name=enemyDisplay(e);e.hp=0;e.rewarded=true;e.escaped=true;log(`${name}は消え去った。`)}else log(`${enemyDisplay(e)}には効かなかった。`)}
+ for(const e of targets){let chance=dispelChance(s.members[i].level,monsterLevel(e));if(Math.random()<chance){let name=enemyDisplay(e);e.hp=0;e.rewarded=true;e.escaped=true;log(`${name}は消え去った。`)}else log(`${enemyDisplay(e)}には効かなかった。`)}
 }

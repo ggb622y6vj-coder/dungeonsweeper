@@ -206,3 +206,8 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 ## 044 ラカニトのLv判定整理
 
 `dist/spells.js` のラカニトを `lakanitoApplies(e)`（非守護者・非不死・非構造体）＋ `killByMagic(e)` に整理。成功率 `max(0,100−monsterLevel(e)×6)` は不変。対象外は乱数を引かず「〇〇には効かない！」、抵抗は「〇〇は耐えた。」。構造体を無効対象に追加。`tests/makanito.cjs` に Lv10 の 39.9/40.0 境界、Lv17（霜の巨人）は常に耐える、不死・構造体・守護者の「効かない！」表示を追加。
+
+
+## 045 ディスペルの敵Lv係数を Wizardry 式に
+
+`dist/monsters.js` に `dispelChance(casterLv,enemyLv)=clamp(0.05,0.95,0.5+0.05×casterLv−0.10×enemyLv+0.05×K)`（`DISPEL_LEVEL_OFFSET` K=12）を追加し、`dispelUndead` で使用。K は全不死14種のLv中央値（2,4,5,6,7,8,9,11,13,15,15,18,18,20 → (11+13)/2=12）。敵Lv=K のとき旧式と一致。6F亡霊（Lv11）に僧侶Lv12で 55%→60%。経験値なしの仕様は不変。`tests/game.cjs` に Lv12対Lv10/11/12（70/60/50%）と上下限のテストを追加。シムAIはディスペルを使わないためシム結果は不変。
