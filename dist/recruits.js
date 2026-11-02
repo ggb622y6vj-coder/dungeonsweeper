@@ -44,11 +44,22 @@ function registerRecruit(record) {
 function changeRecruitParty(id, join) {
  const roster=trainingRoster(), index=roster.findIndex(r=>r.members.id===id);
  if(index<0)return false;
- if(join&&roster[index].members.status==='lost')return false;
+ if(join&&roster[index].members.status!=='ok')return false;
  let order=s.members.map((_,i)=>i);
  if(join){if(index<order.length||order.length>=6)return false;order.push(index)}
  else {if(index>=order.length)return false;order=order.filter(i=>i!==index)}
  return setPartyFromRoster(roster,order);
+}
+function removeFromParty(ids){
+ const removed=new Set(ids),records=partyRecords(),order=records.map((r,i)=>removed.has(r.members.id)?-1:i).filter(i=>i>=0);
+ if(!records.some(r=>removed.has(r.members.id)))return [];
+ const kept=order.map(i=>records[i]),moved=records.filter(r=>removed.has(r.members.id)).map(r=>Object.fromEntries(PARTY_FIELDS.map(key=>[key,r[key]])));
+ for(const key of PARTY_FIELDS)s[key]=kept.map(r=>r[key]);
+ s.reserve=[...(s.reserve||[]),...moved];
+ s.commands=s.members.map((_,i)=>i<3?'fight':'guard');
+ s.magicPlans=s.members.map(()=>null);s.itemPlans=s.members.map(()=>null);s.attackRows=s.members.map(()=>null);
+ displayVitals=null;refreshNames();
+ return moved;
 }
 function deleteRecruit(id) {
  if(s.area!=='town'||!idle())return false;

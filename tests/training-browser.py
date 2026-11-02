@@ -94,18 +94,25 @@ with sync_playwright() as p:
   # Town return levels eligible members and heals them in the same transition.
   page.evaluate("s.enemy=null;s.members.forEach(m=>{m.status='ok';m.xp=650});s.hp=s.members.map(()=>1);s.mp=s.members.map(()=>0);monsterHurt(0,999,s.commands,'敵');render()")
   page.wait_for_function('!logBusy()')
+  dead_id=page.evaluate('s.members[0].id')
   page.evaluate('s.pos=s.start;s.pendingStairs=true;render()')
   page.locator('#bossyes').click()
-  assert page.evaluate("s.area==='town'&&s.members[0].level===1")
-  assert page.evaluate("s.hp[0]===0&&s.mp[0]===0&&s.members[0].status==='dead'&&s.members[0].xp===650")
-  assert page.evaluate('s.members.slice(1).every((m,i)=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length&&s.hp[i+1]===m.maxHP&&s.mp[i+1]===m.maxMP)')
-  assert page.locator('#leveldialog').is_visible()
-  assert page.evaluate("s.members.slice(1).every(m=>$('#levelreport').textContent.includes(m.name+' Lv.1 → '+m.level))")
+  # 029: the dead member is carried to the reserve (temple) on return, keeping level/XP/HP0/MP.
+  dead_ok="id=>{const r=s.reserve.find(r=>r.members.id===id);return !!r&&r.members.level===1&&r.hp===0&&r.mp===0&&r.members.status==='dead'&&r.members.xp===650&&!s.members.some(m=>m.id===id)}"
+  assert page.evaluate("s.area==='town'&&s.members.length===5")
+  assert page.evaluate(dead_ok,dead_id)
+  assert page.evaluate('s.members.every((m,i)=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length&&s.hp[i]===m.maxHP&&s.mp[i]===m.maxMP)')
+  assert page.locator('#templecarrydialog').is_visible() and not page.locator('#leveldialog').is_visible()
+  page.locator('#templecarryok').click()
+  page.locator('#leveldialog').wait_for(state='visible',timeout=3000)
+  assert page.evaluate("s.members.every(m=>$('#levelreport').textContent.includes(m.name+' Lv.1 → '+m.level))")
   assert page.locator('#innopen,#inndialog,#stable').count()==0
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   page.locator('#levelclose').click()
   page.reload()
-  assert page.evaluate("s.area==='town'&&s.hp[0]===0&&s.members[0].status==='dead'&&s.members[0].xp===650&&s.members.slice(1).every(m=>m.level>1)")
+  assert page.evaluate("s.area==='town'&&s.members.length===5&&s.members.every(m=>m.level>1)")
+  assert page.evaluate(dead_ok,dead_id)
+  assert not page.locator('#templecarrydialog').is_visible()
   page.locator('#trainingopen').click()
   while page.locator('#recruitlist section').count():
    page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click();page.locator('#recruitdeleteconfirm').click()
@@ -113,6 +120,6 @@ with sync_playwright() as p:
   page.reload();assert page.evaluate('trainingRoster().length')==0
   assert page.evaluate('s.library.monsters.slime.count===1 && s.library.items.helm && s.library.items.plate && s.library.items.healingPotion')
   assert not errors,errors
-  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, retains dead XP, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
+  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, carries dead to reserve with XP, carry dialog before level report, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
   ctx.close()
  browser.close()
