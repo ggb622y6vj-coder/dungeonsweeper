@@ -195,25 +195,25 @@ s.area='dungeon';s.enemy=null;s.done=false;s.pendingBoss=null;s.pendingStairs=fa
 mode='move';s.logs=[];s.hp=s.members.map(()=>20);
 s.ailments=s.members.map(()=>({poison:false,paralysis:0}));
 s.cells.forEach(c=>{c.type='';c.trap=false;c.flag=false;c.open=true;delete c.chest});
-s.pos=0;s.hp[0]=2;s.ailments[0].poison=true;Math.random=()=>.99;`);
+var poisonId=s.members[0].id,poisonName=NAMES[0],poisonIndex=()=>s.members.findIndex(m=>m.id===poisonId);s.pos=0;s.hp[poisonIndex()]=2;s.ailments[0].poison=true;Math.random=()=>.99;`);
 try {
   run(`cell(1);
-if(s.pos!==1||s.hp[0]!==0)throw Error('poison death on movement');
-var poisonDeathText=NAMES[0]+'は毒で倒れた。';
+if(s.pos!==1||s.hp[poisonIndex()]!==0)throw Error('poison death on movement');
+var poisonDeathText=poisonName+'は毒で倒れた。';
 var poisonDeathEntries=logQueue.filter(e=>e.text===poisonDeathText);
 if(poisonDeathEntries.length!==1||poisonDeathEntries[0].hp[0]!==0)throw Error('poison death log / snapshot');
 if(logQueue.some(e=>e.text.includes('毒で2ダメージ')))throw Error('exploration poison damage log');`);
   drain();
   run(`cell(0);
-if(s.pos!==0||s.hp[0]!==0||logQueue.some(e=>e.text===poisonDeathText))throw Error('duplicate poison death');
+if(s.pos!==0||s.hp[poisonIndex()]!==0||logQueue.some(e=>e.text===poisonDeathText))throw Error('duplicate poison death');
 if(s.logs.filter(t=>t===poisonDeathText).length!==1)throw Error('rendered poison death count');
-s.logs=[];s.hp[0]=10;cell(1);
-if(s.pos!==1||s.hp[0]!==8)throw Error('nonfatal poison on movement');
+s.logs=[];s.members[poisonIndex()].status='ok';s.hp[poisonIndex()]=10;cell(1);
+if(s.pos!==1||s.hp[poisonIndex()]!==8)throw Error('nonfatal poison on movement');
 if(logQueue.some(e=>e.text.includes('毒')))throw Error('nonfatal poison queued log');`);
   drain();
   run(`if(s.logs.some(t=>t.includes('毒')))throw Error('nonfatal poison rendered log');
-s.hp[0]=2;tickAilments();
-if(s.hp[0]!==0||logQueue.filter(e=>e.text===poisonDeathText).length!==1||!logQueue.some(e=>e.text===NAMES[0]+'は毒で2ダメージ。'))throw Error('combat poison death and damage logs');`);
+s.hp[poisonIndex()]=2;tickAilments();
+if(s.hp[poisonIndex()]!==0||logQueue.filter(e=>e.text===poisonDeathText).length!==1||!logQueue.some(e=>e.text===poisonName+'は毒で2ダメージ。'))throw Error('combat poison death and damage logs');`);
   drain();
 } finally {
   run(`clearTimeout(logTimer);logTimer=null;logQueue=[];displayVitals=null;displayCombat=undefined;
@@ -285,5 +285,6 @@ require('./death-status.cjs');
 require('./temple.cjs');
 require('./library.cjs');
 require('./target-select.cjs');
+require('./auto-reorder.cjs');
 
 const html=fs.readFileSync(require('path').join(__dirname,'../dist/index.html'),'utf8');if(/id=["'](?:room|inncost|innopen|inndialog|stable)["']/.test(html)||html.includes('宿屋')||html.includes('馬小屋'))throw Error('inn remains in UI');console.log('PASS inn removed from town UI');

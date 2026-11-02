@@ -18,6 +18,7 @@ function finishMonsterBattle(){
   }else if(s.floor<MAX_FLOOR){s.cells[s.boss].type='down';s.pendingStairs='down';log('守護者の一団を撃破！ 下り階段が現れた。');log(`地下${s.floor+1}階に移動しますか？`)}
  }
  else if(!defeated.length)log('敵はいなくなった。');
+ autoReorderParty('battle-end');
 }
 function migrateMonsterBattle(){
  if(!s.enemy||s.enemy.dataVersion===1)return;

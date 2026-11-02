@@ -67,3 +67,15 @@ Sites project_id：appgprj_6ae2ad2e8d1881918d4dc813e0e1df34
 
 町でのロード時、パーティーに正常以外が残る旧セーブは `removeFromParty` で控えへ移し、`templeReport` と `templeReportFromLoad` を設定して保存、搬送ダイアログのみ表示する（閉じてもレベル報告は出さない）。迷宮内・`defeatPending` 中のロードは対象外。酒場は在籍中の非正常メンバーを残した保存を「死亡したメンバーを外してください。」で拒否し、新規加入は従来の「死亡したメンバーは加入できません。」。
 回帰テスト：`tests/auto-temple.cjs`（旧セーブ）、`tests/temple.cjs`（パーティー内蘇生失敗後の再読込搬送）、`tests/load-carry-browser.py`（1280/390px）。
+
+
+## 行動不能メンバーの自動後退（032）
+
+`dist/party.js` の `partyIncapacitated` / `autoReorderParty(reason)` を追加。前衛の行動不能者を下げ、行動可能者で前衛3枠を詰める。残りの相対順は維持する（A,B,C／D,E,F → B死亡 → A,C,D／B,E,F → A麻痺 → C,D,E／A,B,F）。麻痺解除による自動復帰はない。状態stoneも行動不能判定へ含めるが、石化を付与・治療する機能は本変更の対象外。
+
+各行動境界で呼び出し、全PARTY_FIELDS・コマンド・予約を揃えて移動する。予約の味方対象はメンバーIDで付け替え、敵uid・列keyは保持。味方のターン実行と敵から受ける防御コマンドもIDで追跡する。毒・麻痺tickは全員分を処理してから後退するため、全員が毒で倒れる場合の遺体記録順は変えない。ログ再生の名前・職業別操作・AC・NEXTもスナップショットに合わせた。
+
+回帰検証は `tests/auto-reorder.cjs`（`tests/game.cjs`からも実行）と `tests/auto-reorder-browser.py`（1280/390px）を追加。既存の死亡・毒テストは固定添字による実データ参照を人物IDの追跡に変更し、死亡ログの旧添字スナップショット検証は維持。
+
+ロード時の自動後退は町（寺院搬送の後）のみ。迷宮内ロードでは並び順を変えない（既存の load-carry-browser の前提を維持）。後衛に交代できる行動可能者がいない場合（3人以下のパーティーなど）は並び順を変えない。
+ブラウザテストは executor が 1280/390px で全本 PASS を確認済み。

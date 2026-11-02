@@ -19,11 +19,12 @@ function stepLog(g) {
 
 // Use attack(), log playback and return end to end.
 const combat = party();
-combat.run(`s.hp[2]=1;s.mp[1]=0;s.mp[2]=1;
+combat.run(`var deadId=s.members[2].id;s.hp[2]=1;s.mp[1]=0;s.mp[2]=1;
   s.enemy={units:[{id:'slime',uid:0,row:0,hp:999,identified:true}]};
   s.commands=s.members.map(()=> 'guard');Math.random=()=>.999;attack();`);
-assert.equal(combat.run('s.hp[2]'), 0);
-assert.equal(combat.run('s.members[2].status'), 'dead');
+assert.equal(combat.run('s.hp[s.members.findIndex(m=>m.id===deadId)]'), 0);
+assert.equal(combat.run('s.members.find(m=>m.id===deadId).status'), 'dead');
+assert.equal(combat.run('s.members.findIndex(m=>m.id===deadId)'), 3, 'dead front member retreats');
 assert.equal(combat.run('ailmentLabel(2)'), '正常', 'death must not leak ahead of the damage log');
 assert.equal(combat.run("logQueue.find(e=>e.text.includes('ダメージ')).members[2].status"), 'dead');
 while (combat.run("logQueue.length && !logQueue[0].text.includes('ダメージ')")) {
@@ -37,7 +38,7 @@ combat.drain();
 combat.run('s.enemy.units[0].hp=1;s.commands[0]="fight";attack();');
 combat.drain();
 assert.equal(combat.run('s.enemy'), null);
-combat.run(`s.ailments=s.members.map(()=>({poison:true,paralysis:4}));var beforeTownHP=s.hp.slice(),beforeTownMP=s.mp.slice(),deadId=s.members[2].id;enterTown();`);
+combat.run(`s.ailments=s.members.map(()=>({poison:true,paralysis:4}));var beforeTownHP=s.hp.slice(),beforeTownMP=s.mp.slice();enterTown();`);
 assert.equal(combat.run('s.area'), 'town');
 assert.equal(combat.run('s.members.length'), 5, 'the dead member is carried out of the party');
 assert.equal(combat.run('s.members.some(m=>m.id===deadId)'), false);
