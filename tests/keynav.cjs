@@ -44,3 +44,17 @@ nav.clearKeyboardFocus({documentElement:{classList:{remove:c=>root.delete(c)}},
  querySelectorAll:()=>rings.map(classes=>({classList:{remove:c=>classes.delete(c)}}))});
 assert(!root.has('keynav-keyboard'));assert(rings.every(s=>!s.has('kfocus')));assert(rings[0].has('other'));
 console.log('PASS keynav: 2×3 spatial navigation, edges, centers, disabled focus/activation, modifier/input guards, pointer ring removal');
+// 041: battle command grid (2 columns above a full-width back button).
+{
+ const box=(x,y,w,h)=>({getBoundingClientRect:()=>({left:x,top:y,width:w,height:h,right:x+w,bottom:y+h})});
+ const fight=box(113,531,317,44),guard=box(437,531,317,44),dispel=box(113,582,317,44),spell=box(437,582,317,44),item=box(113,633,317,44),back=box(113,683,642,48);
+ const items=[fight,guard,dispel,spell,item,back];
+ assert.equal(nav.nearest(fight,items,'right'),back,'038 centre distance alone picks the wide back button');
+ assert.equal(nav.gridMove(fight,items,'right'),guard);
+ assert.equal(nav.gridMove(guard,items,'down'),spell);
+ assert.equal(nav.gridMove(spell,items,'left'),dispel);
+ assert.equal(nav.gridMove(item,items,'down'),back);
+ assert.equal(nav.step(fight,items,'up'),fight);
+ assert.equal(nav.step(back,items,'down',true),fight);
+}
+console.log('PASS 041 keynav grid/step');
