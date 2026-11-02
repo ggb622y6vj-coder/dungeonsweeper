@@ -15,6 +15,8 @@ function showRecruitPreview(){
 }
 function renderTraining(){
  const list=$('#recruitlist');list.replaceChildren();const roster=trainingRoster();
+ $('#trainingreorder').disabled=s.members.length<2;
+ $('#trainingreorder').title=s.members.length<2?'入れ替えには2人以上のパーティーが必要です。':'';
  for(const corpse of s.corpses||[]){
   const p=document.createElement('p');p.textContent=`迷宮に残された遺体：地下${corpse.floor}階（${corpse.records.map(r=>r.members.name).join('、')}）`;list.append(p);
  }
@@ -40,4 +42,53 @@ for(const id of ['recruitname','recruitjob'])$('#'+id).oninput=resetRecruitDraft
 $('#registerrecruit').onclick=()=>{if(registerRecruit(recruitDraft)){resetRecruitDraft();renderTraining();trainingNotice('控えに登録しました。「加入」でパーティに加えてください。')}};
 $('#recruitdeletecancel').onclick=()=>$('#recruitdeletedialog').close();
 $('#recruitdeleteconfirm').onclick=()=>{if(deleteRecruit(pendingDelete)){renderTraining();trainingNotice('登録を抹消しました。')}$('#recruitdeletedialog').close()};
-$('#recruitdeletedialog').addEventListener('close',()=>{pendingDelete=null});
+// 'close' is dispatched asynchronously; a fast Space close→reopen must keep the new target.
+$('#recruitdeletedialog').addEventListener('close',()=>{if(!$('#recruitdeletedialog').open)pendingDelete=null});
+
+// The tavern shares the existing registration UI; closing it returns one layer
+// and refreshes the roster so a later formation save cannot resurrect old data.
+$('#tavernmanage').onclick=()=>$('#trainingopen').onclick();
+$('#training').addEventListener('close',()=>{
+ if(!$('#training').open&&$('#taverndialog').open){
+  tavernRoster=trainingRoster();tavernOrder=Array.from({length:6},(_,i)=>i<s.members.length?i:-1);
+  renderTavern();
+ }
+});
+$('#recruitname').addEventListener('keydown',e=>{
+ if(e.key!=='Enter'||e.ctrlKey||e.altKey||e.metaKey||e.isComposing||e.repeat)return;
+ e.preventDefault();
+ if(!recruitDraft)$('#rollrecruit').onclick();
+ $('#registerrecruit').onclick();
+});
+
+let trainingOrderPicked=null;
+function cancelTrainingOrderPick(){trainingOrderPicked=null;renderTrainingOrder()}
+function renderTrainingOrder(){
+ const list=$('#trainingorderlist');list.replaceChildren();
+ $('#trainingorderhint').textContent=trainingOrderPicked
+  ?'選択中の冒険者と入れ替える相手を選んでください。Escで選択をやめます。'
+  :'冒険者を選び、次に入れ替える相手を選んでください。Spaceで決定します。';
+ $('#trainingordercancel').hidden=!trainingOrderPicked;
+ s.members.forEach((m,index)=>{
+  const button=document.createElement('button'),picked=m.id===trainingOrderPicked;
+  button.setAttribute('data-order-member',m.id);
+  button.setAttribute('aria-pressed',String(picked));
+  if(index===0)button.setAttribute('data-key-default','');
+  button.className=picked?'order-picked':'';
+  button.textContent=`${index+1}. ${m.name}${picked?'（選択中）':''}`;
+  button.onclick=()=>{
+   if(!trainingOrderPicked){trainingOrderPicked=m.id;renderTrainingOrder();return}
+   const from=s.members.findIndex(member=>member.id===trainingOrderPicked);
+   const to=s.members.findIndex(member=>member.id===m.id),order=s.members.map((_,i)=>i);
+   if(from>=0&&to>=0){[order[from],order[to]]=[order[to],order[from]];reorderParty(order)}
+   trainingOrderPicked=null;renderTrainingOrder();renderTraining();
+  };
+  list.append(button);
+ });
+}
+$('#trainingreorder').onclick=()=>{
+ trainingOrderPicked=null;renderTrainingOrder();$('#trainingorderdialog').showModal();
+};
+$('#trainingorderclose').onclick=()=>$('#trainingorderdialog').close();
+$('#trainingordercancel').onclick=cancelTrainingOrderPick;
+$('#trainingorderdialog').addEventListener('close',()=>{if(!$('#trainingorderdialog').open)trainingOrderPicked=null});

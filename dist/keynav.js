@@ -6,7 +6,11 @@
  function nearest(current,items,way,rect=el=>el.getBoundingClientRect()){
   if(!current)return items[0]||null;
   const from=rect(current),x=from.left+from.width/2,y=from.top+from.height/2;
-  let best=current,distance=Infinity;
+  // Items sharing the row/column band (overlapping perpendicular extent) win
+  // over off-axis items, so a full-width button above a 2-column grid does not
+  // steal A/D between the columns. Otherwise the nearest center wins.
+  let best=current,distance=Infinity,aligned=null,alignedDistance=Infinity;
+  const vertical=way==='up'||way==='down';
   for(const item of items){
    if(item===current)continue;
    const box=rect(item),dx=box.left+box.width/2-x,dy=box.top+box.height/2-y;
@@ -14,8 +18,11 @@
    if(!(forward>0))continue;
    const score=dx*dx+dy*dy;
    if(score<distance){best=item;distance=score;}
+   const overlap=vertical?Math.min(from.left+from.width,box.left+box.width)-Math.max(from.left,box.left)
+    :Math.min(from.top+from.height,box.top+box.height)-Math.max(from.top,box.top);
+   if(overlap>0&&score<alignedDistance){aligned=item;alignedDistance=score;}
   }
-  return best;
+  return aligned||best;
  }
  function step(current,items,way,wrap=false){
   if(!items.length)return null;
@@ -117,7 +124,7 @@
    const reason=keyboard&&disabled(selected)?`　${selected.title||'選択できません'}`:'';
    const value=layer?.id==='explore:'
     ? '探索　W/S・↑/↓：前進/後退　A/D・←/→：旋回　Q/E：横移動　F：旗　G：旗種　M：地図　C：ステータス'
-    : `${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：${layer?.id==='chest'?'何もしない':'戻る'}${reason}`;
+    : `${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：${layer?.id==='chest'?'何もしない':'戻る'}${layer?.items?.some(el=>el.getAttribute('role')==='tab')?'　Q/E：タブ':''}${reason}`;
    if(hint.textContent!==value)hint.textContent=value;
   }
   if(toggle){toggle.setAttribute('aria-pressed',String(hints));const value='キーヒント：'+(hints?'表示':'非表示');if(toggle.textContent!==value)toggle.textContent=value;}
@@ -150,7 +157,8 @@
   if(layer?.id==='boss')return $('#bossno');
   if(layer?.id==='stairs')return $('#bossyes');
   if(keyboard&&layer?.id?.id==='statsdialog')return items.find(el=>el.matches('.statcard'))||items[0];
-  return items.find(el=>el.hasAttribute('data-key-default'))||items.find(el=>!el.hasAttribute('data-key-back'))||items[0]||null;
+  const defaults=items.filter(el=>el.hasAttribute('data-key-default'));
+  return defaults.find(el=>!el.hasAttribute('data-key-back'))||defaults[0]||items.find(el=>!el.hasAttribute('data-key-back'))||items[0]||null;
  }
  function sync(){
   if(syncing)return;
@@ -189,6 +197,9 @@
  function back(){
   if(layer.id==='chest')return;
   if((layer.kind==='command'||layer.kind==='ally'||layer.kind==='confirm')&&logBusy())return;
+  if(layer.kind==='dialog'&&layer.id.id==='trainingorderdialog'&&trainingOrderPicked){
+   cancelTrainingOrderPick();sync();return;
+  }
   const button=layer.items.find(el=>el.hasAttribute('data-key-back')&&!disabled(el));
   if(button)activate(button);
   else if(layer.kind==='dialog')layer.id.close();
@@ -212,6 +223,28 @@
   if(layer.kind==='command'){const next=gridMove(selected,layer.items,way);if(next&&next!==selected)return next;}
   return nearest(selected,layer.items,way);
  }
+ // Tab rows and their lists have an explicit vertical boundary; geometry alone
+ // would jump back to a header when a long list has scrolled beneath it.
+ function tabNavigation(way,key){
+  const tabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
+  if(!tabs.length)return false;
+  const active=tabs.find(el=>el.getAttribute('aria-selected')==='true')||tabs[0];
+  const panel=doc.getElementById(active.getAttribute('aria-controls'));
+  const entries=panel?.hasAttribute('data-key-list')?layer.items.filter(el=>el!==panel&&panel.contains(el)):[];
+  const shortcut=key.toLowerCase()==='q'?-1:key.toLowerCase()==='e'?1:0;
+  const onTab=tabs.includes(selected),index=entries.indexOf(selected);
+  if(shortcut||(onTab&&['left','right'].includes(way))||(onTab&&['Home','End'].includes(key))){
+   const step=shortcut||(way==='left'?-1:1);
+   const current=onTab?selected:active;
+   const target=key==='Home'?tabs[0]:key==='End'?tabs.at(-1):tabs[(tabs.indexOf(current)+step+tabs.length)%tabs.length];
+   activate(target);sync();focus(target);return true;
+  }
+  if(onTab&&way==='down'&&entries.length){focus(entries[0]);return true;}
+  if(index>=0&&(way==='up'||way==='down')){
+   focus(way==='up'?(index===0?active:entries[index-1]):entries[Math.min(index+1,entries.length-1)]);return true;
+  }
+  return false;
+ }
  function keydown(e){
   if(ignores(e))return;
   const inField=editing(e.target);
@@ -234,16 +267,21 @@
    if((e.key==='c'||e.key==='C')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#statsopen').click();return;}
   }
   const way=direction(e.key),decide=e.key===' '||e.key==='Enter',tab=e.key==='Tab';
+  const tabShortcut=['q','e'].includes(e.key.toLowerCase())&&layer.items.some(el=>el.getAttribute('role')==='tab');
   const tabEdge=e.target.getAttribute?.('role')==='tab'&&['Home','End'].includes(e.key);
-  if(!way&&!decide&&!tab&&e.key!=='Escape'&&!tabEdge)return;
+  if(!way&&!decide&&!tab&&e.key!=='Escape'&&!tabEdge&&!tabShortcut)return;
   keyboard=true;doc.documentElement.classList.add('keynav-keyboard');sync();
   // Focus set by Tab, mouse, or existing UI is authoritative, except for the
   // logical disabled cursor whose DOM focus intentionally lives on the layer.
   if(layer.items.includes(doc.activeElement))focus(doc.activeElement,false);
   if(e.key==='Escape'){
    consume(e);
-   if(inField){focus(layer.items.find(el=>el.hasAttribute('data-key-back')&&!disabled(el))||defaultItem(layer.items));return;}
-   if(!e.repeat)back();return;
+   if(e.repeat)return;
+   if(inField){
+    const adjacent=doc.getElementById(e.target.getAttribute('data-key-exit'));
+    focus(layer.items.includes(adjacent)?adjacent:layer.items.find(el=>el.hasAttribute('data-key-back')&&!disabled(el))||defaultItem(layer.items));return;
+   }
+   back();return;
   }
   if(tab){
    const items=layer.items.filter(el=>!disabled(el)&&el.getAttribute('tabindex')!=='-1');
@@ -255,6 +293,10 @@
   if(decide){
    if(!e.repeat&&!(typeof logBusy==='function'&&logBusy()))activate(selected?.matches('.statcard')?selected.querySelector('[data-stat-inventory]'):selected);
    sync();return;
+  }
+  if(tabNavigation(way,e.key)){sync();return;}
+  if(way&&selected?.hasAttribute('data-order-member')){
+   focus(nearest(selected,layer.items.filter(el=>el.hasAttribute('data-order-member')),way));return;
   }
   const tabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
   const target=tabEdge?(e.key==='Home'?tabs[0]:tabs[tabs.length-1]):navigate(way);

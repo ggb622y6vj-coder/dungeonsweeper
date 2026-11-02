@@ -172,7 +172,8 @@ function renderTemple(result=null){
  if(!records.length){const p=document.createElement('p');p.textContent='蘇生が必要な冒険者はいません。';list.append(p)}
  for(const r of records){
   const m=r.members,row=document.createElement('div'),info=document.createElement('div'),name=document.createElement('b'),detail=document.createElement('small'),price=document.createElement('span'),button=document.createElement('button');
-  row.className='shopitem';
+  row.className='shopitem';row.setAttribute('data-recruit-id',m.id);
+  if(r===records[0])button.setAttribute('data-key-default','');
   name.textContent=m.name||CLASSES[m.job??0].name;
   detail.textContent=`${s.members.some(p=>p.id===m.id)?'パーティ':'控え'} · Lv.${m.level} · ${{dead:'死亡',ash:'灰',stone:'石化'}[m.status]} · 成功率 ${templeChance(m)}%`;
   price.textContent=`${templeCost(m)} G`;button.textContent=m.status==='stone'?'石化解除':'蘇生';

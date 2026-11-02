@@ -162,7 +162,7 @@ Node全15本、compile-monsters --check、sim/selftest、JS/Python構文チェ�
 
 検証済み：Nodeテスト全15本、compile-monsters --check、sim/selftest、JS/Python構文、git diff --check。既存テストのチェックの削除・緩和はなし。新規fixtureの1ターンと勝利→帰還→レベルアップは既存Nodeハーネスでも実データを確認した（ブラウザ検証の代用ではない）。
 
-レビュー修正（041）：(1) 戦闘コマンド欄と列・呪文対象・薬一覧のA/D/W/Sは、同じ表示行・列の帯を優先する（`KeyNav.gridMove`、該当なしなら038の中心距離）。中心距離だけだと2列の「戦う」でDを押すと全幅の「戻る」へ飛んでいた。町など他のレイヤーの038の動きは変更なし。(2) 薬の一覧ボタンの表示は、薬ダイアログを開いた時点のキーボード／ポインター状態で決める（`hidden`）。html.keynav-keyboardに連動させるとpointerdownで一覧が消えてボタンがずれ、クリックが外れていた（target-select-browserの回帰）。(3) Nodeハーネスに`documentElement`がないため参照をoptional chainingに。ブラウザ全13本は1280/390でPASS、battle-keys-browser.pyは10回連続PASS、JSエラーなし。
+レビュー修正（041）：(1) 戦闘コマンド欄と列・呪文対象・薬一覧のA/D/W/Sは、同じ表示行・列の帯を優先する（`KeyNav.gridMove`、該当なしなら038の中心距離）。中心距離だけだと2列の「戦う」でDを押すと全幅の「戻る」へ飛んでいた。町など他のレイヤーの038の動きは変更なし（※040で `nearest` 自体が帯優先に変更）。(2) 薬の一覧ボタンの表示は、薬ダイアログを開いた時点のキーボード／ポインター状態で決める（`hidden`）。html.keynav-keyboardに連動させるとpointerdownで一覧が消えてボタンがずれ、クリックが外れていた（target-select-browserの回帰）。(3) Nodeハーネスに`documentElement`がないため参照をoptional chainingに。ブラウザ全13本は1280/390でPASS、battle-keys-browser.pyは10回連続PASS、JSエラーなし。
 
 
 ## 敵物理命中のLv差補正（042）
@@ -174,3 +174,18 @@ Node全15本、compile-monsters --check、sim/selftest、JS/Python構文チェ�
 全10階の指定Lv・職業・n=400シムは全階許容範囲内。除数3を維持。Node全16本、CSV整合性、sim/selftest、git diff --checkはPASS。ブラウザ全13本はレビュー時に1280/390pxでPASS（Codex sandboxでは起動不可のためレビュー側で実施）。表のLvでは通常敵の補正は0で全階シム値は不変。守護者は6F〜9Fで+1・10Fで+2、6F守護者戦の全滅率は28.25%→35.75%（受入基準の対象外、要確認）。
 
 階別比較・計測条件・専用ログの所在は [042検証記録](042-MONSTER-LEVEL-HIT.md) を参照。
+
+
+## 町・施設のキー操作（040）
+
+038・039反映済みの状態から実装。町の既定は迷宮入口（無効時も論理フォーカス）。KeyNavへタブのA/D循環・Q/E近道・Sで一覧先頭／先頭Wでタブ復帰・一覧内の順送りを追加。scrollIntoViewによる長い一覧の追従を維持する。名前欄のEnterは既存の生成／登録処理を使い、Escは生成ボタンへ抜けてから次のEscで閉じる。修飾キーとIME入力中は対象外。
+
+酒場に登録画面への入口を追加し、閉じた際に酒場のロスター／編成を更新する。訓練所にSpaceで二人を選んで即時交換する順番変更を追加。安定メンバーIDで選択を保持し、全PARTY_FIELDSはreorderPartyへ委譲する。選択中は破線・文言・aria-pressedで表示し、Escで選択だけを解除する。寺院の既定は先頭の治療ボタン（空なら閉じる）。確認の既定は「キャンセル」（文言は従来どおり）。図書館に呪文タブ（未習得は「？？？」）と各項目の詳細dialogを追加し、既存の一覧内詳細も保持する。ゲームバランス・ash-v1・敵データには変更なし。
+
+`tests/town-keys-browser.py` を追加。1280/390px、操作はpage.keyboardのみ、evaluateは読取りのみ。酒場からの登録・加入・離脱・抹消、Space連打での確認取消、名前欄のEnter／Esc、寺院の死亡・灰・石化／搬送報告、全レコードの入れ替えと取消、購入・売却・譲渡・在庫末尾、図書館3タブ／各末尾／詳細／スクロール／段階的Esc、JSエラー・横スクロールを確認する。寺院と図書館の保存状態は起動前fixtureで用意し、蘇生用の固定乱数も起動前だけ設定する（039と同方式）。既存keynav/explore-keysテストは入口既定への変更に合わせ、初期S→Wを追加して元の上移動検証も保持。temple.cjsのDOMモックへsetAttributeを補完し、既存assertは変更していない。
+
+検証：Node全15本、compile-monsters --check、sim/selftest、JS/Python構文確認はPASS。ブラウザ全13本は実行を試みたがChromium起動時にソケット権限が拒否され停止（Operation not permitted）。HTTPサーバーも同じ制限で起動不可。**1280/390px全件PASS・JSエラーなし・タッチ／マウス回帰の実確認は未完了**。実行可能な環境でdistを配信し、`/tmp/pyv/bin/python tests/town-keys-browser.py [URL]` および既存全 `tests/*-browser.py` を実行すること。push・公開は未実施。
+
+レビュー修正（040）：KeyNavの方向移動で、垂直範囲が重なる項目（同じ行／列の帯）を優先するよう変更（中心距離のみでは訓練所からDで全幅の入口へ移り、2列の左右移動が成立しなかった）。tests/keynav.cjsに町メニュー配置の回帰を追加。dialogの'close'イベントは非同期のため、抹消確認・順番変更・酒場の再読込のcloseハンドラーは再オープン済みなら何もしない（Space連打で閉じて開き直した直後に抹消対象が消え、D→Spaceで抹消できない競合があった）。town-keys-browser.pyの搬送報告クリア確認はcloseイベント後を待つ。実ブラウザで全13本（1280/390）PASS、town-keys-browser.pyは10/10 PASS。
+
+統合（040→main、041の後）：041の `gridMove`（戦闘コマンド等の同じ行・列優先）と040の `nearest` 帯優先を両立。`nearest` 自体が帯優先になったため、041の「町など他のレイヤーは038のまま」は040で置き換わる（町・施設も帯優先、該当なしなら中心距離）。オーナー決定：(a) 帯優先と書き換えたkeynav-browser.pyの期待値を採用、図書館の呪文タブは登録冒険者の誰も習得していない呪文を「？？？」で表示し名前・詳細を隠す（他タブの未発見と同じ）、酒場から訓練所の重ね開きは可、名前欄Enterは未生成なら生成して登録、確認dialogの文言は「キャンセル」のまま（既定フォーカスもキャンセル）。

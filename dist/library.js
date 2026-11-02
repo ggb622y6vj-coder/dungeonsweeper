@@ -42,10 +42,22 @@ function libraryItemDetails(w){
   ['性能',performance],['価格',`${Number.isFinite(w.price)?w.price+' G（基準価格）':'購入価格なし'} / 売却 ${w.sell} G`],
   ['入手先',`${shop?'店売り・迷宮':'迷宮限定'}（地下${w.minFloor||1}階〜）`]];
 }
+function librarySpellsLearned(){
+ const members=typeof trainingRoster==='function'?trainingRoster().map(r=>r.members):(s.members||[]);
+ return new Set(members.flatMap(m=>m?.known||[]));
+}
 function libraryElement(tag,text){const el=document.createElement(tag);el.textContent=text;return el}
-function libraryEntry(name,details){
+function libraryEntry(name,details,key=null){
  const entry=document.createElement('article');entry.className='library-entry';
  entry.append(libraryElement('h4',name));
+ if(key){
+  entry.tabIndex=0;entry.setAttribute('role','button');entry.setAttribute('data-library-entry',key);
+  entry.setAttribute('aria-haspopup','dialog');
+  entry.onclick=()=>{
+   $('#librarydetailbody').replaceChildren(libraryEntry(name,details));
+   $('#librarydetaildialog').showModal();
+  };
+ }
  if(details){
   const list=document.createElement('dl');
   for(const [label,value] of details)list.append(libraryElement('dt',label),libraryElement('dd',value));
@@ -58,7 +70,7 @@ function renderLibrary(tab='monsters'){
  const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.count>0).length;
  const itemCount=WEAPONS.filter(w=>s.library.items[w.id]).length;
  $('#libraryprogress').textContent=`モンスター ${monsterCount}/${ENEMIES.length} · アイテム ${itemCount}/${WEAPONS.length}`;
- for(const name of ['monsters','items']){
+ for(const name of ['monsters','items','spells']){
   const button=$('#librarytab-'+name),active=name===tab;
   button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
  }
@@ -69,22 +81,33 @@ function renderLibrary(tab='monsters'){
    if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`地下${floor}階`))}
    const record=s.library.monsters[d.id],known=record?.count>0;
    const mark=d.id==='labyrinthlord'?' ★ 迷宮の主':d.boss?' ◆ 守護者':'';
-   body.append(libraryEntry(known?d.name+mark:'？？？',known?libraryMonsterDetails(d,record):null));
+   body.append(libraryEntry(known?d.name+mark:'？？？',known?libraryMonsterDetails(d,record):null,'monster-'+d.id));
   }
- }else{
+ }else if(tab==='items'){
   for(const kind of ['武器','防具（頭）','防具（胴体）','防具（足）','薬']){
    body.append(libraryElement('h3',kind==='薬'?`薬（別枠） ${MEDICINES.filter(w=>s.library.items[w.id]).length}/${MEDICINES.length}`:kind));
    for(const w of [...WEAPONS,...MEDICINES].filter(w=>libraryItemKind(w)===kind)){
-    const known=!!s.library.items[w.id];body.append(libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null));
+    const known=!!s.library.items[w.id];body.append(libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,'item-'+w.id));
    }
+  }
+ }
+ if(tab==='spells'){
+  // A spell counts as discovered once any registered adventurer has learned it.
+  const learned=librarySpellsLearned();
+  for(const spell of MAGIC){
+  const known=learned.has(spell.id);
+  body.append(libraryEntry(known?spell.name:'？？？',known?[['職業',CLASSES[spell.job].name],['習得レベル',`Lv.${spell.level}`],
+   ['消費MP',String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
+   ['効果',spell.description]]:null,'spell-'+spell.id));
   }
  }
  body.scrollTop=0;
 }
 function libraryUI(){
  $('#libraryopen').onclick=()=>{if(s.area!=='town'||!idle()||s.done)return;renderLibrary();$('#librarydialog').showModal()};
+ $('#librarydetailclose').onclick=()=>$('#librarydetaildialog').close();
  $('#libraryclose').onclick=()=>$('#librarydialog').close();
- for(const tab of ['monsters','items']){
+ for(const tab of ['monsters','items','spells']){
   const button=$('#librarytab-'+tab);
   button.onclick=()=>renderLibrary(tab);
  }
