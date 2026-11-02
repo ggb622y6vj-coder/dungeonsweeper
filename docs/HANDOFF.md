@@ -141,3 +141,11 @@ disabledボタンはネイティブのdisabledを維持し、方向移動の論�
 `tests/keynav-browser.py` を追加（URL引数、既定 `http://127.0.0.1:8000/`、CHROME_PATH対応、pageerror検出）。1280/390pxで操作はpage.keyboardのみ、evaluateは状態の確認のみ。町の空間移動、両決定キー、disabled、入力中のwasd/space/e/f、Esc、修飾キー、入れ子dialogと復帰、3pxリング、設定保存と再読込、探索での二重処理防止、横スクロールを検証する。ポインター解除の実ブラウザ確認は別途必要。
 
 未完了：追加指示に従ってブラウザ実行は省略。レビュー側でdistを配信し、`/tmp/pyv/bin/python tests/keynav-browser.py [URL]` と既存 `tests/*-browser.py` 全件を実行すること。1280/390px全件PASS・JSエラーなし・マウス／タッチの実挙動は未検証。
+
+## 探索キーと旗（039）
+
+038を土台に、探索のキー処理を `dist/keynav.js` の単一入口へ統合した。W/S・上下は前進/後退、A/D・左右は旋回、Q/Eは横移動、Fは正面の旗、Gは旗種、Mは地図、Cはステータス。R/Tは未割当。帰還ボタンは038の方向フォーカスとSpace/Enterで選ぶ。地図dialog内のMは閉じる操作として処理し、F/Gは動作しない。探索時の画面内キーヒントも新しい割当へ更新した。game.jsの旧探索keydownは削除し、移動・旗・ボタンの既存処理を呼び出す。
+
+`tests/explore-keys-browser.py` は1280/390pxの両幅を走査。使い捨ての登録済みパーティのセーブを起動前にlocalStorageへ設定し、罠なしマップと起動前の固定乱数（.99）で移動時の遭遇を排除する。操作はpage.keyboardのみ、evaluateは読取りのみ。各移動の厳密な座標/向き・大文字・矢印・R/T無効・修飾キー・長押し・旗の設置/解除/種類・外壁/範囲外・地図/ステータス開閉・戦闘/箱/階段/ボス/dialog中の移動と旗の抑止・両帰還ボタンへのWASDフォーカスとSpace決定を確認する。
+
+Node全15本、compile-monsters --check、sim/selftest、JS/Python構文チェックはPASS。HTTPサーバーとブラウザ全12本の起動を実際に試みたが、この環境ではソケット権限が拒否された（HTTP: Operation not permitted、Chromium: crashpad setsockopt Operation not permitted / SIGTRAP）。ブラウザは起動前に終了し、1280/390の判定・JSエラーなし・タッチ回帰の確認は未完了。実行可能な環境で `/tmp/pyv/bin/python tests/explore-keys-browser.py`、`tests/keynav-browser.py` と残りの `tests/*-browser.py` を再実行すること。push・公開は実施していない。

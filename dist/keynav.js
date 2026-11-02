@@ -89,7 +89,9 @@
   if(hint){
    if(hint.hidden!==!hints)hint.hidden=!hints;
    const reason=keyboard&&disabled(selected)&&selected.title?`　${selected.title}`:'';
-   const value=`${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：戻る${reason}`;
+   const value=layer?.id==='explore:'
+    ? '探索　W/S・↑/↓：前進/後退　A/D・←/→：旋回　Q/E：横移動　F：旗　G：旗種　M：地図　C：ステータス'
+    : `${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：戻る${reason}`;
    if(hint.textContent!==value)hint.textContent=value;
   }
   if(toggle){toggle.setAttribute('aria-pressed',String(hints));const value='キーヒント：'+(hints?'表示':'非表示');if(toggle.textContent!==value)toggle.textContent=value;}
@@ -163,9 +165,20 @@
    if(e.key==='Tab'){keyboard=true;doc.documentElement.classList.add('keynav-keyboard');paint();}
    return;
   }
-  // Live dungeon movement stays with the game's own key handler.
   sync();
-  if(layer?.id==='explore:'&&/^(Arrow(Up|Down|Left|Right)|[aAdD])$/.test(e.key))return;
+  if(layer.kind==='dialog'&&layer.id.id==='mapdialog'&&e.key.toLowerCase()==='m'){
+   consume(e);if(!e.repeat)back();return;
+  }
+  // Exploration controls are dispatched here once, alongside UI shortcuts.
+  if(layer?.kind==='explore'&&layer.id==='explore:'&&typeof move==='function'){
+   const action={w:'forward',W:'forward',ArrowUp:'forward',s:'back',S:'back',ArrowDown:'back',a:'left',A:'left',ArrowLeft:'left',d:'right',D:'right',ArrowRight:'right',q:'strafeLeft',Q:'strafeLeft',e:'strafeRight',E:'strafeRight'}[e.key];
+   const active=typeof allyTargetPick!=='undefined'&&allyTargetPick||typeof currentChest==='function'&&currentChest()||s.area!=='dungeon'||s.pendingStairs||s.done||s.enemy||s.pendingBoss||typeof logBusy==='function'&&logBusy();
+   if(action){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat&&!active)move(action);return;}
+   if((e.key==='f'||e.key==='F')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#frontflag').click();return;}
+   if((e.key==='g'||e.key==='G')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#flagopen').click();return;}
+   if((e.key==='m'||e.key==='M')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#maptoggle').click();return;}
+   if((e.key==='c'||e.key==='C')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#statsopen').click();return;}
+  }
   const way=direction(e.key),decide=e.key===' '||e.key==='Enter',tab=e.key==='Tab';
   const tabEdge=e.target.getAttribute?.('role')==='tab'&&['Home','End'].includes(e.key);
   if(!way&&!decide&&!tab&&e.key!=='Escape'&&!tabEdge)return;
