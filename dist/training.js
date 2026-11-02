@@ -27,7 +27,7 @@ function renderTraining(){
   const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
   row.append(title,status,stats);const actions=document.createElement('div');actions.className='recruit-actions';row.append(actions);
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b)};
-  button(index<0?'加入':'離脱',()=>{if(changeRecruitParty(m.id,index<0)){trainingNotice(index<0?'パーティに加入しました。':'控えに移しました。');renderTraining()}},index<0&&(s.members.length>=6||m.status==='lost'));
+  button(index<0?'加入':'離脱',()=>{if(changeRecruitParty(m.id,index<0)){trainingNotice(index<0?'パーティに加入しました。':'控えに移しました。');renderTraining()}},index<0&&(s.members.length>=6||m.status!=='ok'));
   if(index>=0)for(const [text,offset] of [['前へ',-1],['後ろへ',1]])button(text,()=>{const order=s.members.map((_,i)=>i);[order[index],order[index+offset]]=[order[index+offset],order[index]];reorderParty(order);renderTraining()},index+offset<0||index+offset>=s.members.length);
   button('登録抹消',()=>{pendingDelete=m.id;$('#recruitdeletename').textContent=`${m.name}を登録抹消しますか？装備・所持品も削除され、元に戻せません。`;$('#recruitdeletedialog').showModal()});list.append(row);
  }

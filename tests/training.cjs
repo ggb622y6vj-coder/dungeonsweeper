@@ -54,9 +54,9 @@ g.run('trainingRoster().map(r=>r.members.id).forEach(deleteRecruit)');assert.equ
 g=game(g.saved());assert.equal(g.run('trainingRoster().length'),0);g.run('enterDungeon()');assert.equal(g.run('s.area'),'town');
 console.log('PASS deletion including last active member and empty save reload');
 g=game();g.run("s.area='town';s.pos=0;var st=[0,1,2].map(i=>generateRecruit('状態'+i,0));st.forEach(registerRecruit);s.reserve[0].members.status='lost';s.reserve[1].members.status='dead';s.reserve[2].members.status='ash'");
-assert.equal(g.run('changeRecruitParty(st[0].members.id,true)'),false);assert.equal(g.run('changeRecruitParty(st[1].members.id,true)'),true);assert.equal(g.run('changeRecruitParty(st[2].members.id,true)'),true);
+assert.equal(g.run('changeRecruitParty(st[0].members.id,true)'),false);assert.equal(g.run('changeRecruitParty(st[1].members.id,true)'),false);assert.equal(g.run('changeRecruitParty(st[2].members.id,true)'),false);
 assert.equal(g.run('deleteRecruit(st[0].members.id)'),true);assert.equal(g.run('trainingRoster().some(r=>r.members.id===st[0].members.id)'),false);
-console.log('PASS lost recruits cannot join but can be deleted; dead/ash can join');
+console.log('PASS lost/dead/ash recruits cannot join but can be deleted');
 
 // Wipes must preserve complete records separately from the playable roster.
 function corpseParty(count=6){

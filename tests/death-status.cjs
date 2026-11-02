@@ -37,31 +37,32 @@ combat.drain();
 combat.run('s.enemy.units[0].hp=1;s.commands[0]="fight";attack();');
 combat.drain();
 assert.equal(combat.run('s.enemy'), null);
-combat.run(`s.ailments=s.members.map(()=>({poison:true,paralysis:4}));var beforeTownHP=s.hp.slice(),beforeTownMP=s.mp.slice();enterTown();`);
+combat.run(`s.ailments=s.members.map(()=>({poison:true,paralysis:4}));var beforeTownHP=s.hp.slice(),beforeTownMP=s.mp.slice(),deadId=s.members[2].id;enterTown();`);
 assert.equal(combat.run('s.area'), 'town');
-assert.equal(combat.run('s.hp[2]'), 0);
-assert.equal(combat.run('s.mp[2]'), 1, 'dead members do not refill MP');
-assert.equal(combat.run("s.mp.every((mp,i)=>mp===(s.members[i].status==='ok'?s.members[i].maxMP:beforeTownMP[i]))"), true, 'town return refills only ok members MP');
-assert.equal(combat.run("s.hp.every((h,i)=>h===(s.members[i].status==='ok'?s.members[i].maxHP:beforeTownHP[i]))"), true, 'town return refills only ok members HP');
+assert.equal(combat.run('s.members.length'), 5, 'the dead member is carried out of the party');
+assert.equal(combat.run('s.members.some(m=>m.id===deadId)'), false);
+assert.equal(combat.run("s.reserve.find(r=>r.members.id===deadId).members.status"), 'dead');
+assert.equal(combat.run("s.reserve.find(r=>r.members.id===deadId).hp"), 0);
+assert.equal(combat.run("s.reserve.find(r=>r.members.id===deadId).mp"), 1, 'dead members do not refill MP');
+assert.equal(combat.run("s.mp.every((mp,i)=>mp===s.members[i].maxMP)"), true, 'town return refills ok members MP');
+assert.equal(combat.run("s.hp.every((h,i)=>h===s.members[i].maxHP)"), true, 'town return refills ok members HP');
 assert.equal(combat.run('s.ailments.some(a=>a.poison||a.paralysis)'), false);
-assert.match(combat.run("$('#party').innerHTML"), /ailment-dead.*死亡/);
+assert.equal(combat.run("!!(s.reserve.find(r=>r.members.id===deadId).ailments.poison||s.reserve.find(r=>r.members.id===deadId).ailments.paralysis)"), false);
+assert.equal(combat.run("$('#templecarrydialog').open"), true);
+assert.match(combat.run("$('#templecarrylist').textContent"), /（死亡）を寺院に運んだ/);
 const town = reload(combat);
-assert.equal(town.run('s.members[2].status'), 'dead');
-assert.equal(town.run('s.hp[2]'), 0);
+town.run(`var deadId=${JSON.stringify(combat.run('deadId'))};`);
+assert.equal(town.run('s.members.length'), 5);
+assert.equal(town.run('s.reserve.find(r=>r.members.id===deadId).members.status'), 'dead');
+assert.equal(town.run('s.reserve.find(r=>r.members.id===deadId).hp'), 0);
+assert.equal(town.run('changeRecruitParty(deadId,true)'), false, 'dead members cannot rejoin');
 town.run('enterDungeon();');
-assert.equal(town.run('s.area'), 'town');
-assert.equal(town.run("$('#townnotice').textContent"), '死亡したメンバーを外してください。');
-town.drain();
-town.run(`var deadId=s.members[2].id;
-  $('#tavernopen').onclick();
-  $('#tavernslots').onchange({target:{dataset:{tavernSlot:'2'},value:'-1'}});
-  $('#tavernsave').onclick();enterDungeon();`);
 town.drain();
 assert.equal(town.run("$('#townnotice').textContent"), '');
 assert.equal(town.run('s.area'), 'dungeon');
 assert.equal(town.run('s.reserve.find(r=>r.members.id===deadId).members.status'), 'dead');
 assert.equal(reload(town).run("s.reserve.find(r=>r.members.status==='dead').hp"), 0);
-console.log('PASS combat death snapshot, town return growth/healing, XP retention, death persistence and dungeon reentry');
+console.log('PASS combat death snapshot, town return carry/healing, death persistence and dungeon reentry');
 
 // Cover every HP-zero path, including both floor-damage branches and party-wide attacks.
 for (const [name, action, count] of [
@@ -95,33 +96,37 @@ console.log('PASS HP-zero paths: physical, instant death, floor/chest traps, fie
 // Already recorded states never downgrade to dead/ok, including on return or reload.
 const states = party();
 states.run(`['dead','ash','lost'].forEach((status,i)=>{s.members[i].status=status;s.hp[i]=0;s.mp[i]=0});
-  s.ailments=s.members.map(()=>({poison:true,paralysis:4}));s.members.forEach(m=>m.xp=650);markDeaths();enterTown();`);
-assert.equal(states.run("s.members.slice(0,3).map(m=>m.status).join()"), 'dead,ash,lost');
-assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
-assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
-assert.equal(states.run('[0,1,2].map(ailmentLabel).join()'), '死亡,灰,ロスト');
+  s.ailments=s.members.map(()=>({poison:true,paralysis:4}));s.members.forEach(m=>m.xp=650);markDeaths();enterTown();
+  var carriedR=()=>['dead','ash','lost'].map(st=>s.reserve.find(r=>r.members.status===st));`);
+assert.equal(states.run("carriedR().map(r=>r.members.status).join()"), 'dead,ash,lost');
+assert.equal(states.run('carriedR().map(r=>r.hp).join()'), '0,0,0');
+assert.equal(states.run('carriedR().map(r=>r.mp).join()'), '0,0,0');
 assert.equal(states.run('s.ailments.some(a=>a.poison||a.paralysis)'), false);
-
-assert.equal(states.run('s.members.slice(0,3).map(m=>m.level).join()'), '1,1,1');
-assert.equal(states.run('s.members.slice(0,3).every(m=>m.xp===650)'), true, 'dead/ash/lost retain XP');
-assert.equal(states.run('s.members.slice(3).every(m=>m.level>1)'), true, 'ok members level on return');
-assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
-assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
-assert.equal(states.run('s.members.slice(3).every(m=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length)'), true, 'every ok member levels on return');
+assert.equal(states.run('carriedR().some(r=>r.ailments.poison||r.ailments.paralysis)'), false);
+assert.equal(states.run('carriedR().map(r=>r.members.level).join()'), '1,1,1');
+assert.equal(states.run('carriedR().every(r=>r.members.xp===650)'), true, 'dead/ash/lost retain XP');
+assert.equal(states.run('s.members.length'), 3);
+assert.equal(states.run('s.members.every(m=>m.level>1)'), true, 'ok members level on return');
+assert.equal(states.run('s.members.every(m=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length)'), true, 'every ok member levels on return');
 for (const i of [0,1,2]) {
   const g = reload(states);
-  g.run(`setPartyFromRoster(trainingRoster(),[${i},3]);enterDungeon();`);
+  g.run(`var r=trainingRoster(),k=r.findIndex(x=>x.members.status===['dead','ash','lost'][${i}]);setPartyFromRoster(r,[k,0]);enterDungeon();`);
   assert.equal(g.run('s.area'), 'town', 'each non-ok state independently blocks entry');
+  assert.equal(g.run("$('#townnotice').textContent"), '死亡したメンバーを外してください。');
   g.drain();
+  assert.equal(g.run('ailmentLabel(0)'), ['死亡','灰','ロスト'][i]);
   g.run('reorderParty([1,0]);');
   assert.equal(g.run('ailmentLabel(1)'), ['死亡','灰','ロスト'][i], 'status follows member identity');
 }
-states.run("log('状態の記録');s.members[1].status='lost';");
-assert.equal(states.run('ailmentLabel(1)'), '灰', 'status display reads the snapshot member');
-stepLog(states);
-assert.equal(states.run('ailmentLabel(1)'), '灰');
-states.drain();
-assert.equal(states.run('ailmentLabel(1)'), 'ロスト');
+const snap = reload(states);
+snap.run("var r=trainingRoster(),k=r.findIndex(x=>x.members.status==='ash');setPartyFromRoster(r,[0,k]);");
+snap.drain();
+snap.run("log('状態の記録');s.members[1].status='lost';");
+assert.equal(snap.run('ailmentLabel(1)'), '灰', 'status display reads the snapshot member');
+stepLog(snap);
+assert.equal(snap.run('ailmentLabel(1)'), '灰');
+snap.drain();
+assert.equal(snap.run('ailmentLabel(1)'), 'ロスト');
 console.log('PASS dead/ash/lost preservation, labels, independent entry blocks, reorder and snapshot display');
 
 // Load actual old ash-v1 payloads, both roster-based and parallel-array formats.
