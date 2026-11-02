@@ -17,7 +17,7 @@ function stepLog(g) {
   g.run('clearTimeout(logTimer);logTimer=null;pumpLog();');
 }
 
-// Use attack(), log playback, return and the actual tavern handlers end to end.
+// Use attack(), log playback and return end to end.
 const combat = party();
 combat.run(`s.hp[2]=1;s.mp[1]=0;s.mp[2]=1;
   s.enemy={units:[{id:'slime',uid:0,row:0,hp:999,identified:true}]};
@@ -61,7 +61,7 @@ assert.equal(town.run("$('#townnotice').textContent"), '');
 assert.equal(town.run('s.area'), 'dungeon');
 assert.equal(town.run('s.reserve.find(r=>r.members.id===deadId).members.status'), 'dead');
 assert.equal(reload(town).run("s.reserve.find(r=>r.members.status==='dead').hp"), 0);
-console.log('PASS combat death snapshot, town HP/MP policy, death persistence, tavern removal and dungeon reentry');
+console.log('PASS combat death snapshot, town return growth/healing, XP retention, death persistence and dungeon reentry');
 
 // Cover every HP-zero path, including both floor-damage branches and party-wide attacks.
 for (const [name, action, count] of [
@@ -95,19 +95,19 @@ console.log('PASS HP-zero paths: physical, instant death, floor/chest traps, fie
 // Already recorded states never downgrade to dead/ok, including on return or reload.
 const states = party();
 states.run(`['dead','ash','lost'].forEach((status,i)=>{s.members[i].status=status;s.hp[i]=0;s.mp[i]=0});
-  s.ailments=s.members.map(()=>({poison:true,paralysis:4}));markDeaths();enterTown();`);
+  s.ailments=s.members.map(()=>({poison:true,paralysis:4}));s.members.forEach(m=>m.xp=650);markDeaths();enterTown();`);
 assert.equal(states.run("s.members.slice(0,3).map(m=>m.status).join()"), 'dead,ash,lost');
 assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
 assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
 assert.equal(states.run('[0,1,2].map(ailmentLabel).join()'), '死亡,灰,ロスト');
 assert.equal(states.run('s.ailments.some(a=>a.poison||a.paralysis)'), false);
-states.run("s.members.forEach(m=>m.xp=650);s.gold=0;stayAtInn('stable');");
+
 assert.equal(states.run('s.members.slice(0,3).map(m=>m.level).join()'), '1,1,1');
+assert.equal(states.run('s.members.slice(0,3).every(m=>m.xp===650)'), true, 'dead/ash/lost retain XP');
+assert.equal(states.run('s.members.slice(3).every(m=>m.level>1)'), true, 'ok members level on return');
 assert.equal(states.run('s.hp.slice(0,3).join()'), '0,0,0');
 assert.equal(states.run('s.mp.slice(0,3).join()'), '0,0,0');
-assert.equal(states.run('s.members.slice(3).every(m=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length)'), true, 'every ok member levels at the stable');
-assert.equal(states.run('s.gold'), 0);
-states.run("$('#leveldialog').close();");
+assert.equal(states.run('s.members.slice(3).every(m=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length)'), true, 'every ok member levels on return');
 for (const i of [0,1,2]) {
   const g = reload(states);
   g.run(`setPartyFromRoster(trainingRoster(),[${i},3]);enterDungeon();`);

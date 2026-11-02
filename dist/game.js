@@ -66,8 +66,7 @@ function weapon(id){return WEAPONS.find(w=>w.id===id)||MEDICINES.find(w=>w.id===
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
 function diceLabel(w){if(w.kind==='medicine')return w.description;if(w.part)return `${{head:"頭",body:"胴体",feet:"足"}[w.part]} AC −${w.ac}`;return `${w.dice[0]}d${w.dice[1]}${w.dice[2]?'+'+w.dice[2]:''}`}
 function idle(){return !currentChest()&&!logBusy()&&!s.enemy&&!s.pendingBoss&&!s.pendingStairs}
-function enterTown(){if(!idle())return;s.area='town';s.hp=s.members.map((m,i)=>m.status==='ok'?m.maxHP:s.hp[i]);s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);s.light=false;s.watchful=false;s.dumapicUses=0;s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));s.scan=5;s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;resetDungeon();render()}
-function stayAtInn(kind){if(s.area!=='town'||!idle()||kind!=='stable')return;levelUp(s.members.flatMap((m,i)=>m.status==='ok'?[i]:[]));s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);render();$('#inndialog').close();showLevelReport();return true}
+function enterTown(){if(!idle())return;s.area='town';levelUp(s.members.flatMap((m,i)=>m.status==='ok'?[i]:[]));s.hp=s.members.map((m,i)=>m.status==='ok'?m.maxHP:s.hp[i]);s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);s.light=false;s.watchful=false;s.dumapicUses=0;s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));s.scan=5;s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;resetDungeon();render();showLevelReport()}
 function resetDungeon(){let report=s.levelReport;fresh(1);s.area='town';s.floors={};s.cells.forEach(c=>c.open=false);s.logs=[];s.levelReport=report;s.dungeonCycleVersion=1;}
 function enterDungeon(){if(!s.members.length||s.area!=='town'||!idle())return;if(s.members.some(m=>m.status!=='ok')){$('#townnotice').textContent='死亡したメンバーを外してください。';render();return;}$('#townnotice').textContent='';if(s.done||s.floor!==1||!s.dungeonCycleVersion)resetDungeon();s.area='dungeon';s.pos=s.start;s.cells[s.start].open=true;log('迷宮へ入った。');render()}
 function answerStairs(yes){if(logBusy()||!s.pendingStairs)return;let down=s.pendingStairs==='down';s.pendingStairs=false;if(yes){if(down)travelFloor(s.floor+1);else if(s.floor>1)travelFloor(s.floor-1);else enterTown();}else{log('階段の前にとどまった。');render()}}
@@ -195,5 +194,3 @@ function coloredLog(text){
 inventoryPartyUI();
 
 $('#levelclose').onclick=()=>$('#leveldialog').close();
-$('#innopen').onclick=()=>{$('#stable').disabled=!s.members.some(m=>m.status==='ok');$('#inndialog').showModal()};
-$('#innclose').onclick=()=>$('#inndialog').close();$('#stable').onclick=()=>stayAtInn('stable');

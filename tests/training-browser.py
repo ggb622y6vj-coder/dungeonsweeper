@@ -48,36 +48,27 @@ with sync_playwright() as p:
   for _ in range(5):page.locator('[data-command-choice="guard"]').click()
   page.locator('#attack').click()
   page.wait_for_function('!logBusy()');assert page.evaluate('s.enemy.units[0].hp<999')
-  # Town healing and stable-only inn: exercise the real return/stay handlers.
+  # Town return levels eligible members and heals them in the same transition.
   page.evaluate("s.enemy=null;s.members.forEach(m=>{m.status='ok';m.xp=650});s.hp=s.members.map(()=>1);s.mp=s.members.map(()=>0);monsterHurt(0,999,s.commands,'敵');render()")
   page.wait_for_function('!logBusy()')
   page.evaluate('s.pos=s.start;s.pendingStairs=true;render()')
   page.locator('#bossyes').click()
-  assert page.evaluate("s.area==='town'&&s.members.every(m=>m.level===1)")
-  assert page.evaluate("s.hp[0]===0&&s.mp[0]===0&&s.members[0].status==='dead'")
-  assert page.evaluate('s.members.every((m,i)=>i===0||(s.hp[i]===m.maxHP&&s.mp[i]===m.maxMP))')
-  assert page.locator('#room').count()==0
-  assert page.locator('#inncost').count()==0
-  page.locator('#innopen').click()
-  assert page.locator('#inndialog').is_visible()
-  assert page.locator('#inndialog button').count()==2  # Close and stable only.
-  page.evaluate('s.gold=0;window.beforeStableHP=s.hp.slice()')
-  page.locator('#stable').click()
-  assert page.evaluate('s.gold===0&&s.hp.every((h,i)=>h===window.beforeStableHP[i])')
-  assert page.evaluate("s.members[0].level===1&&s.hp[0]===0&&s.mp[0]===0&&s.members[0].status==='dead'")
-  assert page.evaluate('s.members.every((m,i)=>i===0||(m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length&&s.mp[i]===m.maxMP))')
+  assert page.evaluate("s.area==='town'&&s.members[0].level===1")
+  assert page.evaluate("s.hp[0]===0&&s.mp[0]===0&&s.members[0].status==='dead'&&s.members[0].xp===650")
+  assert page.evaluate('s.members.slice(1).every((m,i)=>m.level===m.xpTargets.filter((v,j)=>j>=1&&v<=650).length&&s.hp[i+1]===m.maxHP&&s.mp[i+1]===m.maxMP)')
   assert page.locator('#leveldialog').is_visible()
   assert page.evaluate("s.members.slice(1).every(m=>$('#levelreport').textContent.includes(m.name+' Lv.1 → '+m.level))")
+  assert page.locator('#innopen,#inndialog,#stable').count()==0
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   page.locator('#levelclose').click()
   page.reload()
-  assert page.evaluate("s.area==='town'&&s.hp[0]===0&&s.members[0].status==='dead'&&s.members.slice(1).every(m=>m.level>1)")
+  assert page.evaluate("s.area==='town'&&s.hp[0]===0&&s.members[0].status==='dead'&&s.members[0].xp===650&&s.members.slice(1).every(m=>m.level>1)")
   page.locator('#trainingopen').click()
   while page.locator('#recruitlist section').count():
    page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click();page.locator('#recruitdeleteconfirm').click()
   page.locator('#trainingclose').click();assert page.locator('#entrance').is_disabled()
   page.reload();assert page.evaluate('trainingRoster().length')==0
   assert not errors,errors
-  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town full heal/death, stable all-ok levels/report, no paid room, empty party; no JS errors or overflow')
+  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, retains dead XP, no inn, empty party; no JS errors or overflow')
   ctx.close()
  browser.close()
