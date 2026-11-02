@@ -77,7 +77,7 @@ function partyAction(i){
  }
  if(s.ailments[i].fear>0){log(`${NAMES[i]}は恐怖で攻撃できない。`);return}
  if(!canWeaponAttack(i)){log(`${NAMES[i]}の近接攻撃は後衛から届かない。`);return}
- const e=selectedEnemy(i);
+ const e=selectedEnemy(i)||reachableEnemyGroups(i)[0]?.units.find(e=>e.hp>0);
  if(!e){log(`${NAMES[i]}の攻撃対象の列は全滅している。`);return}
  const result=physicalAttack(i,e);
  if(!result.hitsCount){log(`${NAMES[i]}の攻撃は${enemyDisplay(e)}にかわされた。`);return}
