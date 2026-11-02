@@ -2,6 +2,18 @@
 function ensureLibrary(){
  s.library??={monsters:{},items:{}};
  s.library.monsters??={};s.library.items??={};
+ // Legacy saves have no spell record: seed it from every registered adventurer (party + reserve).
+ if(!s.library.spells){s.library.spells={};recordLibrarySpells()}
+}
+// Permanent spell record: once learned by anyone it stays, even after deletion, wipe or loss.
+function recordLibrarySpells(ids){
+ if(!s.library?.spells)return ensureLibrary();
+ if(!ids){
+  let members=s.members||[];
+  try{if(typeof trainingRoster==='function')members=[...members,...trainingRoster().map(r=>r?.members)]}catch{}
+  ids=members.flatMap(m=>m?.known||[]);
+ }
+ for(const id of ids)if(MAGIC.some(x=>x.id===id))s.library.spells[id]=true;
 }
 function recordLibraryVictory(combat){
  if(combat.libraryRecorded)return;
@@ -41,10 +53,6 @@ function libraryItemDetails(w){
  return [['種類',libraryItemKind(w)],[medicine?'使用できる職業':'装備できる職業',w.classes.map(i=>CLASSES[i].name).join('・')],
   ['性能',performance],['価格',`${Number.isFinite(w.price)?w.price+' G（基準価格）':'購入価格なし'} / 売却 ${w.sell} G`],
   ['入手先',`${shop?'店売り・迷宮':'迷宮限定'}（地下${w.minFloor||1}階〜）`]];
-}
-function librarySpellsLearned(){
- const members=typeof trainingRoster==='function'?trainingRoster().map(r=>r.members):(s.members||[]);
- return new Set(members.flatMap(m=>m?.known||[]));
 }
 function libraryElement(tag,text){const el=document.createElement(tag);el.textContent=text;return el}
 function libraryEntry(name,details,key=null){
@@ -92,10 +100,10 @@ function renderLibrary(tab='monsters'){
   }
  }
  if(tab==='spells'){
-  // A spell counts as discovered once any registered adventurer has learned it.
-  const learned=librarySpellsLearned();
+  // Permanent record: a spell stays discovered once any adventurer has learned it.
+  recordLibrarySpells();
   for(const spell of MAGIC){
-  const known=learned.has(spell.id);
+  const known=!!s.library.spells[spell.id];
   body.append(libraryEntry(known?spell.name:'？？？',known?[['職業',CLASSES[spell.job].name],['習得レベル',`Lv.${spell.level}`],
    ['消費MP',String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
    ['効果',spell.description]]:null,'spell-'+spell.id));

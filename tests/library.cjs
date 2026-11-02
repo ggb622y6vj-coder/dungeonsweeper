@@ -9,7 +9,7 @@ function party(){
 let g=game();
 assert.equal(g.run('ENEMIES.length'),88);
 assert.equal(g.run('WEAPONS.length'),52);
-assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{}}');
+assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
 assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/88 · アイテム 0/52');
@@ -137,4 +137,31 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  g.run("s.members[0].known.push(MAGIC.find(x=>x.job===1&&!learned.has(x.id)).id);renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
  assert.equal(g.run("entries.filter(e=>e.children[0].textContent!=='？？？').length"),g.run('learned.size')+1);
  console.log('PASS library: spell tab shows unlearned spells as ？？？');
+}
+
+// 040b: the spell record is permanent and stored in the save like other discoveries.
+{
+ const g=game(null,()=>.5);
+ g.run("var mage=generateRecruit('術者',1);registerRecruit(mage);changeRecruitParty(mage.members.id,true);var only=mage.members.known.slice();");
+ assert.ok(g.run('only.length')>0);
+ assert.equal(g.run('only.every(id=>s.library.spells[id]===true)'),true,'creation records spells');
+ g.run("var extra=MAGIC.find(x=>x.job===1&&x.level===3);Math.random=()=>0;learnMagic(0,3);");
+ assert.equal(g.run('s.members[0].known.includes(extra.id)&&s.library.spells[extra.id]'),true,'level-up learning records spells');
+ let r=reload(g);
+ assert.equal(r.run('JSON.parse(localStorage.getItem("ash-v1")).library.spells.dilto'),true,'saved in ash-v1 library');
+ const ids=r.run("JSON.stringify(s.members[0].known)");
+ r.run("trainingRoster().map(x=>x.members.id).forEach(deleteRecruit);");
+ assert.equal(r.run('trainingRoster().length'),0);
+ r=reload(r);
+ r.run(`var ids=${ids};renderLibrary('spells');`);r.run("var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
+ assert.equal(r.run("entries.every((e,i)=>ids.includes(MAGIC[i].id)?(e.children[0].textContent===MAGIC[i].name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1))"),true,'learned spells stay after deleting the only learner');
+ // Legacy save without spells: seed from party + reserve.
+ const h=game(null,()=>.5);
+ h.run("var a=generateRecruit('僧侶',2);registerRecruit(a);changeRecruitParty(a.members.id,true);var b=generateRecruit('術者',1);registerRecruit(b);b=trainingRoster()[1];b.members.known.push(MAGIC.find(x=>x.job===1&&x.level===5).id);");
+ assert.equal(h.run('trainingRoster().length'),2);assert.equal(h.run('s.members.length'),1);
+ const old=h.run("JSON.stringify((()=>{const o=structuredClone(rosterSaveState());delete o.library.spells;return o})())");
+ const m=game(old);
+ const want=h.run("JSON.stringify([...new Set(trainingRoster().flatMap(r=>r.members.known))].sort())");
+ assert.equal(m.run("JSON.stringify(Object.keys(s.library.spells).sort())"),want,'old save migrates from party + reserve');
+ console.log('PASS library: permanent spell record (creation, level up, deletion, reload, legacy migration)');
 }
