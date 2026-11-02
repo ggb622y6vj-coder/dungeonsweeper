@@ -103,7 +103,7 @@ console.log('PASS temple town/idle guards, invalid targets and repeated attempts
 
 // Capture the temple DOM only, keeping the shared game harness unchanged.
 const ui = fixture();
-ui.run(`document.createElement=()=>({children:[],append(...nodes){this.children.push(...nodes)}});
+ui.run(`document.createElement=()=>({children:[],attributes:{},setAttribute(k,v){this.attributes[k]=v},append(...nodes){this.children.push(...nodes)}});
   Object.assign($('#templemembers'),{children:[],append(...nodes){this.children.push(...nodes)},replaceChildren(...nodes){this.children=nodes}});
   registerRecruit(generateRecruit('控え',0));s.reserve[0].members.status='ash';s.reserve[0].hp=0;
   registerRecruit(generateRecruit('正常',0));registerRecruit(generateRecruit('ロスト',0));s.reserve[2].members.status='lost';

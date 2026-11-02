@@ -43,15 +43,21 @@ def move_in_town(page, key, direction):
     positions = page.locator('#town button, #statsopen').evaluate_all('''els=>els
       .filter(el=>el.getClientRects().length && getComputedStyle(el).visibility==='visible')
       .map(el=>{const r=el.getBoundingClientRect();return {id:el.id,
-        x:r.left+r.width/2,y:r.top+r.height/2,selected:el.classList.contains('kfocus')}})''')
+        x:r.left+r.width/2,y:r.top+r.height/2,l:r.left,r:r.right,t:r.top,b:r.bottom,
+        selected:el.classList.contains('kfocus')}})''')
     current = next(x for x in positions if x['selected'])
     candidates = []
     for item in positions:
         dx, dy = item['x'] - current['x'], item['y'] - current['y']
         forward = {'up': -dy, 'down': dy, 'left': -dx, 'right': dx}[direction]
         if forward > 0:
-            candidates.append((dx * dx + dy * dy, item))
-    expected = min(candidates, key=lambda pair: pair[0])[1] if candidates else current
+            # 040: items overlapping the current row/column band take priority.
+            if direction in ('up', 'down'):
+                overlap = min(current['r'], item['r']) - max(current['l'], item['l'])
+            else:
+                overlap = min(current['b'], item['b']) - max(current['t'], item['t'])
+            candidates.append((0 if overlap > 0 else 1, dx * dx + dy * dy, item))
+    expected = min(candidates, key=lambda c: (c[0], c[1]))[2] if candidates else current
     page.keyboard.press(key)
     ring(page, '#' + expected['id'])
 
@@ -68,6 +74,9 @@ with sync_playwright() as p:
         page.on('pageerror', lambda error: errors.append(str(error)))
         page.goto(URL)
         page.wait_for_function('!!globalThis.KeyNav')
+        # 040 starts on the entrance, including its disabled logical cursor.
+        assert page.evaluate("KeyNav.current().id==='entrance'")
+        page.keyboard.press('s')
         assert focused(page, '#trainingopen')
         assert page.locator('#keyhint').is_visible() == (width == 1280)
         assert '町メニュー' in page.locator('#keyhint').text_content()

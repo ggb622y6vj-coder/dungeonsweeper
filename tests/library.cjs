@@ -125,3 +125,16 @@ assert.equal(g.run('s.library.monsters[summoner.id].count'),2,'same battle canno
 const victoryReload=reload(g);
 assert.equal(victoryReload.run('Object.values(s.library.monsters)[0].count'),2,'reload during victory logs keeps final records');
 console.log('PASS library: summoned units counted individually, idempotence and reload during victory logs');
+
+// 040: spell tab hides spells no registered adventurer has learned, like other tabs.
+{
+ const g=game(null,()=>.5);
+ g.run("for(const job of [1,2]){const r=generateRecruit('術者'+job,job);registerRecruit(r);changeRecruitParty(r.members.id,true);}");
+ g.run("renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');var learned=new Set(trainingRoster().flatMap(r=>r.members.known));");
+ assert.equal(g.run('entries.length'),g.run('MAGIC.length'));
+ assert.ok(g.run('learned.size')>0&&g.run('learned.size')<g.run('MAGIC.length'));
+ assert.equal(g.run("entries.every((e,i)=>learned.has(MAGIC[i].id)?(e.children[0].textContent===MAGIC[i].name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1))"),true);
+ g.run("s.members[0].known.push(MAGIC.find(x=>x.job===1&&!learned.has(x.id)).id);renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
+ assert.equal(g.run("entries.filter(e=>e.children[0].textContent!=='？？？').length"),g.run('learned.size')+1);
+ console.log('PASS library: spell tab shows unlearned spells as ？？？');
+}

@@ -110,6 +110,8 @@ with sync_playwright() as p:
 
         context, page = load(fixture())
         # 038 town focus navigation, with an actual registered party in the save.
+        # 040 defaults to the entrance; still exercise the route up from training.
+        page.keyboard.press('s')
         page.keyboard.press('w')
         assert page.locator('#entrance').evaluate('(e)=>e.classList.contains("kfocus")&&!e.disabled')
         press(page, 'Space')

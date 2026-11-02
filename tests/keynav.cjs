@@ -21,6 +21,14 @@ const origin=element(0,0),diagonal=element(35,25),far=element(150,0);
 assert.equal(nav.nearest(origin,[origin,far,diagonal],'right'),diagonal);
 const wide=element(-100,100,240,40),narrow=element(40,100);
 assert.equal(nav.nearest(origin,[origin,narrow,wide],'down'),wide);
+// 040 town menu: a full-width button above a 2-column grid must not win A/D
+// between the columns (it is closer by center distance but off the row band).
+const entrance=element(360,276,560,64),training=element(360,352,274,52),tavern=element(646,352,274,52);
+const smith=element(360,416,274,52),temple=element(646,416,274,52),library=element(360,480,560,52);
+const town=[entrance,training,tavern,smith,temple,library];
+for(const [way,from,to] of [['right',training,tavern],['left',tavern,training],['right',smith,temple],['left',temple,smith],
+ ['down',entrance,training],['up',training,entrance],['up',tavern,entrance],['down',smith,library],['down',temple,library],['up',library,smith]])
+ assert.equal(nav.nearest(from,town,way),to,`town ${way}`);
 b.disabled=true;b.title='沈黙している';
 assert.equal(nav.nearest(a,grid,'right'),b,'disabled stays navigable');
 assert.equal(nav.activate(b),false);assert.equal(b.clicks,0);assert.equal(b.title,'沈黙している');
@@ -49,7 +57,9 @@ console.log('PASS keynav: 2×3 spatial navigation, edges, centers, disabled focu
  const box=(x,y,w,h)=>({getBoundingClientRect:()=>({left:x,top:y,width:w,height:h,right:x+w,bottom:y+h})});
  const fight=box(113,531,317,44),guard=box(437,531,317,44),dispel=box(113,582,317,44),spell=box(437,582,317,44),item=box(113,633,317,44),back=box(113,683,642,48);
  const items=[fight,guard,dispel,spell,item,back];
- assert.equal(nav.nearest(fight,items,'right'),back,'038 centre distance alone picks the wide back button');
+ // 038's centre distance alone picked the wide back button; 040 band priority in nearest() now agrees with gridMove.
+ assert.equal(nav.nearest(fight,items,'right'),guard,'band priority keeps D on the same row');
+ assert.equal(nav.nearest(item,items,'right'),back,'no same-row item: centre-distance fallback');
  assert.equal(nav.gridMove(fight,items,'right'),guard);
  assert.equal(nav.gridMove(guard,items,'down'),spell);
  assert.equal(nav.gridMove(spell,items,'left'),dispel);
