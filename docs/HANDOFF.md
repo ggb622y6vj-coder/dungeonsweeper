@@ -106,3 +106,23 @@ sim内の状態初期化は `{poison:false,paralysis:0,sleep:0,silence:0,fear:0}
 再開作業の検証は `tests/*.cjs` 全13本（`node tests/game.cjs` と `node tests/silence.cjs` を含む）、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs` がPASS。新規ブラウザテストはPythonと埋め込みJavaScriptの構文チェックのみPASS。
 
 ブラウザ実行は再開指示に従い未実施。レビュー側でdistを配信し、`/tmp/pyv/bin/python tests/silence-browser.py http://127.0.0.1:8000/` および既存 `tests/*-browser.py` を実行すること。ブラウザ全件PASS・JSエラーなしの最終確認は未完了。push・公開作業は行っていない。
+
+## 恐怖（037、035・036完了後）
+
+035（6aa4723）・036（84e2108）を確認して実装。`ailments[i].fear` は付与・重ね掛けで3、`tickBattleFear` で戦闘ターン終了ごとに1減り、0で「〇〇は落ち着きを取り戻した。」。036と同じ位置で呼び、逃走失敗は1回だけ進む。`clearBattleFear` を勝利・敵の退散・逃走成功・全滅に追加し、遺体記録前にも解除する。帰還は既存の `freshAilments()`、戦闘中の再読込は残りターン数を保持する。
+
+「戦う」を無効化し、理由「恐怖で攻撃できない」をボタン内とtitleに表示する。`canWeaponAttack`・列選択・実行時の `partyAction` でも攻撃を止める。防御・呪文・アイテム・解呪は維持し、032の自動後退判定は変更しない。タグ `.ailment-fear` は既存の `visibleAilments` / `displayVitals` に同期する。
+
+ディアルコ・マディ・気付け薬で治療し、恐怖だけでも薬を消費して治せる。モーリス／マモーリスは「敵を怯えさせ守りを崩す」の説明だけを追記、敵AC＋3の効果を維持。CSVの亡霊6F・地獄の猟犬7F・魔界の猟犬9Fへ命中時15%、死神10Fへ20%を追加し、compile-monstersでfearへ変換した。`monsterOnHit` は既存のstatuses経路を利用し、既存のLv吸収・即死・ブレス等を保持。図鑑は「恐怖 15%」など確率付きで表示する。
+
+simは従来の呪文優先処理後、恐怖中なら使用可能な呪文を選び、使えなければ防御する。通常の魔法使いAIのMP閾値未満でもハリトなどを使用できる。selftestに低MP・自己治療・後衛の補助呪文・MP不足・沈黙併発・解除後の攻撃・次試行への持越し禁止を追加した。
+
+`tests/fear.cjs` を追加し `tests/game.cjs` からも実行。敵4種それぞれ10000命中の恐怖率は亡霊／地獄の猟犬／魔界の猟犬14.59%、死神20.28%で、各指定率±1.5ポイント以内。持続・重ね掛け・各治療・戦闘終了／帰還・隊列維持・予約攻撃禁止・遠距離禁止・ログ同期・保存再読込・沈黙との併発を検証する。
+
+既存テストの期待値変更理由（コミットメッセージにも記載すること）：037でディアルコと気付け薬の治療対象に恐怖を追加したため、`tests/silence.cjs` の「恐怖が2残る」を「恐怖が0」に更新した。毒・HP・MPなど他のassertは維持し、チェックの削除・緩和はない。`tests/silence-browser.py` のディアルコ説明文チェックも恐怖を含む新しい全文へ更新した。
+
+検証済み：`tests/*.cjs` 全14本、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs`、`git diff --check` がPASS。ブラウザテスト全ファイルのPython構文および静的に抽出した埋め込みJavaScriptの構文チェックもPASS。
+
+新規 `tests/fear-browser.py` は既存と同じURL引数形式（既定 `http://127.0.0.1:8000/`）。1280/390pxで図鑑4種、命中時の恐怖とログタグ同期、無効化理由・防御選択、呪文／薬での自己治療、3ターン回復、保存再読込、隊列維持、pageerror・横スクロールを確認する。スクリーンショット先は既定 `/tmp/fear-browser`（`FEAR_SCREENSHOT_DIR` で変更可）。
+
+ブラウザ実行は037の追加指示に従い未実施。レビュー側でdistを配信し、新規 `python3 tests/fear-browser.py [URL]` と既存 `tests/*-browser.py` 全件を実行すること。1280/390での全件PASS・JSエラーなしの最終確認は未完了。push・公開は行っていない。

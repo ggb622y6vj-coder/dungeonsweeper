@@ -138,6 +138,19 @@ function planTurn(g) {
           .find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
         if (id && target !== undefined) { s.magicPlans[i] = {id,target}; return 'spell'; }
       }
+      // Fear blocks weapons, but even low-MP casters can still use a spell.
+      // Prefer curing fear, then damage; retain the normal healing priorities above.
+      if (s.ailments[i].fear > 0) {
+        const priority = {cure:0,damage:1,buff:2};
+        const spells = MAGIC.filter(x => x.job === jobOf(i) && !spellReason(i,x))
+          .sort((a,b) => (priority[a.effect] ?? 3) - (priority[b.effect] ?? 3));
+        for (const x of spells) {
+          const target = x.target === 'ally' ? i : ['enemy','group'].includes(x.target)
+            ? s.enemy.units.find(e => e.hp > 0)?.uid : null;
+          if (validMagicTarget(x,target)) { s.magicPlans[i] = {id:x.id,target}; return 'spell'; }
+        }
+        return 'guard';
+      }
       if (canWeaponAttack(i)) {
         const group = reachableEnemyGroups(i)[0];
         if (group) { s.attackRows[i] = group.key; return 'fight'; }

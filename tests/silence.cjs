@@ -56,7 +56,7 @@ const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
  assert.equal(loaded.run('s.ailments[0].silence'),3,'battle reload preserves remaining duration');
 }
 
-// Cure all three supported conditions together; preserve poison/fear, HP and MP.
+// 037 adds fear to the cure contract; preserve the existing poison, HP and MP checks.
 for(const spell of ['dialko','madi','paralysisCure']) {
  const g=party();
  g.run("s.ailments[1]={poison:true,paralysis:2,sleep:2,silence:3,fear:2};s.hp[1]=10;s.mp[1]=7");
@@ -69,7 +69,7 @@ for(const spell of ['dialko','madi','paralysisCure']) {
  assert.equal(g.run('s.mp[1]'),7);
  assert.equal(g.run('s.hp[1]'),spell==='madi'?10000:10);
  assert.equal(g.run('s.ailments[1].poison'),spell!=='madi');
- assert.equal(g.run('s.ailments[1].fear'),spell==='madi'?0:2);
+ assert.equal(g.run('s.ailments[1].fear'),0,'037: Dialko and smelling salts now cure fear too');
 }
 for(const key of ['silence','sleep']) {
  const g=party();g.run(`s.inventory[0].push('paralysisCure');s.ailments[0].${key}=3`);

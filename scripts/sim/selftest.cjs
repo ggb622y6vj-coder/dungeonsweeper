@@ -194,3 +194,38 @@ prepareTrial(silenceAI, {...opt, jobs:[2,1,0], boss:true});
 assert.equal(silenceAI.run('s.ailments.every(a=>a.silence===0&&a.sleep===0&&a.fear===0)'), true,
   'a later trial must not inherit silence');
 console.log('PASS simulator Montino target threshold, MP/boss restrictions, healing priority, silenced casters and reset');
+
+// 037: fear keeps spellcasters useful, including below the normal mage MP threshold.
+const fearAI = game(null, seededRandom(37));
+createParty(fearAI, [1,0,2,3,0,2]);
+fearAI.run(`s.area='dungeon';s.pendingStairs=false;s.pendingBoss=null;
+  s.enemy={units:[{...makeEnemy('slime',91),row:17,hp:99999}],flagEffect:{}};
+  s.ailments.forEach(a=>a.fear=3);
+  s.members[0].known=['halito'];s.mp[0]=2;
+  s.members[2].known=['dialko'];s.mp[2]=4;
+  s.members[5].known=['kalki'];s.mp[5]=3;`);
+planTurn(fearAI);
+assert.equal(fearAI.run('s.commands.join()'), 'spell,guard,spell,guard,guard,spell');
+assert.equal(fearAI.run('s.magicPlans[0].id'), 'halito');
+assert.equal(fearAI.run('s.magicPlans[0].target'), 91);
+assert.equal(fearAI.run('s.magicPlans[2].id'), 'dialko');
+assert.equal(fearAI.run('s.magicPlans[2].target'), 2, 'frightened priest can cure self');
+assert.equal(fearAI.run('s.magicPlans[5].id'), 'kalki', 'party spells remain available from rear');
+fearAI.run('partyAction(0);partyAction(2);partyAction(5)');
+assert(fearAI.run('s.enemy.units[0].hp') < 99999);
+assert.equal(fearAI.run('s.ailments[2].fear'), 0);
+assert.equal(fearAI.run('s.enemy.partyAC'), 1);
+fearAI.drain();
+fearAI.run('s.ailments.forEach(a=>a.fear=3);s.mp.fill(0)');
+planTurn(fearAI);
+assert.equal(fearAI.run("s.commands.every(c=>c==='guard')"),true,'no usable spell means guard');
+fearAI.run('s.mp.fill(100);s.ailments.forEach(a=>a.silence=3)');
+planTurn(fearAI);
+assert.equal(fearAI.run("s.commands.every(c=>c==='guard')"),true,'fear plus silence means guard');
+fearAI.run('s.ailments.forEach(a=>{a.silence=0;a.fear=0})');
+planTurn(fearAI);
+assert.equal(fearAI.run('s.commands[1]'), 'fight', 'fighter resumes attacking when fear ends');
+fearAI.run('s.ailments.forEach(a=>a.fear=3)');
+prepareTrial(fearAI, {...opt, jobs:[1,0,2,3,0,2], boss:true});
+assert.equal(fearAI.run('s.ailments.every(a=>a.fear===0)'),true,'next trial cannot inherit fear');
+console.log('PASS simulator fear: spells including low MP/self-cure/rear buff, otherwise guard, silence overlap, recovery and trial reset');

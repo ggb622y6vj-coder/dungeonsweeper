@@ -75,6 +75,7 @@ function partyAction(i){
   }else log(`${NAMES[i]}の呪文が選ばれていない。`);
   return;
  }
+ if(s.ailments[i].fear>0){log(`${NAMES[i]}は恐怖で攻撃できない。`);return}
  if(!canWeaponAttack(i)){log(`${NAMES[i]}の近接攻撃は後衛から届かない。`);return}
  const e=selectedEnemy(i);
  if(!e){log(`${NAMES[i]}の攻撃対象の列は全滅している。`);return}
@@ -98,7 +99,7 @@ function attack(){
  if(!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
  else if(s.enemy.initiative==='party')s.enemy.initiative='normal';
  else enemyTurn(s.commands);
- tickBattleSilence();
+ tickBattleSilence();tickBattleFear();
  resetCommandEntry();resetPartyCommands();
  if(s.enemy){const next=s.enemy.units.find(e=>e.hp>0);s.attackRows=s.attackRows.map(key=>s.enemy.units.some(e=>String(rowKey(e))===String(key)&&e.hp>0)?key:rowKey(next))}
  render();
@@ -110,7 +111,7 @@ function levelUp(indices=s.members.map((_,i)=>i)){let reports=[];indices.forEach
 function renderStats(){ $('#partyreorder').disabled=!idle()||s.done; $('#statsbody').innerHTML=s.members.map((_,i)=>{let m=shownMember(i);let values=[['HP',`${(displayVitals?.hp||s.hp)[i]}/${m.maxHP}`],['MP',`${(displayVitals?.mp||s.mp)[i]}/${m.maxMP}`],['STR',m.str],['AC',displayVitals?.ac?.[i]??effectiveAC(i)],['IQ',m.intelligence],['PIE',m.piety],['経験値',m.xp],['NEXT',m.level>=LEVEL_CAP?'上限':Math.max(0,m.xpTargets[m.level+1]-m.xp)]];return `<article class="statcard"><h3>${m.name||CLASSES[m.job??i].name} <small>Lv.${m.level} · ${i<3?'前衛':'後衛'}</small>${ailmentTags(i)}</h3><dl class="stat-metrics">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="stat-actions"><button data-stat-inventory="${i}" ${!idle()?'disabled':''}>アイテム</button>${[1,2].includes(m.job??i)?`<button data-stat-cast="${i}" ${s.enemy||logBusy()?'disabled':''}>呪文</button>`:''}</div></article>`}).join('')}
 function showLevelReport(){if(!s.levelReport?.length)return;$('#levelreport').textContent=s.levelReport.join('\n');if(!$('#leveldialog').open)$('#leveldialog').showModal()}
 function showTempleCarryReport(){if(!s.templeReport?.length){showLevelReport();return}const lines=[],normal=s.templeReport.filter(r=>r.status==='dead'||r.status==='ash'),lost=s.templeReport.filter(r=>r.status==='lost'),stone=s.templeReport.filter(r=>r.status==='stone');if(normal.length)lines.push(`${normal.map(r=>`${r.name}（${r.status==='dead'?'死亡':'灰'}）`).join('、')}を寺院に運んだ。寺院で蘇生できます。`);if(stone.length)lines.push(`${stone.map(r=>`${r.name}（石化）`).join('、')}を寺院に運んだ。寺院で石化を解除できます。`);for(const r of lost)lines.push(`${r.name}（ロスト）はパーティーから外れた。ロストは蘇生できません。`);$('#templecarrylist').textContent=lines.join('\n');$('#templecarrydialog').showModal()}
-function canWeaponAttack(i){return i<3||equippedWeapon(i)?.range==='ranged'}
+function canWeaponAttack(i){return !(s.ailments[i].fear>0)&&(i<3||equippedWeapon(i)?.range==='ranged')}
 function itemDescription(w){return diceLabel(w)+(w.dice?' · '+(w.range==='ranged'?'遠距離':'近距離'):'')}
 function renderCatalog(){ $('#catalogbody').innerHTML=`<table><thead><tr><th>敵</th><th>HP</th><th>攻撃</th><th>AC</th><th>経験値</th><th>群れ</th><th>金貨</th></tr></thead><tbody>${ENEMIES.map(e=>`<tr><td>${e.name}</td><td>${diceLabel({dice:e.hp})}</td><td>${diceLabel({dice:e.attack})}</td><td>${e.ac}</td><td>${e.xp}</td><td>${e.groupSize.join("〜")}体</td><td>${diceLabel({dice:e.gold})} ÷3（切捨）</td></tr>`).join('')}</tbody></table>`}
 function drawEnemies(){let combat=visibleCombat();if(!combat)return '';let groups=enemyGroups(combat),height=Math.min(130,260/groups.length);return groups.map((g,row)=>{let y=62+row*height;let visible=g.units.filter(e=>!e.rewarded);return visible.map((e,col)=>{if(e.rewarded)return '';let width=Math.min(108,560/visible.length-8),x=320+(col-(visible.length-1)/2)*(width+8);return `<g data-enemy-uid="${e.uid}"><rect x="${x-width/2}" y="${y}" width="${width}" height="${height-9}" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="${y+height*.65}" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text><text x="${x}" y="${y+height-18}" text-anchor="middle" fill="#dac595" font-size="16">${e.sleep>0?'Zzz':''}</text></g>`}).join('')}).join('')}
@@ -125,7 +126,7 @@ function enterDungeon(){if(!s.members.length||s.area!=='town'||!idle())return;if
 function answerStairs(yes){if(logBusy()||!s.pendingStairs)return;let down=s.pendingStairs==='down';s.pendingStairs=false;if(yes){if(down)travelFloor(s.floor+1);else if(s.floor>1)travelFloor(s.floor-1);else enterTown();}else{log('階段の前にとどまった。');render()}}
 function defeat(){
  if(s.defeatPending||!s.members.length)return;
- clearBattleSilence();
+ clearBattleSilence();clearBattleFear();
  s.members.forEach((m,i)=>{if(m.status==='stone')return;if(m.status==='ok')m.status='dead';s.hp[i]=0});
  (s.corpses??=[]).push({id:crypto.randomUUID(),floor:s.floor,cell:s.pos,records:structuredClone(partyRecords()),gold:s.gold});
  s.gold=0;s.defeatPending=true;s.done=true;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;
@@ -204,7 +205,7 @@ function isEquipped(i,slot){return s.equipped[i]===slot||Object.values(s.armor[i
 function effectiveAC(i){return memberClass(i).ac-Object.values(s.armor[i]).reduce((n,k)=>n+(weapon(s.inventory[i][k])?.ac||0),0)-(s.enemy?.partyAC||0)}
 $('#resetopen').onclick=()=>$('#resetdialog').showModal();$('#resetcancel').onclick=()=>$('#resetdialog').close();$('#resetconfirm').onclick=()=>{s=null;fresh();s.area='town';s.hp=s.members.map(m=>m.maxHP);s.mp=s.members.map(m=>m.maxMP);$('#resetdialog').close();render()};
 
-function visibleAilments(i){let a=(displayVitals?.ailments||s.ailments)[i]||{},hp=(displayVitals?.hp||s.hp)[i],status=shownMember(i).status,label={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[status];return label?[[status,label]]:hp<=0?[['dead','死亡']]:[[a.poison,'poison','毒'],[a.paralysis>0,'paralysis','麻痺'],[a.sleep>0,'sleep','睡眠'],[a.silence>0,'silence','沈黙']].filter(([active])=>active).map(([,kind,label])=>[kind,label])}
+function visibleAilments(i){let a=(displayVitals?.ailments||s.ailments)[i]||{},hp=(displayVitals?.hp||s.hp)[i],status=shownMember(i).status,label={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[status];return label?[[status,label]]:hp<=0?[['dead','死亡']]:[[a.poison,'poison','毒'],[a.paralysis>0,'paralysis','麻痺'],[a.sleep>0,'sleep','睡眠'],[a.silence>0,'silence','沈黙'],[a.fear>0,'fear','恐怖']].filter(([active])=>active).map(([,kind,label])=>[kind,label])}
 function ailmentLabel(i){return visibleAilments(i).map(([,label])=>label).join('・')||'正常'}
 function ailmentTags(i){return visibleAilments(i).map(([kind,label])=>`<span class="ailment-tag ailment-${kind}">${label}</span>`).join('')}
 function afflict(i,type){
@@ -212,6 +213,7 @@ function afflict(i,type){
  if(!['poison','paralysis','stone','silence','fear'].includes(type)){console.warn('Unknown ailment type:',type);return}
  displayVitals??=snapshotVitals();
  if(type==='stone'){s.members[i].status='stone';s.ailments[i]=freshAilments();log(`${NAMES[i]}は石になった。`);return}
+ if(type==='fear'){s.ailments[i].fear=3;log(`${NAMES[i]}は恐怖に怯えた。`);return}
  if(type==='silence'){s.ailments[i].silence=3;log(`${NAMES[i]}は沈黙した。`);return}
  if(type==='poison')s.ailments[i].poison=true;else if(type==='paralysis')s.ailments[i].paralysis=4;
  if(type==='poison'||type==='paralysis')log(`${NAMES[i]}は${type==='poison'?'毒':'麻痺'}に侵された。`);
@@ -225,6 +227,15 @@ function tickBattleSilence(){
  }
 }
 function clearBattleSilence(){for(const a of s.ailments)a.silence=0}
+// Fear follows the same completed-turn boundaries as silence.
+function tickBattleFear(){
+ if(!s.enemy)return;
+ for(let i=0;i<s.members.length;i++)if(s.ailments[i].fear>0){
+  s.ailments[i].fear--;
+  if(s.ailments[i].fear===0)log(`${NAMES[i]}は落ち着きを取り戻した。`);
+ }
+}
+function clearBattleFear(){for(const a of s.ailments)a.fear=0}
 function tickAilments(logPoison=true){
  for(const id of s.members.map(m=>m.id)){
   const i=s.members.findIndex(m=>m.id===id),a=s.ailments[i];
@@ -274,7 +285,7 @@ function enemyTurn(cmds){
 
 function monsterLevel(e){return enemyDefinition(e.id).level}
 function escapeChance(){if(!s.enemy||s.enemy.boss||s.enemy.flagEffect?.bad)return 0;let party=s.members.reduce((a,m,i)=>{if(activeMember(i)&&!s.ailments[i].poison&&!s.ailments[i].paralysis){a.total+=m.level;a.count++}return a},{total:0,count:0}),enemies=s.enemy.units.reduce((a,e)=>{if(e.hp>0&&!e.sleep){a.total+=monsterLevel(e);a.count++}return a},{total:0,count:0});if(!party.count)return 10;let bonus=party.count===1?15:party.count===2?10:party.count===3?5:0,partyAverage=party.total/party.count,enemyAverage=enemies.count?enemies.total/enemies.count:0;return Math.max(10,Math.min(95,50+5*(partyAverage-enemyAverage)+bonus))}
-function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();s.enemy=null;s.pos=to;s.previousPos=from;autoReorderParty('escape');log('逃走に成功。一歩前のマスへ戻った。')}else{log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();render()}
+function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();clearBattleFear();s.enemy=null;s.pos=to;s.previousPos=from;autoReorderParty('escape');log('逃走に成功。一歩前のマスへ戻った。')}else{log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();tickBattleFear();render()}
 
 magicUI();medicineUI();flagUI();partyUI();libraryUI();
 

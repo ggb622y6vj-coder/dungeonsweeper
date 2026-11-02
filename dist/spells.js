@@ -6,9 +6,9 @@ const MAGIC = [
  ['katino','カティノ',1,1,3,true,'battle','group','sleep',null,'選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止'],
  ['dilto','ディルト',1,3,3,true,'battle','group','debuff',2,'選択した列の敵のAC＋2。戦闘終了まで'],
  ['mahalito','マハリト',1,5,7,true,'battle','group','damage',[4,6],'選択した列の敵に火炎4d6'],
- ['morlis','モーリス',1,7,5,true,'battle','group','debuff',3,'選択した列の敵のAC＋3。戦闘終了まで'],
+ ['morlis','モーリス',1,7,5,true,'battle','group','debuff',3,'敵を怯えさせ守りを崩す。選択した列の敵のAC＋3。戦闘終了まで'],
  ['dalto','ダルト',1,7,10,false,'battle','group','damage',[6,6],'選択した列の敵に冷気6d6'],
- ['mamorlis','マモーリス',1,9,8,true,'battle','all','debuff',3,'敵全体のAC＋3。戦闘終了まで'],
+ ['mamorlis','マモーリス',1,9,8,true,'battle','all','debuff',3,'敵を怯えさせ守りを崩す。敵全体のAC＋3。戦闘終了まで'],
  ['lakanito','ラカニト',1,11,16,true,'battle','group','death',null,'選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死には無効'],
  ['malor','マロール',1,13,20,true,'field','floor','warp',null,'訪問済み階の上り階段へ転移。未訪問階は選択不可'],
  ['tiltowait','ティルトウェイト',1,13,30,false,'battle','all','damage',[10,15],'敵全体に10d15'],
@@ -19,7 +19,7 @@ const MAGIC = [
  ['watchful','警戒結界',2,3,4,true,'field','party','watchful',null,'町へ戻るまで敵の奇襲を防ぐ。味方の先制率は変わらない'],
  ['calfo','カルフォ',2,3,3,false,'chest','chest','identify',null,'宝箱の罠を95%の精度で識別。解除はしない'],
  ['lomilwa','ロミルワ',2,5,5,true,'field','party','light',null,'町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま'],
- ['dialko','ディアルコ',2,5,4,false,'both','ally','cure',null,'生存する味方1人の麻痺・睡眠・沈黙を治す'],
+ ['dialko','ディアルコ',2,5,4,false,'both','ally','cure',null,'生存する味方1人の麻痺・睡眠・沈黙・恐怖を治す'],
  ['dial','ディアル',2,7,5,true,'both','ally','heal',[4,4],'生存する味方1人のHPを4d4回復'],
  ['latumofis','ラツモフィス',2,7,4,false,'both','ally','antidote',null,'生存する味方1人の毒を治す'],
  ['dialma','ディアルマ',2,9,8,true,'both','ally','heal',[8,3],'生存する味方1人のHPを8d3回復'],
@@ -42,7 +42,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||x.job!==jobOf(i)||spellReason(
  else if(x.effect==='identifyfoe'){identifyEnemies(true);log('敵の正体を見破った。')}
  else if(x.effect==='buff'){s.enemy.partyAC=Math.max(s.enemy.partyAC||0,x.value);log('一行の守りが強まった。')}
  else if(x.effect==='heal'||x.effect==='restore'){let before=s.hp[t];s.hp[t]=x.effect==='restore'?maxHP(t):Math.min(maxHP(t),s.hp[t]+dice(...x.value).value);if(x.effect==='restore'){const petrified=s.members[t].status==='stone';s.members[t].status='ok';s.ailments[t]=freshAilments();if(petrified)log(`${NAMES[t]}の石化が解けた。`);}log(`${NAMES[t]}のHPが${s.hp[t]-before}回復した。`)}
- else if(x.effect==='cure'){s.ailments[t].paralysis=0;s.ailments[t].sleep=0;s.ailments[t].silence=0;log(`${NAMES[t]}の麻痺・睡眠・沈黙が解けた。`)}
+ else if(x.effect==='cure'){s.ailments[t].paralysis=0;s.ailments[t].sleep=0;s.ailments[t].silence=0;s.ailments[t].fear=0;log(`${NAMES[t]}の麻痺・睡眠・沈黙・恐怖が解けた。`)}
  else if(x.effect==='antidote'){s.ailments[t].poison=false;log(`${NAMES[t]}の毒が消えた。`)}
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}
  else if(x.effect==='survey'){s.dumapicUses=(s.dumapicUses||0)+1;let j=target();if(j<0||s.cells[j].open)log('調査に失敗した。');else{let truth=!!s.cells[j].trap,correct=Math.random()<.85;log((correct?truth:!truth)?'前方は罠の可能性あり':'前方にはなにもない')}}

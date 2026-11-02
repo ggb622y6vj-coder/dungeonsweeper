@@ -24,7 +24,7 @@ function libraryDice(values){
 function libraryMonsterDetails(d,record){
  const abilities=[];
  if(d.breath)abilities.push(`${d.breath.element}のブレス`);
- for(const a of d.statuses)if(a.chance>0)abilities.push(({poison:'毒',paralysis:'麻痺',sleep:'睡眠',stone:'石化'})[a.type]||a.type);
+ for(const a of d.statuses)if(a.chance>0)abilities.push(a.type==='fear'?`恐怖 ${Math.round(a.chance*100)}%`:({poison:'毒',paralysis:'麻痺',sleep:'睡眠',stone:'石化'})[a.type]||a.type);
  for(const [key,label] of [['steal','アイテム奪取'],['drain','レベル吸収'],['death','即死'],['summon','仲間を呼ぶ'],['rear','後衛攻撃'],['flee','逃走']])if(d[key])abilities.push(label);
  if(d.resistance&&d.resistance!=='なし')abilities.push(`耐性：${d.resistance}`);
  return [
