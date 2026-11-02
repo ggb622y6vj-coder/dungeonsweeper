@@ -185,8 +185,8 @@ console.log('PASS wipe skips all reordering and preserves corpse records, reserv
 }
 {
  const g=party();g.run("s.members[1].status='stone';enterTown()");
- assert.equal(g.run('order()'),'ACDBEF','town hook runs after return processing');
- assert.equal(g.run("s.members[index('B')].status"),'stone');
+ assert.equal(g.run('order()'),'ACDEF','stone is now carried before the town hook (033)');
+ assert.equal(g.run("s.reserve.find(r=>r.members.name==='B').members.status"),'stone');
  const h=party();battle(h);h.run("s.ailments[1].paralysis=4;s.enemy.units[0].hp=0;s.enemy.units[0].rewarded=true;finishMonsterBattle()");
  assert.equal(h.run('order()'),'ACDBEF');assert.equal(h.run('s.enemy'),null);
  const f=party();battle(f);f.run("s.ailments[1].paralysis=4;Math.random=()=>0;flee()");

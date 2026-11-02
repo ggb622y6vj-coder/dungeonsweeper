@@ -8,7 +8,7 @@ const MEDICINES=[
 ];
 let medicineMember=0;
 function medicineSlots(i){return s.inventory[i].flatMap((id,slot)=>MEDICINES.some(w=>w.id===id)?[{slot,item:weapon(id)}]:[])}
-function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&s.hp[i]>0&&!s.ailments[i].paralysis}
+function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&!partyIncapacitated(i)}
 function medicineAction(i){if(!s.enemy||!medicineSlots(i).length)return '';let plan=s.itemPlans[i],w=plan&&weapon(plan.id);return `<button data-medicine="${i}" ${!canChooseMedicine(i)?'disabled':''}>${s.commands[i]==='item'&&w?w.name+' → '+NAMES[plan.target]:'薬を使う'}</button>`}
 function dropMedicine(){
  if(Math.random()>=.30)return;
@@ -19,7 +19,8 @@ function dropMedicine(){
 function removeInventorySlot(i,slot){s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let part in s.armor[i])if(s.armor[i][part]>slot)s.armor[i][part]--}
 function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  let w=weapon(s.inventory[i]?.[slot]);
- if(!w||w.kind!=='medicine'||(expectedId&&w.id!==expectedId)||s.hp[i]<=0||s.ailments[i].paralysis||!validAllyTarget(target)||s.done||(!inTurn&&(!canChooseMedicine(i)||s.enemy)))return false;
+ if(!w||w.kind!=='medicine'||(expectedId&&w.id!==expectedId)||partyIncapacitated(i)||!validAllyTarget(target)||s.done||(!inTurn&&(!canChooseMedicine(i)||s.enemy)))return false;
+ if(s.members[target].status==='stone'){log(`${w.name}では${NAMES[target]}の石化を治せない。`);return false}
  const heal=['dios','dial','dialma'].includes(w.spell);
  if(heal&&s.hp[target]>=maxHP(target)){log(NAMES[target]+'のHPは満タンだ。');return false}
  if(w.spell==='dialko'&&!s.ailments[target].paralysis){log(NAMES[target]+'は麻痺していない。');return false}

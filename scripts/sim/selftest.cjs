@@ -130,3 +130,33 @@ for (const value of Object.values(report)) assert(Number.isFinite(value));
 assert(report.winRate + report.wipeRate <= 1);
 assert(report.deathsPerBattle >= 0 && report.deathsPerBattle <= 6);
 console.log('PASS simulator arguments, party identity, RNG diversity/reproducibility, growth reset, AI, escape/wipe/victory and timeout');
+
+// 033: stone cannot act or attract ordinary healing; Madi can cure it.
+const petrifyAI = game(null, seededRandom());
+createParty(petrifyAI, [0,2,1]);
+petrifyAI.run(`s.area='dungeon';s.enemy={units:[{...makeEnemy('slime',0),row:0,hp:999}],boss:true};
+  s.members[0].status='stone';s.hp[0]=3;s.members[2].status='stone';
+  s.members[1].known=['dios'];s.mp[1]=100;`);
+planTurn(petrifyAI);
+assert.equal(petrifyAI.run("s.commands[0]==='guard'&&s.commands[2]==='guard'"),true);
+assert.equal(petrifyAI.run('s.magicPlans[1]'),null,'ordinary healing must not target stone');
+petrifyAI.run("s.members[1].known.push('madi')");
+planTurn(petrifyAI);
+assert.equal(petrifyAI.run('s.magicPlans[1].id'),'madi');
+assert.equal(petrifyAI.run('s.magicPlans[1].target'),0);
+petrifyAI.run("s.hp[1]=1;s.ailments[1].poison=true;s.hp[2]=0;s.members[2].status='dead'");
+const stoneWipe = resolveBattle(petrifyAI);
+assert.equal(stoneWipe.outcome,'wipe');assert.equal(stoneWipe.alive,0);
+assert.equal(stoneWipe.deaths,2,'petrified survivors are not reported as deaths');
+assert.equal(stoneWipe.total,3,'petrification preserves HP in the loss metric');
+
+// Opening ambush capture persists after finishDefeat removes all party fields.
+const openingStone = game(null, seededRandom());
+createParty(openingStone,[0,2]);
+openingStone.run(`rollInitiative=()=> 'enemy';enemyTurn=()=>{afflict(0,'stone');s.hp[1]=0;markDeaths();defeat()}`);
+prepareTrial(openingStone,{...opt,jobs:[0,2]});
+assert.equal(openingStone.run('s.members.length'),0);
+const openingResult=resolveBattle(openingStone);
+assert.equal(openingResult.outcome,'wipe');assert.equal(openingResult.deaths,1);
+assert(openingResult.total>0);assert.equal(openingResult.rounds,0);
+console.log('PASS simulator stone actors/targets, Madi, mixed wipe counts and HP, opening ambush snapshot');

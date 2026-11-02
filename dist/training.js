@@ -22,8 +22,8 @@ function renderTraining(){
  if(!roster.length){const p=document.createElement('p');p.textContent='名前と職業を選んで、最初の冒険者を作成してください。';list.append(p)}
  for(const r of roster){
   const m=r.members,index=s.members.findIndex(x=>x.id===m.id),row=document.createElement('section');row.dataset.recruitId=m.id;
-  const title=document.createElement('h4');title.textContent=`${m.name} · ${CLASSES[m.job].name} Lv.${m.level}`;
-  const status=document.createElement('p'),ailment={dead:'死亡',ash:'灰',lost:'ロスト'}[m.status];status.textContent=ailment?`${index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`}・${ailment}`:index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`;
+  const title=document.createElement('h4');title.textContent=`${m.name}${m.status==='stone'?'（石化）':''} · ${CLASSES[m.job].name} Lv.${m.level}`;
+  const status=document.createElement('p'),ailment={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[m.status];status.textContent=ailment?`${index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`}・${ailment}`:index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`;
   const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
   row.append(title,status,stats);const actions=document.createElement('div');actions.className='recruit-actions';row.append(actions);
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b)};
