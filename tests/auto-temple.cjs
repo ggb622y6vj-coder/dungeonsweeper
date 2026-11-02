@@ -102,6 +102,25 @@ assert.equal(g.run("$('#templecarrylist').textContent"),g.run("`${deadName}（�
 assert.equal(g.run("changeRecruitParty(s.reserve.find(r=>r.members.status==='lost').members.id,true)"),false);
 console.log('PASS lost members carried with separate message and cannot join');
 
+// Tavern blocks impaired members in the UI and validates again when saving.
+g=boot();
+g.run(`s.area='town';for(let i=0;i<3;i++){let r=generateRecruit('酒場'+i,i%4);registerRecruit(r);changeRecruitParty(r.members.id,true)}let dead=generateRecruit('死亡者',0);registerRecruit(dead);let ash=generateRecruit('灰の者',1);registerRecruit(ash);let roster=trainingRoster();roster.find(r=>r.members.name==='死亡者').members.status='dead';roster.find(r=>r.members.name==='死亡者').hp=0;roster.find(r=>r.members.name==='灰の者').members.status='ash';roster.find(r=>r.members.name==='灰の者').hp=0;s.reserve=roster.filter(r=>!s.members.some(m=>m.id===r.members.id));let before=JSON.stringify(s.members.map(m=>m.id));partyUI();$('#tavernopen').onclick()`);
+assert.equal(g.run("$('#taverndialog').open"),true);
+assert.equal(g.run("$('#tavernslots').innerHTML.includes('死亡者（死亡）')"),true);
+assert.equal(g.run("$('#tavernslots').innerHTML.includes('灰の者（灰）')"),true);
+assert.equal(g.run("$('#tavernslots').innerHTML.includes('value=\"3\"')&&$('#tavernslots').innerHTML.includes('disabled>死亡者')"),true);
+assert.equal(g.run("$('#tavernslots').innerHTML.includes('disabled>灰の者')"),true);
+g.run(`tavernOrder[3]=3;setTownPartyFromRoster(tavernRoster,tavernOrder)`);
+assert.equal(g.run("JSON.stringify(s.members.map(m=>m.id))"),g.run('before'),'tampered save cannot add dead member');
+assert.equal(g.run("$('#taverndialog').open"),true,'rejected save leaves tavern open');
+assert.equal(g.run("$('#townnotice').textContent"),'死亡したメンバーは加入できません。');
+assert.equal(g.run("$('#tavernnotice').textContent"),'死亡したメンバーは加入できません。','rejection shown inside the tavern dialog');
+assert.equal(g.run('setTownPartyFromRoster(tavernRoster,[0,1,2,4])'),false,'ash member also rejected by tavern roster setter');
+assert.equal(g.run("JSON.stringify(s.members.map(m=>m.id))"),g.run('before'));
+g.run('tavernOrder=[2,1,0,-1,-1,-1];if(!setTownPartyFromRoster(tavernRoster,tavernOrder))throw Error(\'valid reshuffle failed\')');
+assert.equal(g.run("s.members.map(m=>m.name).join(',')"),'酒場2,酒場1,酒場0','valid party reorder still works');
+console.log('PASS tavern: dead/ash options disabled, tampered save rejected, valid party reorder retained');
+
 // Wipe (defeat) keeps the corpse flow: nothing is carried to the reserve.
 g=sixParty();
 g.run(`s.enemy=null;defeat();var corpses=s.corpses.length;`);
