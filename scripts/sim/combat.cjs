@@ -68,7 +68,7 @@ function prepareTrial(g, opt) {
     levelUp();
     s.hp = s.members.map(m => m.maxHP);
     s.mp = s.members.map(m => m.maxMP);
-    s.ailments = s.members.map(() => ({poison:false, paralysis:0}));
+    s.ailments = s.members.map(() => ({poison:false,paralysis:0,sleep:0,silence:0,fear:0}));
     s.corpses = [];
     if (${opt.floor} > 1) fresh(${opt.floor});
     s.area = 'dungeon';
@@ -111,7 +111,7 @@ function planTurn(g) {
     s.magicPlans = s.members.map(() => null);
     s.commands = s.members.map((m,i) => {
       if (partyIncapacitated(i)) return 'guard';
-      if (jobOf(i) === 2) {
+      if (jobOf(i) === 2 && !s.ailments[i].silence) {
         const stone = s.members.findIndex(m => m.status === 'stone');
         if (stone >= 0 && m.known.includes('madi') && !spellReason(i, magic('madi'))) {
           s.magicPlans[i] = {id:'madi',target:stone}; return 'spell';
@@ -121,8 +121,14 @@ function planTurn(g) {
           .sort((a,b) => s.hp[a] / s.members[a].maxHP - s.hp[b] / s.members[b].maxHP)[0];
         const id = ['dialma','dial','dios'].find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
         if (target !== undefined && id) { s.magicPlans[i] = {id,target}; return 'spell'; }
+        const casterGroup = enemyGroups().find(g => g.units.filter(e => e.hp > 0 && !e.silence &&
+          enemyDefinition(e.id).spellInfo && !enemyDefinition(e.id).boss).length >= 2);
+        if (casterGroup && !s.enemy.boss && !spellReason(i, magic('montino'))) {
+          const target = casterGroup.units.find(e => e.hp > 0 && !e.silence).uid;
+          s.magicPlans[i] = {id:'montino',target}; return 'spell';
+        }
       }
-      if (jobOf(i) === 1 && s.mp[i] >= 6) {
+      if (jobOf(i) === 1 && !s.ailments[i].silence && s.mp[i] >= 6) {
         const targetGroup = enemyGroups().find(g => g.units.some(e => e.hp > 0));
         const target = targetGroup?.units.find(e => e.hp > 0)?.uid;
         const spellOrder = ['tiltowait','lakanito','dalto','mahalito'];

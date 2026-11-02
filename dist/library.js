@@ -29,7 +29,7 @@ function libraryMonsterDetails(d,record){
  if(d.resistance&&d.resistance!=='なし')abilities.push(`耐性：${d.resistance}`);
  return [
   ['出現階',`地下${d.floor}階`],['HPの目安',libraryDice(d.hp)],['攻撃回数',`${d.swings}回`],
-  ['使う呪文',d.spell>0?(d.spellInfo?.name||'ハリト'):'なし'],['特殊能力',abilities.join('・')||'なし'],
+  ['使う呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体 ${Math.round(d.spell*100)}%）`:(d.spellInfo?.name||'ハリト')):'なし'],['特殊能力',abilities.join('・')||'なし'],
   ['撃破数',`${record.count}体`],['初撃破階',`地下${record.firstFloor}階`]
  ];
 }
