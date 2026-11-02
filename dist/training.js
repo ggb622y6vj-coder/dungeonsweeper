@@ -34,7 +34,7 @@ function renderTraining(){
 }
 $('#trainingopen').onclick=()=>{if(s.area!=='town'||!idle())return;resetRecruitDraft();trainingNotice('');renderTraining();$('#training').showModal()};
 $('#trainingclose').onclick=()=>$('#training').close();
-$('#training').addEventListener('close',resetRecruitDraft);
+$('#training').addEventListener('close',()=>{if(!$('#training').open)resetRecruitDraft()});
 $('#rollrecruit').onclick=()=>{const record=generateRecruit($('#recruitname').value,+$('#recruitjob').value);if(!record){trainingNotice('名前を入力してください。');return}previousRecruit=recruitDraft;recruitDraft=record;showRecruitPreview();$('#registerrecruit').disabled=false;trainingNotice('能力値を確認して登録してください。')};
 for(const id of ['recruitname','recruitjob'])$('#'+id).oninput=resetRecruitDraft;
 $('#registerrecruit').onclick=()=>{if(registerRecruit(recruitDraft)){resetRecruitDraft();renderTraining();trainingNotice('控えに登録しました。「加入」でパーティに加えてください。')}};

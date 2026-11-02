@@ -126,3 +126,18 @@ simは従来の呪文優先処理後、恐怖中なら使用可能な呪文を�
 新規 `tests/fear-browser.py` は既存と同じURL引数形式（既定 `http://127.0.0.1:8000/`）。1280/390pxで図鑑4種、命中時の恐怖とログタグ同期、無効化理由・防御選択、呪文／薬での自己治療、3ターン回復、保存再読込、隊列維持、pageerror・横スクロールを確認する。スクリーンショット先は既定 `/tmp/fear-browser`（`FEAR_SCREENSHOT_DIR` で変更可）。
 
 ブラウザ実行は037の追加指示に従い未実施。レビュー側でdistを配信し、新規 `python3 tests/fear-browser.py [URL]` と既存 `tests/*-browser.py` 全件を実行すること。1280/390での全件PASS・JSエラーなしの最終確認は未完了。push・公開は行っていない。
+
+
+## キーボード操作の基盤（038）
+
+`dist/keynav.js` を新設し、index.htmlから全ゲームスクリプトの後に読み込む。最前面dialog／味方対象／戦闘コマンド／町／探索の操作レイヤー、中心座標によるWASD・矢印の移動、Space・Enterのclick経路、Escの明示的な戻る処理、入れ子dialogのフォーカス復帰、3pxの`.kfocus`とpointerdown解除を実装。`data-key-default`／`data-key-back`で既定・戻る項目を指定する。戦闘再描画は入力段階の `data-key-context` と安定したdata属性で追跡し、敵row/key・戦闘の実データ・ログスナップショットには変更を加えない。
+
+disabledボタンはネイティブのdisabledを維持し、方向移動の論理フォーカスで通過可能、決定は拒否する（DOMフォーカスはコンテナへ退避）。titleの理由をヒントとstatusへ出す。入力欄・selectのキーはEsc以外を通し、Escはまず入力欄から抜ける。Ctrl／Alt／Meta・IMEは処理しない。タブ操作・味方選択のTab順も中央処理へ集約した。`game.js`の旧探索keydownは039で統合する前提で残し、中央capture処理と旧入口のKeyNavガードで二重実行を防ぐ。パーティーの旧入口はNodeテストからの直接呼出し互換として残し、ブラウザでは無効。
+
+町メニューの下に「設定」を追加。PC用ヒントは `ash-keyhint=on/off`（既定on）へ独立保存。既存の町メニューの列数と入口・図書館・リセットの配置ルールは維持。390px・タッチではヒントを出さない。依存パッケージ追加・ash-v1変更・push・公開はなし。
+
+検証済み：`tests/*.cjs` 全15本、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs`。`tests/keynav.cjs` は2×3座標・上下左右と端・中心距離・disabled選択／実行禁止・修飾キー／入力ガード・pointerリング解除を検証し、`tests/game.cjs` からも実行する。既存テストのチェックは削除・緩和していない。
+
+`tests/keynav-browser.py` を追加（URL引数、既定 `http://127.0.0.1:8000/`、CHROME_PATH対応、pageerror検出）。1280/390pxで操作はpage.keyboardのみ、evaluateは状態の確認のみ。町の空間移動、両決定キー、disabled、入力中のwasd/space/e/f、Esc、修飾キー、入れ子dialogと復帰、3pxリング、設定保存と再読込、探索での二重処理防止、横スクロールを検証する。ポインター解除の実ブラウザ確認は別途必要。
+
+未完了：追加指示に従ってブラウザ実行は省略。レビュー側でdistを配信し、`/tmp/pyv/bin/python tests/keynav-browser.py [URL]` と既存 `tests/*-browser.py` 全件を実行すること。1280/390px全件PASS・JSエラーなし・マウス／タッチの実挙動は未検証。

@@ -87,10 +87,5 @@ function libraryUI(){
  for(const tab of ['monsters','items']){
   const button=$('#librarytab-'+tab);
   button.onclick=()=>renderLibrary(tab);
-  button.onkeydown=e=>{
-   if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
-   e.preventDefault();const next=e.key==='Home'?'monsters':e.key==='End'?'items':tab==='monsters'?'items':'monsters';
-   renderLibrary(next);$('#librarytab-'+next).focus();
-  };
  }
 }
