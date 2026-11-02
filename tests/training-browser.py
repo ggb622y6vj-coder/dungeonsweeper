@@ -18,6 +18,21 @@ with sync_playwright() as p:
   page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:8000/')
   assert page.locator('#entrance').is_disabled()
+  # Empty library opens without any registered adventurers; both tabs scroll.
+  page.locator('#libraryopen').click()
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/88 · アイテム 0/52'
+  assert page.locator('#librarybody .library-entry').count()==88
+  assert page.locator('#librarybody h4').all_text_contents()==['？？？']*88
+  assert page.locator('#librarybody dl').count()==0
+  for tab,total in [('items',57),('monsters',88)]:
+   page.locator('#librarytab-'+tab).click()
+   assert page.locator('#librarytab-'+tab).get_attribute('aria-selected')=='true'
+   assert page.locator('#librarybody h4').all_text_contents()==['？？？']*total
+   page.locator('#librarybody .library-entry').last.scroll_into_view_if_needed()
+   assert page.locator('#librarybody').evaluate('(e)=>e.scrollTop>0 && e.scrollWidth<=e.clientWidth')
+   assert page.locator('#libraryclose').evaluate('(e)=>{const r=e.getBoundingClientRect();return r.top>=0 && r.bottom<=innerHeight}')
+  page.locator('#libraryclose').click();assert not page.locator('#librarydialog').is_visible()
+  page.locator('#libraryopen').click();page.keyboard.press('Escape');assert not page.locator('#librarydialog').is_visible()
   page.locator('#trainingopen').click()
   page.locator('#rollrecruit').click();assert page.locator('#registerrecruit').is_disabled()
   for i,job in enumerate([0,0,0,2,1,3,1]):
@@ -38,6 +53,34 @@ with sync_playwright() as p:
   page.screenshot(path=f'/tmp/training-{width}.png')
   before=page.evaluate('JSON.stringify(trainingRoster())');order=page.evaluate('s.members.map(m=>m.id)')
   page.reload();assert page.evaluate('JSON.stringify(trainingRoster())')==before;assert page.evaluate('s.members.map(m=>m.id)')==order
+  # Purchase via the shop and win a deterministic 1F combat via the real turn path.
+  page.evaluate('s.gold=1000;render()')
+  page.locator('#blacksmith').click();page.locator('[data-buy="helm"]').click();page.locator('#shopclose').click()
+  page.locator('#entrance').click();page.wait_for_function('!logBusy()')
+  page.evaluate("s.enemy={units:[{id:'slime',uid:0,row:0,hp:1,rewarded:false}],initiative:'party',chestBattle:true};s.attackRows=s.members.map(()=>0);resetPartyCommands();Math.random=()=>.999;attack()")
+  page.wait_for_function('!logBusy()')
+  page.evaluate("s.cells[s.pos].chest.trap='none';weightedLoot=()=>weapon('plate');Math.random=()=>0")
+  page.locator('#chestopen').click();page.wait_for_function('!logBusy()')
+  page.evaluate('enterTown()');page.reload()
+  page.locator('#libraryopen').click()
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/88 · アイテム 2/52'
+  assert page.locator('#librarybody h4').first.inner_text()=='洞窟スライム'
+  assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
+  assert '初撃破階' in page.locator('#librarybody .library-entry').first.inner_text()
+  assert page.locator('#librarybody dl').count()==1
+  page.screenshot(path=f'/tmp/library-monsters-{width}.png')
+  page.locator('#librarytab-items').click()
+  assert '鉄兜' in page.locator('#librarybody h4').all_text_contents()
+  assert '板金鎧' in page.locator('#librarybody h4').all_text_contents()
+  assert '傷薬' in page.locator('#librarybody h4').all_text_contents()
+  assert page.locator('#librarybody dl').count()==3
+  page.get_by_role('heading',name='板金鎧',exact=True).scroll_into_view_if_needed()
+  page.screenshot(path=f'/tmp/library-items-{width}.png')
+  assert page.locator('#librarydialog').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
+  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+  page.locator('#librarytab-items').focus();page.keyboard.press('ArrowLeft')
+  assert page.locator('#librarytab-monsters').get_attribute('aria-selected')=='true'
+  page.locator('#libraryclose').click()
   page.locator('#entrance').click();page.wait_for_function('!logBusy()')
   assert page.locator('#party .card').count()==6
   page.locator('#party').click();page.locator('#statsclose').click()
@@ -68,7 +111,8 @@ with sync_playwright() as p:
    page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click();page.locator('#recruitdeleteconfirm').click()
   page.locator('#trainingclose').click();assert page.locator('#entrance').is_disabled()
   page.reload();assert page.evaluate('trainingRoster().length')==0
+  assert page.evaluate('s.library.monsters.slime.count===1 && s.library.items.helm && s.library.items.plate && s.library.items.healingPotion')
   assert not errors,errors
-  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, retains dead XP, no inn, empty party; no JS errors or overflow')
+  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, retains dead XP, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
   ctx.close()
  browser.close()

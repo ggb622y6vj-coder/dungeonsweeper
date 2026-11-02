@@ -14,7 +14,7 @@ function dropMedicine(){
  if(Math.random()>=.30)return;
  const pool=MEDICINES.filter(w=>(w.minFloor||1)<=(s.floor||1)),total=pool.reduce((n,w)=>n+w.weight,0);let roll=Math.random()*total,w=pool[0];for(let item of pool){roll-=item.weight;if(roll<0){w=item;break}}
  let i=s.inventory.findIndex(a=>a.length<10);if(i<0){log(w.name+'を見つけたが、アイテムがいっぱいだ。');return}
- s.inventory[i].push(w.id);log(w.name+'を入手。'+NAMES[i]+'が受け取った。');
+ s.inventory[i].push(w.id);recordLibraryItem(w.id);log(w.name+'を入手。'+NAMES[i]+'が受け取った。');
 }
 function removeInventorySlot(i,slot){s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let part in s.armor[i])if(s.armor[i][part]>slot)s.armor[i][part]--}
 function useMedicine(i,slot,target,inTurn=false,expectedId=null){

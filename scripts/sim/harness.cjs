@@ -7,7 +7,7 @@ function game(saved = null, random = Math.random) {
   let nextTimer = 0;
   let storage = saved;
   const elements = new Map();
-  const element = () => ({ style: {}, value: '0', classList: { toggle() {} }, setAttribute() {}, addEventListener() {}, append() {}, replaceChildren() {}, showModal() { this.open = true; }, close() { this.open = false; } });
+  const element = () => ({ style: {}, value: '0', children: [], attributes: {}, classList: { toggle() {} }, setAttribute(key, value) { this.attributes[key] = value; }, addEventListener() {}, append(...items) { this.children.push(...items); }, replaceChildren(...items) { this.children = items; }, showModal() { this.open = true; }, close() { this.open = false; } });
   const ctx = {
     crypto: require('node:crypto').webcrypto,
     structuredClone,
@@ -18,7 +18,7 @@ function game(saved = null, random = Math.random) {
     Math: Object.assign(Object.create(Math), { random }),
   };
   vm.createContext(ctx);
-  for (const file of ['weapons', 'monster-data', 'balance', 'spells', 'items', 'flags', 'traps', 'combatui', 'party', 'monsters', 'recruits', 'game']) {
+  for (const file of ['weapons', 'monster-data', 'balance', 'spells', 'items', 'flags', 'traps', 'combatui', 'party', 'monsters', 'recruits', 'library', 'game']) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../../dist', `${file}.js`), 'utf8'), ctx);
   }
   return {
