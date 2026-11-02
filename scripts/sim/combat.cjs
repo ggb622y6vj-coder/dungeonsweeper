@@ -139,8 +139,11 @@ function planTurn(g) {
         const spellOrder = ['tiltowait','lakanito','dalto','mahalito'];
         if (!s.enemy.boss && (targetGroup?.units.filter(e => e.hp > 0).length || 0) >= 2) spellOrder.push('katino');
         spellOrder.push('halito');
+        // Skip Lakanito when no living enemy in the target row can be affected
+        // (undead, constructs, guardians), so the sim does not waste 16 MP.
+        const lakanitoUseful = !!targetGroup?.units.some(e => e.hp > 0 && lakanitoApplies(e));
         const id = spellOrder
-          .find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
+          .find(id => (id !== 'lakanito' || lakanitoUseful) && m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
         if (id && target !== undefined) { s.magicPlans[i] = {id,target}; return 'spell'; }
       }
       // Fear blocks weapons, but even low-MP casters can still use a spell.
