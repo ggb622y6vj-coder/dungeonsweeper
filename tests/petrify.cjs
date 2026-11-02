@@ -222,12 +222,13 @@ for(const reserve of [false,true])for(const level of [1,2,3,4,5,10,30]){
  assert.equal(g.run('result.success'),true);assert.equal(g.run('s.gold'),0);
  assert.equal(g.run('r.members.status'),'ok');assert.equal(g.run('r.members.level'),level);assert.equal(g.run('r.members.xp'),650);
  assert.equal(g.run(`(${reserve} ? r.hp : s.hp[index('B')])===r.members.maxHP`),true);
- assert.equal(g.run(`(${reserve} ? r.mp : s.mp[index('B')])`),2,'stone treatment preserves MP');
+ assert.equal(g.run(`(${reserve} ? r.mp : s.mp[index('B')])`),g.run('r.members.maxMP'),'temple stone treatment restores all spell-level MP');
  assert.match(g.run("$('#templenotice').textContent"),/石化が解けた/);
  assert.equal(g.run('templeRaise(id)'),false,'no duplicate charge');
  if(reserve)assert.equal(g.run('changeRecruitParty(id,true)'),true);
  const loaded=game(g.run("save();localStorage.getItem('ash-v1')"));
  assert.equal(loaded.run("s.members.find(m=>m.name==='B').status"),'ok');
+ assert.equal(loaded.run("s.mp[ s.members.findIndex(m=>m.name==='B') ]"),loaded.run("s.members.find(m=>m.name==='B').maxMP"),'temple stone treatment MP persists after reload');
 }
 // XP reward excludes stone without treating paralysis as death.
 {
