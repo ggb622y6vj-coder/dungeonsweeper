@@ -1,0 +1,127 @@
+const assert = require('node:assert/strict');
+const { game } = require('../scripts/sim/harness.cjs');
+const reload = g => game(g.run("save();localStorage.getItem('ash-v1')"));
+function party(){
+ const g=game(null,()=>.5);
+ g.run("const r=generateRecruit('冒険者',0);registerRecruit(r);changeRecruitParty(r.members.id,true);");
+ return g;
+}
+let g=game();
+assert.equal(g.run('ENEMIES.length'),88);
+assert.equal(g.run('WEAPONS.length'),52);
+assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{}}');
+g.run("$('#libraryopen').onclick()");
+assert.equal(g.run("$('#librarydialog').open"),true);
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/88 · アイテム 0/52');
+g.run("$('#libraryclose').onclick()");
+assert.equal(g.run("$('#librarydialog').open"),false);
+g=party();
+assert.equal(g.run('Object.keys(s.library.items).length'),0,'starter equipment is not acquired loot');
+for(const format of ['rosterSaveState()','s']){
+ const old=g.run(`JSON.stringify((()=>{const old=structuredClone(${format});delete old.library;return old})())`);
+ const migrated=game(old);
+ assert.equal(migrated.run('Object.keys(s.library.items).length'),0);
+ assert.equal(migrated.run('Object.keys(s.library.monsters).length'),0);
+ assert.equal(migrated.run('s.inventory[0][0]'),'sword');
+}
+console.log('PASS library: empty new/legacy saves, totals, starter exclusion and town open/close');
+
+// One real turn per unit: registration happens only when the final enemy falls.
+g.run(`enterDungeon()`);g.drain();
+g.run(`s.enemy={units:[0,1,2].map(uid=>({id:'slime',uid,row:uid,hp:1,rewarded:false})),initiative:'party'};
+ Math.random=()=>.999;s.commands=['fight'];s.attackRows=[0];attack();`);g.drain();
+assert.equal(g.run('Object.keys(s.library.monsters).length'),0);
+g.run('s.attackRows=[1];attack()');g.drain();
+g.run('s.attackRows=[2];attack()');g.drain();
+assert.equal(g.run('s.enemy'),null);
+assert.equal(g.run('s.library.monsters.slime.count'),3);
+assert.equal(g.run('s.library.monsters.slime.firstFloor'),1);
+g=reload(g);
+assert.equal(g.run('s.library.monsters.slime.count'),3);
+g.run(`fresh(2);s.enemy={units:[{id:'slime',hp:0,rewarded:true},{id:'skeleton',hp:0,rewarded:true,escaped:true}]};finishMonsterBattle()`);g.drain();
+assert.equal(g.run('s.library.monsters.slime.count'),4);
+assert.equal(g.run('s.library.monsters.slime.firstFloor'),1);
+assert.equal(g.run('s.library.monsters.skeleton'),undefined,'escaped/dispelled enemies do not count');
+g.run(`s.enemy={units:[{id:'goblin',hp:0,rewarded:true},{id:'wolf',hp:10}],escapeTo:s.start};Math.random=()=>0;flee()`);g.drain();
+assert.equal(g.run('s.library.monsters.goblin'),undefined,'partial kills before fleeing are not a victory');
+g.run(`s.enemy={units:[{id:'goblin',hp:0,rewarded:true},{id:'wolf',hp:10}]};hurt(999)`);
+const duringWipe=reload(g);g.drain();
+for(const saved of [g,duringWipe]){
+ saved.drain();assert.equal(saved.run('s.library.monsters.slime.count'),4);
+ assert.equal(saved.run('s.library.monsters.goblin'),undefined);
+}
+console.log('PASS library: multi-row victory counts, first floor, reload, flee/dispel exclusion and wipe during/after logs');
+
+g=party();
+g.run("s.gold=1000;buy('helm',0);buy('helm',0)");
+assert.equal(g.run('Object.keys(s.library.items).length'),1);
+g.run("buy('staff',0);buy('holysword',0);s.gold=0;buy('longsword',0)");
+assert.equal(g.run('Object.keys(s.library.items).length'),1,'rejected purchases do not unlock entries');
+g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0})");g.drain();
+assert.equal(g.run('Object.keys(s.library.items).length'),1,'full inventory does not record unreceived loot');
+g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
+// Force the loot selection, while retaining the actual acquisition paths.
+g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;dropWeapon();weightedLoot=()=>weapon('plate');rewardChest({gold:0});weightedLoot=actualLoot");g.drain();
+for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),true,id);
+g.run("var acquired=JSON.stringify(s.library);enterTown();sell(0,1)");
+assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'),'selling keeps the record');
+g=reload(g);
+g.run("var acquired=JSON.stringify(s.library);trainingRoster().map(r=>r.members.id).forEach(deleteRecruit)");
+assert.equal(g.run('s.members.length'),0);
+assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'));
+g=reload(g);
+assert.equal(g.run('s.library.items.plate'),true);
+g.run("const second=generateRecruit('冒険者',0);registerRecruit(second);changeRecruitParty(second.members.id,true);enterDungeon()");g.drain();
+g.run('hurt(999)');g.drain();g=reload(g);
+assert.equal(g.run('s.library.items.healingPotion'),true);
+g.run("$('#resetconfirm').onclick()");
+assert.equal(g.run('Object.keys(s.library.items).length'),0,'explicit full reset clears the library');
+console.log('PASS library: purchases, drops/chests/medicine, capacity, sale, deletion, wipe, reload and explicit reset');
+
+g=party();
+g.run('enterDungeon()');g.drain();g.run("$('#libraryopen').onclick()");
+assert.notEqual(g.run("$('#librarydialog').open"),true,'library is town-only');
+g.run('enterTown();log("待機中");');g.run("$('#libraryopen').onclick()");
+assert.notEqual(g.run("$('#librarydialog').open"),true,'library cannot expose future log results');
+g.drain();
+assert.match(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}))"),/1d6\+3.*毒.*2体/);
+assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('holysword')))"),/4d8\+5.*hitBonus \+3.*2回.*6000.*迷宮限定/);
+assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('plate')))"),/AC −5/);
+assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('healingPotion')))"),/1d8.*購入価格なし.*迷宮限定/);
+console.log('PASS library: town/idle guards and source-backed monster/item details');
+
+// Render all source records to check ordering, concealed details and safe text.
+g.run("renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
+assert.equal(g.run('entries.length'),88);
+assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].textContent==='？？？')"),true);
+g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{count:1,firstFloor:d.floor}]));
+ s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
+ renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 88/88 · アイテム 52/52');
+assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
+assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
+assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
+g.run("renderLibrary('items');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
+assert.equal(g.run('entries.length'),57);
+assert.equal(g.run('entries.every(e=>e.children.length===2)'),true);
+g.run(`ENEMIES[0].name='<img src=x onerror=alert(1)>';WEAPONS[0].name='<script>bad()</script>';
+ renderLibrary();var first=$('#librarybody').children[1].children[0];`);
+assert.equal(g.run('first.textContent'),'<img src=x onerror=alert(1)>');
+assert.equal(g.run('first.innerHTML'),undefined);
+g.run("renderLibrary('items');var first=$('#librarybody').children[1].children[0]");
+assert.equal(g.run('first.textContent'),'<script>bad()</script>');
+assert.equal(g.run('first.innerHTML'),undefined);
+console.log('PASS library: complete catalog rendering, floor order, guardian/lord marks, hidden details and textContent names');
+
+g=party();g.run('enterDungeon()');g.drain();
+g.run(`var summoner=ENEMIES.find(d=>d.summon>0);
+ s.enemy={units:[{...makeEnemy(summoner.id,0),row:7}]};
+ Math.random=()=>summoner.flee+.00001;monsterAction(s.enemy.units[0],['guard']);
+ s.enemy.units.forEach(e=>{e.hp=0;killReward(e)});var completed=s.enemy;finishMonsterBattle();`);
+assert.equal(g.run('completed.units.length'),2);
+assert.equal(g.run('s.library.monsters[summoner.id].count'),2);
+g.run('recordLibraryVictory(completed)');
+assert.equal(g.run('s.library.monsters[summoner.id].count'),2,'same battle cannot be recorded twice');
+const victoryReload=reload(g);
+assert.equal(victoryReload.run('Object.values(s.library.monsters)[0].count'),2,'reload during victory logs keeps final records');
+console.log('PASS library: summoned units counted individually, idempotence and reload during victory logs');
