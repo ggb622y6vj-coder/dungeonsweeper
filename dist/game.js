@@ -273,7 +273,7 @@ function enemyTurn(cmds){
     const alive=activeMembers(),front=alive.filter(i=>i<3),pool=d.rear||!front.length?alive:front;
     if(!pool.length)break;
     const i=pool[Math.random()*pool.length|0];
-    if(!hits(d.hit,effectiveAC(i))){log(`${NAMES[i]}は${enemyDisplay(e)}の攻撃をかわした。`);continue}
+    if(!hits(d.hit+levelHitBonus(e,i),effectiveAC(i))){log(`${NAMES[i]}は${enemyDisplay(e)}の攻撃をかわした。`);continue}
     monsterHurt(i,dice(...d.attack).value,currentCommands,enemyDisplay(e));if(s.hp[i]>0)monsterOnHit(e,i);
    }
   }
@@ -284,6 +284,8 @@ function enemyTurn(cmds){
 }
 
 function monsterLevel(e){return enemyDefinition(e.id).level}
+// Relative levels preserve the floor-tuned CSV hit values at the intended party level.
+function levelHitBonus(e,i){return Math.max(-3,Math.min(3,Math.trunc((monsterLevel(e)-s.members[i].level)/3)))||0}
 function escapeChance(){if(!s.enemy||s.enemy.boss||s.enemy.flagEffect?.bad)return 0;let party=s.members.reduce((a,m,i)=>{if(activeMember(i)&&!s.ailments[i].poison&&!s.ailments[i].paralysis){a.total+=m.level;a.count++}return a},{total:0,count:0}),enemies=s.enemy.units.reduce((a,e)=>{if(e.hp>0&&!e.sleep){a.total+=monsterLevel(e);a.count++}return a},{total:0,count:0});if(!party.count)return 10;let bonus=party.count===1?15:party.count===2?10:party.count===3?5:0,partyAverage=party.total/party.count,enemyAverage=enemies.count?enemies.total/enemies.count:0;return Math.max(10,Math.min(95,50+5*(partyAverage-enemyAverage)+bonus))}
 function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();clearBattleFear();s.enemy=null;s.pos=to;s.previousPos=from;autoReorderParty('escape');log('逃走に成功。一歩前のマスへ戻った。')}else{log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();tickBattleFear();render()}
 
