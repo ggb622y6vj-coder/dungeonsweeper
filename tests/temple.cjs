@@ -49,8 +49,10 @@ for (const reserve of [false, true]) {
 console.log('PASS temple: all four outcomes for party/reserve, fees, full HP/MP, XP preservation, save/reload and dungeon reentry');
 
 for (const [status, level, cost, chance] of [
-  ['dead', 1, 100, 53], ['dead', 5, 500, 65], ['dead', 15, 1500, 95], ['dead', 30, 3000, 95],
-  ['ash', 1, 250, 43], ['ash', 5, 1250, 55], ['ash', 17, 4250, 90], ['ash', 30, 7500, 90],
+  ['dead', 1, 25, 53], ['dead', 2, 100, 56], ['dead', 3, 225, 59],
+  ['dead', 4, 400, 62], ['dead', 5, 500, 65], ['dead', 15, 1500, 95], ['dead', 30, 3000, 95],
+  ['ash', 1, 60, 43], ['ash', 2, 240, 46], ['ash', 3, 540, 49], ['ash', 4, 960, 52],
+  ['ash', 5, 1250, 55], ['ash', 17, 4250, 90], ['ash', 30, 7500, 90],
 ]) {
   const g = fixture(status, false, level);
   assert.equal(g.run('templeCost(s.members[0])'), cost);
