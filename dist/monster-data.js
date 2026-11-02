@@ -421,7 +421,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -758,7 +759,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -912,7 +914,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -1168,7 +1171,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -1420,7 +1424,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -1532,7 +1537,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -1812,16 +1818,13 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.4,
+    "spell": 0.3,
     "spellInfo": {
-      "id": "halito",
-      "name": "ハリト",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ]
+      "id": "montino",
+      "name": "モンティノ",
+      "target": "all",
+      "dice": null,
+      "effect": "silence"
     }
   },
   {
@@ -1875,7 +1878,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -2258,7 +2262,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -2415,7 +2420,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -2716,7 +2722,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -2820,7 +2827,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3062,7 +3070,8 @@ const ENEMIES=[
         5,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3264,7 +3273,8 @@ const ENEMIES=[
         4,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3409,14 +3419,11 @@ const ENEMIES=[
     "breath": null,
     "spell": 0.25,
     "spellInfo": {
-      "id": "dalto",
-      "name": "ダルト",
+      "id": "montino",
+      "name": "モンティノ",
       "target": "all",
-      "dice": [
-        5,
-        6,
-        0
-      ]
+      "dice": null,
+      "effect": "silence"
     }
   },
   {
@@ -3569,7 +3576,8 @@ const ENEMIES=[
         1,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3623,7 +3631,8 @@ const ENEMIES=[
         5,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3677,7 +3686,8 @@ const ENEMIES=[
         6,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3776,7 +3786,8 @@ const ENEMIES=[
         5,
         6,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -3928,7 +3939,8 @@ const ENEMIES=[
         6,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -4133,7 +4145,8 @@ const ENEMIES=[
         6,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -4343,7 +4356,8 @@ const ENEMIES=[
         8,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   },
   {
@@ -4397,7 +4411,8 @@ const ENEMIES=[
         8,
         8,
         0
-      ]
+      ],
+      "effect": "damage"
     }
   }
 ];

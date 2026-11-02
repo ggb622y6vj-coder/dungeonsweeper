@@ -98,6 +98,7 @@ function attack(){
  if(!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
  else if(s.enemy.initiative==='party')s.enemy.initiative='normal';
  else enemyTurn(s.commands);
+ tickBattleSilence();
  resetCommandEntry();resetPartyCommands();
  if(s.enemy){const next=s.enemy.units.find(e=>e.hp>0);s.attackRows=s.attackRows.map(key=>s.enemy.units.some(e=>String(rowKey(e))===String(key)&&e.hp>0)?key:rowKey(next))}
  render();
@@ -124,6 +125,7 @@ function enterDungeon(){if(!s.members.length||s.area!=='town'||!idle())return;if
 function answerStairs(yes){if(logBusy()||!s.pendingStairs)return;let down=s.pendingStairs==='down';s.pendingStairs=false;if(yes){if(down)travelFloor(s.floor+1);else if(s.floor>1)travelFloor(s.floor-1);else enterTown();}else{log('階段の前にとどまった。');render()}}
 function defeat(){
  if(s.defeatPending||!s.members.length)return;
+ clearBattleSilence();
  s.members.forEach((m,i)=>{if(m.status==='stone')return;if(m.status==='ok')m.status='dead';s.hp[i]=0});
  (s.corpses??=[]).push({id:crypto.randomUUID(),floor:s.floor,cell:s.pos,records:structuredClone(partyRecords()),gold:s.gold});
  s.gold=0;s.defeatPending=true;s.done=true;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;
@@ -202,7 +204,7 @@ function isEquipped(i,slot){return s.equipped[i]===slot||Object.values(s.armor[i
 function effectiveAC(i){return memberClass(i).ac-Object.values(s.armor[i]).reduce((n,k)=>n+(weapon(s.inventory[i][k])?.ac||0),0)-(s.enemy?.partyAC||0)}
 $('#resetopen').onclick=()=>$('#resetdialog').showModal();$('#resetcancel').onclick=()=>$('#resetdialog').close();$('#resetconfirm').onclick=()=>{s=null;fresh();s.area='town';s.hp=s.members.map(m=>m.maxHP);s.mp=s.members.map(m=>m.maxMP);$('#resetdialog').close();render()};
 
-function visibleAilments(i){let a=(displayVitals?.ailments||s.ailments)[i]||{},hp=(displayVitals?.hp||s.hp)[i],status=shownMember(i).status,label={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[status];return label?[[status,label]]:hp<=0?[['dead','死亡']]:[[a.poison,'poison','毒'],[a.paralysis>0,'paralysis','麻痺'],[a.sleep>0,'sleep','睡眠']].filter(([active])=>active).map(([,kind,label])=>[kind,label])}
+function visibleAilments(i){let a=(displayVitals?.ailments||s.ailments)[i]||{},hp=(displayVitals?.hp||s.hp)[i],status=shownMember(i).status,label={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[status];return label?[[status,label]]:hp<=0?[['dead','死亡']]:[[a.poison,'poison','毒'],[a.paralysis>0,'paralysis','麻痺'],[a.sleep>0,'sleep','睡眠'],[a.silence>0,'silence','沈黙']].filter(([active])=>active).map(([,kind,label])=>[kind,label])}
 function ailmentLabel(i){return visibleAilments(i).map(([,label])=>label).join('・')||'正常'}
 function ailmentTags(i){return visibleAilments(i).map(([kind,label])=>`<span class="ailment-tag ailment-${kind}">${label}</span>`).join('')}
 function afflict(i,type){
@@ -210,9 +212,19 @@ function afflict(i,type){
  if(!['poison','paralysis','stone','silence','fear'].includes(type)){console.warn('Unknown ailment type:',type);return}
  displayVitals??=snapshotVitals();
  if(type==='stone'){s.members[i].status='stone';s.ailments[i]=freshAilments();log(`${NAMES[i]}は石になった。`);return}
+ if(type==='silence'){s.ailments[i].silence=3;log(`${NAMES[i]}は沈黙した。`);return}
  if(type==='poison')s.ailments[i].poison=true;else if(type==='paralysis')s.ailments[i].paralysis=4;
  if(type==='poison'||type==='paralysis')log(`${NAMES[i]}は${type==='poison'?'毒':'麻痺'}に侵された。`);
 }
+// Silence counts completed combat turns, independently of poison/paralysis at turn start.
+function tickBattleSilence(){
+ if(!s.enemy)return;
+ for(let i=0;i<s.members.length;i++)if(s.ailments[i].silence>0){
+  s.ailments[i].silence--;
+  if(s.ailments[i].silence===0)log(`${NAMES[i]}の沈黙が解けた。`);
+ }
+}
+function clearBattleSilence(){for(const a of s.ailments)a.silence=0}
 function tickAilments(logPoison=true){
  for(const id of s.members.map(m=>m.id)){
   const i=s.members.findIndex(m=>m.id===id),a=s.ailments[i];
@@ -262,7 +274,7 @@ function enemyTurn(cmds){
 
 function monsterLevel(e){return enemyDefinition(e.id).level}
 function escapeChance(){if(!s.enemy||s.enemy.boss||s.enemy.flagEffect?.bad)return 0;let party=s.members.reduce((a,m,i)=>{if(activeMember(i)&&!s.ailments[i].poison&&!s.ailments[i].paralysis){a.total+=m.level;a.count++}return a},{total:0,count:0}),enemies=s.enemy.units.reduce((a,e)=>{if(e.hp>0&&!e.sleep){a.total+=monsterLevel(e);a.count++}return a},{total:0,count:0});if(!party.count)return 10;let bonus=party.count===1?15:party.count===2?10:party.count===3?5:0,partyAverage=party.total/party.count,enemyAverage=enemies.count?enemies.total/enemies.count:0;return Math.max(10,Math.min(95,50+5*(partyAverage-enemyAverage)+bonus))}
-function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}s.enemy=null;s.pos=to;s.previousPos=from;autoReorderParty('escape');log('逃走に成功。一歩前のマスへ戻った。')}else{log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}render()}
+function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();s.enemy=null;s.pos=to;s.previousPos=from;autoReorderParty('escape');log('逃走に成功。一歩前のマスへ戻った。')}else{log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();render()}
 
 magicUI();medicineUI();flagUI();partyUI();libraryUI();
 

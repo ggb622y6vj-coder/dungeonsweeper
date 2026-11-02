@@ -90,3 +90,19 @@ Sites project_id：appgprj_6ae2ad2e8d1881918d4dc813e0e1df34
 `tests/petrify.cjs` を追加し `tests/game.cjs` から実行。032の石化者が帰還後もパーティに残る旧期待値だけ、033の控え搬送・stone保持の期待値へ更新した。既存の死亡／灰／ロスト・030/031の検証は維持。
 
 `tests/petrify-browser.py` は1280/390pxで石化付与→ログ同期→後退→再読込→帰還→寺院解除→加入、およびディアルコ／マディのカード対象選択、JSエラー・横スクロールを検証する。ブラウザテスト8本（新規petrify＋既存7本）を Chromium 1280/390px で実行し全PASS（executor検証）。tavern の無効optionは `e.disabled` で判定（Playwrightの is_disabled は option に対して不安定なため tavern-browser.py と同じ方法に統一）。
+
+## 沈黙・モンティノ（036、035完了後）
+
+035（6aa4723）の状態初期化統一を土台に、前回の実装コミット0577692を確認して再開。味方の沈黙は `ailments[i].silence` の残り3ターンで、戦闘終了・帰還時に解除する。呪文を封じ、攻撃・防御・アイテムと隊列は維持する。ディアルコ・マディ・気付け薬でも解除できる。状態タグは `displayVitals` に同期する。
+
+僧侶Lv3・MP4のモンティノを追加。敵1グループの各個体へカティノと同式で判定し、ボス・守護者には無効。敵に付与した沈黙は戦闘中持続し、呪文の抽選枠だけ通常攻撃へ変える。敵の使用者は闇の司祭（4F、30%）と魔女（8F、25%）で、生存かつ非石化の味方全員へ個別判定する。CSVから生成する `spellInfo.effect` はdamage/silence、図鑑に沈黙・全体・行動確率を表示する。詳細と計算式は仕様書3・6章、呪文一覧は `SPELLS.md`。
+
+sim内の状態初期化は `{poison:false,paralysis:0,sleep:0,silence:0,fear:0}` に統一。全滅テストは初期化後に毒を付与し、従来の全滅チェックを維持した。僧侶AIは治療を優先後、同じグループの未沈黙術者が2体以上ならモンティノを検討し、沈黙中は攻撃可能なら攻撃する。selftestに対象人数・MP・ボス制限・治療優先・沈黙時の攻撃・次試行での解除の回帰チェックを追加。敵の呪文はharnessで本体処理を実行する。
+
+`tests/training.cjs` の遺体保存fixtureは、035の `freshAilments()` に毒・麻痺を重ねる形へ補完した。旧fixtureにはsilence項目がなく、036の戦闘終了処理で0が追加されると全レコード比較が失敗するため。毒・麻痺の値もレコード全体一致のassertも変更していない。前回コミットの `tests/game.cjs` の呪文数期待値25→26、僧侶の習得数13→14はモンティノ1件追加によるもの。
+
+`tests/silence.cjs` は敵味方各10000回の命中率、沈黙中の敵の10000回の行動、持続・治療・各戦闘終了・帰還・後退対象外・ログ順を検証する。新規 `tests/silence-browser.py` は既存と同じURL引数形式で、1280/390pxの図鑑2種、呪文一覧・選択、実際の敵モンティノのログとタグの同期、呪文グレーアウト、攻撃予約、3ターンでの解除、JSエラー・横スクロールを確認する。スクリーンショットは既定 `/tmp/silence-browser`（`SILENCE_SCREENSHOT_DIR` で変更可能）。
+
+再開作業の検証は `tests/*.cjs` 全13本（`node tests/game.cjs` と `node tests/silence.cjs` を含む）、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs` がPASS。新規ブラウザテストはPythonと埋め込みJavaScriptの構文チェックのみPASS。
+
+ブラウザ実行は再開指示に従い未実施。レビュー側でdistを配信し、`/tmp/pyv/bin/python tests/silence-browser.py http://127.0.0.1:8000/` および既存 `tests/*-browser.py` を実行すること。ブラウザ全件PASS・JSエラーなしの最終確認は未完了。push・公開作業は行っていない。

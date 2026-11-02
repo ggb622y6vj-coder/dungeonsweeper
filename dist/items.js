@@ -2,7 +2,7 @@
 const MEDICINES=[
  {id:'healingPotion',name:'傷薬',kind:'medicine',spell:'dios',description:'ディオス相当：味方1人のHPを1d8回復',classes:[0,1,2,3],sell:8,weight:70,minFloor:1},
  {id:'antidote',name:'解毒剤',kind:'medicine',spell:'latumofis',description:'ラツモフィス相当：味方1人の毒を解除',classes:[0,1,2,3],sell:6,weight:30,minFloor:1},
- {id:'paralysisCure',name:'気付け薬',kind:'medicine',spell:'dialko',description:'ディアルコ相当：味方1人の麻痺を解除',classes:[0,1,2,3],sell:15,weight:20,minFloor:3},
+ {id:'paralysisCure',name:'気付け薬',kind:'medicine',spell:'dialko',description:'ディアルコ相当：味方1人の麻痺・睡眠・沈黙を治す',classes:[0,1,2,3],sell:15,weight:20,minFloor:3},
  {id:'greaterPotion',name:'上傷薬',kind:'medicine',spell:'dial',description:'ディアル相当：味方1人のHPを4d4回復',classes:[0,1,2,3],sell:30,weight:35,minFloor:4},
  {id:'elixir',name:'霊薬',kind:'medicine',spell:'dialma',description:'ディアルマ相当：味方1人のHPを8d3回復',classes:[0,1,2,3],sell:80,weight:20,minFloor:7}
 ];
@@ -23,12 +23,12 @@ function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  if(s.members[target].status==='stone'){log(`${w.name}では${NAMES[target]}の石化を治せない。`);return false}
  const heal=['dios','dial','dialma'].includes(w.spell);
  if(heal&&s.hp[target]>=maxHP(target)){log(NAMES[target]+'のHPは満タンだ。');return false}
- if(w.spell==='dialko'&&!s.ailments[target].paralysis){log(NAMES[target]+'は麻痺していない。');return false}
+ if(w.spell==='dialko'&&!['paralysis','sleep','silence'].some(key=>s.ailments[target][key]>0)){log(NAMES[target]+'は麻痺・睡眠・沈黙していない。');return false}
  if(w.spell==='latumofis'&&!s.ailments[target].poison){log(NAMES[target]+'は毒に侵されていない。');return false}
  if(!displayVitals)displayVitals=snapshotVitals();
  removeInventorySlot(i,slot);log(NAMES[i]+'は'+w.name+'を使った。');
  if(heal){let before=s.hp[target];s.hp[target]=Math.min(maxHP(target),before+dice(...magic(w.spell).value).value);log(NAMES[target]+'のHPが'+(s.hp[target]-before)+'回復した。')}
- else if(w.spell==='dialko'){s.ailments[target].paralysis=0;log(NAMES[target]+'の麻痺が解けた。')}
+ else if(w.spell==='dialko'){s.ailments[target].paralysis=0;s.ailments[target].sleep=0;s.ailments[target].silence=0;log(NAMES[target]+'の麻痺・睡眠・沈黙が解けた。')}
  else{s.ailments[target].poison=false;log(NAMES[target]+'の毒が消えた。')}
  if(!inTurn)autoReorderParty('medicine');
  return true;

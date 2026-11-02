@@ -69,7 +69,7 @@ function corpseParty(count=6){
 g=corpseParty();
 g.run(`fresh(3);s.pos=17;s.gold=321;s.cleared=true;s.light=true;s.watchful=true;s.dumapicUses=4;
  s.inventory[0].push('helm','healingPotion');s.armor[0].head=1;s.members[0].xp=123;
- s.members[0].extra={history:[1,2]};s.mp[1]=3;s.ailments[0]={poison:true,paralysis:2};
+ s.members[0].extra={history:[1,2]};s.mp[1]=3;s.ailments[0]={...freshAilments(),poison:true,paralysis:2};
  var reserveBefore=JSON.stringify(s.reserve),liveRecords=partyRecords(),recordsBefore=structuredClone(liveRecords);
  recordsBefore.forEach(r=>{r.hp=0;r.members.status='dead'});
  log('全滅直前');hurt(999);`);

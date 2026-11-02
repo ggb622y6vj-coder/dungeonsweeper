@@ -72,6 +72,8 @@ prepareTrial(gBase, opt);
 assert.equal(gBase.run('s.members[0].xp'), 0);
 assert.equal(gBase.run('s.inventory[0].length'), 1);
 assert.equal(gBase.run('s.ailments.some(a => a.poison)'), false);
+assert.equal(gBase.run('s.ailments.every(a => JSON.stringify(a) === JSON.stringify({poison:false,paralysis:0,sleep:0,silence:0,fear:0}))'), true,
+  'trial reset must restore the complete ailment shape');
 
 // AI uses professions and stable row IDs; the mage gets the front living unit UID.
 const gAI = game(null, seededRandom());
@@ -107,7 +109,9 @@ assert.equal(gAI.run('s.hp.every(h=>h===1)'), true);
 assert.equal(gAI.run('s.enemy.units[0].hp'), gAI.run('simEnemyHP'));
 gAI.run('Math.random=()=>0');
 assert.equal(resolveBattle(gAI).outcome, 'escape');
-gAI.run('s.enemy=simTestCombat; s.ailments=s.ailments.map(()=>({poison:true,paralysis:0}))');
+gAI.run(`s.enemy=simTestCombat;
+  s.ailments=s.ailments.map(()=>({poison:false,paralysis:0,sleep:0,silence:0,fear:0}));
+  s.ailments.forEach(a=>a.poison=true);`);
 const wipe = resolveBattle(gAI);
 assert.equal(wipe.outcome, 'wipe');
 assert.equal(wipe.deaths, 6);
@@ -116,7 +120,7 @@ assert.equal(wipe.total, 0);
 assert.equal(gAI.run('s.members.length'), 0, 'game defeat completion clears the party after the wipe snapshot');
 gAI.run(`s.members=structuredClone(simBase.map(r=>r.members));
   for(const key of PARTY_FIELDS) s[key]=structuredClone(simBase.map(r=>r[key]));`);
-gAI.run(`s.done=false; s.hp=s.members.map(m=>m.maxHP); s.ailments=s.ailments.map(()=>({poison:false,paralysis:0}));
+gAI.run(`s.done=false; s.hp=s.members.map(m=>m.maxHP); s.ailments=s.ailments.map(()=>({poison:false,paralysis:0,sleep:0,silence:0,fear:0}));
   s.enemy={units:[{...makeEnemy('slime',0),row:0,hp:0,rewarded:true}],lootXP:0,lootGold:0};
   finishMonsterBattle();`);
 gAI.drain();
@@ -160,3 +164,33 @@ const openingResult=resolveBattle(openingStone);
 assert.equal(openingResult.outcome,'wipe');assert.equal(openingResult.deaths,1);
 assert(openingResult.total>0);assert.equal(openingResult.rounds,0);
 console.log('PASS simulator stone actors/targets, Madi, mixed wipe counts and HP, opening ambush snapshot');
+
+// 036: prefer Montino for a group of at least two unsilenced casters.
+const silenceAI = game(null, seededRandom(36));
+createParty(silenceAI, [2,1,0]);
+silenceAI.run(`s.area='dungeon';s.pendingStairs=false;s.pendingBoss=null;
+  s.members[0].level=3;learnMagic(0,3);s.mp[0]=100;
+  s.enemy={units:[{...makeEnemy('darkpriest',91),row:17},
+    {...makeEnemy('darkpriest',92),row:17}],flagEffect:{}};`);
+planTurn(silenceAI);
+assert.equal(silenceAI.run('s.magicPlans[0].id'), 'montino');
+assert.equal(silenceAI.run('s.magicPlans[0].target'), 91, 'target is a unit UID, not its row key');
+for (const condition of ['s.enemy.units[1].hp=0', 's.enemy.units[1].silence=true',
+  's.enemy.boss=true', 's.mp[0]=3']) {
+  silenceAI.run(condition);
+  planTurn(silenceAI);
+  assert.equal(silenceAI.run('s.magicPlans[0]'), null, condition);
+  silenceAI.run('s.enemy.units[1].hp=20;s.enemy.units[1].silence=false;s.enemy.boss=false;s.mp[0]=100');
+}
+silenceAI.run('s.hp[2]=1');
+planTurn(silenceAI);
+assert.equal(silenceAI.run('s.magicPlans[0].id'), 'dios', 'urgent healing takes priority');
+silenceAI.run('s.ailments[0].silence=3;s.ailments[1].silence=3');
+planTurn(silenceAI);
+assert.equal(silenceAI.run("s.commands[0]==='fight'&&s.commands[1]==='fight'"), true,
+  'silenced front-line priest and mage attack instead of casting');
+assert.equal(silenceAI.run('s.magicPlans[0]===null&&s.magicPlans[1]===null'), true);
+prepareTrial(silenceAI, {...opt, jobs:[2,1,0], boss:true});
+assert.equal(silenceAI.run('s.ailments.every(a=>a.silence===0&&a.sleep===0&&a.fear===0)'), true,
+  'a later trial must not inherit silence');
+console.log('PASS simulator Montino target threshold, MP/boss restrictions, healing priority, silenced casters and reset');
