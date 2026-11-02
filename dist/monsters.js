@@ -6,7 +6,7 @@ function monsterOnHit(e,i){let d=enemyDefinition(e.id);for(const a of d.statuses
 // A completed battle pays only for defeated enemies, never escaped enemies.
 function finishMonsterBattle(){
  const combat=s.enemy,defeated=combat.units.filter(e=>e.rewarded&&!e.escaped);
- clearBattleSilence();
+ clearBattleSilence();clearBattleFear();
  recordLibraryVictory(combat);
  awardVictory(combat);
  if(combat.chestBattle&&defeated.length){s.cells[s.pos].chest={gold:combat.lootGold,opened:false};fixChestTrap(s.cells[s.pos].chest);log('宝箱が現れた。開けるか、放棄するか。')}

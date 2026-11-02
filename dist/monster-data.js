@@ -2460,7 +2460,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0.1,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "fear",
+        "chance": 0.15
+      }
+    ],
     "resistance": "毒無効",
     "boss": false,
     "icon": "☠",
@@ -3110,7 +3115,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "fear",
+        "chance": 0.15
+      }
+    ],
     "resistance": "炎半減",
     "boss": false,
     "icon": "♞",
@@ -3979,7 +3989,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "fear",
+        "chance": 0.15
+      }
+    ],
     "resistance": "炎半減",
     "boss": false,
     "icon": "♞",
@@ -4185,7 +4200,12 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0.15,
     "death": 0.1,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "fear",
+        "chance": 0.2
+      }
+    ],
     "resistance": "毒無効",
     "boss": false,
     "icon": "☠",

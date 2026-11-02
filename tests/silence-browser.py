@@ -102,7 +102,7 @@ with sync_playwright() as p:
         assert montino.is_visible() and montino.is_enabled()
         assert 'モンティノ' in montino.inner_text() and 'MP 4' in montino.inner_text()
         assert 'Lv.3' in montino.inner_text() and '選択した列の敵に沈黙判定' in montino.inner_text()
-        assert '麻痺・睡眠・沈黙を治す' in page.locator('[data-spell="dialko"]').inner_text()
+        assert '麻痺・睡眠・沈黙・恐怖を治す' in page.locator('[data-spell="dialko"]').inner_text()
         no_overflow(page)
         page.screenshot(path=str(output / f'montino-spell-{width}.png'))
         page.locator('#magicclose').click()
