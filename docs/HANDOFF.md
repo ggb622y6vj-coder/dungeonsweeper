@@ -201,3 +201,8 @@ Node全15本、compile-monsters --check、sim/selftest、JS/Python構文チェ�
 Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS。ブラウザ全15本は実行を試みたが、HTTPサーバーとChromiumがソケット権限制限（Operation not permitted）で起動できず、実ブラウザ検証は未完了。
 
 4Fの指定400戦シムは全滅率0.25%・死亡0.005/戦で、基準0を超過した。指定の使用条件を維持しており、受入条件は未達。詳細・全階比較・専用ログは [043検証記録](043-MAKANITO.md)。push・公開は未実施。
+
+
+## 044 ラカニトのLv判定整理
+
+`dist/spells.js` のラカニトを `lakanitoApplies(e)`（非守護者・非不死・非構造体）＋ `killByMagic(e)` に整理。成功率 `max(0,100−monsterLevel(e)×6)` は不変。対象外は乱数を引かず「〇〇には効かない！」、抵抗は「〇〇は耐えた。」。構造体を無効対象に追加。`tests/makanito.cjs` に Lv10 の 39.9/40.0 境界、Lv17（霜の巨人）は常に耐える、不死・構造体・守護者の「効かない！」表示を追加。

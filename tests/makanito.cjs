@@ -119,6 +119,33 @@ for (const legacy of [false,true]) {
   g.run("s.mp[0]=60;Math.random=()=>.999;castMagic(0,'lakanito',102)");
   assert.equal(g.run('s.enemy.units[2].hp'),99);
 }
+// Lakanito distinguishes immunity from resistance and keeps the exact Lv-based boundary.
+for (const [roll, expected, logText] of [[39.9,0,'は息絶えた。'],[40,99,'は耐えた。']]) {
+  const g=battle(['troll']);
+  g.run(`s.members[0].known.push('lakanito');Math.random=()=>${roll/100};castMagic(0,'lakanito',100)`);
+  assert.equal(g.run('s.enemy.units[0].hp'),expected,`Lv10 roll ${roll}`);
+  assert(json(g,'logQueue.map(e=>e.text)').some(t=>t.endsWith(logText)),`Lv10 roll ${roll} log`);
+}
+{
+  const g=battle(['guardian']);
+  g.run("s.members[0].known.push('lakanito');Math.random=()=>0;castMagic(0,'lakanito',100)");
+  assert.equal(g.run('s.enemy.units[0].hp'),99);
+  assert(json(g,'logQueue.map(e=>e.text)').includes(g.run("enemyDisplay(s.enemy.units[0])+'には効かない！'")));
+}
+{
+  const g=battle(['lich','stone','guardian']);
+  g.run("s.members[0].known.push('lakanito');s.enemy.units[0].row=28;s.enemy.units[1].row=28;s.enemy.units[2].row=28;Math.random=()=>0;castMagic(0,'lakanito',100)");
+  assert.deepEqual(json(g,'s.enemy.units.map(e=>e.hp)'),[99,99,99]);
+  assert.equal(json(g,'logQueue.map(e=>e.text)').filter(t=>t.endsWith('には効かない！')).length,3);
+}
+for (const roll of [0,.5,.999999]) {
+  const g=battle(['frostgiant']);
+  assert.equal(g.run("monsterLevel(s.enemy.units[0])"),17);
+  assert.equal(g.run("enemyDefinition('frostgiant').boss"),false);
+  g.run(`s.members[0].known.push('lakanito');Math.random=()=>${roll};castMagic(0,'lakanito',100)`);
+  assert.equal(g.run('s.enemy.units[0].hp'),99,'Lv17 is always resisted');
+  assert(json(g,'logQueue.map(e=>e.text)').includes(g.run("enemyDisplay(s.enemy.units[0])+'は耐えた。'")));
+}
 // AI counts eligible living individuals across rows, including boss escorts.
 for(const [ids,mp,known,silence,fear,want] of [
   [['thief','goblin','harpy'],12,true,0,0,true],
