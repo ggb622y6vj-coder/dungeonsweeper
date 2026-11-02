@@ -34,7 +34,9 @@ for (const reserve of [false, true]) {
     assert.deepEqual(after, before, 'only status and HP/MP on success change; XP, equipment and identity stay intact');
     const restored = reload(g);
     assert.equal(restored.run('s.gold'), 10000 - cost);
-    assert.equal(restored.run('s.members.length'), reserve ? 0 : 1);
+    // A failed in-party raise leaves an impaired member in the town party; reload carries it to the reserve (029b).
+    assert.equal(restored.run('s.members.length'), reserve || expected !== 'ok' ? 0 : 1);
+    assert.equal(!!restored.run("$('#templecarrydialog').open"), !reserve && expected !== 'ok');
     assert.deepEqual(JSON.parse(restored.run('JSON.stringify(trainingRoster()[0])')), after);
     assert.match(g.run("$('#templenotice').textContent"), expected === 'ok' ? /蘇生した/ : expected === 'ash' ? /灰になった/ : /ロストした/);
     if (expected === 'ok') {
