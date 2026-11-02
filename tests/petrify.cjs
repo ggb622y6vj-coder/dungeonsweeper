@@ -40,7 +40,7 @@ function stone(g,name='B'){g.run(`afflict(index('${name}'),'stone');autoReorderP
  assert.equal(g.run('order()'),'ACDBEF');
  assert.equal(g.run("s.members[index('B')].status"),'stone');
  assert.equal(g.run("s.hp[index('B')]"),g.run('hpBefore-1'));
- assert.deepEqual(json(g,"s.ailments[index('B')]"),{poison:false,paralysis:0,sleep:0});
+ assert.deepEqual(json(g,"s.ailments[index('B')]"),{poison:false,paralysis:0,sleep:0,silence:0,fear:0});
  assert.equal(g.run("s.members[s.magicPlans[index('E')].target].name"),'B');
  const logs=json(g,'logQueue.map(e=>e.text)');
  assert.deepEqual(logs.slice(-2),['Bは石になった。','Bが後列に下がった。']);
@@ -55,7 +55,7 @@ function stone(g,name='B'){g.run(`afflict(index('${name}'),'stone');autoReorderP
  const hp=g.run("s.hp[index('B')]");
  g.run("tickAilments();tickAilments(false);afflict(index('B'),'poison');afflict(index('B'),'paralysis')");g.drain();
  assert.equal(g.run("s.hp[index('B')]"),hp);
- assert.deepEqual(json(g,"s.ailments[index('B')]"),{poison:false,paralysis:0,sleep:0});
+ assert.deepEqual(json(g,"s.ailments[index('B')]"),{poison:false,paralysis:0,sleep:0,silence:0,fear:0});
  const loaded=game(g.run("save();localStorage.getItem('ash-v1')"));
  assert.equal(loaded.run("s.members.find(m=>m.name==='B').status"),'stone');
  assert.equal(loaded.run("s.hp[s.members.findIndex(m=>m.name==='B')]"),hp);

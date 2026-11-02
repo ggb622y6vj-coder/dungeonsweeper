@@ -8,9 +8,9 @@ function refreshNames(){NAMES.splice(0,NAMES.length,...s.members.map((m,i)=>m.na
 function ensureSixParty(){
  if(s.partyVersion===1){refreshNames();return}
  s.members.forEach((m,i)=>{m.job??=i;m.id??='member-'+i;m.name??=CLASSES[m.job].name});
- s.inventory??=[['sword'],['staff'],['mace']];s.equipped??=[0,0,0];s.armor??=[{},{},{}];s.ailments??=s.members.map(()=>({poison:false,paralysis:0}));
+ s.inventory??=[['sword'],['staff'],['mace']];s.equipped??=[0,0,0];s.armor??=[{},{},{}];s.ailments??=s.members.map(()=>freshAilments());
  s.members[0].name='戦士Ⅰ';
- for(let [job,name] of [[0,'戦士Ⅱ'],[0,'戦士Ⅲ'],[3,'盗賊']]){let c=CLASSES[job],id='member-'+s.members.length;s.members.push({id,job,name,level:1,xp:0,maxHP:c.hp,maxMP:c.mp,attack:c.attack,ac:c.ac});s.hp.push(c.hp);s.mp.push(c.mp);s.inventory.push([['sword','staff','mace','dagger'][job]]);s.equipped.push(0);s.armor.push({});s.ailments.push({poison:false,paralysis:0})}
+ for(let [job,name] of [[0,'戦士Ⅱ'],[0,'戦士Ⅲ'],[3,'盗賊']]){let c=CLASSES[job],id='member-'+s.members.length;s.members.push({id,job,name,level:1,xp:0,maxHP:c.hp,maxMP:c.mp,attack:c.attack,ac:c.ac});s.hp.push(c.hp);s.mp.push(c.mp);s.inventory.push([['sword','staff','mace','dagger'][job]]);s.equipped.push(0);s.armor.push({});s.ailments.push(freshAilments())}
  let order=[0,3,4,2,1,5];for(let key of PARTY_FIELDS)s[key]=order.map(i=>s[key][i]);s.partyVersion=1;resetPartyCommands();refreshNames();
 }
 // Eligible for enemy/trap targeting and counted as a survivor (paralysis is still alive).
