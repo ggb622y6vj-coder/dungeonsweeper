@@ -67,7 +67,7 @@
 |morlis|モーリス|1|7|5|true|battle|group|debuff|3|選択した列の敵のAC＋3。戦闘終了まで|
 |dalto|ダルト|1|7|10|false|battle|group|damage|[6,6]|選択した列の敵に冷気6d6|
 |mamorlis|マモーリス|1|9|8|true|battle|all|debuff|3|敵全体のAC＋3。戦闘終了まで|
-|lakanito|ラカニト|1|11|16|true|battle|group|death|null|選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死には無効|
+|lakanito|ラカニト|1|11|16|true|battle|group|death|null|選択した列の敵に即死判定（100−敵Lv×6 %、Lv17以上は無効）。不死・構造体・守護者には無効|
 |malor|マロール|1|13|20|true|field|floor|warp|null|訪問済み階の上り階段へ転移。未訪問階は選択不可|
 |tiltowait|ティルトウェイト|1|13|30|false|battle|all|damage|[10,15]|敵全体に10d15|
 |dios|ディオス|2|1|2|true|both|ally|heal|[1,8]|生存する味方1人のHPを1d8回復|
