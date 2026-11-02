@@ -90,7 +90,7 @@ function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||
 function equip(i,slot){if(!idle()||!s.inventory[i][slot]||!weapon(s.inventory[i][slot]).classes.includes(jobOf(i)))return;let w=weapon(s.inventory[i][slot]);if(w.kind==='medicine')return;if(w.part){if(s.armor[i][w.part]===slot)delete s.armor[i][w.part];else s.armor[i][w.part]=slot}else s.equipped[i]=slot;render();renderInventory()}
 function sell(i,slot){if(s.area!=='town'||!idle()||isEquipped(i,slot)||!s.inventory[i][slot])return;let w=weapon(s.inventory[i][slot]);s.gold+=w.sell;s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let p in s.armor[i])if(s.armor[i][p]>slot)s.armor[i][p]--;render();renderInventory();renderShop()}
 // 寺院の費用・成功率は本作の暫定式。成功率は百分率で返す。
-function templeCost(m){return m.status==='dead'?100*m.level:m.status==='ash'?250*m.level:0}
+function templeCost(m){return m.status==='dead'?Math.min(100*m.level,25*m.level*m.level):m.status==='ash'?Math.min(250*m.level,60*m.level*m.level):0}
 function templeChance(m){return m.status==='dead'?Math.max(50,Math.min(95,50+3*m.level)):m.status==='ash'?Math.max(40,Math.min(90,40+3*m.level)):0}
 function templeRaise(id){
  if(s.area!=='town'||!idle())return false;

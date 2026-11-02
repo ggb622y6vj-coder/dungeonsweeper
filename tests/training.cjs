@@ -237,12 +237,13 @@ g=game(g.saved());
 assert.equal(g.run('s.corpses.length'),0);
 assert.equal(g.run('s.reserve.map(r=>r.members.id).join()'),rescuedIds);
 assert.equal(g.run('s.gold'),321);
-g.run('enterTown();Math.random=()=>0;var rescuedId=s.reserve[0].members.id;var raised=templeRaise(rescuedId);');
+g.run('enterTown();Math.random=()=>0;var rescuedId=s.reserve[0].members.id;var raisedCost=templeCost(s.reserve[0].members);var raised=templeRaise(rescuedId);');
 assert.equal(g.run('raised.success'),true);
 assert.equal(g.run('s.reserve[0].members.status'),'ok');
 assert.equal(g.run('s.reserve[0].hp'),g.run('s.reserve[0].members.maxHP'));
 assert.equal(g.run('s.reserve[0].mp'),g.run('s.reserve[0].members.maxMP'));
-assert.equal(g.run('s.gold'),221);
+assert.equal(g.run('raisedCost'),g.run('25*Math.min(4,s.reserve[0].members.level)*s.reserve[0].members.level'),'026 low-level dead fee');
+assert.equal(g.run('s.gold'),321-g.run('raisedCost'));
 assert.equal(g.run('changeRecruitParty(rescuedId,true)'),true);
 console.log('PASS rescue: real wipe, replacement party, hidden/flagged/reloaded bone icon, full dead records/gold recovered once, temple and rejoining');
 
