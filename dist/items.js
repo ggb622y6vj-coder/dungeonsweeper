@@ -33,7 +33,9 @@ function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  if(!inTurn)autoReorderParty('medicine');
  return true;
 }
-function openMedicine(i,slot){if(!canChooseMedicine(i)||!medicineSlots(i).length)return;medicineMember=i;$('#medicinetitle').textContent=NAMES[i]+'の薬';$('#medicineitem').innerHTML=medicineSlots(i).map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${x.item.name}（枠${x.slot+1}）</option>`).join('');$('#medicinetarget').innerHTML=allyTargetCandidates().map(j=>`<option value="${j}">${NAMES[j]} ${s.hp[j]}/${maxHP(j)}・${ailmentLabel(j)}</option>`).join('');$('#medicineuse').textContent=s.enemy?'この薬で行動する':'使う';renderMedicineDescription();$('#medicinepick').hidden=s.area!=='dungeon';$('#medicinedialog').showModal();if(slot!==undefined&&s.area==='dungeon')pickMedicineTarget()}
+function openMedicine(i,slot){if(!canChooseMedicine(i)||!medicineSlots(i).length)return;medicineMember=i;$('#medicinetitle').textContent=NAMES[i]+'の薬';$('#medicineitem').innerHTML=medicineSlots(i).map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${x.item.name}（枠${x.slot+1}）</option>`).join('');$('#medicinetarget').innerHTML=allyTargetCandidates().map(j=>`<option value="${j}">${NAMES[j]} ${s.hp[j]}/${maxHP(j)}・${ailmentLabel(j)}</option>`).join('');// Decide visibility once per opening: toggling it on pointerdown would shift
+ // the dialog under a mouse/touch press.
+ $('#medicinelist').hidden=!document.documentElement?.classList?.contains('keynav-keyboard');$('#medicinelist').innerHTML=medicineSlots(i).map((x,index)=>`<button data-medicine-choice="${x.slot}" ${index===0?'data-key-default':''}>${x.item.name}（枠${x.slot+1}）</button>`).join('');$('#medicineuse').textContent=s.enemy?'この薬で行動する':'使う';renderMedicineDescription();$('#medicinepick').hidden=s.area!=='dungeon';$('#medicinedialog').showModal();if(slot!==undefined&&s.area==='dungeon')pickMedicineTarget()}
 function renderMedicineDescription(){let w=weapon(s.inventory[medicineMember][+$('#medicineitem').value]);$('#medicinedescription').textContent=w?.description||''}
 function commitMedicineChoice(i,slot,target,id){
  const w=weapon(s.inventory[i]?.[slot]);
@@ -45,13 +47,19 @@ function commitMedicineChoice(i,slot,target,id){
 function pickMedicineTarget(){
  const i=medicineMember,slot=+$('#medicineitem').value,w=weapon(s.inventory[i]?.[slot]),battle=!!s.enemy;
  if(!canChooseMedicine(i)||w?.kind!=='medicine'||s.area!=='dungeon')return;
- beginAllyTargetPick({candidates:allyTargetCandidates,prompt:w.name,fallback:$('#medicinechoice'),
+ beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),prompt:w.name,fallback:$('#medicinechoice'),
   onPick:t=>commitMedicineChoice(i,slot,t,w.id),onCancel:()=>{
    if(battle)$('#commandentry [data-command-choice="item"]')?.focus();
    else{$('#medicinedialog').showModal();$('#medicinepick').focus()}
   }});
 }
 function medicineUI(){
+ $('#medicinelist').onclick=e=>{
+  const button=e.target.closest('[data-medicine-choice]');
+  if(!button||!canChooseMedicine(medicineMember))return;
+  $('#medicineitem').value=button.dataset.medicineChoice;renderMedicineDescription();
+  if(s.area==='dungeon')pickMedicineTarget();else $('#medicineuse').focus();
+ };
  $('#medicineclose').onclick=()=>$('#medicinedialog').close();
  $('#medicineitem').onchange=()=>{renderMedicineDescription();pickMedicineTarget()};
  $('#medicinepick').onclick=pickMedicineTarget;

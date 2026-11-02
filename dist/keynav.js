@@ -17,6 +17,21 @@
   }
   return best;
  }
+ function step(current,items,way,wrap=false){
+  if(!items.length)return null;
+  const i=items.indexOf(current),next=i+(way==='up'||way==='left'?-1:1);
+  return items[wrap?(next+items.length)%items.length:Math.max(0,Math.min(items.length-1,next))];
+ }
+ // Grid rows use the rendered positions, including responsive party layouts.
+ // Prefer the same row/column so a slightly taller card cannot cause a diagonal jump.
+ function gridMove(current,items,way){
+  const r=current?.getBoundingClientRect();if(!r)return items[0]||null;
+  const vertical=way==='up'||way==='down';
+  const aligned=items.filter(el=>{const b=el.getBoundingClientRect();return vertical
+   ? Math.min(r.right,b.right)>Math.max(r.left,b.left)
+   : Math.min(r.bottom,b.bottom)>Math.max(r.top,b.top);});
+  return nearest(current,aligned,way);
+ }
  function disabled(el){return !!el&&(el.disabled||el.matches?.(':disabled')||el.getAttribute?.('aria-disabled')==='true');}
  function activate(el){if(!el||disabled(el))return false;el.click();return true;}
  function ignores(e){return !!(e.defaultPrevented||e.ctrlKey||e.altKey||e.metaKey||e.isComposing);}
@@ -25,7 +40,7 @@
   document.documentElement.classList.remove('keynav-keyboard');
   document.querySelectorAll('.kfocus').forEach(el=>el.classList.remove('kfocus'));
  }
- const api={direction,nearest,disabled,activate,ignores,editing,clearKeyboardFocus};
+ const api={direction,nearest,step,gridMove,disabled,activate,ignores,editing,clearKeyboardFocus};
  if(typeof module==='object'&&module.exports)module.exports=api;
  if(typeof document==='undefined')return;
  global.KeyNav=api;
@@ -73,25 +88,36 @@
   stack=stack.filter(d=>dialogs.includes(d));
   for(const d of dialogs)if(!stack.includes(d))stack.push(d);
   if(stack.length){const d=stack[stack.length-1];return {id:d,kind:'dialog',roots:[d]};}
-  if(typeof allyTargetPick!=='undefined'&&allyTargetPick)return {id:allyTargetPick,kind:'ally',roots:[...doc.querySelectorAll('#party .targetable'),$('#allytargetbar'),$('#allytargetbattlebar'),$('#allytargetcancel')]};
+  if(typeof allyTargetPick!=='undefined'&&allyTargetPick){
+   const candidates=keyboard&&allyTargetPick.keyboardCandidates?allyTargetPick.keyboardCandidates():allyTargetPick.candidates();
+   const targets=[...doc.querySelectorAll('#party .targetable')];
+   // Native Shift+Tab from a protected select must also skip keyboard-ineligible
+   // cards. Pointer mode restores their existing tab order and click behavior.
+   for(const el of targets)el.tabIndex=candidates.includes(+el.dataset.allyTarget)?0:-1;
+   const cards=targets.filter(el=>candidates.includes(+el.dataset.allyTarget));
+   return {id:allyTargetPick,kind:'ally',roots:[...cards,$('#allytargetbar'),$('#allytargetbattlebar'),$('#allytargetcancel')]};
+  }
   const command=$('#commandentry');
   if(visible(command))return {id:'command:'+command.getAttribute('data-key-context'),kind:'command',roots:[command,$('#flee')]};
   if(visible($('#town')))return {id:'town',kind:'town',roots:[$('#town'),$('#statsopen')]};
+  if(visible($('#bosschoice')))return {id:s.pendingStairs?'stairs':'boss',kind:'confirm',roots:[$('#bosschoice')]};
+  if(visible($('#chestactions')))return {id:'chest',kind:'confirm',roots:[$('#chestactions')]};
+  if(visible($('#clearresult')))return {id:'clear',kind:'report',roots:[$('#clearresult')]};
   const prompts=[$('#bosschoice'),$('#chestactions'),$('#clearresult'),$('#backtown')];
   return {id:'explore:'+prompts.filter(visible).map(el=>el.id).join(','),kind:'explore',
    roots:[...prompts,$('#dungeon'),$('#statsopen'),$('#maptoggle')]};
  }
- const labels={dialog:'画面内',ally:'味方対象',command:'戦闘コマンド',town:'町メニュー',explore:'探索ボタン'};
+ const labels={dialog:'画面内',ally:'味方対象',command:'戦闘コマンド',town:'町メニュー',explore:'探索ボタン',confirm:'確認',report:'報告'};
  let hints=true;
  try{hints=localStorage.getItem('ash-keyhint')!=='off';}catch(_){/* Storage can be unavailable. */}
  function updateHint(){
   const hint=$('#keyhint'),toggle=$('#keyhinttoggle');
   if(hint){
    if(hint.hidden!==!hints)hint.hidden=!hints;
-   const reason=keyboard&&disabled(selected)&&selected.title?`　${selected.title}`:'';
+   const reason=keyboard&&disabled(selected)?`　${selected.title||'選択できません'}`:'';
    const value=layer?.id==='explore:'
     ? '探索　W/S・↑/↓：前進/後退　A/D・←/→：旋回　Q/E：横移動　F：旗　G：旗種　M：地図　C：ステータス'
-    : `${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：戻る${reason}`;
+    : `${labels[layer?.kind]||'選択'}　W/A/S/D・矢印：選択　Space・Enter：決定　Esc：${layer?.id==='chest'?'何もしない':'戻る'}${reason}`;
    if(hint.textContent!==value)hint.textContent=value;
   }
   if(toggle){toggle.setAttribute('aria-pressed',String(hints));const value='キーヒント：'+(hints?'表示':'非表示');if(toggle.textContent!==value)toggle.textContent=value;}
@@ -120,7 +146,12 @@
   const reason=disabled(el)?`${el.textContent.trim()}：${el.title||'選択できません'}`:'';
   if(status&&status.textContent!==reason)status.textContent=reason;
  }
- function defaultItem(items){return items.find(el=>el.hasAttribute('data-key-default'))||items.find(el=>!el.hasAttribute('data-key-back'))||items[0]||null;}
+ function defaultItem(items){
+  if(layer?.id==='boss')return $('#bossno');
+  if(layer?.id==='stairs')return $('#bossyes');
+  if(keyboard&&layer?.id?.id==='statsdialog')return items.find(el=>el.matches('.statcard'))||items[0];
+  return items.find(el=>el.hasAttribute('data-key-default'))||items.find(el=>!el.hasAttribute('data-key-back'))||items[0]||null;
+ }
  function sync(){
   if(syncing)return;
   syncing=true;
@@ -131,7 +162,10 @@
    if(changed){
     // Only restore into the active layer; chained reports/target picking take priority.
     const opener=previous?.kind==='dialog'&&!previous.id.open?resolve(openers.get(previous.id),layer.items):null;
-    target=opener||defaultItem(layer.items);
+    // Ally cancellation explicitly focuses its spell/item command after render.
+    // Do not replace that newly created button with the first command.
+    const cancelled=previous?.kind==='ally'&&next.kind==='command'&&layer.items.includes(doc.activeElement)?doc.activeElement:null;
+    target=cancelled||opener||defaultItem(layer.items);
    }
    if(!target)target=defaultItem(layer.items);
    if(changed||target!==selected)focus(target,changed||keyboard);
@@ -153,10 +187,30 @@
  }
  function consume(e){e.preventDefault();e.stopImmediatePropagation();}
  function back(){
+  if(layer.id==='chest')return;
+  if((layer.kind==='command'||layer.kind==='ally'||layer.kind==='confirm')&&logBusy())return;
   const button=layer.items.find(el=>el.hasAttribute('data-key-back')&&!disabled(el));
   if(button)activate(button);
   else if(layer.kind==='dialog')layer.id.close();
   sync();
+ }
+ function navigate(way){
+  if(layer.kind==='confirm')return step(selected,layer.items,way,true);
+  if(layer.kind==='ally'&&selected?.matches('[data-ally-target]'))return gridMove(selected,layer.items.filter(el=>el.matches('[data-ally-target]')),way);
+  if(selected?.matches('.statcard'))return gridMove(selected,layer.items.filter(el=>el.matches('.statcard')),way);
+  const list=selected?.closest('#magiclist,#medicinelist');
+  if(list&&(way==='up'||way==='down'))return step(selected,layer.items.filter(el=>list.contains(el)),way);
+  // W/S traverse the entire row/spell target list, even when it wraps to two columns.
+  if(selected?.matches('[data-row-choice],[data-spell-target]')&&(way==='up'||way==='down'))
+   return step(selected,layer.items.filter(el=>el.matches('[data-row-choice],[data-spell-target]')),way);
+  // A/D in two-column lists stay on the same visual row of that list; the
+  // full-width back button below must not win on raw centre distance.
+  const group=list?layer.items.filter(el=>list.contains(el)):selected?.matches('[data-row-choice],[data-spell-target]')?layer.items.filter(el=>el.matches('[data-row-choice],[data-spell-target]')):null;
+  if(group&&(way==='left'||way==='right')){const next=gridMove(selected,group,way);if(next&&next!==selected)return next;}
+  // Battle commands are a 2-column grid above full-width 戻る/逃げる: prefer
+  // the same visual row/column band, then fall back to 038's centre distance.
+  if(layer.kind==='command'){const next=gridMove(selected,layer.items,way);if(next&&next!==selected)return next;}
+  return nearest(selected,layer.items,way);
  }
  function keydown(e){
   if(ignores(e))return;
@@ -198,9 +252,12 @@
    focus(items[(i+step+items.length)%items.length]);return;
   }
   consume(e);
-  if(decide){if(!e.repeat)activate(selected);sync();return;}
+  if(decide){
+   if(!e.repeat&&!(typeof logBusy==='function'&&logBusy()))activate(selected?.matches('.statcard')?selected.querySelector('[data-stat-inventory]'):selected);
+   sync();return;
+  }
   const tabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
-  const target=tabEdge?(e.key==='Home'?tabs[0]:tabs[tabs.length-1]):nearest(selected,layer.items,way);
+  const target=tabEdge?(e.key==='Home'?tabs[0]:tabs[tabs.length-1]):navigate(way);
   focus(target);
   // Preserve the library's existing automatic horizontal tab activation.
   if(target?.getAttribute('role')==='tab'&&(tabEdge||((way==='left'||way==='right')&&e.target.getAttribute?.('role')==='tab')))activate(target);
