@@ -70,7 +70,7 @@ function partyTargetEvent(e){
  return true;
 }
 let commandIndex=0,commandConfirmed=[],choosingRow=false,pendingSpell=null;
-function commandMembers(){return s.members.map((m,i)=>i).filter(i=>s.hp[i]>0&&!s.ailments[i].paralysis)}
+function commandMembers(){return s.members.map((m,i)=>i).filter(i=>!partyIncapacitated(i))}
 function resetCommandEntry(){endAllyTargetPick();commandIndex=0;commandConfirmed=[];choosingRow=false;pendingSpell=null}
 function confirmCommand(i){if(!s.enemy||logBusy())return;commandConfirmed[i]=true;commandIndex=commandMembers().indexOf(i)+1;choosingRow=false;pendingSpell=null;render()}
 function commandSummary(i){let c=s.commands[i];if(c==='dispel')return '呪いを解く';if(c==='guard')return '守る';if(c==='spell')return magic(s.magicPlans[i]?.id)?.name||'呪文';if(c==='item')return weapon(s.itemPlans[i]?.id)?.name||'アイテム';let g=enemyGroups().find(g=>String(g.key)===String(s.attackRows[i]));return '戦う'+(g?' → '+(g.index+1)+'列':'')}

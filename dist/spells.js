@@ -47,7 +47,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||x.job!==jobOf(i)||spellReason(
  else if(x.effect==='survey'){s.dumapicUses=(s.dumapicUses||0)+1;let j=target();if(j<0||s.cells[j].open)log('調査に失敗した。');else{let truth=!!s.cells[j].trap,correct=Math.random()<.85;log((correct?truth:!truth)?'前方は罠の可能性あり':'前方にはなにもない')}}
  else if(x.effect==='watchful'){s.watchful=true;log('警戒結界が一行を包んだ。')}
  else if(x.effect==='light'){s.light=true;log('視界が広がった。')}
- else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{s.pos=s.start;s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}return true}
+ else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{s.pos=s.start;s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}if(!s.enemy)autoReorderParty('spell');return true}
 function fixChestTrap(c){if(c.trap!==undefined)return;let r=Math.random();c.trap=r>=.4?'none':r<.2?'needle':r<.32?'poison':'paralysis'}
 function magicActions(i){if(!hasSpells(i))return ''; let plan=s.magicPlans[i],x=magic(plan?.id);return `<button data-magic="${i}" ${logBusy()||s.done?'disabled':''}>${s.enemy&&s.commands[i]==='spell'&&x?x.name+' · 変更':'呪文を選ぶ'}</button>${s.enemy&&s.commands[i]==='spell'&&x?`<small class="spellplan">MP ${spellCost(x)} · ${spellTargetLabel(x,plan.target)}</small>`:''}`}
 function spellTargetLabel(x,t){if(x.target==='ally')return NAMES[t];if(x.target==='group'||x.target==='enemy'){let e=s.enemy.units.find(e=>e.uid===t),g=e&&enemyGroups().find(g=>g.key===rowKey(e));return g?`${g.index+1}列：${enemyDisplay(g.units[0])}`:'対象なし'}if(x.target==='enemy')return enemyDefinition(s.enemy.units.find(e=>e.uid===t)?.id||s.enemy.units[0].id).name+(x.target==='group'?'の組':'');return {party:'味方全員',all:'敵全体',chest:'宝箱',floor:`地下${t}階`}[x.target]}
@@ -59,7 +59,7 @@ function renderMagicChoice(){let x=magic(spellSelected),i=spellMember;let box=$(
 function commitMagicChoice(i,x,t){
  if(logBusy()||spellReason(i,x)||!validMagicTarget(x,t)){render();return}
  if(s.enemy){s.magicPlans[i]={id:x.id,target:t};s.commands[i]='spell'}
- else{displayVitals={hp:s.hp.slice(),mp:s.mp.slice(),ailments:structuredClone(s.ailments),members:structuredClone(s.members)};castMagic(i,x.id,t)}
+ else{displayVitals=snapshotVitals();castMagic(i,x.id,t)}
  $('#magicdialog').close();s.enemy?confirmCommand(i):render();
 }
 function pickFieldSpell(){

@@ -13,6 +13,38 @@ function ensureSixParty(){
  for(let [job,name] of [[0,'戦士Ⅱ'],[0,'戦士Ⅲ'],[3,'盗賊']]){let c=CLASSES[job],id='member-'+s.members.length;s.members.push({id,job,name,level:1,xp:0,maxHP:c.hp,maxMP:c.mp,attack:c.attack,ac:c.ac});s.hp.push(c.hp);s.mp.push(c.mp);s.inventory.push([['sword','staff','mace','dagger'][job]]);s.equipped.push(0);s.armor.push({});s.ailments.push({poison:false,paralysis:0})}
  let order=[0,3,4,2,1,5];for(let key of PARTY_FIELDS)s[key]=order.map(i=>s[key][i]);s.partyVersion=1;resetPartyCommands();refreshNames();
 }
+// Only fill vacant front-line roles. The remaining members retain their order,
+// so a cured rear member never jumps forward merely because they recovered.
+function partyIncapacitated(i){return ['dead','ash','lost','stone'].includes(s.members[i].status)||s.hp[i]<=0||s.ailments[i]?.paralysis>0}
+function autoReorderParty(reason){
+ if(s.defeatPending||s.done||!s.hp.some(h=>h>0))return false;
+ const oldMembers=s.members.slice(),indices=oldMembers.map((_,i)=>i);
+ if(!indices.some(i=>i<3&&partyIncapacitated(i))||!indices.some(i=>i>=3&&!partyIncapacitated(i)))return false;
+ const front=indices.filter(i=>!partyIncapacitated(i)).slice(0,3);
+ const order=[...front,...indices.filter(i=>!front.includes(i))];
+ if(order.every((old,i)=>old===i))return false;
+ // Capture the displayed order before changing any parallel array. Older queued
+ // log entries stay untouched; the retreat entries capture the new formation.
+ // Legacy parallel-array saves may not yet have roster IDs (save normally
+ // assigns them). Establish those identities before remapping reservations.
+ const seen=new Set();
+ for(const m of oldMembers){if(!m.id||seen.has(m.id))m.id=crypto.randomUUID();seen.add(m.id)}
+ const newIndex=new Map(order.map((old,i)=>[oldMembers[old].id,i]));
+ const retreated=indices.filter(i=>i<3&&newIndex.get(oldMembers[i].id)>=3);
+ // Only hold the old formation on screen when a retreat log will release it.
+ if(retreated.length)displayVitals??=snapshotVitals();
+ const remapTarget=t=>newIndex.get(oldMembers[t]?.id)??t;
+ for(const key of [...PARTY_FIELDS,'commands','magicPlans','itemPlans','attackRows']){
+  if(s[key])s[key]=order.map(i=>s[key][i]);
+ }
+ s.magicPlans=s.magicPlans.map(plan=>plan&&magic(plan.id)?.target==='ally'?{...plan,target:remapTarget(plan.target)}:plan);
+ s.itemPlans=s.itemPlans.map(plan=>plan?{...plan,target:remapTarget(plan.target)}:plan);
+ commandConfirmed=order.map(i=>commandConfirmed[i]);
+ refreshNames();
+ for(const old of retreated)log(`${oldMembers[old].name}が後列に下がった。`);
+ render();save();
+ return true;
+}
 function resetPartyCommands(){s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.magicPlans=s.members.map(()=>null);s.itemPlans=s.members.map(()=>null);s.attackRows=s.members.map(()=>0);resetCommandEntry()}
 function reorderParty(order){if(s.area!=='town'||!idle()||order.length!==s.members.length||new Set(order).size!==order.length||order.some(i=>!Number.isInteger(i)||i<0||i>=s.members.length))return false;for(let key of PARTY_FIELDS)s[key]=order.map(i=>s[key][i]);displayVitals=null;resetPartyCommands();refreshNames();render();return true}
 let tavernOrder=[],tavernRoster=[];

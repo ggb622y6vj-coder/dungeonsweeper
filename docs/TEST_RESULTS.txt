@@ -1,3 +1,31 @@
+032 自動後退 — 2026-11-02
+並び順はOK例の前衛3枠の繰上げを採用（ACDBEF → CDEABF）。
+既存の検証項目を維持し、死亡者の実データ参照をメンバーIDへ変更。
+
+PASS tests/auto-reorder.cjs
+PASS tests/auto-temple.cjs
+PASS tests/death-status.cjs
+PASS tests/final-boss.cjs
+PASS tests/game.cjs
+PASS tests/library.cjs
+PASS tests/monster-dice.cjs
+PASS tests/target-select.cjs
+PASS tests/temple.cjs
+PASS tests/training.cjs
+PASS python3 scripts/compile-monsters.py --check
+PASS node scripts/sim/selftest.cjs
+
+1280/390px ブラウザテスト（executor 実行、Chromium）:
+PASS tests/auto-reorder-browser.py
+PASS tests/auto-temple-browser.py
+PASS tests/load-carry-browser.py
+PASS tests/target-select-browser.py
+PASS tests/tavern-browser.py
+PASS tests/town-layout-browser.py
+PASS tests/training-browser.py
+
+--- 過去の検証記録 ---
+
 PASS town loop, stairs yes/no, map persistence, buy/equip/sell/capacity, trap consumption, heal, random encounters, drops, combined log
 PASS XP deferred to town, multi-level growth, full refill, persistence, AC, target selection, multiple enemies, reward once, MP spending and save migration
 PASS armor equip/remove/sale guard, 10x10 and 12x12 floors and enemy scaling

@@ -24,11 +24,12 @@ function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  if(heal&&s.hp[target]>=maxHP(target)){log(NAMES[target]+'のHPは満タンだ。');return false}
  if(w.spell==='dialko'&&!s.ailments[target].paralysis){log(NAMES[target]+'は麻痺していない。');return false}
  if(w.spell==='latumofis'&&!s.ailments[target].poison){log(NAMES[target]+'は毒に侵されていない。');return false}
- if(!displayVitals)displayVitals={hp:s.hp.slice(),mp:s.mp.slice(),ailments:structuredClone(s.ailments)};
+ if(!displayVitals)displayVitals=snapshotVitals();
  removeInventorySlot(i,slot);log(NAMES[i]+'は'+w.name+'を使った。');
  if(heal){let before=s.hp[target];s.hp[target]=Math.min(maxHP(target),before+dice(...magic(w.spell).value).value);log(NAMES[target]+'のHPが'+(s.hp[target]-before)+'回復した。')}
  else if(w.spell==='dialko'){s.ailments[target].paralysis=0;log(NAMES[target]+'の麻痺が解けた。')}
  else{s.ailments[target].poison=false;log(NAMES[target]+'の毒が消えた。')}
+ if(!inTurn)autoReorderParty('medicine');
  return true;
 }
 function openMedicine(i,slot){if(!canChooseMedicine(i)||!medicineSlots(i).length)return;medicineMember=i;$('#medicinetitle').textContent=NAMES[i]+'の薬';$('#medicineitem').innerHTML=medicineSlots(i).map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${x.item.name}（枠${x.slot+1}）</option>`).join('');$('#medicinetarget').innerHTML=allyTargetCandidates().map(j=>`<option value="${j}">${NAMES[j]} ${s.hp[j]}/${maxHP(j)}・${ailmentLabel(j)}</option>`).join('');$('#medicineuse').textContent=s.enemy?'この薬で行動する':'使う';renderMedicineDescription();$('#medicinepick').hidden=s.area!=='dungeon';$('#medicinedialog').showModal();if(slot!==undefined&&s.area==='dungeon')pickMedicineTarget()}
