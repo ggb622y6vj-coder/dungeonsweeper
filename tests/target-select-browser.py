@@ -150,63 +150,68 @@ with sync_playwright() as p:
             assert page.evaluate('s.mp[1]') == before_mp - (2 if begin == spell else 0)
             assert page.evaluate('s.inventory[1].length') == (1 if begin == medicine else 2)
 
-        # Existing select controls are reachable outside the closed modal.
-        for begin, select, button in ((spell, 'magictarget', 'magiccast'), (medicine, 'medicinetarget', 'medicineuse')):
-            reset(page)
-            begin(page)
-            assert page.locator(f'{"#allytargetbattlefallback" if page.locator("#battle").is_visible() else "#allytargetfallback"} #{select}').is_visible()
-            assert page.locator(f'#{select} option').evaluate_all('(els)=>els.map(e=>e.value)') == ['1', '2']
-            page.locator(f'#{select}').select_option('2')
-            page.locator(f'#{button}').click()
-            finished(page)
-            page.wait_for_function('!logBusy()')
-            assert page.evaluate('s.hp[2]') == 6
+        # Target selection is exclusively through party cards.
+        reset(page)
+        spell(page)
+        assert page.locator('#magictarget').count() == 0
+        assert page.locator('#magiccast').is_hidden()
+        assert page.locator('#allytargetbar select,#magicdialog select').count() == 0
+        assert page.locator('#party [data-ally-target="2"]').is_visible()
+        tap_target()
+        finished(page)
+        page.wait_for_function('!logBusy()')
+        assert page.evaluate('s.hp[2]') == 6
+        reset(page)
+        medicine(page)
+        assert page.locator('#medicinetarget,#medicineuse,#medicinechoice').count() == 0
+        page.locator('#allytargetfieldcancel').click()
+        finished(page)
+        assert page.locator('#medicinedialog').is_visible()
+        assert page.locator('#medicinedialog select').count() == 1  # item choice only
+        page.locator('#medicinepick').click()
+        assert page.locator('#allytargetbar select').count() == 0
+        tap_target()
+        finished(page)
+        page.wait_for_function('!logBusy()')
+        assert page.evaluate('s.hp[2]') == 6
 
         # Battle picks reserve actions, leave resources intact, and advance once.
         for begin, plan in ((spell, 'magicPlans'), (medicine, 'itemPlans')):
-            for fallback in (False, True, 'buttons') if begin == spell else (False, True):
-                reset(page, True)
-                resources = page.evaluate('JSON.stringify([s.hp,s.mp,s.inventory])')
-                before_layout = layout(page)
-                before_back = page.locator('[data-command-back]').bounding_box()
-                assert abs(before_back['height']-48) <= 0.5, before_back
-                begin(page, True)
-                assert_layout(before_layout, layout(page), battle=True)
-                cancel_button = page.locator('#commandentry #allytargetcancel')
-                assert cancel_button.count() == 1
-                cancel_box = cancel_button.bounding_box()
-                assert abs(before_back['x']-cancel_box['x']) <= 2
-                assert abs(before_back['width']-cancel_box['width']) <= 2
-                assert abs(before_back['height']-cancel_box['height']) <= 2
-                assert cancel_box['height'] >= 44
-                assert page.locator('#commandentry [data-command-back]').count() == 0
-                assert page.locator('[id=allytargetcancel]').count() == 1
-                assert page.locator('#allytargetbattlebar').is_visible()
-                assert page.locator('#allytargetbattlebar').bounding_box()['y'] >= page.locator('#battle').bounding_box()['y'] + page.locator('#battle').bounding_box()['height']
-                assert page.locator('#allytargetbar').is_hidden()
-                page.screenshot(path=str(screenshot_dir / f'ts-{width}-below-battle-{begin.__name__}.png'))
-                if fallback == 'buttons':
-                    page.locator('[data-spell-target="2"]').click()
-                elif fallback and begin == spell:
-                    page.locator('#allytargetspellselect').select_option('2')
-                    page.locator('#allytargetspelluse').click()
-                elif fallback:
-                    page.locator('#medicinetarget').select_option('2')
-                    page.locator('#medicineuse').click()
-                else:
-                    tap_target()
-                assert_layout(before_layout, layout(page), battle=True)
-                finished(page)
-                assert page.evaluate(f's.{plan}[1].target') == 2
-                assert page.evaluate('commandIndex') == 1
-                assert page.evaluate('JSON.stringify([s.hp,s.mp,s.inventory])') == resources
-                assert '冒険者3' in page.locator('.commandheading').inner_text()
-                page.locator('[data-command-choice="guard"]').click()
-                assert page.locator('#commandreviewpopup').is_visible()
-                page.locator('[data-command-back]').click()
-                assert page.evaluate('commandIndex') == 1
-                back_after = page.locator('#commandentry > [data-command-back]').bounding_box()
-                assert abs(back_after['height']-48) <= 0.5, back_after
+            reset(page, True)
+            resources = page.evaluate('JSON.stringify([s.hp,s.mp,s.inventory])')
+            before_layout = layout(page)
+            before_back = page.locator('[data-command-back]').bounding_box()
+            assert abs(before_back['height']-48) <= 0.5, before_back
+            begin(page, True)
+            assert_layout(before_layout, layout(page), battle=True)
+            cancel_button = page.locator('#commandentry #allytargetcancel')
+            assert cancel_button.count() == 1
+            cancel_box = cancel_button.bounding_box()
+            assert abs(before_back['x']-cancel_box['x']) <= 2
+            assert abs(before_back['width']-cancel_box['width']) <= 2
+            assert abs(before_back['height']-cancel_box['height']) <= 2
+            assert cancel_box['height'] >= 44
+            assert page.locator('#commandentry [data-command-back]').count() == 0
+            assert page.locator('[id=allytargetcancel]').count() == 1
+            assert page.locator('#allytargetbattlebar').is_visible()
+            assert page.locator('#allytargetspellselect,#allytargetspelluse,#medicinetarget,#medicineuse').count() == 0
+            assert page.locator('#commandentry [data-spell-target],#commandentry select,#allytargetbattlebar select,#allytargetbar select').count() == 0
+            assert page.locator('#allytargetbattlebar').bounding_box()['y'] >= page.locator('#battle').bounding_box()['y'] + page.locator('#battle').bounding_box()['height']
+            assert page.locator('#allytargetbar').is_hidden()
+            page.screenshot(path=str(screenshot_dir / f'ts-{width}-below-battle-{begin.__name__}.png'))
+            tap_target()
+            assert_layout(before_layout, layout(page), battle=True)
+            finished(page)
+            assert page.evaluate(f's.{plan}[1].target') == 2
+            assert page.evaluate('commandIndex') == 1
+            assert page.evaluate('JSON.stringify([s.hp,s.mp,s.inventory])') == resources
+            assert '冒険者3' in page.locator('.commandheading').inner_text()
+            page.locator('[data-command-choice="guard"]').click()
+            assert page.locator('#commandreviewpopup').is_visible()
+            page.locator('[data-command-back]').click()
+            assert page.evaluate('commandIndex') == 1
+            back_after = page.locator('#commandentry > [data-command-back]').bounding_box()
+            assert abs(back_after['height']-48) <= 0.5, back_after
 
         # Cancel button/Escape/back do not reserve or spend; field choices survive.
         for battle in (False, True):
@@ -259,10 +264,6 @@ with sync_playwright() as p:
             page.keyboard.press('Tab')
             assert page.evaluate('document.activeElement.dataset.allyTarget') == '2'
             page.keyboard.press('Tab')
-            expected_select = '#allytargetbattlefallback select' if battle else '#allytargetfallback select'
-            assert page.locator(expected_select).evaluate('(el)=>document.activeElement===el')
-            page.keyboard.press('Tab')
-            page.keyboard.press('Tab')
             cancel_selector = '#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel'
             assert page.locator(cancel_selector).evaluate('(el)=>document.activeElement===el')
             page.locator(cancel_selector).click()
@@ -279,7 +280,7 @@ with sync_playwright() as p:
             page.wait_for_function('!logBusy()')
             assert page.evaluate('s.hp[2]') == 6
 
-        # Playback rejects stale clicks and fallback attempts, then re-enables.
+        # Playback rejects stale card clicks, then re-enables.
         reset(page, True)
         spell(page, True)
         before = snapshot(page)
@@ -301,6 +302,6 @@ with sync_playwright() as p:
         assert page.locator('#statsdialog').is_visible()
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         assert not errors, errors
-        print(f'PASS target selection Chromium {width}px: field/battle spell/medicine, fallback parity, disabled targets, cancel/Escape/back, Tab/Enter/Space, snapshots, rerender/focus, 44px taps, no overflow or JS errors')
+        print(f'PASS target selection Chromium {width}px: field/battle spell/medicine cards, no ally target selects, disabled targets, cancel/Escape/back, Tab/Enter/Space, snapshots, rerender/focus, 44px taps, no overflow or JS errors')
         ctx.close()
     browser.close()
