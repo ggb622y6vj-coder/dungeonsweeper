@@ -27,6 +27,17 @@ assert.equal(rows.get('奈落の監視者')[7], '3d6+2', '3F guardian remains un
 for (const [name, breath] of [['火蜻蛉', '炎/全体/2d6/60%'], ['深層の魔将', '炎/全体/2d8/60%'], ['奈落の監視者', '氷/全体/2d8/60%'], ['黒牙狼', 'なし']]) {
   assert.equal(rows.get(name)[14], breath, `${name} breath remains unchanged`);
 }
+for (const [name, id, expected] of [
+  ['サッキュバス','succubus',{floor:10,level:12,hp:[10,7,8],ac:1,hit:11,attack:[2,10,0],xp:1000,groupSize:[1,2],gold:[10,8,30],race:'悪魔',swings:1,rear:false,statuses:[],resistance:'なし',boss:false,icon:'♜'}],
+  ['ダイダラボチ','daidaraboti',{floor:10,level:10,hp:[15,10,0],ac:-3,hit:12,attack:[5,9,0],xp:4500,groupSize:[1,1],gold:[10,8,80],race:'人型',swings:2,rear:true,statuses:[{type:'paralysis',chance:.2}],resistance:'炎半減・氷半減',boss:false,icon:'♟'}],
+]) {
+  const fields=rows.get(name); assert.ok(fields,`${name} CSV exists`);
+  const compiledSrc = fs.readFileSync(path.join(__dirname, '../dist/monster-data.js'), 'utf8');
+  const all = new Function(`${compiledSrc}\nreturn ENEMIES;`)();
+  const m=all.find(e=>e.id===id); assert.ok(m,`${id} compiled`);
+  for(const [key,value] of Object.entries(expected)) assert.deepEqual(m[key],value,`${id} ${key}`);
+  assert.equal(fields[2],'10F');
+}
 const compiledSrc = fs.readFileSync(path.join(__dirname, '../dist/monster-data.js'), 'utf8');
 const ENEMIES = new Function(`${compiledSrc}\nreturn ENEMIES;`)();
 for (const [name, damage] of expected) {
@@ -35,4 +46,6 @@ for (const [name, damage] of expected) {
   const [, n, d, b = '0'] = damage.match(/^(\d+)d(\d+)(?:\+(\d+))?$/);
   assert.deepEqual(m.attack, [+n, +d, +b], `${name} compiled attack ${damage}`);
 }
-console.log(`PASS monster physical damage dice: ${expected.size} regular monsters; guardians and breath unchanged`);
+assert.equal(ENEMIES.filter(e=>e.floor===10&&e.boss).length,1);
+assert.equal(ENEMIES.find(e=>e.id==='labyrinthlord').boss,true);
+console.log(`PASS monster dice and 90 definitions; 10F additions, boss invariant, guardians and breath unchanged`);

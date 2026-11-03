@@ -4366,6 +4366,101 @@ const ENEMIES=[
     }
   },
   {
+    "id": "succubus",
+    "name": "サッキュバス",
+    "unknown": "悪魔",
+    "floor": 10,
+    "level": 12,
+    "hp": [
+      10,
+      7,
+      8
+    ],
+    "ac": 1,
+    "hit": 11,
+    "attack": [
+      2,
+      10,
+      0
+    ],
+    "xp": 1000.0,
+    "groupSize": [
+      1,
+      2
+    ],
+    "gold": [
+      10,
+      8,
+      30
+    ],
+    "race": "悪魔",
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♜",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "daidaraboti",
+    "name": "ダイダラボチ",
+    "unknown": "巨大な影",
+    "floor": 10,
+    "level": 10,
+    "hp": [
+      15,
+      10,
+      0
+    ],
+    "ac": -3,
+    "hit": 12,
+    "attack": [
+      5,
+      9,
+      0
+    ],
+    "xp": 4500.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      10,
+      8,
+      80
+    ],
+    "race": "人型",
+    "swings": 2,
+    "rear": true,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [
+      {
+        "type": "paralysis",
+        "chance": 0.2
+      }
+    ],
+    "resistance": "炎半減・氷半減",
+    "boss": false,
+    "icon": "♟",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
     "id": "labyrinthlord",
     "name": "迷宮の主",
     "unknown": "玉座の影",

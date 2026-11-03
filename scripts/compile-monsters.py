@@ -43,7 +43,7 @@ ids={
   "毒竜": "gasdragon", "牛頭の戦士": "minotaur", "肉の巨像": "fleshgolem", "忍びの頭目": "ninjachief", "死霊魔導士": "deathmage", "地獄の犬": "hellhound", "這い寄る大蟲": "crawler", "双頭の巨人": "ettin",
   "レッサーデーモン": "lesserdemon", "雷竜": "bluedragon", "死の騎士": "deathknight", "魔女": "witch", "多頭竜": "hydra", "影の暗殺者": "assassin", "邪眼": "evileye", "魔将軍": "demongeneral",
   "グレーターデーモン": "greaterdemon", "霜の巨人": "frostgiant", "夜の貴族": "vampirelord", "赤竜": "reddragon", "上忍": "masterninja", "リッチ": "lich", "魔界の猟犬": "fiendhound", "古竜": "ancientdragon",
-  "魔王の近衛": "royalguard", "堕天使": "fallenangel", "死神": "reaper", "混沌の竜": "chaosdragon", "混沌の落とし子": "chaosspawn", "大魔導師": "archmage", "迷宮の主": "labyrinthlord"
+  "魔王の近衛": "royalguard", "堕天使": "fallenangel", "死神": "reaper", "混沌の竜": "chaosdragon", "混沌の落とし子": "chaosspawn", "大魔導師": "archmage", "サッキュバス": "succubus", "ダイダラボチ": "daidaraboti", "迷宮の主": "labyrinthlord"
 }
 BOSSES=['guardian','general','watcher','minogate','necromancer','vampire','ettin','demongeneral','ancientdragon','labyrinthlord']
 # 敵の呪文：名前→(id,対象,ダイス,効果)。全体は生存する味方全員に個別ダイス。
