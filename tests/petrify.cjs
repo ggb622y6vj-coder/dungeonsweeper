@@ -172,6 +172,19 @@ for(const combat of [false,true]){
  assert.equal(g.run('order()'),'ACDBEF','cure does not restore the old formation');
  assert.equal(g.run('commandMembers().includes(t)'),true);
 }
+// The active target picker dims and rejects only targets this action cannot affect.
+for(const [id,canWork] of [['dios',false],['dialko',false],['madi',true]]){
+ const g=party();stone(g);g.run(`s.members[index('E')].known.push('${id}');s.mp[index('E')]=100;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||magic('${id}').effect==='restore'),canWork:t=>s.members[t].status!=='stone'||magic('${id}').effect==='restore',prompt:'test',onPick:()=>{},onCancel:()=>{}})`);
+ assert.equal(g.run("allyTargetPick.candidates().includes(index('B'))"),true);
+ assert.equal(g.run("allyTargetPick.canWork(index('B'))"),canWork);
+ assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('B'))"),canWork);
+}
+for(const id of ['healingPotion','antidote','paralysisCure']){
+ const g=party();stone(g);g.run(`s.inventory[index('E')].push('${id}');beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),canWork:t=>s.members[t].status!=='stone',prompt:'test',onPick:()=>{},onCancel:()=>{}})`);
+ assert.equal(g.run("allyTargetPick.canWork(index('B'))"),false);
+ assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('B'))"),false);
+ assert.equal(g.run("allyTargetPick.canWork(index('A'))"),true);
+}
 // Simultaneously reserved Madi target follows the member through auto-retreat.
 {
  const g=party();battle(g);g.run(`s.members[4].known.push('madi');s.mp[4]=100;s.commands[4]='spell';s.magicPlans[4]={id:'madi',target:1};
@@ -237,3 +250,19 @@ for(const reserve of [false,true])for(const level of [1,2,3,4,5,10,30]){
 }
 assert.match(fs.readFileSync(path.join(__dirname,'../dist/index.html'),'utf8'),/\.ailment-stone\{/);
 console.log('PASS petrify: town/load carry, XP/HP/MP preservation, blocked joining, temple fees 1–30, guaranteed cure, rejoining and persistence');
+// 049: the real battle Dios path keeps the stone member listed but rejects picking it.
+{
+ const g=party();battle(g);stone(g);
+ const e=g.run("index('E')");g.run(`s.members[${e}].known.push('dios','madi');s.mp[${e}]=100;chooseBattleSpell(${e},magic('dios'))`);
+ const b=g.run("index('B')"),before=g.run('JSON.stringify([s.logs.length,s.mp,s.commands])');
+ assert.equal(g.run(`allyTargetPick.candidates().includes(${b})`),true);
+ assert.equal(g.run(`allyTargetPick.canWork(${b})`),false);
+ g.run(`pickAllyTarget(${b})`);
+ assert.equal(g.run('JSON.stringify([s.logs.length,s.mp,s.commands])'),before,'stone pick: no message, no MP, no command');
+ assert.equal(g.run('!!allyTargetPick'),true,'picker stays open');
+ g.run('endAllyTargetPick();pendingSpell=null');
+ g.run(`chooseBattleSpell(${e},magic('madi'))`);
+ assert.equal(g.run(`allyTargetPick.canWork(${b})`),true);
+ g.run(`pickAllyTarget(${b})`);
+ assert.equal(g.run(`s.magicPlans[${e}]?.target`),b,'Madi can target stone');
+}

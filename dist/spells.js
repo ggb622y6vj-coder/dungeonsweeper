@@ -72,7 +72,7 @@ function commitMagicChoice(i,x,t){
 function pickFieldSpell(){
  const i=spellMember,x=magic(spellSelected);
  if(!x||spellBrowse||s.enemy||x.target!=='ally'||spellReason(i,x)||logBusy())return;
- beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),prompt:x.name,
+ beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),canWork:t=>s.members[t].status!=='stone'||x.effect==='restore',prompt:x.name,
   onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>{renderMagic();$('#magicdialog').showModal();$('#magicpick').focus()}});
 }
 function magicUI(){
