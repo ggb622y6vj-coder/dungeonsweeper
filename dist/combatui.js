@@ -1,8 +1,8 @@
 // UI-only state: never persisted in ash-v1. Party cards commit ally targets.
 let allyTargetPick=null;
-function beginAllyTargetPick({candidates,onPick,onCancel,prompt,keyboardCandidates=candidates}){
+function beginAllyTargetPick({candidates,onPick,onCancel,prompt,keyboardCandidates=candidates,canWork=()=>true}){
  if(logBusy()||allyTargetPick)return false;
- allyTargetPick={candidates,keyboardCandidates,onPick,onCancel,prompt};
+ allyTargetPick={candidates,keyboardCandidates,onPick,onCancel,prompt,canWork};
  for(const id of ['magicdialog','medicinedialog','inventorydialog','statsdialog'])if($('#'+id).open)$('#'+id).close();
  render();
  $('#party').scrollIntoView?.({block:'nearest'});
@@ -18,9 +18,10 @@ function endAllyTargetPick(){
 }
 function pickAllyTarget(target){
  const pick=allyTargetPick;
- if(!pick||logBusy()||!pick.candidates().includes(target))return;
+ if(!pick||logBusy()||!pick.candidates().includes(target)||!pick.canWork(target))return;
  endAllyTargetPick();pick.onPick(target);
 }
+function allyTargetCanWork(target){return !!allyTargetPick?.canWork?.(target)}
 function cancelAllyTargetPick(){
  if(!allyTargetPick||logBusy())return;
  const pick=endAllyTargetPick();pendingSpell=null;choosingRow=false;render();pick.onCancel();
@@ -42,12 +43,12 @@ function renderAllyTargetPick(focusedTarget){
  if(battleCancel)battleCancel.disabled=logBusy();
  if($('#allytargetbattleprompt'))$('#allytargetbattleprompt').textContent=$('#allytargetprompt').textContent;
  document.querySelectorAll('#party .card').forEach((card,i)=>{
-  const available=candidates.includes(i);
+  const available=candidates.includes(i),canWork=available&&pick.canWork(i);
   if(available&&i===candidates[0])card.setAttribute('data-key-default','');
   card.dataset.allyTarget=String(i);
-  card.classList.toggle('targetable',available);card.classList.toggle('untargetable',!available);
-  card.setAttribute('role','button');card.setAttribute('tabindex',available?'0':'-1');
-  card.setAttribute('aria-disabled',String(!available));
+  card.classList.toggle('targetable',canWork);card.classList.toggle('untargetable',!canWork);
+  card.setAttribute('role','button');card.setAttribute('tabindex',canWork?'0':'-1');
+  card.setAttribute('aria-disabled',String(!canWork));
   card.setAttribute('aria-label',`${NAMES[i]}を対象に選ぶ HP ${(displayVitals?.hp||s.hp)[i]}/${shownMember(i).maxHP}`);
  });
  if(focusedTarget!==undefined)($('#party .targetable[data-ally-target="'+focusedTarget+'"]')||$('#party .targetable'))?.focus();
@@ -57,7 +58,8 @@ function partyTargetEvent(e){
  const targets=document.querySelectorAll('#party .targetable');
  if(e.type==='keydown'&&e.key==='Tab'&&!e.shiftKey&&targets.length&&e.target===targets[targets.length-1]){e.preventDefault();($('#allytargetbattlebar:not([hidden]) :is(select,button),#allytargetbar:not([hidden]) :is(select,button)')||$('#commandentry #allytargetcancel'))?.focus();return true;}
  if(e.type==='click'||e.key==='Enter'||e.key===' '){
-  e.preventDefault();const card=e.target.closest('[data-ally-target]');if(card)pickAllyTarget(+card.dataset.allyTarget);
+  const card=e.target.closest('[data-ally-target]');if(card&&!allyTargetCanWork(+card.dataset.allyTarget))return true;
+  e.preventDefault();if(card)pickAllyTarget(+card.dataset.allyTarget);
  }
  return true;
 }
@@ -76,4 +78,4 @@ function renderCommandEntry(){let box=$('#commandentry'),members=commandMembers(
 
 function spellTargets(x){if(x.target==='ally')return allyTargetCandidates().map(i=>[i,`${NAMES[i]} ${s.hp[i]}/${maxHP(i)}`]);if(x.target==='enemy'||x.target==='group')return enemyGroups().filter(g=>g.units.some(e=>e.hp>0)).map(g=>[g.units.find(e=>e.hp>0).uid,`${g.index+1}列：${enemyDisplay(g.units[0])} ×${g.units.filter(e=>e.hp>0).length}`]);return []}
 function spellTargetButtons(x){if(x.target==='ally')return '';return spellTargets(x).map(([id,name])=>`<button data-spell-target="${id}">${name}</button>`).join('')}
-function chooseBattleSpell(i,x){if(!s.enemy||logBusy()||spellReason(i,x))return;$('#magicdialog').close();let options=spellTargets(x);if(x.target==='ally'){pendingSpell=x;choosingRow=false;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),prompt:x.name,onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>$('#commandentry [data-command-choice="spell"]')?.focus()});return}if(options.length>1){pendingSpell=x;choosingRow=false;render()}else{s.commands[i]='spell';s.magicPlans[i]={id:x.id,target:options.length?options[0][0]:null};confirmCommand(i)}}
+function chooseBattleSpell(i,x){if(!s.enemy||logBusy()||spellReason(i,x))return;$('#magicdialog').close();let options=spellTargets(x);if(x.target==='ally'){pendingSpell=x;choosingRow=false;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),canWork:t=>s.members[t].status!=='stone'||x.effect==='restore',prompt:x.name,onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>$('#commandentry [data-command-choice="spell"]')?.focus()});return}if(options.length>1){pendingSpell=x;choosingRow=false;render()}else{s.commands[i]='spell';s.magicPlans[i]={id:x.id,target:options.length?options[0][0]:null};confirmCommand(i)}}
