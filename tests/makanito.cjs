@@ -13,6 +13,7 @@ function battle(ids = ['thief','ogre','skeleton','stone','guardian','goblin']) {
     s.enemy={dataVersion:1,units:${JSON.stringify(ids)}.map((id,i)=>({
       ...makeEnemy(id,100+i),row:17+i*11,hp:99,identified:true
     })),initiative:'party',flagEffect:{}};
+    ENEMIES.forEach(d=>{d.mageResist=0;d.priestResist=0});
     resetPartyCommands();`);
   g.drain();
   return g;
@@ -45,13 +46,14 @@ for (const random of [0, .999999]) {
 }
 {
   const g = battle(['thief']);
-  // Death itself must not roll resistance. Gold rewards may still roll dice.
+  // Only the spell-resistance roll (one per target) is allowed; the death effect itself must not roll.
   g.run(`var reward=killReward, rewardCalls=0;
     killReward=e=>{rewardCalls++;const random=Math.random;Math.random=()=>.5;
       try{return reward(e)}finally{Math.random=random}};
-    Math.random=()=>{throw Error('unexpected resistance roll')};`);
+    var resistRolls=0;Math.random=()=>{if(++resistRolls>1)throw Error('unexpected resistance roll');return .5};`);
   assert.equal(g.run("castMagic(0,'makanito',null)"),true);
   assert.equal(g.run('rewardCalls'),1);
+  assert.equal(g.run('resistRolls'),1,'exactly one spell-resistance roll');
 }
 {
   const g = battle(['ogre']);

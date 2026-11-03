@@ -61,7 +61,12 @@ for r in rows:
  floor_values=re.findall(r'(\d+)F?',r['出現階層'])
  assert floor_values and '・'.join(f'{n}F' for n in floor_values)==r['出現階層'], f"Invalid floor list: {r['出現階層']}"
  floors=sorted({int(n) for n in floor_values})
- d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=floors[0],floors=floors,level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
+ resist_values=[]
+ for col in ('魔法使い呪文抵抗','僧侶呪文抵抗'):
+  value=r[col]
+  assert re.fullmatch(r'\d+',value or '') and 0<=int(value)<=95, f"Invalid {col} for {id}: {value!r}"
+  resist_values.append(int(value)/100)
+ d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=floors[0],floors=floors,level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],mageResist=resist_values[0],priestResist=resist_values[1],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
  assert not d['boss'] or len(floors)==1, f"Guardian must have exactly one floor: {id}"
  m=re.search(r'列上限(\d+)体',r['仲間呼び']);d['summonCap']=int(m[1]) if m else 4
  d['breath']=None if r['ブレス']=='なし' else {'element':r['ブレス'].split('/')[0],'dice':dice(r['ブレス'].split('/')[2]),'chance':pct(r['ブレス'])}

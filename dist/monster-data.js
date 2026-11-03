@@ -32,6 +32,8 @@ const ENEMIES=[
       2
     ],
     "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -86,6 +88,8 @@ const ENEMIES=[
       0
     ],
     "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -134,6 +138,8 @@ const ENEMIES=[
       2
     ],
     "race": "不死",
+    "mageResist": 0.0,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -182,6 +188,8 @@ const ENEMIES=[
       2
     ],
     "race": "獣",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -230,6 +238,8 @@ const ENEMIES=[
       2
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0.4,
@@ -278,6 +288,8 @@ const ENEMIES=[
       2
     ],
     "race": "獣",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -326,6 +338,8 @@ const ENEMIES=[
       2
     ],
     "race": "獣",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -374,6 +388,8 @@ const ENEMIES=[
       2
     ],
     "race": "虫",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -422,6 +438,8 @@ const ENEMIES=[
       2
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0.4,
@@ -470,6 +488,8 @@ const ENEMIES=[
       2
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -518,6 +538,8 @@ const ENEMIES=[
       20
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -566,6 +588,8 @@ const ENEMIES=[
       4
     ],
     "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -619,6 +643,8 @@ const ENEMIES=[
       4
     ],
     "race": "不死",
+    "mageResist": 0.0,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -667,6 +693,8 @@ const ENEMIES=[
       4
     ],
     "race": "虫",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -723,6 +751,8 @@ const ENEMIES=[
       4
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0.2,
@@ -771,6 +801,8 @@ const ENEMIES=[
       4
     ],
     "race": "虫",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -819,6 +851,8 @@ const ENEMIES=[
       4
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -877,6 +911,8 @@ const ENEMIES=[
       4
     ],
     "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -930,6 +966,8 @@ const ENEMIES=[
       4
     ],
     "race": "不死",
+    "mageResist": 0.0,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0.1,
@@ -983,6 +1021,8 @@ const ENEMIES=[
       4
     ],
     "race": "構造体",
+    "mageResist": 0.15,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1041,6 +1081,8 @@ const ENEMIES=[
       0
     ],
     "race": "悪魔",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -1102,6 +1144,8 @@ const ENEMIES=[
       6
     ],
     "race": "不定形",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1159,6 +1203,8 @@ const ENEMIES=[
       6
     ],
     "race": "不死",
+    "mageResist": 0.05,
+    "priestResist": 0.15,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1207,6 +1253,8 @@ const ENEMIES=[
       6
     ],
     "race": "魔獣",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1255,6 +1303,8 @@ const ENEMIES=[
       6
     ],
     "race": "人型",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0.1,
@@ -1313,6 +1363,8 @@ const ENEMIES=[
       6
     ],
     "race": "虫",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1361,6 +1413,8 @@ const ENEMIES=[
       6
     ],
     "race": "人型",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1409,6 +1463,8 @@ const ENEMIES=[
       6
     ],
     "race": "竜",
+    "mageResist": 0.15,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1470,6 +1526,8 @@ const ENEMIES=[
       6
     ],
     "race": "獣",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1518,6 +1576,8 @@ const ENEMIES=[
       6
     ],
     "race": "構造体",
+    "mageResist": 0.2,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1581,6 +1641,8 @@ const ENEMIES=[
       0
     ],
     "race": "不死",
+    "mageResist": 0.05,
+    "priestResist": 0.15,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1629,6 +1691,8 @@ const ENEMIES=[
       0
     ],
     "race": "悪魔",
+    "mageResist": 0.35,
+    "priestResist": 0.35,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -1700,6 +1764,8 @@ const ENEMIES=[
       8
     ],
     "race": "人型",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1748,6 +1814,8 @@ const ENEMIES=[
       6
     ],
     "race": "不死",
+    "mageResist": 0.05,
+    "priestResist": 0.15,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1801,6 +1869,8 @@ const ENEMIES=[
       6
     ],
     "race": "魔獣",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -1849,6 +1919,8 @@ const ENEMIES=[
       6
     ],
     "race": "獣",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1902,6 +1974,8 @@ const ENEMIES=[
       6
     ],
     "race": "虫",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1950,6 +2024,8 @@ const ENEMIES=[
       8
     ],
     "race": "人型",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -2004,6 +2080,8 @@ const ENEMIES=[
       8
     ],
     "race": "人型",
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": true,
     "flee": 0.1,
@@ -2062,6 +2140,8 @@ const ENEMIES=[
       8
     ],
     "race": "構造体",
+    "mageResist": 0.2,
+    "priestResist": 0.05,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2115,6 +2195,8 @@ const ENEMIES=[
       30
     ],
     "race": "人型",
+    "mageResist": 0.15,
+    "priestResist": 0.15,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2163,6 +2245,8 @@ const ENEMIES=[
       10
     ],
     "race": "不死",
+    "mageResist": 0.1,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2211,6 +2295,8 @@ const ENEMIES=[
       10
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2259,6 +2345,8 @@ const ENEMIES=[
       10
     ],
     "race": "魔獣",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2307,6 +2395,8 @@ const ENEMIES=[
       10
     ],
     "race": "虫",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2364,6 +2454,8 @@ const ENEMIES=[
       10
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 2,
     "rear": false,
     "flee": 0.1,
@@ -2412,6 +2504,8 @@ const ENEMIES=[
       10
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -2470,6 +2564,8 @@ const ENEMIES=[
       10
     ],
     "race": "竜",
+    "mageResist": 0.2,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2526,6 +2622,8 @@ const ENEMIES=[
       10
     ],
     "race": "不定形",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2579,6 +2677,8 @@ const ENEMIES=[
       40
     ],
     "race": "人型",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2637,6 +2737,8 @@ const ENEMIES=[
       12
     ],
     "race": "不死",
+    "mageResist": 0.1,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -2690,6 +2792,8 @@ const ENEMIES=[
       12
     ],
     "race": "構造体",
+    "mageResist": 0.25,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2743,6 +2847,8 @@ const ENEMIES=[
       12
     ],
     "race": "魔獣",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2799,6 +2905,8 @@ const ENEMIES=[
       12
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2847,6 +2955,8 @@ const ENEMIES=[
       12
     ],
     "race": "不定形",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2904,6 +3014,8 @@ const ENEMIES=[
       12
     ],
     "race": "人型",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -2962,6 +3074,8 @@ const ENEMIES=[
       12
     ],
     "race": "獣",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -3015,6 +3129,8 @@ const ENEMIES=[
       60
     ],
     "race": "不死",
+    "mageResist": 0.2,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3073,6 +3189,8 @@ const ENEMIES=[
       15
     ],
     "race": "竜",
+    "mageResist": 0.3,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3129,6 +3247,8 @@ const ENEMIES=[
       15
     ],
     "race": "人型",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3177,6 +3297,8 @@ const ENEMIES=[
       15
     ],
     "race": "構造体",
+    "mageResist": 0.35,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3225,6 +3347,8 @@ const ENEMIES=[
       15
     ],
     "race": "人型",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 2,
     "rear": false,
     "flee": 0.1,
@@ -3273,6 +3397,8 @@ const ENEMIES=[
       15
     ],
     "race": "不死",
+    "mageResist": 0.2,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -3331,6 +3457,8 @@ const ENEMIES=[
       15
     ],
     "race": "魔獣",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3392,6 +3520,8 @@ const ENEMIES=[
       15
     ],
     "race": "虫",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3445,6 +3575,8 @@ const ENEMIES=[
       80
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3493,6 +3625,8 @@ const ENEMIES=[
       20
     ],
     "race": "悪魔",
+    "mageResist": 0.4,
+    "priestResist": 0.4,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3551,6 +3685,8 @@ const ENEMIES=[
       20
     ],
     "race": "竜",
+    "mageResist": 0.3,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3607,6 +3743,8 @@ const ENEMIES=[
       20
     ],
     "race": "不死",
+    "mageResist": 0.2,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3655,6 +3793,8 @@ const ENEMIES=[
       20
     ],
     "race": "人型",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -3709,6 +3849,8 @@ const ENEMIES=[
       20
     ],
     "race": "竜",
+    "mageResist": 0.3,
+    "priestResist": 0.2,
     "swings": 3,
     "rear": false,
     "flee": 0,
@@ -3757,6 +3899,8 @@ const ENEMIES=[
       20
     ],
     "race": "人型",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 2,
     "rear": true,
     "flee": 0.15,
@@ -3805,6 +3949,8 @@ const ENEMIES=[
       20
     ],
     "race": "魔獣",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -3872,6 +4018,8 @@ const ENEMIES=[
       100
     ],
     "race": "悪魔",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3930,6 +4078,8 @@ const ENEMIES=[
       30
     ],
     "race": "悪魔",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -3988,6 +4138,8 @@ const ENEMIES=[
       30
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4036,6 +4188,8 @@ const ENEMIES=[
       30
     ],
     "race": "不死",
+    "mageResist": 0.3,
+    "priestResist": 0.4,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4094,6 +4248,8 @@ const ENEMIES=[
       30
     ],
     "race": "竜",
+    "mageResist": 0.4,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4150,6 +4306,8 @@ const ENEMIES=[
       30
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 3,
     "rear": false,
     "flee": 0.1,
@@ -4198,6 +4356,8 @@ const ENEMIES=[
       30
     ],
     "race": "不死",
+    "mageResist": 0.3,
+    "priestResist": 0.4,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -4256,6 +4416,8 @@ const ENEMIES=[
       30
     ],
     "race": "魔獣",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4317,6 +4479,8 @@ const ENEMIES=[
       150
     ],
     "race": "竜",
+    "mageResist": 0.5,
+    "priestResist": 0.4,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4373,6 +4537,8 @@ const ENEMIES=[
       40
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4421,6 +4587,8 @@ const ENEMIES=[
       40
     ],
     "race": "悪魔",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4479,6 +4647,8 @@ const ENEMIES=[
       40
     ],
     "race": "不死",
+    "mageResist": 0.3,
+    "priestResist": 0.4,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -4532,6 +4702,8 @@ const ENEMIES=[
       40
     ],
     "race": "竜",
+    "mageResist": 0.4,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4588,6 +4760,8 @@ const ENEMIES=[
       40
     ],
     "race": "不定形",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4649,6 +4823,8 @@ const ENEMIES=[
       40
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -4708,6 +4884,8 @@ const ENEMIES=[
       30
     ],
     "race": "悪魔",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -4757,6 +4935,8 @@ const ENEMIES=[
       80
     ],
     "race": "人型",
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -4811,6 +4991,8 @@ const ENEMIES=[
       0
     ],
     "race": "不死",
+    "mageResist": 0.3,
+    "priestResist": 0.4,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4867,6 +5049,8 @@ const ENEMIES=[
       300
     ],
     "race": "悪魔",
+    "mageResist": 0.7,
+    "priestResist": 0.7,
     "swings": 4,
     "rear": false,
     "flee": 0,
