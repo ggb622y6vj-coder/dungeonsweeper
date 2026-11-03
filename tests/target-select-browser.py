@@ -132,8 +132,23 @@ with sync_playwright() as p:
                 box = dead.bounding_box()
                 before = snapshot(page)
                 page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
-                assert snapshot(page) == before
+                assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
+                assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
                 assert not page.locator('#statsdialog').is_visible()
+            # Pointer selection of an unavailable card must leave both cursor
+            # and resources in place; deciding cannot fall through to default.
+            dead = page.locator('[data-ally-target="0"]')
+            box = dead.bounding_box()
+            page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
+            page.keyboard.press('Space')
+            page.keyboard.press('Enter')
+            assert snapshot(page) == before
+            assert page.evaluate('!!allyTargetPick')
+            assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
+            page.keyboard.press('ArrowRight')
+            assert page.evaluate('document.activeElement.dataset.allyTarget') == '2', page.evaluate('document.activeElement.outerHTML.slice(0,80)')
+            page.keyboard.press('ArrowLeft')
+            assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
             page.evaluate('render()')
             assert page.locator('#party .targetable').count() == 2
             assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
@@ -183,6 +198,14 @@ with sync_playwright() as p:
             before_back = page.locator('[data-command-back]').bounding_box()
             assert abs(before_back['height']-48) <= 0.5, before_back
             begin(page, True)
+            before_pick = snapshot(page)
+            dead_box = page.locator('[data-ally-target="0"]').bounding_box()
+            (page.touchscreen.tap if width < 700 else page.mouse.click)(dead_box['x'] + dead_box['width']/2, dead_box['y'] + dead_box['height']/2)
+            page.keyboard.press('Space')
+            page.keyboard.press('Enter')
+            assert snapshot(page) == before_pick
+            assert page.evaluate('!!allyTargetPick')
+            assert page.evaluate('document.activeElement.dataset.allyTarget') == '1'
             assert_layout(before_layout, layout(page), battle=True)
             cancel_button = page.locator('#commandentry #allytargetcancel')
             assert cancel_button.count() == 1

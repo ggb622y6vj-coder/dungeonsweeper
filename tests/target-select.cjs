@@ -90,6 +90,22 @@ for (const battle of [false, true]) {
 }
 console.log('PASS field/battle magic and medicine: card click/keyboard selection, no dead selection, one commit, log snapshots, command progression/review');
 
+// Invalid cards must not become the logical or DOM cursor; the key handler is
+// also guarded in case focus is moved there by the browser before the click.
+for (const battle of [false, true]) {
+  for (const action of ['Spell', 'Medicine']) {
+    const g = fixture(battle);
+    g.run(`start${action}()`);
+    const before = state(g);
+    g.run("$('#party').onclick(cardEvent(0)); partyTargetEvent(cardEvent(0))");
+    assert.equal(state(g), before);
+    assert.equal(g.run('!!allyTargetPick'), true);
+    g.run('cancelAllyTargetPick()');
+    assert.equal(state(g), before);
+  }
+}
+console.log('PASS grayed-out card clicks preserve target pick and resources in field/battle spell/medicine');
+
 for (const battle of [false, true]) {
   for (const action of ['Spell', 'Medicine']) {
     const g = fixture(battle), before = state(g);

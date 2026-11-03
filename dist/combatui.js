@@ -22,6 +22,8 @@ function pickAllyTarget(target){
  endAllyTargetPick();pick.onPick(target);
 }
 function allyTargetCanWork(target){return !!allyTargetPick?.canWork?.(target)}
+// Selectable = rendered as an active (non-grayed) target card.
+function allyTargetSelectable(target){return allyTargetCanWork(target)&&!!document.querySelector('#party .targetable[data-ally-target="'+target+'"]')}
 function cancelAllyTargetPick(){
  if(!allyTargetPick||logBusy())return;
  const pick=endAllyTargetPick();pendingSpell=null;choosingRow=false;render();pick.onCancel();
@@ -57,6 +59,17 @@ function partyTargetEvent(e){
  if(!allyTargetPick)return false;
  const targets=document.querySelectorAll('#party .targetable');
  if(e.type==='keydown'&&e.key==='Tab'&&!e.shiftKey&&targets.length&&e.target===targets[targets.length-1]){e.preventDefault();($('#allytargetbattlebar:not([hidden]) :is(select,button),#allytargetbar:not([hidden]) :is(select,button)')||$('#commandentry #allytargetcancel'))?.focus();return true;}
+ if(e.type==='click'){
+  const card=e.target.closest('[data-ally-target]');
+  if(card&&!allyTargetSelectable(+card.dataset.allyTarget)){
+   // A grayed-out card is not a cursor position. Undo the browser's
+   // pointer-induced focus change so keyboard navigation keeps its place.
+   e.preventDefault();
+   const active=document.activeElement;
+   if(active===card)($('#party .targetable')||$('#allytargetcancel'))?.focus({preventScroll:true});
+   return true;
+  }
+ }
  if(e.type==='click'||e.key==='Enter'||e.key===' '){
   const card=e.target.closest('[data-ally-target]');if(card&&!allyTargetCanWork(+card.dataset.allyTarget))return true;
   e.preventDefault();if(card)pickAllyTarget(+card.dataset.allyTarget);
@@ -79,3 +92,10 @@ function renderCommandEntry(){let box=$('#commandentry'),members=commandMembers(
 function spellTargets(x){if(x.target==='ally')return allyTargetCandidates().map(i=>[i,`${NAMES[i]} ${s.hp[i]}/${maxHP(i)}`]);if(x.target==='enemy'||x.target==='group')return enemyGroups().filter(g=>g.units.some(e=>e.hp>0)).map(g=>[g.units.find(e=>e.hp>0).uid,`${g.index+1}列：${enemyDisplay(g.units[0])} ×${g.units.filter(e=>e.hp>0).length}`]);return []}
 function spellTargetButtons(x){if(x.target==='ally')return '';return spellTargets(x).map(([id,name])=>`<button data-spell-target="${id}">${name}</button>`).join('')}
 function chooseBattleSpell(i,x){if(!s.enemy||logBusy()||spellReason(i,x))return;$('#magicdialog').close();let options=spellTargets(x);if(x.target==='ally'){pendingSpell=x;choosingRow=false;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),canWork:t=>s.members[t].status!=='stone'||x.effect==='restore',prompt:x.name,onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>$('#commandentry [data-command-choice="spell"]')?.focus()});return}if(options.length>1){pendingSpell=x;choosingRow=false;render()}else{s.commands[i]='spell';s.magicPlans[i]={id:x.id,target:options.length?options[0][0]:null};confirmCommand(i)}}
+// A grayed-out ally card must never take focus from a pointer press, so the
+// keyboard cursor stays on the previously selected card.
+// The press is remembered so an immediate Space/Enter (meant for the grayed
+// card) is swallowed instead of using the item/spell on the kept cursor.
+let allyTargetVoidPress=false;
+document.addEventListener('mousedown',e=>{const c=allyTargetPick&&e.target.closest?.('[data-ally-target]');allyTargetVoidPress=!!(c&&!allyTargetSelectable(+c.dataset.allyTarget));if(allyTargetVoidPress)e.preventDefault()},true);
+document.addEventListener('keydown',e=>{if(!allyTargetVoidPress)return;if(allyTargetPick&&(e.key===' '||e.key==='Enter')){e.preventDefault();e.stopImmediatePropagation();return}allyTargetVoidPress=false},true);
