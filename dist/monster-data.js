@@ -235,13 +235,13 @@ const ENEMIES=[
     "name": "大鼠",
     "unknown": "小さな獣",
     "floor": 1,
-    "level": 3,
+    "level": 1,
     "hp": [
       1,
       6,
       2
     ],
-    "ac": 8,
+    "ac": 9,
     "hit": 2,
     "attack": [
       1,
@@ -262,7 +262,7 @@ const ENEMIES=[
     "swings": 1,
     "rear": false,
     "flee": 0,
-    "summon": 0.4,
+    "summon": 0.2,
     "steal": 0,
     "drain": 0,
     "death": 0,
@@ -311,12 +311,7 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [
-      {
-        "type": "poison",
-        "chance": 0.15
-      }
-    ],
+    "statuses": [],
     "resistance": "なし",
     "boss": false,
     "icon": "✥",
@@ -400,7 +395,7 @@ const ENEMIES=[
     ],
     "race": "人型",
     "swings": 1,
-    "rear": true,
+    "rear": false,
     "flee": 0,
     "summon": 0,
     "steal": 0,
@@ -412,18 +407,8 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.5,
-    "spellInfo": {
-      "id": "halito",
-      "name": "ハリト",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "spell": 0,
+    "spellInfo": null
   },
   {
     "id": "guardian",
@@ -3544,7 +3529,7 @@ const ENEMIES=[
       10,
       0
     ],
-    "xp": 460.0,
+    "xp": 3000.0,
     "groupSize": [
       1,
       2
