@@ -54,6 +54,55 @@ const ENEMIES=[
     "spellInfo": null
   },
   {
+    "id": "gas",
+    "name": "シンキロウ",
+    "unknown": "意思を持つ煙",
+    "floor": 2,
+    "floors": [
+      2,
+      3
+    ],
+    "level": 5,
+    "hp": [
+      3,
+      9,
+      0
+    ],
+    "ac": 7,
+    "hit": 3,
+    "attack": [
+      1,
+      5,
+      2
+    ],
+    "xp": 20.0,
+    "groupSize": [
+      2,
+      4
+    ],
+    "gold": [
+      2,
+      4,
+      0
+    ],
+    "race": "不定形",
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "◉",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
     "id": "skeleton",
     "name": "骸骨の衛兵",
     "unknown": "動く死体",
@@ -4726,6 +4775,63 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "kashadokuro",
+    "name": "火車髑髏",
+    "unknown": "巨大な骸骨",
+    "floor": 9,
+    "floors": [
+      9,
+      10
+    ],
+    "level": 23,
+    "hp": [
+      10,
+      8,
+      14
+    ],
+    "ac": -5,
+    "hit": 11,
+    "attack": [
+      5,
+      8,
+      0
+    ],
+    "xp": 3600.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      100,
+      3,
+      0
+    ],
+    "race": "不死",
+    "swings": 2,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "炎半減",
+    "boss": false,
+    "icon": "☠",
+    "summonCap": 4,
+    "breath": {
+      "element": "炎",
+      "dice": [
+        15,
+        8,
+        0
+      ],
+      "chance": 0.25
+    },
     "spell": 0,
     "spellInfo": null
   },

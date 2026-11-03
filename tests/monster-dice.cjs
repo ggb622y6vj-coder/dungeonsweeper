@@ -48,4 +48,4 @@ for (const [name, damage] of expected) {
 }
 assert.equal(ENEMIES.filter(e=>e.floor===10&&e.boss).length,1);
 assert.equal(ENEMIES.find(e=>e.id==='labyrinthlord').boss,true);
-console.log(`PASS monster dice and 90 definitions; 10F additions, boss invariant, guardians and breath unchanged`);
+console.log(`PASS monster dice and 92 definitions; 10F additions, boss invariant, guardians and breath unchanged`);

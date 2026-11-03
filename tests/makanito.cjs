@@ -120,6 +120,13 @@ for (const legacy of [false,true]) {
   assert.equal(g.run('s.enemy.units[2].hp'),99);
 }
 // Lakanito distinguishes immunity from resistance and keeps the exact Lv-based boundary.
+{
+  const g=battle(['kashadokuro']);
+  g.run("s.members[0].known.push('lakanito');Math.random=()=>0;castMagic(0,'lakanito',100);magic('makanito').value=30;castMagic(0,'makanito',null)");
+  assert.equal(g.run('s.enemy.units[0].hp'),99,'kashadokuro is immune to lakanito and makanito');
+  assert.equal(json(g,'logQueue.map(e=>e.text)').filter(t=>t.endsWith('には効かない！')).length,1);
+  assert(json(g,'logQueue.map(e=>e.text)').some(t=>t.endsWith('には効かなかった。')),'makanito is resisted as undead');
+}
 for (const [roll, expected, logText] of [[39.9,0,'は息絶えた。'],[40,99,'は耐えた。']]) {
   const g=battle(['troll']);
   g.run(`s.members[0].known.push('lakanito');Math.random=()=>${roll/100};castMagic(0,'lakanito',100)`);

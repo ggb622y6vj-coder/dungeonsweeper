@@ -52,7 +52,7 @@ with sync_playwright() as p:
         assert page.evaluate('!s.library.monsters.wolf.identified&&s.library.monsters.wolf.seen')
         page.locator('#libraryopen').click()
         # identified slime (0 kills) counts; seen wolf and killed-but-unidentified rat do not.
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 1/90 ')
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 1/92 ')
         slime = entry(page, 'slime')
         slime.scroll_into_view_if_needed()
         assert slime.locator('h4').inner_text() == '洞窟スライム'
