@@ -32,7 +32,7 @@ ids={
   "骸骨の射手": "archer",
   "フェンリル狼": "blackwolf",
   "オーク呪術師": "shaman",
-  "髑髏武者蜘蛛": "venomspider",
+  "髑髏武者グモ": "venomspider",
   "影の盗人": "thief",
   "炎竜": "dragon",
   "赤兎": "rabbit",

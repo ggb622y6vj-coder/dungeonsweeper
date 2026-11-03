@@ -1334,7 +1334,7 @@ const ENEMIES=[
   },
   {
     "id": "venomspider",
-    "name": "髑髏武者蜘蛛",
+    "name": "髑髏武者グモ",
     "unknown": "おぞましい虫",
     "floor": 3,
     "floors": [
