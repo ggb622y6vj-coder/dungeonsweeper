@@ -5,6 +5,9 @@ const ENEMIES=[
     "name": "洞窟スライム",
     "unknown": "不定形",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 2,
     "hp": [
       1,
@@ -55,6 +58,9 @@ const ENEMIES=[
     "name": "骸骨の衛兵",
     "unknown": "動く死体",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 2,
     "hp": [
       2,
@@ -100,6 +106,9 @@ const ENEMIES=[
     "name": "灰狼",
     "unknown": "素早い牙",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 2,
     "hp": [
       2,
@@ -145,6 +154,9 @@ const ENEMIES=[
     "name": "迷宮ゴブリン",
     "unknown": "小鬼",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 2,
     "hp": [
       2,
@@ -190,6 +202,9 @@ const ENEMIES=[
     "name": "洞窟蝙蝠",
     "unknown": "羽ばたく影",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 3,
     "hp": [
       1,
@@ -235,6 +250,9 @@ const ENEMIES=[
     "name": "大鼠",
     "unknown": "小さな獣",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 1,
     "hp": [
       1,
@@ -280,6 +298,9 @@ const ENEMIES=[
     "name": "髑髏蜘蛛",
     "unknown": "うごめく虫",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 3,
     "hp": [
       1,
@@ -325,6 +346,9 @@ const ENEMIES=[
     "name": "盗賊の斥候",
     "unknown": "怪しい人影",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 3,
     "hp": [
       1,
@@ -370,6 +394,9 @@ const ENEMIES=[
     "name": "迷宮の詐欺師",
     "unknown": "杖を持つ人影",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 4,
     "hp": [
       1,
@@ -415,6 +442,9 @@ const ENEMIES=[
     "name": "迷宮の守護者",
     "unknown": "武装した人影",
     "floor": 1,
+    "floors": [
+      1
+    ],
     "level": 4,
     "hp": [
       4,
@@ -460,6 +490,9 @@ const ENEMIES=[
     "name": "毒スライム",
     "unknown": "不定形",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 4,
     "hp": [
       2,
@@ -510,6 +543,9 @@ const ENEMIES=[
     "name": "亡霊騎士",
     "unknown": "動く死体",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 4,
     "hp": [
       2,
@@ -555,6 +591,9 @@ const ENEMIES=[
     "name": "火蜻蛉",
     "unknown": "巨大な虫",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 4,
     "hp": [
       2,
@@ -608,6 +647,9 @@ const ENEMIES=[
     "name": "オーク戦士",
     "unknown": "鬼",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 4,
     "hp": [
       2,
@@ -653,6 +695,9 @@ const ENEMIES=[
     "name": "武者蜘蛛",
     "unknown": "巨大な虫",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 5,
     "hp": [
       2,
@@ -698,6 +743,9 @@ const ENEMIES=[
     "name": "洞窟の魔術師",
     "unknown": "杖を持つ人影",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 5,
     "hp": [
       2,
@@ -753,6 +801,9 @@ const ENEMIES=[
     "name": "山賊の頭目",
     "unknown": "怪しい人影",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 5,
     "hp": [
       2,
@@ -803,6 +854,9 @@ const ENEMIES=[
     "name": "腐肉食い",
     "unknown": "動く死体",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 5,
     "hp": [
       2,
@@ -853,6 +907,9 @@ const ENEMIES=[
     "name": "石の番人",
     "unknown": "震える石像",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 6,
     "hp": [
       2,
@@ -908,6 +965,9 @@ const ENEMIES=[
     "name": "深層の魔将",
     "unknown": "武装した人影",
     "floor": 2,
+    "floors": [
+      2
+    ],
     "level": 6,
     "hp": [
       3,
@@ -966,6 +1026,9 @@ const ENEMIES=[
     "name": "硫化スライム",
     "unknown": "不定形",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 6,
     "hp": [
       3,
@@ -1020,6 +1083,9 @@ const ENEMIES=[
     "name": "骸骨の射手",
     "unknown": "動く死体",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 6,
     "hp": [
       3,
@@ -1065,6 +1131,9 @@ const ENEMIES=[
     "name": "黒牙狼",
     "unknown": "素早い牙",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 6,
     "hp": [
       3,
@@ -1110,6 +1179,9 @@ const ENEMIES=[
     "name": "オーク呪術師",
     "unknown": "鬼",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 6,
     "hp": [
       3,
@@ -1165,6 +1237,9 @@ const ENEMIES=[
     "name": "髑髏武者蜘蛛",
     "unknown": "おぞましい虫",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1210,6 +1285,9 @@ const ENEMIES=[
     "name": "影の盗人",
     "unknown": "怪しい人影",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1255,6 +1333,9 @@ const ENEMIES=[
     "name": "炎竜",
     "unknown": "竜",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1313,6 +1394,9 @@ const ENEMIES=[
     "name": "赤兎",
     "unknown": "獣",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1358,6 +1442,9 @@ const ENEMIES=[
     "name": "鉄の番人",
     "unknown": "不気味な立像",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 8,
     "hp": [
       3,
@@ -1418,6 +1505,9 @@ const ENEMIES=[
     "name": "テラー",
     "unknown": "幽霊",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 8,
     "hp": [
       3,
@@ -1463,6 +1553,9 @@ const ENEMIES=[
     "name": "奈落の監視者",
     "unknown": "武装した人影",
     "floor": 3,
+    "floors": [
+      3
+    ],
     "level": 8,
     "hp": [
       4,
@@ -1531,6 +1624,9 @@ const ENEMIES=[
     "name": "オーガ",
     "unknown": "大きな鬼",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 8,
     "hp": [
       4,
@@ -1576,6 +1672,9 @@ const ENEMIES=[
     "name": "ゾンビ",
     "unknown": "動く死体",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 7,
     "hp": [
       4,
@@ -1626,6 +1725,9 @@ const ENEMIES=[
     "name": "ハーピー",
     "unknown": "翼ある影",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1671,6 +1773,9 @@ const ENEMIES=[
     "name": "大毒蛇",
     "unknown": "大きな蛇",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 8,
     "hp": [
       4,
@@ -1721,6 +1826,9 @@ const ENEMIES=[
     "name": "鎧蟻",
     "unknown": "巨大な虫",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 7,
     "hp": [
       3,
@@ -1766,6 +1874,9 @@ const ENEMIES=[
     "name": "闇の司祭",
     "unknown": "ローブの人影",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 8,
     "hp": [
       3,
@@ -1817,6 +1928,9 @@ const ENEMIES=[
     "name": "迷宮の妖術師",
     "unknown": "杖を持つ人影",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 9,
     "hp": [
       3,
@@ -1872,6 +1986,9 @@ const ENEMIES=[
     "name": "ガーゴイル",
     "unknown": "翼ある石像",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 9,
     "hp": [
       4,
@@ -1922,6 +2039,9 @@ const ENEMIES=[
     "name": "牛頭の門番",
     "unknown": "巨大な人影",
     "floor": 4,
+    "floors": [
+      4
+    ],
     "level": 11,
     "hp": [
       10,
@@ -1967,6 +2087,9 @@ const ENEMIES=[
     "name": "墓所の亡者",
     "unknown": "動く死体",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 9,
     "hp": [
       4,
@@ -2012,6 +2135,9 @@ const ENEMIES=[
     "name": "トロル",
     "unknown": "醜い大男",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 10,
     "hp": [
       6,
@@ -2057,6 +2183,9 @@ const ENEMIES=[
     "name": "人狼",
     "unknown": "素早い牙",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 9,
     "hp": [
       4,
@@ -2102,6 +2231,9 @@ const ENEMIES=[
     "name": "大蠍",
     "unknown": "巨大な甲虫",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 9,
     "hp": [
       4,
@@ -2156,6 +2288,9 @@ const ENEMIES=[
     "name": "忍びの者",
     "unknown": "怪しい人影",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 10,
     "hp": [
       3,
@@ -2201,6 +2336,9 @@ const ENEMIES=[
     "name": "高位の魔術師",
     "unknown": "杖を持つ人影",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 10,
     "hp": [
       3,
@@ -2256,6 +2394,9 @@ const ENEMIES=[
     "name": "火蜥蜴",
     "unknown": "赤い鱗",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 10,
     "hp": [
       5,
@@ -2309,6 +2450,9 @@ const ENEMIES=[
     "name": "ブロブ",
     "unknown": "泡立つ膜",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 9,
     "hp": [
       8,
@@ -2359,6 +2503,9 @@ const ENEMIES=[
     "name": "屍術師",
     "unknown": "ローブの人影",
     "floor": 5,
+    "floors": [
+      5
+    ],
     "level": 13,
     "hp": [
       8,
@@ -2414,6 +2561,9 @@ const ENEMIES=[
     "name": "亡霊",
     "unknown": "幽霊",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 11,
     "hp": [
       5,
@@ -2464,6 +2614,9 @@ const ENEMIES=[
     "name": "石巨人",
     "unknown": "巨大な石像",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 12,
     "hp": [
       8,
@@ -2514,6 +2667,9 @@ const ENEMIES=[
     "name": "キメラ",
     "unknown": "異形の獣",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 12,
     "hp": [
       6,
@@ -2567,6 +2723,9 @@ const ENEMIES=[
     "name": "闇の騎士",
     "unknown": "武装した人影",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 12,
     "hp": [
       6,
@@ -2612,6 +2771,9 @@ const ENEMIES=[
     "name": "毒茸の群れ",
     "unknown": "動く茸",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 10,
     "hp": [
       5,
@@ -2666,6 +2828,9 @@ const ENEMIES=[
     "name": "ダークエルフ",
     "unknown": "邪悪な妖精",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 11,
     "hp": [
       4,
@@ -2721,6 +2886,9 @@ const ENEMIES=[
     "name": "吸血蝙蝠",
     "unknown": "羽ばたく影",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 10,
     "hp": [
       3,
@@ -2771,6 +2939,9 @@ const ENEMIES=[
     "name": "吸血鬼",
     "unknown": "黒い死体",
     "floor": 6,
+    "floors": [
+      6
+    ],
     "level": 15,
     "hp": [
       10,
@@ -2826,6 +2997,9 @@ const ENEMIES=[
     "name": "毒竜",
     "unknown": "竜",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 13,
     "hp": [
       8,
@@ -2879,6 +3053,9 @@ const ENEMIES=[
     "name": "牛頭の戦士",
     "unknown": "巨大な人影",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 13,
     "hp": [
       8,
@@ -2924,6 +3101,9 @@ const ENEMIES=[
     "name": "肉の巨像",
     "unknown": "蠢く石像",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 14,
     "hp": [
       10,
@@ -2969,6 +3149,9 @@ const ENEMIES=[
     "name": "忍びの頭目",
     "unknown": "怪しい人影",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 13,
     "hp": [
       6,
@@ -3014,6 +3197,9 @@ const ENEMIES=[
     "name": "死霊魔導士",
     "unknown": "ローブの死体",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 13,
     "hp": [
       6,
@@ -3069,6 +3255,9 @@ const ENEMIES=[
     "name": "地獄の犬",
     "unknown": "燃える獣",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 12,
     "hp": [
       6,
@@ -3127,6 +3316,9 @@ const ENEMIES=[
     "name": "這い寄る大蟲",
     "unknown": "巨大な虫",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 12,
     "hp": [
       7,
@@ -3177,6 +3369,9 @@ const ENEMIES=[
     "name": "双頭の巨人",
     "unknown": "異形の大男",
     "floor": 7,
+    "floors": [
+      7
+    ],
     "level": 17,
     "hp": [
       14,
@@ -3222,6 +3417,9 @@ const ENEMIES=[
     "name": "レッサーデーモン",
     "unknown": "悪魔",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 15,
     "hp": [
       9,
@@ -3277,6 +3475,9 @@ const ENEMIES=[
     "name": "雷竜",
     "unknown": "竜",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 15,
     "hp": [
       10,
@@ -3330,6 +3531,9 @@ const ENEMIES=[
     "name": "死の騎士",
     "unknown": "武装した死体",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 15,
     "hp": [
       10,
@@ -3375,6 +3579,9 @@ const ENEMIES=[
     "name": "魔女",
     "unknown": "ローブの人影",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 14,
     "hp": [
       6,
@@ -3426,6 +3633,9 @@ const ENEMIES=[
     "name": "多頭竜",
     "unknown": "竜",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 15,
     "hp": [
       12,
@@ -3471,6 +3681,9 @@ const ENEMIES=[
     "name": "影の暗殺者",
     "unknown": "怪しい人影",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 14,
     "hp": [
       7,
@@ -3516,6 +3729,9 @@ const ENEMIES=[
     "name": "邪眼",
     "unknown": "跳ねる眼球",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 14,
     "hp": [
       6,
@@ -3580,6 +3796,9 @@ const ENEMIES=[
     "name": "魔将軍",
     "unknown": "異形の巨人",
     "floor": 8,
+    "floors": [
+      8
+    ],
     "level": 19,
     "hp": [
       14,
@@ -3635,6 +3854,9 @@ const ENEMIES=[
     "name": "グレーターデーモン",
     "unknown": "悪魔",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 17,
     "hp": [
       11,
@@ -3690,6 +3912,9 @@ const ENEMIES=[
     "name": "霜の巨人",
     "unknown": "巨大な人影",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 17,
     "hp": [
       14,
@@ -3735,6 +3960,9 @@ const ENEMIES=[
     "name": "夜の貴族",
     "unknown": "青白い貴人",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 18,
     "hp": [
       12,
@@ -3790,6 +4018,9 @@ const ENEMIES=[
     "name": "赤竜",
     "unknown": "竜",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 18,
     "hp": [
       14,
@@ -3843,6 +4074,9 @@ const ENEMIES=[
     "name": "上忍",
     "unknown": "怪しい人影",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 17,
     "hp": [
       9,
@@ -3888,6 +4122,9 @@ const ENEMIES=[
     "name": "リッチ",
     "unknown": "ローブの死体",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 18,
     "hp": [
       10,
@@ -3943,6 +4180,9 @@ const ENEMIES=[
     "name": "魔界の猟犬",
     "unknown": "燃える獣",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 16,
     "hp": [
       9,
@@ -4001,6 +4241,9 @@ const ENEMIES=[
     "name": "古竜",
     "unknown": "竜",
     "floor": 9,
+    "floors": [
+      9
+    ],
     "level": 21,
     "hp": [
       16,
@@ -4054,6 +4297,9 @@ const ENEMIES=[
     "name": "魔王の近衛",
     "unknown": "武装した人影",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 19,
     "hp": [
       14,
@@ -4099,6 +4345,9 @@ const ENEMIES=[
     "name": "堕天使",
     "unknown": "醜いカラス",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 20,
     "hp": [
       13,
@@ -4154,6 +4403,9 @@ const ENEMIES=[
     "name": "死神",
     "unknown": "黒衣の影",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 20,
     "hp": [
       12,
@@ -4204,6 +4456,9 @@ const ENEMIES=[
     "name": "混沌の竜",
     "unknown": "竜",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 20,
     "hp": [
       16,
@@ -4257,6 +4512,9 @@ const ENEMIES=[
     "name": "混沌の落とし子",
     "unknown": "不定形",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 18,
     "hp": [
       18,
@@ -4315,6 +4573,9 @@ const ENEMIES=[
     "name": "大魔導師",
     "unknown": "杖を持つ人影",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 20,
     "hp": [
       10,
@@ -4369,7 +4630,11 @@ const ENEMIES=[
     "id": "succubus",
     "name": "サッキュバス",
     "unknown": "悪魔",
-    "floor": 10,
+    "floor": 9,
+    "floors": [
+      9,
+      10
+    ],
     "level": 12,
     "hp": [
       10,
@@ -4414,7 +4679,11 @@ const ENEMIES=[
     "id": "daidaraboti",
     "name": "ダイダラボチ",
     "unknown": "巨大な影",
-    "floor": 10,
+    "floor": 9,
+    "floors": [
+      9,
+      10
+    ],
     "level": 10,
     "hp": [
       15,
@@ -4465,6 +4734,9 @@ const ENEMIES=[
     "name": "迷宮の主",
     "unknown": "玉座の影",
     "floor": 10,
+    "floors": [
+      10
+    ],
     "level": 25,
     "hp": [
       44,

@@ -56,13 +56,17 @@ for r in rows:
  resistances=r['耐性'].split('・')
  assert (resistances==['なし'] or all(value in {'毒無効','炎半減','氷半減'} for value in resistances)), 'Unsupported resistance'
  group=[int(n) for n in re.findall(r'\d+',r['群れの数'])];group=group if len(group)==2 else group*2
- d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=int(re.match(r'\d+',r['出現階層'])[0]),level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
+ floor_values=re.findall(r'(\d+)F?',r['出現階層'])
+ assert floor_values and '・'.join(f'{n}F' for n in floor_values)==r['出現階層'], f"Invalid floor list: {r['出現階層']}"
+ floors=sorted({int(n) for n in floor_values})
+ d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=floors[0],floors=floors,level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
+ assert not d['boss'] or len(floors)==1, f"Guardian must have exactly one floor: {id}"
  m=re.search(r'列上限(\d+)体',r['仲間呼び']);d['summonCap']=int(m[1]) if m else 4
  d['breath']=None if r['ブレス']=='なし' else {'element':r['ブレス'].split('/')[0],'dice':dice(r['ブレス'].split('/')[2]),'chance':pct(r['ブレス'])}
  d['spell']=pct(r['呪文']);d['spellInfo']=None if not sp else {'id':MONSTER_SPELLS[sp[1]][0],'name':sp[1],'target':'all' if sp[2]=='全体' else 'one','dice':MONSTER_SPELLS[sp[1]][2],'effect':MONSTER_SPELLS[sp[1]][3]};assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
-for f in sorted({d['floor'] for d in data}):
- assert sum(1 for d in data if d['floor']==f and d['boss'])==1, f'floor {f} needs exactly one boss'
- assert any(d['floor']==f and not d['boss'] for d in data), f'floor {f} needs normal monsters'
+for f in sorted({floor for d in data for floor in d['floors']}):
+ assert sum(1 for d in data if f in d['floors'] and d['boss'])==1, f'floor {f} needs exactly one boss'
+ assert any(f in d['floors'] and not d['boss'] for d in data), f'floor {f} needs normal monsters'
 
 output='// Generated from data/monsters.csv by scripts/compile-monsters.py.\nconst ENEMIES='+json.dumps(data,ensure_ascii=False,indent=2)+';\n'
 path=root/'dist/monster-data.js'

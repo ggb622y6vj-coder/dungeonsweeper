@@ -16,7 +16,7 @@ output.mkdir(parents=True, exist_ok=True)
 ORDER = ['種族', '出現階', 'HP', '物理ダメージ', '攻撃回数', '特殊能力', '使用呪文', '経験値', '撃破数']
 # Spot checks straight from data/monsters.csv (HP, 物理ダメージ, 経験値, 出現階, 種族).
 CSV = {'rat': ('獣', '1F', '1d6+2', '1d5', '15'), 'evileye': ('魔獣', '8F', '6d8', '1d10', '3000'),
-       'daidaraboti': ('人型', '10F', '15d10', '5d9', '4500')}
+       'daidaraboti': ('人型', '9F・10F', '15d10', '5d9', '4500')}
 STYLE = 'e=>{const c=getComputedStyle(e);return [c.color,c.backgroundColor,c.borderTopColor].join()}'
 
 with sync_playwright() as p:
