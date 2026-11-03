@@ -19,7 +19,6 @@ function fixture(battle = false) {
     render();
     // Minimal DOM wiring for the existing VM harness; actual DOM, focus and
     // keyboard propagation are covered by target-select-browser.py.
-    for(const id of ['magicchoice','medicinechoice'])$('#'+id).parentNode={append(){}};
     for(const selector of ['#magicpick','#medicinepick','#commandentry [data-command-choice="spell"]','#commandentry [data-command-choice="item"]'])$(selector).focus=()=>{};
     function cardEvent(i,key){return {type:key?'keydown':'click',key,preventDefault(){},target:{closest:()=>({dataset:{allyTarget:String(i)}})}}}
     function commandEvent(selector,dataset={}){return {target:{closest:q=>q===selector?{dataset}:null}}}
@@ -64,9 +63,7 @@ for (const battle of [false, true]) {
       assert.equal(g.run("!!$('#statsdialog').open"), false);
       assert.equal(g.run('!!allyTargetPick'), true, 'rerender retains selection');
       if (!fallback) g.run("$('#party').onkeydown(cardEvent(2,'Enter'))");
-      else if (action === 'Medicine') g.run("$('#medicinetarget').value='2';$('#medicineuse').onclick()");
-      else if (battle) g.run("$('#commandentry').onclick(commandEvent('[data-spell-target]',{spellTarget:'2'}))");
-      else g.run("$('#magictarget').value='2';$('#magiccast').onclick()");
+      else g.run("$('#party').onkeydown(cardEvent(2,' '))");
       assert.equal(g.run('allyTargetPick'), null);
       assert.equal(g.run("$('#allytargetbar').hidden"), true);
       assert.equal(g.run('pendingSpell'), null);
@@ -91,7 +88,7 @@ for (const battle of [false, true]) {
     }
   }
 }
-console.log('PASS field/battle magic and medicine: card/Enter and fallback parity, no dead selection, one commit, log snapshots, command progression/review');
+console.log('PASS field/battle magic and medicine: card click/keyboard selection, no dead selection, one commit, log snapshots, command progression/review');
 
 for (const battle of [false, true]) {
   for (const action of ['Spell', 'Medicine']) {

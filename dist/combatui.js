@@ -1,12 +1,9 @@
-// UI-only state: never persisted in ash-v1. Both cards and fallback controls
-// finish this same selection before invoking the action (including log playback).
+// UI-only state: never persisted in ash-v1. Party cards commit ally targets.
 let allyTargetPick=null;
-function beginAllyTargetPick({candidates,onPick,onCancel,prompt,fallback=null,keyboardCandidates=candidates}){
+function beginAllyTargetPick({candidates,onPick,onCancel,prompt,keyboardCandidates=candidates}){
  if(logBusy()||allyTargetPick)return false;
- const parent=fallback?.parentNode;
- allyTargetPick={candidates,keyboardCandidates,onPick,onCancel,prompt,fallback,parent};
+ allyTargetPick={candidates,keyboardCandidates,onPick,onCancel,prompt};
  for(const id of ['magicdialog','medicinedialog','inventorydialog','statsdialog'])if($('#'+id).open)$('#'+id).close();
- if(fallback)(s.enemy?$('#allytargetbattlefallback'):$('#allytargetfallback')).append(fallback);
  render();
  $('#party').scrollIntoView?.({block:'nearest'});
  ($('#party .targetable')||$('#allytargetcancel')).focus?.();
@@ -15,8 +12,6 @@ function beginAllyTargetPick({candidates,onPick,onCancel,prompt,fallback=null,ke
 function endAllyTargetPick(){
  const pick=allyTargetPick;if(!pick)return null;
  allyTargetPick=null;
- if(pick.fallback)pick.parent.append(pick.fallback);
- const battleFallback=$('#allytargetbattlefallback');if(battleFallback)battleFallback.replaceChildren();
  $('#allytargetbar').hidden=true;
  $('#allytargetbattlebar').hidden=true;
  return pick;
@@ -46,7 +41,6 @@ function renderAllyTargetPick(focusedTarget){
  const battleCancel=$('#commandentry #allytargetcancel');
  if(battleCancel)battleCancel.disabled=logBusy();
  if($('#allytargetbattleprompt'))$('#allytargetbattleprompt').textContent=$('#allytargetprompt').textContent;
- document.querySelectorAll('#allytargetfallback button,#allytargetfallback select,#allytargetbattlefallback button,#allytargetbattlefallback select').forEach(el=>el.disabled=logBusy());
  document.querySelectorAll('#party .card').forEach((card,i)=>{
   const available=candidates.includes(i);
   if(available&&i===candidates[0])card.setAttribute('data-key-default','');
@@ -56,8 +50,6 @@ function renderAllyTargetPick(focusedTarget){
   card.setAttribute('aria-disabled',String(!available));
   card.setAttribute('aria-label',`${NAMES[i]}を対象に選ぶ HP ${(displayVitals?.hp||s.hp)[i]}/${shownMember(i).maxHP}`);
  });
- const battleFallback=$('#allytargetbattlefallback');
- if(s.enemy&&pendingSpell&&battleFallback&&!battleFallback.firstChild){const options=candidates.map(i=>`<option value="${i}">${NAMES[i]}</option>`).join('');battleFallback.innerHTML=`<label>対象 <select id="allytargetspellselect">${options}</select></label><button id="allytargetspelluse">この呪文で行動する</button>`;$('#allytargetspelluse').onclick=()=>pickAllyTarget(+$('#allytargetspellselect').value);}
  if(focusedTarget!==undefined)($('#party .targetable[data-ally-target="'+focusedTarget+'"]')||$('#party .targetable'))?.focus();
 }
 function partyTargetEvent(e){
@@ -79,9 +71,9 @@ function renderCommandEntry(){let box=$('#commandentry'),members=commandMembers(
  const first=box.querySelector?.('.commandchoices button');if(first)first.setAttribute('data-key-default','');
  let popup=$('#commandreviewpopup');popup.hidden=!ready||busy||!s.enemy;popup.innerHTML=popup.hidden?'':`<b>行動確認</b><table class="commandreview" aria-label="選択した行動"><tbody>${members.map(j=>`<tr><th scope="row">${NAMES[j]}</th><td>${commandSummary(j)}</td></tr>`).join('')}</tbody></table>`;
  if(ready&&!busy){$('#attack').onclick=attack;$('#attack').hidden=false;$('#attack').disabled=false;}else if($('#attack'))$('#attack').hidden=true;$('#flee').hidden=busy||ready||!!allyTargetPick;
- box.onclick=e=>{if(logBusy()||!s.enemy)return;if(e.target.closest('#allytargetcancel')){cancelAllyTargetPick();return}if(e.target.closest('[data-command-back]')){if(pendingSpell)pendingSpell=null;else if(choosingRow)choosingRow=false;else commandIndex=Math.max(0,commandIndex-1);render();return}let st=e.target.closest('[data-spell-target]');if(st&&pendingSpell){if(allyTargetPick){pickAllyTarget(+st.dataset.spellTarget);return}if(!validMagicTarget(pendingSpell,+st.dataset.spellTarget))return;s.commands[i]='spell';s.magicPlans[i]={id:pendingSpell.id,target:+st.dataset.spellTarget};confirmCommand(i);return}if(allyTargetPick)return;let row=e.target.closest('[data-row-choice]');if(row){if(!canWeaponAttack(i)||!reachableEnemyGroups(i).some(g=>String(g.key)===row.dataset.rowChoice))return;s.commands[i]='fight';s.attackRows[i]=row.dataset.rowChoice;confirmCommand(i);return}let b=e.target.closest('[data-command-choice]');if(!b||b.disabled)return;let c=b.dataset.commandChoice;if(c==='fight'){if(!canWeaponAttack(i))return;let groups=reachableEnemyGroups(i);if(groups.length===1){s.commands[i]='fight';s.attackRows[i]=groups[0].key;confirmCommand(i)}else{choosingRow=true;render()}}else if(c==='dispel'){s.commands[i]='dispel';confirmCommand(i)}else if(c==='guard'){s.commands[i]='guard';confirmCommand(i)}else if(c==='spell')openMagic(i);else openMedicine(i)};
+ box.onclick=e=>{if(logBusy()||!s.enemy)return;if(e.target.closest('#allytargetcancel')){cancelAllyTargetPick();return}if(e.target.closest('[data-command-back]')){if(pendingSpell)pendingSpell=null;else if(choosingRow)choosingRow=false;else commandIndex=Math.max(0,commandIndex-1);render();return}let st=e.target.closest('[data-spell-target]');if(st&&pendingSpell){if(!validMagicTarget(pendingSpell,+st.dataset.spellTarget))return;s.commands[i]='spell';s.magicPlans[i]={id:pendingSpell.id,target:+st.dataset.spellTarget};confirmCommand(i);return}if(allyTargetPick)return;let row=e.target.closest('[data-row-choice]');if(row){if(!canWeaponAttack(i)||!reachableEnemyGroups(i).some(g=>String(g.key)===row.dataset.rowChoice))return;s.commands[i]='fight';s.attackRows[i]=row.dataset.rowChoice;confirmCommand(i);return}let b=e.target.closest('[data-command-choice]');if(!b||b.disabled)return;let c=b.dataset.commandChoice;if(c==='fight'){if(!canWeaponAttack(i))return;let groups=reachableEnemyGroups(i);if(groups.length===1){s.commands[i]='fight';s.attackRows[i]=groups[0].key;confirmCommand(i)}else{choosingRow=true;render()}}else if(c==='dispel'){s.commands[i]='dispel';confirmCommand(i)}else if(c==='guard'){s.commands[i]='guard';confirmCommand(i)}else if(c==='spell')openMagic(i);else openMedicine(i)};
 }
 
 function spellTargets(x){if(x.target==='ally')return allyTargetCandidates().map(i=>[i,`${NAMES[i]} ${s.hp[i]}/${maxHP(i)}`]);if(x.target==='enemy'||x.target==='group')return enemyGroups().filter(g=>g.units.some(e=>e.hp>0)).map(g=>[g.units.find(e=>e.hp>0).uid,`${g.index+1}列：${enemyDisplay(g.units[0])} ×${g.units.filter(e=>e.hp>0).length}`]);return []}
-function spellTargetButtons(x){return spellTargets(x).map(([id,name])=>`<button data-spell-target="${id}">${name}</button>`).join('')}
+function spellTargetButtons(x){if(x.target==='ally')return '';return spellTargets(x).map(([id,name])=>`<button data-spell-target="${id}">${name}</button>`).join('')}
 function chooseBattleSpell(i,x){if(!s.enemy||logBusy()||spellReason(i,x))return;$('#magicdialog').close();let options=spellTargets(x);if(x.target==='ally'){pendingSpell=x;choosingRow=false;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),prompt:x.name,onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>$('#commandentry [data-command-choice="spell"]')?.focus()});return}if(options.length>1){pendingSpell=x;choosingRow=false;render()}else{s.commands[i]='spell';s.magicPlans[i]={id:x.id,target:options.length?options[0][0]:null};confirmCommand(i)}}
