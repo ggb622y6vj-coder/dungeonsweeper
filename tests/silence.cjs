@@ -129,7 +129,7 @@ for(const end of ['win','enemy-flee','escape','defeat','town']) {
 // The player's spell rolls per individual, uses stable row keys, and excludes bosses.
 {
  const g=party([2]);
- g.run(`var hits=0;log=()=>{};
+ g.run(`var hits=0;log=()=>{};ENEMIES.forEach(d=>{d.priestResist=0});
    for(let n=0;n<10000;n++){s.mp[0]=1000;s.enemy.units[0].silence=false;castMagic(0,'montino',91);if(s.enemy.units[0].silence)hits++}`);
  const rate=g.run('hits/10000');assert(Math.abs(rate-.49)<=.02,`player rate ${rate}`);
  console.log(`PASS player Montino 10000 casts: ${(rate*100).toFixed(2)}% (49% ±2%)`);
