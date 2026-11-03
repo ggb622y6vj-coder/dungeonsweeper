@@ -61,7 +61,7 @@ g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Mat
 assert.equal(g.run('Object.keys(s.library.items).length'),1,'full inventory does not record unreceived loot');
 g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
 // Force the loot selection, while retaining the actual acquisition paths.
-g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;dropWeapon();weightedLoot=()=>weapon('plate');rewardChest({gold:0});weightedLoot=actualLoot");g.drain();
+g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();weightedLoot=()=>weapon('plate');rewardChest({gold:0});weightedLoot=actualLoot");g.drain();
 for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),true,id);
 g.run("var acquired=JSON.stringify(s.library);enterTown();sell(0,1)");
 assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'),'selling keeps the record');
