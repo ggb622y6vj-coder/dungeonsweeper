@@ -23,6 +23,7 @@ python3 -m http.server 8000 --directory dist
 
 ```sh
 node tests/game.cjs
+node tests/floodfill.cjs
 python3 scripts/compile-monsters.py --check
 node tests/training.cjs
 node tests/auto-reorder.cjs
