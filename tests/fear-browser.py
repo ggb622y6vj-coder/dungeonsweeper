@@ -57,7 +57,8 @@ with sync_playwright() as p:
             entry = page.locator('#librarybody .library-entry').filter(
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
-            assert entry.is_visible() and f'恐怖 {chance}%' in entry.inner_text()
+            assert entry.is_visible() and entry.locator('.ailment-fear').inner_text() == '恐怖'
+            assert entry.locator('.ailment-fear + .library-chance').inner_text() == f'{chance}%'
             no_overflow(page)
         page.screenshot(path=str(output / f'fear-library-{width}.png'))
         page.locator('#libraryclose').click()

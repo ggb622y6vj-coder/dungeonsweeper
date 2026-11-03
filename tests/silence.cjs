@@ -24,7 +24,7 @@ const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
  }
  assert.equal(g.run("ENEMIES.every(d=>!d.spellInfo||['damage','silence'].includes(d.spellInfo.effect))"),true);
  assert.equal(g.run("ENEMIES.filter(d=>d.spellInfo?.effect==='silence').length"),2);
- assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1,firstFloor:4}).find(([k])=>k==='使う呪文')[1]"),'モンティノ（沈黙・全体 30%）');
+ assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1,firstFloor:4}).find(([k])=>k==='使用呪文')[1]"),'モンティノ（沈黙・全体 30%）');
  g.run("afflict(0,'silence')");
  assert.equal(g.run('s.ailments[0].silence'),3);
  assert.equal(g.run("spellReason(0,magic('dios'))"),'沈黙している');

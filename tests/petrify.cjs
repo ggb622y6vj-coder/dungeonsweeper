@@ -24,7 +24,7 @@ function stone(g,name='B'){g.run(`afflict(index('${name}'),'stone');autoReorderP
  for(const [name,chance] of [['ガーゴイル',.05],['石巨人',.08],['邪眼',.1],['混沌の落とし子',.05]]){
   const d=json(g,`ENEMIES.find(d=>d.name==='${name}')`);
   assert.equal(d.statuses.find(a=>a.type==='stone')?.chance,chance,name);
-  assert.match(g.run(`libraryMonsterDetails(enemyDefinition('${d.id}'),{count:1,firstFloor:${d.floor}}).find(r=>r[0]==='特殊能力')[1]`),/石化/);
+  assert.equal(g.run(`libraryMonsterDetails(enemyDefinition('${d.id}'),{count:1,firstFloor:${d.floor}}).find(r=>r[0]==='特殊能力')[1].children.some(e=>e.textContent.includes('石化'))`),true);
  }
  assert.equal(g.run("ENEMIES.find(d=>d.name==='邪眼').statuses.find(a=>a.type==='paralysis').chance"),.3);
  assert.equal(g.run("ENEMIES.filter(d=>d.statuses.some(a=>a.type==='stone')).length"),4);
