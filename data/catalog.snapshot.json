@@ -1164,7 +1164,7 @@
       "resistance": "なし",
       "boss": false,
       "icon": "♞",
-      "summonCap": 6,
+      "summonCap": 5,
       "breath": null,
       "spell": 0
     },

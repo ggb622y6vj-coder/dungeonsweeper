@@ -71,7 +71,7 @@ with sync_playwright() as p:
   assert '1体' in page.locator('#librarybody .library-entry').first.inner_text()
   page.evaluate("s.library.monsters.slime.identified=true;renderLibrary()")
   assert page.locator('#libraryprogress').inner_text()=='モンスター 1/92 · アイテム 2/52'
-  assert page.locator('#librarybody h4').first.inner_text()=='洞窟スライム'
+  assert page.locator('#librarybody h4').first.inner_text()=='スライム'
   assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
   assert '初撃破階' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert page.locator('#librarybody dl').count()==1

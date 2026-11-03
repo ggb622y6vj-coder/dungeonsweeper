@@ -103,10 +103,10 @@ assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([.
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
 assert.equal(g.run("$('#librarybody').children[0].textContent"),'1F');
-assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('洞窟スライム')).children[2].children.length"),18);
-assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('洞窟スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
+assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),18);
+assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
 const oldRecordSave=reload(g);
-oldRecordSave.run("renderLibrary();var oldEntry=$('#librarybody').children.find(e=>e.className==='library-entry'&&e.children[0].textContent.startsWith('洞窟スライム'))");
+oldRecordSave.run("renderLibrary();var oldEntry=$('#librarybody').children.find(e=>e.className==='library-entry'&&e.children[0].textContent.startsWith('スライム'))");
 assert.equal(oldRecordSave.run("oldEntry.children[2].children.some(e=>e.textContent==='初撃破階')"),false);
 g.run("renderLibrary('items');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
 assert.equal(g.run('entries.length'),57);

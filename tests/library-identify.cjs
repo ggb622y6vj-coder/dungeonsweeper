@@ -8,7 +8,7 @@ assert.equal(g.run('s.library.monsters.slime.seen'),true);
 assert.equal(g.run('s.library.monsters.slime.identified'),true);
 assert.equal(g.run('s.library.monsters.slime.count||0'),0);
 g.run("renderLibrary();var e=$('#librarybody').children.find(x=>x.className==='library-entry'&&x.attributes['data-library-entry']==='monster-slime')");
-assert.equal(g.run('e.children[0].textContent'), '洞窟スライム');
+assert.equal(g.run('e.children[0].textContent'), 'スライム');
 assert.equal(g.run("$('#libraryprogress').textContent").split(' · ')[0],'モンスター 1/92','zero-kill spell identification counts');
 assert.equal(g.run("e.children[1].textContent"),g.run("enemyDefinition('slime').unknown"));
 assert.equal(g.run("e.children[1].className"),'library-subtext');

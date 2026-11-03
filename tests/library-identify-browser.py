@@ -55,7 +55,7 @@ with sync_playwright() as p:
         assert page.locator('#libraryprogress').inner_text().startswith('モンスター 1/92 ')
         slime = entry(page, 'slime')
         slime.scroll_into_view_if_needed()
-        assert slime.locator('h4').inner_text() == '洞窟スライム'
+        assert slime.locator('h4').inner_text() == 'スライム'
         sub = slime.locator('.library-subtext')
         assert sub.inner_text() == page.evaluate("enemyDefinition('slime').unknown")
         assert '不確定名' not in slime.inner_text() and '確定名' not in slime.inner_text()
