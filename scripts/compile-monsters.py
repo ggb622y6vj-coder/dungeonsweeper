@@ -7,6 +7,8 @@ def pct(v):
  m=re.search(r'(\d+)%',v);return int(m[1])/100 if m else 0
 ids={
   "洞窟スライム": "slime",
+  "シンキロウ": "gas",
+  "火車髑髏": "kashadokuro",
   "骸骨の衛兵": "skeleton",
   "灰狼": "wolf",
   "迷宮ゴブリン": "goblin",

@@ -7,12 +7,12 @@ function party(){
  return g;
 }
 let g=game();
-assert.equal(g.run('ENEMIES.length'),90);
+assert.equal(g.run('ENEMIES.length'),92);
 assert.equal(g.run('WEAPONS.length'),52);
 assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/90 · アイテム 0/52');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/92 · アイテム 0/52');
 g.run("$('#libraryclose').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),false);
 g=party();
@@ -93,12 +93,12 @@ console.log('PASS library: town/idle guards and source-backed monster/item detai
 
 // Render all source records to check ordering, concealed details and safe text.
 g.run("renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
-assert.equal(g.run('entries.length'),90);
+assert.equal(g.run('entries.length'),92);
 assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].textContent==='？？？')"),true);
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 90/90 · アイテム 52/52');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 92/92 · アイテム 52/52');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
