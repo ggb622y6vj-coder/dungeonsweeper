@@ -63,12 +63,14 @@ with sync_playwright() as p:
   page.locator('#chestopen').click();page.wait_for_function('!logBusy()')
   page.evaluate('enterTown()');page.reload()
   page.locator('#libraryopen').click()
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/90 · アイテム 2/52'
+  # Counter counts spell-identified species, not kills.
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/90 · アイテム 2/52'
   # 059: a kill without the 識別 spell shows only the unknown name and kill count.
   assert page.locator('#librarybody h4').first.inner_text()=='不定形'
   assert '1d6+3' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert '1体' in page.locator('#librarybody .library-entry').first.inner_text()
   page.evaluate("s.library.monsters.slime.identified=true;renderLibrary()")
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/90 · アイテム 2/52'
   assert page.locator('#librarybody h4').first.inner_text()=='洞窟スライム'
   assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
   assert '初撃破階' not in page.locator('#librarybody .library-entry').first.inner_text()
