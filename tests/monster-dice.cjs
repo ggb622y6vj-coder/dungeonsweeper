@@ -9,9 +9,9 @@ const rows = new Map(csv.trimEnd().split(/\r?\n/).slice(1).map(line => {
 }));
 const expected = new Map([
   ['毒スライム', '1d8+1'], ['亡霊騎士', '1d8+1'], ['オーク戦士', '1d8+1'],
-  ['大蜘蛛', '1d8+1'], ['洞窟の魔術師', '1d8+1'], ['山賊の頭目', '1d8+1'],
+  ['武者蜘蛛', '1d8+1'], ['洞窟の魔術師', '1d8+1'], ['山賊の頭目', '1d8+1'],
   ['腐肉食い', '1d8+1'], ['石の番人', '1d8+1'], ['火蜻蛉', '1d8'],
-  ['酸性スライム', '2d6+2'], ['骸骨の射手', '2d6+2'], ['オーク呪術師', '2d6+2'],
+  ['硫化スライム', '2d6+2'], ['骸骨の射手', '2d6+2'], ['オーク呪術師', '2d6+2'],
   ['影の盗人', '2d6+2'], ['黒牙狼', '2d8+2'],
 ]);
 
@@ -19,7 +19,7 @@ assert.equal(rows.size, csv.trimEnd().split(/\r?\n/).length - 1, 'monster names 
 for (const [name, damage] of expected) {
   assert.ok(rows.has(name), `${name} exists`);
   const fields = rows.get(name);
-  assert.equal(fields[2], name === '酸性スライム' || name === '骸骨の射手' || name === 'オーク呪術師' || name === '影の盗人' || name === '黒牙狼' ? '3F' : '2F');
+  assert.equal(fields[2], name === '硫化スライム' || name === '骸骨の射手' || name === 'オーク呪術師' || name === '影の盗人' || name === '黒牙狼' ? '3F' : '2F');
   assert.equal(fields[7], damage, `${name} physical damage`);
 }
 assert.equal(rows.get('深層の魔将')[7], '3d7', '2F guardian remains unchanged');

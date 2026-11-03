@@ -277,8 +277,8 @@ const ENEMIES=[
   },
   {
     "id": "spider",
-    "name": "毒蜘蛛",
-    "unknown": "虫",
+    "name": "髑髏蜘蛛",
+    "unknown": "うごめく虫",
     "floor": 1,
     "level": 3,
     "hp": [
@@ -372,7 +372,7 @@ const ENEMIES=[
   },
   {
     "id": "apprentice",
-    "name": "迷宮の見習い",
+    "name": "迷宮の詐欺師",
     "unknown": "杖を持つ人影",
     "floor": 1,
     "level": 4,
@@ -665,7 +665,7 @@ const ENEMIES=[
   },
   {
     "id": "bigspider",
-    "name": "大蜘蛛",
+    "name": "武者蜘蛛",
     "unknown": "巨大な虫",
     "floor": 2,
     "level": 5,
@@ -978,7 +978,7 @@ const ENEMIES=[
   },
   {
     "id": "acidslime",
-    "name": "酸性スライム",
+    "name": "硫化スライム",
     "unknown": "不定形",
     "floor": 3,
     "level": 6,
@@ -1177,8 +1177,8 @@ const ENEMIES=[
   },
   {
     "id": "venomspider",
-    "name": "猛毒蜘蛛",
-    "unknown": "巨大な虫",
+    "name": "髑髏武者蜘蛛",
+    "unknown": "おぞましい虫",
     "floor": 3,
     "level": 7,
     "hp": [
@@ -1588,7 +1588,7 @@ const ENEMIES=[
   },
   {
     "id": "zombie",
-    "name": "屍兵",
+    "name": "ゾンビ",
     "unknown": "動く死体",
     "floor": 4,
     "level": 7,
@@ -2025,7 +2025,7 @@ const ENEMIES=[
   {
     "id": "troll",
     "name": "トロル",
-    "unknown": "大きな鬼",
+    "unknown": "醜い大男",
     "floor": 5,
     "level": 10,
     "hp": [
@@ -2115,7 +2115,7 @@ const ENEMIES=[
   {
     "id": "scorpion",
     "name": "大蠍",
-    "unknown": "巨大な虫",
+    "unknown": "巨大な甲虫",
     "floor": 5,
     "level": 9,
     "hp": [
@@ -2321,8 +2321,8 @@ const ENEMIES=[
   },
   {
     "id": "blob",
-    "name": "粘液の塊",
-    "unknown": "不定形",
+    "name": "ブロブ",
+    "unknown": "泡立つ膜",
     "floor": 5,
     "level": 9,
     "hp": [
@@ -2678,8 +2678,8 @@ const ENEMIES=[
   },
   {
     "id": "darkelf",
-    "name": "闇エルフの術師",
-    "unknown": "杖を持つ人影",
+    "name": "ダークエルフ",
+    "unknown": "邪悪な妖精",
     "floor": 6,
     "level": 11,
     "hp": [
@@ -2784,7 +2784,7 @@ const ENEMIES=[
   {
     "id": "vampire",
     "name": "吸血鬼",
-    "unknown": "青白い貴人",
+    "unknown": "黒い死体",
     "floor": 6,
     "level": 15,
     "hp": [
@@ -2937,7 +2937,7 @@ const ENEMIES=[
   {
     "id": "fleshgolem",
     "name": "肉の巨像",
-    "unknown": "巨大な人影",
+    "unknown": "蠢く石像",
     "floor": 7,
     "level": 14,
     "hp": [
@@ -3081,7 +3081,7 @@ const ENEMIES=[
   },
   {
     "id": "hellhound",
-    "name": "地獄の猟犬",
+    "name": "地獄の犬",
     "unknown": "燃える獣",
     "floor": 7,
     "level": 12,
@@ -3190,7 +3190,7 @@ const ENEMIES=[
   {
     "id": "ettin",
     "name": "双頭の巨人",
-    "unknown": "巨大な人影",
+    "unknown": "異形の大男",
     "floor": 7,
     "level": 17,
     "hp": [
@@ -3234,8 +3234,8 @@ const ENEMIES=[
   },
   {
     "id": "lesserdemon",
-    "name": "小悪魔",
-    "unknown": "異形の人影",
+    "name": "レッサーデーモン",
+    "unknown": "悪魔",
     "floor": 8,
     "level": 15,
     "hp": [
@@ -3529,7 +3529,7 @@ const ENEMIES=[
   {
     "id": "evileye",
     "name": "邪眼",
-    "unknown": "浮かぶ目玉",
+    "unknown": "跳ねる眼球",
     "floor": 8,
     "level": 14,
     "hp": [
@@ -3647,8 +3647,8 @@ const ENEMIES=[
   },
   {
     "id": "greaterdemon",
-    "name": "大悪魔",
-    "unknown": "異形の巨人",
+    "name": "グレーターデーモン",
+    "unknown": "悪魔",
     "floor": 9,
     "level": 17,
     "hp": [
@@ -4112,7 +4112,7 @@ const ENEMIES=[
   {
     "id": "fallenangel",
     "name": "堕天使",
-    "unknown": "翼ある人影",
+    "unknown": "醜いカラス",
     "floor": 10,
     "level": 20,
     "hp": [
