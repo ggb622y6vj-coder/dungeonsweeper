@@ -1,5 +1,5 @@
 // 048: chest and enemy-drop loot go to the first member who can use the item and has room,
-// else the first member with room; all full keeps the "full" log.
+// else the first member with room; all full logs 「{name}を見つけたが、アイテムがいっぱいだ。」 (048a).
 const assert = require('node:assert/strict');
 const { game } = require('../scripts/sim/harness.cjs');
 const { createParty } = require('../scripts/sim/combat.cjs');
@@ -32,7 +32,15 @@ for (const kind of ['chest', 'drop']) {
   // All full -> full log, nothing added.
   r = loot(kind, 'staff', [full, full, full, full]);
   assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
-  assert.ok(r.logs.includes(kind === 'chest' ? 'アイテムがいっぱいで装備品を持ち帰れなかった。' : '杖を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes('杖を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(!r.logs.some(l => l.includes('持ち帰れなかった') || l.includes('置いていった')), kind + JSON.stringify(r.logs));
+  // 048a: all full with no capable class uses the same item-name message (staff for a fighter-only party is still "full").
+  g.run('var savedJobs=s.members.map(m=>m.job);s.members.forEach(m=>m.job=0)');
+  assert.equal(g.run("s.members.some((m,i)=>weapon('staff').classes.includes(jobOf(i)))"), false);
+  r = loot(kind, 'staff', [full, full, full, full]);
+  g.run('s.members.forEach((m,i)=>m.job=savedJobs[i])');
+  assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
+  assert.ok(r.logs.includes('杖を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
 }
 // Medicine (all classes) still goes to the front member with room.
 {
