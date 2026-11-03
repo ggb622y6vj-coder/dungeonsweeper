@@ -81,7 +81,7 @@ function libraryEntry(name,details,key=null,subtext=''){
 }
 function renderLibrary(tab='monsters'){
  ensureLibrary();
- const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.count>0).length;
+ const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.identified).length;
  const itemCount=WEAPONS.filter(w=>s.library.items[w.id]).length;
  $('#libraryprogress').textContent=`モンスター ${monsterCount}/${ENEMIES.length} · アイテム ${itemCount}/${WEAPONS.length}`;
  for(const name of ['monsters','items','spells']){
