@@ -53,7 +53,8 @@ for r in rows:
  id=ids[r['確定名']]
  sp=None if r['呪文']=='なし' else re.fullmatch(r'(\S+?)/(単体|全体)/(\d+)%',r['呪文'])
  assert r['呪文']=='なし' or (sp and sp[1] in MONSTER_SPELLS and MONSTER_SPELLS[sp[1]][1]==sp[2]), 'Unsupported spell'
- assert r['耐性'] in ['なし','毒無効','炎半減'], 'Unsupported resistance'
+ resistances=r['耐性'].split('・')
+ assert (resistances==['なし'] or all(value in {'毒無効','炎半減','氷半減'} for value in resistances)), 'Unsupported resistance'
  group=[int(n) for n in re.findall(r'\d+',r['群れの数'])];group=group if len(group)==2 else group*2
  d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=int(re.match(r'\d+',r['出現階層'])[0]),level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
  m=re.search(r'列上限(\d+)体',r['仲間呼び']);d['summonCap']=int(m[1]) if m else 4

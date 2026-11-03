@@ -1,0 +1,29 @@
+const assert = require('node:assert/strict');
+const { game } = require('../scripts/sim/harness.cjs');
+const g = game(null, () => 0);
+g.run("const recruit=generateRecruit('冒険者',1);registerRecruit(recruit);changeRecruitParty(recruit.members.id,true);");
+g.run(`
+const injected={...ENEMIES.find(x=>x.id==='goblin'),id:'testresistance',name:'耐性試験',resistance:'炎半減・氷半減'};
+ENEMIES.push(injected);
+const mage=s.members.findIndex((m,i)=>jobOf(i)===1);
+s.area='dungeon';s.done=false;s.enemy={units:[{id:'testresistance',uid:0,row:0,hp:1000,rewarded:false}]};
+s.members[mage].known.push('dalto','halito','tiltowait');
+s.mp[mage]=1000;
+function cast(id){s.enemy.units[0].hp=1000;castMagic(mage,id,0);return 1000-s.enemy.units[0].hp}
+Math.random=()=>0;
+if(cast('dalto')!==3)throw Error('dalto must halve 6d6 minimum damage and round down');
+if(cast('halito')!==0)throw Error('halito fire resistance should halve rounded-down 1 damage to 0');
+Math.random=()=>.5;
+if(cast('halito')!==2)throw Error('halito fire resistance');
+const fullTilt=80;
+if(cast('tiltowait')!==fullTilt)throw Error('tiltowait must not be halved');
+const firefly=enemyDefinition('firefly');
+ENEMIES.push({...firefly,id:'testfirefly',name:'炎耐性試験',resistance:'炎半減'});
+Math.random=()=>0;
+s.enemy.units[0].id='testfirefly';
+if(cast('dalto')!==6)throw Error('fire-only monster must take full dalto damage');
+const detail=libraryMonsterDetails(injected,{count:1,firstFloor:1});
+if(!detail.find(([label])=>label==='特殊能力')[1].includes('炎半減・氷半減'))throw Error('library must show both resistances');
+`);
+assert.equal(g.run("spellResistance(magic('dalto'))"),'氷半減');
+console.log('PASS fire/ice half resistance, floor rounding, tiltowait exclusion, firefly ice damage and library display');

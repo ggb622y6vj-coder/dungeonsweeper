@@ -284,6 +284,7 @@ require('./final-boss.cjs');
 require('./death-status.cjs');
 require('./temple.cjs');
 require('./library.cjs');
+require('./resistance.cjs');
 require('./target-select.cjs');
 require('./auto-reorder.cjs');
 require('./petrify.cjs');
