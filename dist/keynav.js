@@ -291,7 +291,12 @@
   }
   consume(e);
   if(decide){
-   if(!e.repeat&&!(typeof logBusy==='function'&&logBusy()))activate(selected?.matches('.statcard')?selected.querySelector('[data-stat-inventory]'):selected);
+   if(!e.repeat&&!(typeof logBusy==='function'&&logBusy())){
+    // Pointer focus can land on a card omitted from keyboard navigation.
+    // Never let Space/Enter fall back to the first candidate in that case.
+    if(layer.kind==='ally'&&selected?.matches('[data-ally-target]')&&!allyTargetSelectable(+selected.dataset.allyTarget)){sync();return;}
+    activate(selected?.matches('.statcard')?selected.querySelector('[data-stat-inventory]'):selected);
+   }
    sync();return;
   }
   if(tabNavigation(way,e.key)){sync();return;}
