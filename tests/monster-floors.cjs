@@ -17,6 +17,7 @@ for (const id of ['succubus', 'daidaraboti']) {
 const gas = enemies.find(d => d.id === 'gas');
 const kasha = enemies.find(d => d.id === 'kashadokuro');
 assert.deepEqual(Array.from(gas.floors), [2, 3]);
+assert.deepEqual([enemies.find(d => d.id === 'venomspider').name, enemies.find(d => d.id === 'venomspider').unknown], ['髑髏武者グモ', 'おぞましい虫']);
 const firefly = enemies.find(d => d.id === 'firefly');
 const archer = enemies.find(d => d.id === 'archer');
 assert.deepEqual(Array.from(firefly.floors), [3]);
