@@ -45,7 +45,7 @@ function libraryMonsterDetails(d,record){
  const attacks=document.createElement('dd');
  if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag);if(ability.chance){const chance=libraryElement('span',ability.chance);chance.className='library-chance';attacks.append(chance)}}}else attacks.textContent='なし';
  return [
-  ['種族',d.race],['出現階',`${d.floor}F`],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
+  ['種族',d.race],['出現階',d.floors.map(f=>`${f}F`).join('・')],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
   ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体 ${Math.round(d.spell*100)}%）`:(d.spellInfo?.name||'ハリト')):'なし'],
   ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];
@@ -91,7 +91,7 @@ function renderLibrary(tab='monsters'){
  const body=$('#librarybody');body.replaceChildren();body.setAttribute('aria-labelledby','librarytab-'+tab);
  if(tab==='monsters'){
   let floor;
-  for(const d of [...ENEMIES].sort((a,b)=>a.floor-b.floor)){
+  for(const d of [...ENEMIES].sort((a,b)=>a.floors[0]-b.floors[0])){
    if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`${floor}F`))}
    const record=s.library.monsters[d.id],identified=!!record?.identified,seen=!!record?.seen||record?.count>0;
    const mark=d.id==='labyrinthlord'?' ★ 迷宮の主':d.boss?' ◆ 守護者':'';
