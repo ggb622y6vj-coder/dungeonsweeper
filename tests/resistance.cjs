@@ -23,7 +23,7 @@ Math.random=()=>0;
 s.enemy.units[0].id='testfirefly';
 if(cast('dalto')!==6)throw Error('fire-only monster must take full dalto damage');
 const detail=libraryMonsterDetails(injected,{count:1,firstFloor:1});
-if(!detail.find(([label])=>label==='特殊能力')[1].includes('炎半減・氷半減'))throw Error('library must show both resistances');
+if(!detail.find(([label])=>label==='特殊能力')[1].children.some(e=>e.textContent==='炎半減')||!detail.find(([label])=>label==='特殊能力')[1].children.some(e=>e.textContent==='氷半減'))throw Error('library must show both resistances as tags');
 `);
 assert.equal(g.run("spellResistance(magic('dalto'))"),'氷半減');
 console.log('PASS fire/ice half resistance, floor rounding, tiltowait exclusion, firefly ice damage and library display');

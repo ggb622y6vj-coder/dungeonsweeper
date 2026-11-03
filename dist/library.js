@@ -39,13 +39,15 @@ function libraryDice(values){
 function libraryMonsterDetails(d,record){
  const abilities=[];
  if(d.breath)abilities.push(`${d.breath.element}のブレス`);
- for(const a of d.statuses)if(a.chance>0)abilities.push(a.type==='fear'?`恐怖 ${Math.round(a.chance*100)}%`:({poison:'毒',paralysis:'麻痺',sleep:'睡眠',stone:'石化'})[a.type]||a.type);
- for(const [key,label] of [['steal','アイテム奪取'],['drain','レベル吸収'],['death','即死'],['summon','仲間を呼ぶ'],['rear','後衛攻撃'],['flee','逃走']])if(d[key])abilities.push(label);
- if(d.resistance&&d.resistance!=='なし')abilities.push(`耐性：${d.resistance}`);
+ for(const a of d.statuses)if(a.chance>0)abilities.push({kind:a.type,label:({poison:'毒',paralysis:'麻痺',stone:'石化',fear:'恐怖',sleep:'睡眠',silence:'沈黙'})[a.type]||a.type,chance:`${Math.round(a.chance*100)}%`});
+ for(const [key,label] of [['steal','アイテム奪取'],['drain','レベル吸収'],['death','即死'],['summon','仲間呼び'],['rear','後衛攻撃'],['flee','逃走']])if(d[key])abilities.push(label);
+ if(d.resistance&&d.resistance!=='なし')for(const resistance of d.resistance.split(/[・、]/))abilities.push(resistance);
+ const attacks=document.createElement('dd');
+ if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag);if(ability.chance){const chance=libraryElement('span',ability.chance);chance.className='library-chance';attacks.append(chance)}}}else attacks.textContent='なし';
  return [
-  ['出現階',`地下${d.floor}階`],['HPの目安',libraryDice(d.hp)],['攻撃回数',`${d.swings}回`],
-  ['使う呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体 ${Math.round(d.spell*100)}%）`:(d.spellInfo?.name||'ハリト')):'なし'],['特殊能力',abilities.join('・')||'なし'],
-  ['撃破数',`${record.count}体`],['初撃破階',`地下${record.firstFloor}階`]
+  ['種族',d.race],['出現階',`${d.floor}F`],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
+  ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体 ${Math.round(d.spell*100)}%）`:(d.spellInfo?.name||'ハリト')):'なし'],
+  ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];
 }
 function libraryItemKind(w){return w.kind==='medicine'?'薬':w.part?({head:'防具（頭）',body:'防具（胴体）',feet:'防具（足）'})[w.part]:'武器'}
@@ -72,7 +74,7 @@ function libraryEntry(name,details,key=null,subtext=''){
  }
  if(details){
   const list=document.createElement('dl');
-  for(const [label,value] of details)list.append(libraryElement('dt',label),libraryElement('dd',value));
+  for(const [label,value] of details){list.append(libraryElement('dt',label));const dd=typeof value==='string'?libraryElement('dd',value):value;list.append(dd)}
   entry.append(list);
  }
  return entry;
@@ -90,7 +92,7 @@ function renderLibrary(tab='monsters'){
  if(tab==='monsters'){
   let floor;
   for(const d of [...ENEMIES].sort((a,b)=>a.floor-b.floor)){
-   if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`地下${floor}階`))}
+   if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`${floor}F`))}
    const record=s.library.monsters[d.id],identified=!!record?.identified,seen=!!record?.seen||record?.count>0;
    const mark=d.id==='labyrinthlord'?' ★ 迷宮の主':d.boss?' ◆ 守護者':'';
    let entry;

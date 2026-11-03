@@ -71,7 +71,7 @@ with sync_playwright() as p:
   page.evaluate("s.library.monsters.slime.identified=true;renderLibrary()")
   assert page.locator('#librarybody h4').first.inner_text()=='洞窟スライム'
   assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
-  assert '初撃破階' in page.locator('#librarybody .library-entry').first.inner_text()
+  assert '初撃破階' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert page.locator('#librarybody dl').count()==1
   page.screenshot(path=f'/tmp/library-monsters-{width}.png')
   page.locator('#librarytab-items').click()
