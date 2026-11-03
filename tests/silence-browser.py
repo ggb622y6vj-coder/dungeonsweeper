@@ -31,8 +31,8 @@ def seed(page):
     });
     s.members.forEach((m,i)=>{m.level=8;m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level<=8).map(x=>x.id)});
     s.inventory[0].push('paralysisCure');
-    s.library.monsters.darkpriest={count:1,firstFloor:4};
-    s.library.monsters.witch={count:1,firstFloor:8};render();''')
+    s.library.monsters.darkpriest={identified:true,count:1,firstFloor:4};
+    s.library.monsters.witch={identified:true,count:1,firstFloor:8};render();''')
 
 
 def silence_cast(page):

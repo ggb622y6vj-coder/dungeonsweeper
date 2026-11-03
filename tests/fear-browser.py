@@ -50,7 +50,7 @@ with sync_playwright() as p:
         s.hp=s.members.map(m=>m.maxHP);s.mp=s.members.map(m=>m.maxMP);
         s.inventory[0].push('paralysisCure');
         for(const [id,floor] of [['wraith',6],['hellhound',7],['fiendhound',9],['reaper',10]])
-          s.library.monsters[id]={count:1,firstFloor:floor};
+          s.library.monsters[id]={identified:true,count:1,firstFloor:floor};
         render();''')
         page.locator('#libraryopen').click()
         for name, chance in (('亡霊', 15), ('地獄の犬', 15), ('魔界の猟犬', 15), ('死神', 20)):
