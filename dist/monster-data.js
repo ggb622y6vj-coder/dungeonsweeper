@@ -2,7 +2,7 @@
 const ENEMIES=[
   {
     "id": "slime",
-    "name": "洞窟スライム",
+    "name": "スライム",
     "unknown": "不定形",
     "floor": 1,
     "floors": [
@@ -158,7 +158,7 @@ const ENEMIES=[
   },
   {
     "id": "wolf",
-    "name": "灰狼",
+    "name": "ハイウルフ",
     "unknown": "素早い牙",
     "floor": 1,
     "floors": [
@@ -208,7 +208,7 @@ const ENEMIES=[
   },
   {
     "id": "goblin",
-    "name": "迷宮ゴブリン",
+    "name": "ゴブリン",
     "unknown": "小鬼",
     "floor": 1,
     "floors": [
@@ -258,7 +258,7 @@ const ENEMIES=[
   },
   {
     "id": "bat",
-    "name": "洞窟蝙蝠",
+    "name": "吸血コウモリ",
     "unknown": "羽ばたく影",
     "floor": 1,
     "floors": [
@@ -308,7 +308,7 @@ const ENEMIES=[
   },
   {
     "id": "rat",
-    "name": "大鼠",
+    "name": "ミソカネズミ",
     "unknown": "小さな獣",
     "floor": 1,
     "floors": [
@@ -351,14 +351,14 @@ const ENEMIES=[
     "resistance": "なし",
     "boss": false,
     "icon": "♞",
-    "summonCap": 6,
+    "summonCap": 5,
     "breath": null,
     "spell": 0,
     "spellInfo": null
   },
   {
     "id": "spider",
-    "name": "髑髏蜘蛛",
+    "name": "髑髏グモ",
     "unknown": "うごめく虫",
     "floor": 1,
     "floors": [
@@ -508,8 +508,8 @@ const ENEMIES=[
   },
   {
     "id": "guardian",
-    "name": "迷宮の守護者",
-    "unknown": "武装した人影",
+    "name": "テアシナガ",
+    "unknown": "異形の老人",
     "floor": 1,
     "floors": [
       1
@@ -527,7 +527,7 @@ const ENEMIES=[
       6,
       2
     ],
-    "xp": 75.0,
+    "xp": 100.0,
     "groupSize": [
       1,
       1
@@ -613,7 +613,7 @@ const ENEMIES=[
   },
   {
     "id": "ghostknight",
-    "name": "亡霊騎士",
+    "name": "ゴーストナイト",
     "unknown": "動く死体",
     "floor": 2,
     "floors": [
@@ -663,11 +663,11 @@ const ENEMIES=[
   },
   {
     "id": "firefly",
-    "name": "火蜻蛉",
+    "name": "火トンボ",
     "unknown": "巨大な虫",
-    "floor": 2,
+    "floor": 3,
     "floors": [
-      2
+      3
     ],
     "level": 4,
     "hp": [
@@ -693,8 +693,8 @@ const ENEMIES=[
       4
     ],
     "race": "虫",
-    "mageResist": 0.0,
-    "priestResist": 0.0,
+    "mageResist": 0.05,
+    "priestResist": 0.05,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -771,7 +771,7 @@ const ENEMIES=[
   },
   {
     "id": "bigspider",
-    "name": "武者蜘蛛",
+    "name": "武者グモ",
     "unknown": "巨大な虫",
     "floor": 2,
     "floors": [
@@ -936,7 +936,7 @@ const ENEMIES=[
   },
   {
     "id": "ghoul",
-    "name": "腐肉食い",
+    "name": "コープスイーター",
     "unknown": "動く死体",
     "floor": 2,
     "floors": [
@@ -1051,8 +1051,8 @@ const ENEMIES=[
   },
   {
     "id": "general",
-    "name": "深層の魔将",
-    "unknown": "武装した人影",
+    "name": "ゴヅメヅ",
+    "unknown": "双頭の老人",
     "floor": 2,
     "floors": [
       2
@@ -1070,7 +1070,7 @@ const ENEMIES=[
       7,
       0
     ],
-    "xp": 75.0,
+    "xp": 150.0,
     "groupSize": [
       1,
       1
@@ -1177,7 +1177,8 @@ const ENEMIES=[
     "unknown": "動く死体",
     "floor": 3,
     "floors": [
-      3
+      3,
+      4
     ],
     "level": 6,
     "hp": [
@@ -1223,7 +1224,7 @@ const ENEMIES=[
   },
   {
     "id": "blackwolf",
-    "name": "黒牙狼",
+    "name": "フェンリル狼",
     "unknown": "素早い牙",
     "floor": 3,
     "floors": [
@@ -1512,7 +1513,7 @@ const ENEMIES=[
     "hit": 4,
     "attack": [
       3,
-      5,
+      4,
       0
     ],
     "xp": 59.0,
@@ -1661,7 +1662,7 @@ const ENEMIES=[
   },
   {
     "id": "watcher",
-    "name": "奈落の監視者",
+    "name": "地獄の獄卒",
     "unknown": "武装した人影",
     "floor": 3,
     "floors": [
@@ -4127,7 +4128,7 @@ const ENEMIES=[
       10,
       0
     ],
-    "xp": 880.0,
+    "xp": 2000.0,
     "groupSize": [
       1,
       2
@@ -4730,8 +4731,8 @@ const ENEMIES=[
   },
   {
     "id": "chaosspawn",
-    "name": "混沌の落とし子",
-    "unknown": "不定形",
+    "name": "地震雲",
+    "unknown": "意思を持つ煙",
     "floor": 10,
     "floors": [
       10
@@ -4739,7 +4740,7 @@ const ENEMIES=[
     "level": 18,
     "hp": [
       18,
-      8,
+      6,
       0
     ],
     "ac": 2,
@@ -4889,15 +4890,20 @@ const ENEMIES=[
     "swings": 1,
     "rear": false,
     "flee": 0,
-    "summon": 0,
+    "summon": 0.1,
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [],
+    "statuses": [
+      {
+        "type": "stone",
+        "chance": 0.05
+      }
+    ],
     "resistance": "なし",
     "boss": false,
     "icon": "♜",
-    "summonCap": 4,
+    "summonCap": 3,
     "breath": null,
     "spell": 0,
     "spellInfo": null

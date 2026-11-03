@@ -18,7 +18,7 @@ if(cast('halito')!==2)throw Error('halito fire resistance');
 const fullTilt=80;
 if(cast('tiltowait')!==fullTilt)throw Error('tiltowait must not be halved');
 const firefly=enemyDefinition('firefly');
-ENEMIES.push({...firefly,id:'testfirefly',name:'炎耐性試験',resistance:'炎半減'});
+ENEMIES.push({...firefly,id:'testfirefly',name:'炎耐性試験',resistance:'炎半減',mageResist:0,priestResist:0});
 Math.random=()=>0;
 s.enemy.units[0].id='testfirefly';
 if(cast('dalto')!==6)throw Error('fire-only monster must take full dalto damage');

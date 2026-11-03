@@ -293,7 +293,7 @@ function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect
 magicUI();medicineUI();flagUI();partyUI();libraryUI();
 
 function coloredLog(text){
- const foes=[...ENEMIES.flatMap(e=>[e.name,e.unknown]),'毒スライム','亡霊騎士','地獄の犬','オーク戦士','深層の魔将'];
+ const foes=[...ENEMIES.flatMap(e=>[e.name,e.unknown]),'毒スライム','ゴーストナイト','地獄の犬','オーク戦士','ゴヅメヅ'];
  const spells=MAGIC.map(x=>x.name);
  const flagNames=Object.values(FLAG_NAMES);const names=[...foes,...NAMES,...spells,...flagNames].filter(Boolean).sort((a,b)=>b.length-a.length);
  const escape=t=>t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

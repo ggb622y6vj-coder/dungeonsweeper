@@ -16,7 +16,7 @@ for(const [id,effect,job,target] of [['halito','damage',1,800],['katino','sleep'
  const g=battle();g.run(`ENEMIES.find(d=>d.id==='goblin').mageResist=1;ENEMIES.find(d=>d.id==='goblin').priestResist=1;Math.random=()=>0;`);
  assert.equal(g.run(`magic('${id}').effect`),effect);assert.equal(g.run(`castMagic(${job},'${id}',${target})`),true);
  assert.equal(g.run('s.enemy.units[0].hp'),999,id);assert.equal(g.run('s.enemy.units[0].sleep||0'),0,id);assert.equal(g.run('s.enemy.units[0].silence||false'),false,id);assert.equal(g.run('s.enemy.units[0].acPenalty||0'),0,id);
- assert(json(g,'logQueue.map(e=>e.text)').includes('迷宮ゴブリンは呪文をはね返した！'),id);
+ assert(json(g,'logQueue.map(e=>e.text)').includes('ゴブリンは呪文をはね返した！'),id);
 }
 {
  const g=battle();g.run("ENEMIES.find(d=>d.id==='goblin').mageResist=0;ENEMIES.find(d=>d.id==='goblin').priestResist=1;Math.random=()=>.5");

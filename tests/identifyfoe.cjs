@@ -10,7 +10,7 @@ assert.equal(g.run("magic('identifyfoe').target"),'group');
 g.run("Math.random=()=>0;castMagic("+mage+",'identifyfoe',0)");g.drain();
 assert.equal(g.run('s.mp['+mage+']'),17);
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.enemy.units.map(e=>[e.identified,e.identifiedBySpell||false]))')),[[true,true],[true,true],[false,false]]);
-assert.match(g.run('s.logs[0]'),/不定形の正体を見破った。（→洞窟スライム）/);
+assert.match(g.run('s.logs[0]'),/不定形の正体を見破った。（→スライム）/);
 const saved=g.run("save();localStorage.getItem('ash-v1')");
 const resumed=game(saved);
 assert.deepEqual(JSON.parse(resumed.run('JSON.stringify(s.enemy.units.map(e=>[e.identified,e.identifiedBySpell||false]))')),[[true,true],[true,true],[false,false]],'battle save/reload preserves identification');

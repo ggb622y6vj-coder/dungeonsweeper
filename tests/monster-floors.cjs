@@ -17,6 +17,11 @@ for (const id of ['succubus', 'daidaraboti']) {
 const gas = enemies.find(d => d.id === 'gas');
 const kasha = enemies.find(d => d.id === 'kashadokuro');
 assert.deepEqual(Array.from(gas.floors), [2, 3]);
+const firefly = enemies.find(d => d.id === 'firefly');
+const archer = enemies.find(d => d.id === 'archer');
+assert.deepEqual(Array.from(firefly.floors), [3]);
+assert.deepEqual([firefly.mageResist, firefly.priestResist], [.05, .05]);
+assert.deepEqual(Array.from(archer.floors), [3, 4]);
 assert.deepEqual([gas.hp, gas.ac, gas.attack, gas.xp], [[3, 9, 0], 7, [1, 5, 2], 20]);
 assert.deepEqual([gas.level, gas.hit, Array.from(gas.groupSize), gas.gold, gas.race, gas.swings, gas.icon], [5, 3, [2, 4], [2, 4, 0], '不定形', 1, '◉']);
 assert.deepEqual(Array.from(kasha.floors), [9, 10]);
@@ -44,6 +49,8 @@ for (const floor of [1, 2, 3, 4]) {
   const seen = new Set();
   for (let i = 0; i < 5000; i++) for (const id of vm.runInContext('monsterFormation(false)', context)) seen.add(id);
   assert.equal(seen.has('gas'), floor === 2 || floor === 3, `gas on ${floor}F`);
+  assert.equal(seen.has('firefly'), floor === 3, `firefly on ${floor}F`);
+  assert.equal(seen.has('archer'), floor === 3 || floor === 4, `archer on ${floor}F`);
 }
 
 const libraryContext = vm.createContext({
@@ -74,7 +81,7 @@ try {
   fs.mkdirSync(path.join(temp, 'dist'));
   fs.copyFileSync(path.join(root, 'scripts/compile-monsters.py'), path.join(temp, 'scripts/compile-monsters.py'));
   let csv = fs.readFileSync(path.join(root, 'data/monsters.csv'), 'utf8');
-  csv = csv.replace(/^迷宮の守護者,([^,]+),1F,/m, '迷宮の守護者,$1,1F・2F,');
+  csv = csv.replace(/^テアシナガ,([^,]+),1F,/m, 'テアシナガ,$1,1F・2F,');
   fs.writeFileSync(path.join(temp, 'data/monsters.csv'), csv);
   const result = spawnSync('python3', [path.join(temp, 'scripts/compile-monsters.py')], { encoding: 'utf8' });
   assert.notEqual(result.status, 0, 'compiler rejects a guardian on multiple floors');
@@ -83,4 +90,4 @@ try {
   fs.rmSync(temp, { recursive: true, force: true });
 }
 
-console.log('PASS monster floors: 9F/10F encounters, 8F exclusion, library labels and guardian validation');
+console.log('PASS monster floors: firefly 3F, archer 3F/4F, 2F exclusion, 9F/10F encounters and guardian validation');

@@ -58,7 +58,7 @@ with sync_playwright() as p:
         log = page.locator('#log').inner_text()
         assert '素早い牙の正体を見破った。（→' in log, log
         listing = page.locator('.scene-enemies').inner_text()
-        assert '不定形' in listing and '洞窟スライム' not in listing, listing
+        assert '不定形' in listing and 'スライム' not in listing, listing
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         page.screenshot(path=str(output / f'after-{width}.png'))
         assert not errors, errors
