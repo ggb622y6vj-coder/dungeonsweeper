@@ -53,7 +53,7 @@ with sync_playwright() as p:
           s.library.monsters[id]={count:1,firstFloor:floor};
         render();''')
         page.locator('#libraryopen').click()
-        for name, chance in (('亡霊', 15), ('地獄の猟犬', 15), ('魔界の猟犬', 15), ('死神', 20)):
+        for name, chance in (('亡霊', 15), ('地獄の犬', 15), ('魔界の猟犬', 15), ('死神', 20)):
             entry = page.locator('#librarybody .library-entry').filter(
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
@@ -78,7 +78,7 @@ with sync_playwright() as p:
             expected:displayVitals.ailments.map(a=>a.fear>0)
           })};
           const originalRandom=Math.random;
-          try {Math.random=()=>0;monsterHurt(0,4,s.commands,'地獄の猟犬');monsterOnHit(s.enemy.units[0],0);}
+          try {Math.random=()=>0;monsterHurt(0,4,s.commands,'地獄の犬');monsterOnHit(s.enemy.units[0],0);}
           finally {Math.random=originalRandom;}
           autoReorderParty('enemy-action');render();''')
         page.wait_for_function('!logBusy()')
