@@ -2,9 +2,12 @@
 function ensureLibrary(){
  s.library??={monsters:{},items:{}};
  s.library.monsters??={};s.library.items??={};
+ if(!s.library.monsterIdentifyVersion){for(const r of Object.values(s.library.monsters))if(r?.count>0)r.identified=true;s.library.monsterIdentifyVersion=1}
  // Legacy saves have no spell record: seed it from every registered adventurer (party + reserve).
  if(!s.library.spells){s.library.spells={};recordLibrarySpells()}
 }
+function recordLibraryEncounter(combat){ensureLibrary();for(const e of combat.units||[])if(ENEMIES.some(d=>d.id===e.id)){const r=s.library.monsters[e.id]??={count:0};r.seen=true}}
+function recordLibraryIdentification(combat){ensureLibrary();for(const e of combat.units||[])if(e.identifiedBySpell&&ENEMIES.some(d=>d.id===e.id)){const r=s.library.monsters[e.id]??={count:0};r.identified=true}}
 // Permanent spell record: once learned by anyone it stays, even after deletion, wipe or loss.
 function recordLibrarySpells(ids){
  if(!s.library?.spells)return ensureLibrary();
@@ -55,14 +58,15 @@ function libraryItemDetails(w){
   ['入手先',`${shop?'店売り・迷宮':'迷宮限定'}（地下${w.minFloor||1}階〜）`]];
 }
 function libraryElement(tag,text){const el=document.createElement(tag);el.textContent=text;return el}
-function libraryEntry(name,details,key=null){
+function libraryEntry(name,details,key=null,subtext=''){
  const entry=document.createElement('article');entry.className='library-entry';
  entry.append(libraryElement('h4',name));
+ if(subtext){const sub=libraryElement('small',subtext);sub.className='library-subtext';entry.append(sub)}
  if(key){
   entry.tabIndex=0;entry.setAttribute('role','button');entry.setAttribute('data-library-entry',key);
   entry.setAttribute('aria-haspopup','dialog');
   entry.onclick=()=>{
-   $('#librarydetailbody').replaceChildren(libraryEntry(name,details));
+   $('#librarydetailbody').replaceChildren(libraryEntry(name,details,null,subtext));
    $('#librarydetaildialog').showModal();
   };
  }
@@ -87,9 +91,13 @@ function renderLibrary(tab='monsters'){
   let floor;
   for(const d of [...ENEMIES].sort((a,b)=>a.floor-b.floor)){
    if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`地下${floor}階`))}
-   const record=s.library.monsters[d.id],known=record?.count>0;
+   const record=s.library.monsters[d.id],identified=!!record?.identified,seen=!!record?.seen||record?.count>0;
    const mark=d.id==='labyrinthlord'?' ★ 迷宮の主':d.boss?' ◆ 守護者':'';
-   body.append(libraryEntry(known?d.name+mark:'？？？',known?libraryMonsterDetails(d,record):null,'monster-'+d.id));
+   let entry;
+   if(identified)entry=libraryEntry(d.name+mark,libraryMonsterDetails(d,record),'monster-'+d.id,d.unknown||'');
+   else if(seen)entry=libraryEntry(d.unknown||'？？？',[['撃破数',`${record.count||0}体`]],'monster-'+d.id);
+   else entry=libraryEntry('？？？',null,'monster-'+d.id);
+   body.append(entry);
   }
  }else if(tab==='items'){
   for(const kind of ['武器','防具（頭）','防具（胴体）','防具（足）','薬']){

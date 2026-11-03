@@ -9,7 +9,7 @@ function party(){
 let g=game();
 assert.equal(g.run('ENEMIES.length'),90);
 assert.equal(g.run('WEAPONS.length'),52);
-assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"spells":{}}');
+assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
 assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/90 · アイテム 0/52');
@@ -94,7 +94,7 @@ console.log('PASS library: town/idle guards and source-backed monster/item detai
 g.run("renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
 assert.equal(g.run('entries.length'),90);
 assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].textContent==='？？？')"),true);
-g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{count:1,firstFloor:d.floor}]));
+g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
 assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 90/90 · アイテム 52/52');
