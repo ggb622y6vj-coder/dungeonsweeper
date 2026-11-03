@@ -1,6 +1,7 @@
 // 呪文の正本。職業: 1=魔法使い、2=僧侶。MP・効果は本作用の調整。
 const MAGIC = [
  ['dumapic','デュマピック',1,1,2,true,'field','front','survey',null,'前方の未探索マスを85%の精度で調査。解除・探索はしない。使用ごとにMP倍増、帰還でリセット'],
+ ['floodfill','ミルワピック',2,5,4,true,'field','party','floodfill',null,'現在地から周囲に罠のないマスを連鎖的に探索済みにする（マインスイーパーの自動展開）。敵とは遭遇しない。使用ごとにMP倍増、帰還でリセット'],
  ['identifyfoe','識別',1,1,3,true,'battle','all','identifyfoe',null,'敵全列の正体を見破る'],
  ['halito','ハリト',1,1,2,true,'battle','enemy','damage',[1,8],'敵1体に火炎1d8'],
  ['katino','カティノ',1,1,3,true,'battle','group','sleep',null,'選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止'],
@@ -28,14 +29,14 @@ const MAGIC = [
  ['madi','マディ',2,11,15,false,'both','ally','restore',null,'生存する味方1人のHP・状態異常を全回復。蘇生不可'],
  ['malikto','マリクト',2,13,24,true,'battle','all','damage',[12,6],'敵全体に12d6']
 ].map(([id,name,job,level,mp,guaranteed,where,target,effect,value,description])=>({id,name,job,level,mp,guaranteed,where,target,effect,value,description}));
-function baseSpellCost(x){return x.id==='dumapic'?2**Math.min(50,(s.dumapicUses||0)+1):x.mp}
+function baseSpellCost(x){return x.id==='dumapic'?2**Math.min(50,(s.dumapicUses||0)+1):x.id==='floodfill'?x.mp*2**Math.min(50,s.floodUses||0):x.mp}
 function spellCost(x){return flagSpellCost(baseSpellCost(x))}
 function magic(id){return MAGIC.find(x=>x.id===id)}
 function spellResistance(x){let element=x.description.includes('冷気')?'氷':(['halito','mahalito'].includes(x.id)?'炎':null);return element?`${element}半減`:null}
 function spellHalvedBy(x,e){const r=spellResistance(x);return !!r&&enemyDefinition(e.id).resistance.split('・').includes(r)}
 function learnMagic(i,level){let m=s.members[i],learned=[];for(let x of MAGIC.filter(x=>x.job===jobOf(i)&&x.level<=level&&!m.known.includes(x.id))){if(x.guaranteed||Math.random()<(jobOf(i)===1?m.intelligence:m.piety)/30){m.known.push(x.id);learned.push(x.name)}}if(typeof recordLibrarySpells==='function')recordLibrarySpells(m.known);return learned}
 function ensureMakanito(m,job){if(job===1&&m.level>=magic('makanito').level&&m.known&&!m.known.includes('makanito'))m.known.push('makanito')}
-function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.length)s.magicPlans.push(null);s.members.forEach((m,i)=>{m.intelligence??=jobOf(i)===1?15:10;m.piety??=jobOf(i)===2?15:10;if(!m.known){m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level===1&&x.guaranteed).map(x=>x.id);for(let lv=2;lv<=m.level;lv++)learnMagic(i,lv)}if(jobOf(i)===2&&m.level>=3&&!m.known.includes('watchful'))m.known.push('watchful');if(jobOf(i)===1&&!m.known.includes('identifyfoe'))m.known.push('identifyfoe');if(jobOf(i)===1&&!m.known.includes('dumapic'))m.known.push('dumapic');ensureMakanito(m,jobOf(i))});for(const r of s.reserve||[])ensureMakanito(r.members,r.members.job);if(typeof recordLibrarySpells==='function')recordLibrarySpells();s.commands=s.commands?.map(c=>c==='heal'?'fight':c)}
+function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.length)s.magicPlans.push(null);s.members.forEach((m,i)=>{m.intelligence??=jobOf(i)===1?15:10;m.piety??=jobOf(i)===2?15:10;if(!m.known){m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level===1&&x.guaranteed).map(x=>x.id);for(let lv=2;lv<=m.level;lv++)learnMagic(i,lv)}if(jobOf(i)===2&&m.level>=3&&!m.known.includes('watchful'))m.known.push('watchful');if(jobOf(i)===2&&m.level>=5&&!m.known.includes('floodfill'))m.known.push('floodfill');if(jobOf(i)===1&&!m.known.includes('identifyfoe'))m.known.push('identifyfoe');if(jobOf(i)===1&&!m.known.includes('dumapic'))m.known.push('dumapic');ensureMakanito(m,jobOf(i))});for(const r of s.reserve||[])ensureMakanito(r.members,r.members.job);if(typeof recordLibrarySpells==='function')recordLibrarySpells();s.commands=s.commands?.map(c=>c==='heal'?'fight':c)}
 function magicContext(){return s.enemy?'battle':currentChest()?'chest':'field'}
 function spellReason(i,x){if(s.ailments[i].silence>0)return '沈黙している';if(!s.members[i].known.includes(x.id))return s.members[i].level<x.level?`Lv.${x.level}で解禁`:'未習得';if(s.members[i].status==='stone')return '石化';if(!activeMember(i))return '死亡';if(s.ailments[i].paralysis>0)return '麻痺';if(s.area!=='dungeon'||s.done||s.pendingBoss||s.pendingStairs)return '今は使用不可';let ctx=magicContext();if(x.where!==ctx&&!(x.where==='both'&&(ctx==='battle'||ctx==='field')))return {battle:'戦闘専用',field:'探索専用',chest:'宝箱専用'}[x.where]||'今は使用不可';if(s.mp[i]<spellCost(x))return 'MP不足';return ''}
 function validAllyTarget(t){return Number.isInteger(t)&&s.hp[t]>0&&['ok','stone'].includes(s.members[t]?.status)}
@@ -54,6 +55,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||x.job!==jobOf(i)||spellReason(
  else if(x.effect==='antidote'){s.ailments[t].poison=false;log(`${NAMES[t]}の毒が消えた。`)}
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}
  else if(x.effect==='survey'){s.dumapicUses=(s.dumapicUses||0)+1;let j=target();if(j<0||s.cells[j].open)log('調査に失敗した。');else{let truth=!!s.cells[j].trap,correct=Math.random()<.85;log((correct?truth:!truth)?'前方は罠の可能性あり':'前方にはなにもない')}}
+ else if(x.effect==='floodfill'){s.floodUses=(s.floodUses||0)+1;const start=s.pos,opened=new Set(),seen=new Set([start]),queue=[start];s.cells[start].open=true;if(num(start)>0)log('周囲に罠の気配がある。展開できなかった。');else{while(queue.length){const p=queue.shift();if(num(p)!==0)continue;for(const q of around(p)){const c=s.cells[q];if(seen.has(q)||c.flag||c.trap)continue;seen.add(q);if(!c.open){c.open=true;opened.add(q)}if(num(q)===0)queue.push(q)}}log(opened.size?`${opened.size}マスを探索済みにした。`:'新たに探索できるマスはなかった。')}}
  else if(x.effect==='watchful'){s.watchful=true;log('警戒結界が一行を包んだ。')}
  else if(x.effect==='light'){s.light=true;log('視界が広がった。')}
  else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{s.pos=s.start;s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}if(!s.enemy)autoReorderParty('spell');return true}

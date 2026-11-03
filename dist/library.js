@@ -105,7 +105,7 @@ function renderLibrary(tab='monsters'){
   for(const spell of MAGIC){
   const known=!!s.library.spells[spell.id];
   body.append(libraryEntry(known?spell.name:'？？？',known?[['職業',CLASSES[spell.job].name],['習得レベル',`Lv.${spell.level}`],
-   ['消費MP',String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
+   ['消費MP',spell.id==='dumapic'||spell.id==='floodfill'?`${spell.mp}（使用ごとに倍増）`:String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
    ['効果',spell.description]]:null,'spell-'+spell.id));
   }
  }
