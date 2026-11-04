@@ -41,12 +41,7 @@ const ENEMIES=[
     "steal": 0,
     "drain": 0,
     "death": 0,
-    "statuses": [
-      {
-        "type": "poison",
-        "chance": 0.15
-      }
-    ],
+    "statuses": [],
     "resistance": "なし",
     "boss": false,
     "icon": "◉",
@@ -57,7 +52,7 @@ const ENEMIES=[
   },
   {
     "id": "gas",
-    "name": "シンキロウ",
+    "name": "魔物いきれ",
     "unknown": "意思を持つ煙",
     "floor": 2,
     "floors": [
@@ -75,7 +70,7 @@ const ENEMIES=[
     "attack": [
       1,
       5,
-      2
+      1
     ],
     "xp": 20.0,
     "groupSize": [
@@ -170,8 +165,8 @@ const ENEMIES=[
       5,
       3
     ],
-    "ac": 6,
-    "hit": 4,
+    "ac": 7,
+    "hit": 3,
     "attack": [
       1,
       6,
@@ -321,7 +316,7 @@ const ENEMIES=[
       2
     ],
     "ac": 9,
-    "hit": 2,
+    "hit": 3,
     "attack": [
       1,
       5,
@@ -558,7 +553,7 @@ const ENEMIES=[
   },
   {
     "id": "poisonslime",
-    "name": "毒スライム",
+    "name": "有毒スライム",
     "unknown": "不定形",
     "floor": 2,
     "floors": [
@@ -567,15 +562,15 @@ const ENEMIES=[
     "level": 4,
     "hp": [
       2,
-      6,
-      4
+      9,
+      0
     ],
     "ac": 9,
     "hit": 2,
     "attack": [
       1,
       8,
-      1
+      0
     ],
     "xp": 15.0,
     "groupSize": [
@@ -622,7 +617,7 @@ const ENEMIES=[
     "level": 4,
     "hp": [
       2,
-      6,
+      10,
       4
     ],
     "ac": 8,
@@ -635,7 +630,7 @@ const ENEMIES=[
     "xp": 22.0,
     "groupSize": [
       3,
-      4
+      5
     ],
     "gold": [
       2,
@@ -881,7 +876,7 @@ const ENEMIES=[
   },
   {
     "id": "bandit",
-    "name": "山賊の頭目",
+    "name": "バンディット",
     "unknown": "怪しい人影",
     "floor": 2,
     "floors": [
@@ -891,14 +886,14 @@ const ENEMIES=[
     "hp": [
       2,
       6,
-      4
+      0
     ],
     "ac": 7,
     "hit": 3,
     "attack": [
-      1,
-      8,
-      1
+      2,
+      6,
+      0
     ],
     "xp": 32.0,
     "groupSize": [
@@ -951,14 +946,14 @@ const ENEMIES=[
     "ac": 7,
     "hit": 3,
     "attack": [
-      1,
-      8,
-      1
+      2,
+      6,
+      0
     ],
     "xp": 34.0,
     "groupSize": [
       2,
-      4
+      3
     ],
     "gold": [
       2,
@@ -991,26 +986,26 @@ const ENEMIES=[
   },
   {
     "id": "stone",
-    "name": "石の番人",
+    "name": "ストーンゴーレム",
     "unknown": "震える石像",
     "floor": 2,
     "floors": [
       2
     ],
-    "level": 6,
+    "level": 5,
     "hp": [
-      2,
-      6,
+      3,
+      10,
       4
     ],
     "ac": 6,
     "hit": 4,
     "attack": [
-      1,
-      8,
+      2,
+      7,
       1
     ],
-    "xp": 36.0,
+    "xp": 50.0,
     "groupSize": [
       1,
       2
@@ -1059,9 +1054,9 @@ const ENEMIES=[
     ],
     "level": 6,
     "hp": [
-      3,
-      8,
-      5
+      4,
+      14,
+      20
     ],
     "ac": 6,
     "hit": 4,
@@ -1418,7 +1413,7 @@ const ENEMIES=[
     "priestResist": 0.05,
     "swings": 1,
     "rear": false,
-    "flee": 0,
+    "flee": 0.1,
     "summon": 0,
     "steal": 0.1,
     "drain": 0,
@@ -1519,7 +1514,7 @@ const ENEMIES=[
     "xp": 59.0,
     "groupSize": [
       2,
-      4
+      5
     ],
     "gold": [
       3,
@@ -1841,7 +1836,7 @@ const ENEMIES=[
   {
     "id": "harpy",
     "name": "ハーピー",
-    "unknown": "翼ある影",
+    "unknown": "有翼の女",
     "floor": 4,
     "floors": [
       4
@@ -5082,5 +5077,158 @@ const ENEMIES=[
       ],
       "effect": "damage"
     }
+  },
+  {
+    "id": "takenoko",
+    "name": "キューズドバンブー",
+    "unknown": "繁茂する植物",
+    "floor": 1,
+    "floors": [
+      1,
+      2
+    ],
+    "level": 4,
+    "hp": [
+      2,
+      9,
+      0
+    ],
+    "ac": 8,
+    "hit": 3,
+    "attack": [
+      3,
+      3,
+      0
+    ],
+    "xp": 25.0,
+    "groupSize": [
+      3,
+      4
+    ],
+    "gold": [
+      2,
+      4,
+      5
+    ],
+    "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0.1,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "◉",
+    "summonCap": 5,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "kinoko",
+    "name": "テングダケ",
+    "unknown": "腐乱する苗床",
+    "floor": 1,
+    "floors": [
+      1,
+      2
+    ],
+    "level": 4,
+    "hp": [
+      3,
+      5,
+      3
+    ],
+    "ac": 8,
+    "hit": 3,
+    "attack": [
+      2,
+      10,
+      0
+    ],
+    "xp": 25.0,
+    "groupSize": [
+      1,
+      2
+    ],
+    "gold": [
+      2,
+      5,
+      0
+    ],
+    "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "◉",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "sirakaba",
+    "name": "デクノボー",
+    "unknown": "人面の木",
+    "floor": 2,
+    "floors": [
+      2,
+      3
+    ],
+    "level": 3,
+    "hp": [
+      3,
+      10,
+      7
+    ],
+    "ac": 6,
+    "hit": 3,
+    "attack": [
+      3,
+      5,
+      0
+    ],
+    "xp": 40.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      2,
+      4,
+      0
+    ],
+    "race": "悪魔",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♜",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
   }
 ];

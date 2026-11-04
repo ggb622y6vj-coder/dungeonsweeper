@@ -103,7 +103,7 @@ function serialized(g,code){return JSON.parse(g.run(`JSON.stringify(${code})`))}
  assert.equal(g.run("s.inventory[index('F')].includes('healingPotion')"),false);
  assert.equal(g.run("s.hp[index('C')]"),11);
  assert.equal(g.run('s.enemy.units[0].hp'),994);
- for(const text of ['Dはハリトを唱えた。','Eはディオスを唱えた。','Fは傷薬を使った。'])assert.equal(g.run(`logQueue.filter(e=>e.text===${JSON.stringify(text)}).length`),1);
+ for(const text of ['Dは火炎を唱えた。','Eは回復を唱えた。','Fは傷薬を使った。'])assert.equal(g.run(`logQueue.filter(e=>e.text===${JSON.stringify(text)}).length`),1);
  assert.equal(g.run("s.magicPlans.every(p=>p===null)&&s.itemPlans.every(p=>p===null)"),true,'normal end-of-turn reset still happens');
  console.log('PASS poison turn-start remaps and executes real spell/item plans once on the original targets');
 }

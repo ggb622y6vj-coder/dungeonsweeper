@@ -35,13 +35,13 @@ with sync_playwright() as p:
         page.evaluate('''[1,0,2].forEach((job,i)=>{
           const r=generateRecruit('ABC'[i],job);registerRecruit(r);changeRecruitParty(r.members.id,true);
         });render();''')
-        # Real flow: encounter, cast 識別 on row 1 with a fixed roll, then flee (no kill).
+        # Real flow: encounter, cast 識別 on all rows with mixed fixed rolls, then flee (no kill).
         page.locator('#entrance').click()
         page.wait_for_function('!logBusy()')
         page.evaluate('''s.pendingStairs=false;s.pendingBoss=null;s.members.forEach(m=>m.intelligence=0);s.mp[0]=20;
           s.enemy={dataVersion:1,units:[{...makeEnemy('slime',91),row:17,hp:999},{...makeEnemy('wolf',92),row:28,hp:999}],
             initiative:'normal',flagEffect:{}};s.enemy.units.forEach(e=>e.identified=false);recordLibraryEncounter(s.enemy);
-          const r=Math.random;try{Math.random=()=>0;castMagic(0,'identifyfoe',91)}finally{Math.random=r}
+          const r=Math.random;try{const rolls=[0,.99];Math.random=()=>rolls.shift();castMagic(0,'identifyfoe',null)}finally{Math.random=r}
           s.library.monsters.rat={count:3,firstFloor:1,seen:true};s.enemy=null;''')
         page.wait_for_function('!logBusy()')
         page.evaluate('enterTown();save()')
@@ -52,7 +52,7 @@ with sync_playwright() as p:
         assert page.evaluate('!s.library.monsters.wolf.identified&&s.library.monsters.wolf.seen')
         page.locator('#libraryopen').click()
         # identified slime (0 kills) counts; seen wolf and killed-but-unidentified rat do not.
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 1/92 ')
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 1/95 ')
         slime = entry(page, 'slime')
         slime.scroll_into_view_if_needed()
         assert slime.locator('h4').inner_text() == 'スライム'

@@ -241,7 +241,7 @@ with sync_playwright() as p:
                               ('q','spells'),('q','items'),('q','monsters')]:
             page.keyboard.press(key); ring(page, '#librarytab-'+expected)
             assert page.locator('#librarytab-'+expected).get_attribute('aria-selected') == 'true'
-        for index, (tab, total) in enumerate(zip(tabs, (92,57,28))):
+        for index, (tab, total) in enumerate(zip(tabs, (95,57,32))):
             assert page.locator('#librarytab-'+tab).get_attribute('aria-selected') == 'true'
             page.keyboard.press('s'); ring(page, '#librarybody .library-entry:first-of-type')
             page.keyboard.press('w'); ring(page, '#librarytab-'+tab)

@@ -40,7 +40,7 @@ def spell(page, battle=False):
         page.locator('[data-stat-cast="1"]').click()
     page.locator('[data-spell="dios"]').click()
     assert not page.locator('#magicdialog').is_visible()
-    assert page.locator('#allytargetprompt').inner_text() == '対象を選んでください：ディオス'
+    assert page.locator('#allytargetprompt').inner_text() == '対象を選んでください：回復'
 
 
 def medicine(page, battle=False):

@@ -37,7 +37,7 @@ with sync_playwright() as p:
             {...makeEnemy('slime',91),row:17,hp:999},
             {...makeEnemy('wolf',92),row:28,hp:999,identified:true}],initiative:'normal',flagEffect:{}};
           recordLibraryEncounter(s.enemy);s.commands=s.members.map(()=>'guard');
-          const r=Math.random;try{Math.random=()=>0;castMagic(0,'identifyfoe',91);castMagic(0,'identifyfoe',92)}finally{Math.random=r}
+          const r=Math.random;try{Math.random=()=>0;castMagic(0,'identifyfoe',null)}finally{Math.random=r}
           render();''')
         page.wait_for_function('!logBusy()')
         combat_log = page.locator('#log').inner_text()
@@ -53,7 +53,7 @@ with sync_playwright() as p:
         for key in ('slime', 'wolf'):
             entry = page.locator(f'#librarybody [data-library-entry="monster-{key}"]')
             assert entry.locator('h4').inner_text() == page.evaluate(f"enemyDefinition('{key}').name")
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/92 ')
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/95 ')
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         page.screenshot(path=str(output / f'library-{width}.png'))
         assert not errors, errors
