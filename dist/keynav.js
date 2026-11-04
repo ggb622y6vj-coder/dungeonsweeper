@@ -222,7 +222,15 @@
   // the same visual row/column band, then fall back to 038's centre distance.
   // 070: a disabled 戻る (first member) is never a W/S/A/D stop, so the move from
   // the grid to クイック攻撃｜逃げる is the same at every width.
-  if(layer.kind==='command'){const items=layer.items.filter(el=>el===selected||!(el.hasAttribute('data-key-back')&&disabled(el)));const next=gridMove(selected,items,way);if(next&&next!==selected)return next;return nearest(selected,items,way);}
+  if(layer.kind==='command'){
+   const items=layer.items.filter(el=>el===selected||!(el.hasAttribute('data-key-back')&&disabled(el)));
+   // 071: the heading's クイック攻撃 is entered only by W from the grid's top row
+   // and S leaves it back into the grid, so 逃げる/戻る -W-> grid at every width.
+   const grid=items.filter(el=>el.matches('.commandchoices button'));
+   if(selected?.matches('#quickattack')&&way==='down'&&grid.length)return nearest(selected,grid,way);
+   if(way==='up'&&grid.length&&!selected?.closest('.commandchoices')){const rest=items.filter(el=>!el.matches('#quickattack'));const next=gridMove(selected,rest,way);return next&&next!==selected?next:nearest(selected,rest,way);}
+   const next=gridMove(selected,items,way);if(next&&next!==selected)return next;return nearest(selected,items,way);
+  }
   return nearest(selected,layer.items,way);
  }
  // Tab rows and their lists have an explicit vertical boundary; geometry alone

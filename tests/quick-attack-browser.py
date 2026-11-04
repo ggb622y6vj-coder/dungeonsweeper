@@ -52,21 +52,31 @@ with sync_playwright() as p:
                 assert page.locator(sel).count() <= 1, 'duplicate '+sel
                 assert (page.locator(sel).count() == 1 and page.locator(sel).is_visible()) == visible, (sel, visible)
 
-        # Member 1: quick attack + flee shown below 戻る, side by side, distinct style, not the key default.
+        # Member 1: quick attack sits in the one-line heading; flee is the only extra below 戻る.
         y = back_y(); extras(True); inside()
         qa, fl, bk = (page.locator(s).bounding_box() for s in ('#quickattack', '#flee', '#commandentry [data-command-back]'))
-        assert qa['y'] > bk['y'] and abs(qa['y']-fl['y']) < 1 and qa['x'] < fl['x'], 'quick|flee row under back'
+        # 070 measured #commandentry at 310px (1280) / 298px (390) for this fixture; 071 must be shorter.
+        box_h = page.evaluate('document.querySelector("#commandentry").getBoundingClientRect().height')
+        assert box_h <= {1280: 310, 390: 298}[width] - 10, ('command area not shorter than 070', box_h)
+        heading = page.locator('.commandheading')
+        hb = heading.bounding_box()
+        assert page.locator('#quickattack').evaluate('(e)=>e.parentElement===document.querySelector(".commandheading")'), 'quick attack is in heading'
+        assert abs(qa['y']-hb['y']) < 1 and qa['x'] > hb['x'], 'quick attack at heading right'
+        assert fl['y'] > bk['y'] and page.locator('.battleextras button').count() == 1, 'only flee below back'
+        assert heading.evaluate('(e)=>e.getBoundingClientRect().height===24'), 'heading remains one line'
+        assert qa['height'] < 32 and qa['width'] < width*.55, 'quick attack remains small'
         st = lambda sel, prop: page.locator(sel).evaluate(f'(e)=>getComputedStyle(e).{prop}')
         assert st('#quickattack', 'borderTopColor') != st('[data-command-choice="guard"]', 'borderTopColor') or \
                st('#quickattack', 'backgroundColor') != st('[data-command-choice="guard"]', 'backgroundColor'), 'quick attack looks like others'
-        assert 'クイック攻撃' in page.locator('#quickattack').inner_text() and '全員1列目へ攻撃' in page.locator('#quickattack').inner_text()
+        assert 'クイック攻撃' in page.locator('#quickattack').inner_text() and '全員1列目へ攻撃' not in page.locator('#quickattack').inner_text()
         assert page.evaluate('!!KeyNav.current()?.matches(\'[data-command-choice="fight"]\')'), 'default stays on 戦う'
         page.screenshot(path=str(out/f'{width}-member1.png'))
         cur = lambda q: page.evaluate('(q)=>!!KeyNav.current()?.matches(q)', q)
-        # Same at every width: S from the grid skips the disabled 戻る and lands on クイック攻撃; W comes back.
-        page.keyboard.press('s'); assert cur('#quickattack'), ('S skips disabled 戻る', width, page.evaluate('KeyNav.current()?.outerHTML'))
-        page.keyboard.press('d'); assert cur('#flee')
-        page.keyboard.press('w'); assert cur('.commandchoices button'), 'W returns to the grid, not 戻る'
+        # W from the top row reaches the heading button; S returns to the grid.
+        page.keyboard.press('w'); assert cur('#quickattack'), ('W reaches quick attack', width, page.evaluate('KeyNav.current()?.outerHTML'))
+        page.keyboard.press('s'); assert cur('.commandchoices button'), ('S returns to command grid', width, page.evaluate('KeyNav.current()?.outerHTML'))
+        page.keyboard.press('s'); assert cur('#flee'), ('S skips disabled 戻る', width, page.evaluate('KeyNav.current()?.outerHTML'))
+        page.keyboard.press('w'); assert cur('.commandchoices button'), ('W returns from flee to the grid', page.evaluate('KeyNav.current()?.outerHTML'))
         seen = {counts()}
         # Row choice keeps 戻る in place, no extras.
         press('[data-command-choice="fight"]'); assert page.evaluate('choosingRow===true'); assert back_y() == y; extras(False)
@@ -110,6 +120,6 @@ with sync_playwright() as p:
         page.evaluate('s.ailments.forEach(a=>a.fear=0);s.enemy.boss=true;render()')
         assert page.locator('#quickattack').is_enabled() and page.locator('#flee').is_disabled()
         assert not errors, errors
-        print(f'PASS quick-attack Chromium {width}px: fixed 戻る y across {sorted(seen)} buttons/row choice/review, first-member-only extras, distinct style, keyboard, no review, disabled/boss, no overflow')
+        print(f'PASS quick-attack Chromium {width}px: one-line heading button, shorter extras, fixed 戻る y across {sorted(seen)} buttons/row choice/review, first-member-only extras, keyboard, no review, disabled/boss, no overflow')
         ctx.close()
     browser.close()
