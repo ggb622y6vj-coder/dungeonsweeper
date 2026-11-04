@@ -83,7 +83,7 @@ with sync_playwright() as p:
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
             assert entry.is_visible()
-            assert f'モンティノ（沈黙・全体 {chance}%）' in entry.inner_text()
+            assert 'モンティノ（沈黙・全体）' in entry.inner_text() and '%' not in entry.inner_text(), (chance, entry.inner_text())
             no_overflow(page)
             page.screenshot(path=str(output / f'montino-library-{chance}-{width}.png'))
         page.locator('#libraryclose').click()

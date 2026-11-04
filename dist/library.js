@@ -39,14 +39,14 @@ function libraryDice(values){
 function libraryMonsterDetails(d,record){
  const abilities=[];
  if(d.breath)abilities.push(`${d.breath.element}のブレス`);
- for(const a of d.statuses)if(a.chance>0)abilities.push({kind:a.type,label:({poison:'毒',paralysis:'麻痺',stone:'石化',fear:'恐怖',sleep:'睡眠',silence:'沈黙'})[a.type]||a.type,chance:`${Math.round(a.chance*100)}%`});
+ for(const a of d.statuses)if(a.chance>0)abilities.push({kind:a.type,label:({poison:'毒',paralysis:'麻痺',stone:'石化',fear:'恐怖',sleep:'睡眠',silence:'沈黙'})[a.type]||a.type});
  for(const [key,label] of [['steal','アイテム奪取'],['drain','レベル吸収'],['death','即死'],['summon','仲間呼び'],['rear','後衛攻撃'],['flee','逃走']])if(d[key])abilities.push(label);
  if(d.resistance&&d.resistance!=='なし')for(const resistance of d.resistance.split(/[・、]/))abilities.push(resistance);
  const attacks=document.createElement('dd');
- if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag);if(ability.chance){const chance=libraryElement('span',ability.chance);chance.className='library-chance';attacks.append(chance)}}}else attacks.textContent='なし';
+ if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag)}}else attacks.textContent='なし';
  return [
   ['種族',d.race],['出現階',d.floors.map(f=>`${f}F`).join('・')],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
-  ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体 ${Math.round(d.spell*100)}%）`:(d.spellInfo?.name||'ハリト')):'なし'],
+  ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体）`:(d.spellInfo?.name||'ハリト')):'なし'],
   ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];
 }

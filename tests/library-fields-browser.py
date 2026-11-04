@@ -56,7 +56,12 @@ with sync_playwright() as p:
             page.screenshot(path=str(output / f'{key}-{width}.png'))
         tags = lambda key: page.locator(f'[data-library-entry="monster-{key}"] dd .ailment-tag')
         assert [t.inner_text() for t in tags('evileye').all()] == ['麻痺', '石化', '後衛攻撃']
-        assert '30%' in page.locator('[data-library-entry="monster-evileye"]').inner_text()
+        evileye = page.locator('[data-library-entry="monster-evileye"]')
+        assert [t.inner_text() for t in tags('evileye').all()].count('麻痺') == 1
+        assert '%' not in evileye.inner_text()
+        assert page.locator('#librarybody .library-entry').count() == 92
+        assert all('%' not in entry.inner_text() for entry in page.locator('#librarybody .library-entry').all())
+        assert page.locator('.library-chance').count() == 0
         assert [t.inner_text() for t in tags('daidaraboti').all()] == ['麻痺', '後衛攻撃', '炎半減', '氷半減']
         assert tags('daidaraboti').nth(2).get_attribute('class') == 'ailment-tag ailment-other'
         assert tags('rat').first.inner_text() == '仲間呼び' and 'ailment-other' in tags('rat').first.get_attribute('class')
