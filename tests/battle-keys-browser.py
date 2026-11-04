@@ -209,10 +209,10 @@ with sync_playwright() as p:
         context.close()
         context, page = load(fixture(enemy=combat()))
         press(page, 's'); ring(page, '[data-command-choice="item"]')
-        # 070: 戻る is disabled for the first member (skipped); below it sits the クイック攻撃｜逃げる row.
-        press(page, 's')
-        if selected(page, '[data-command-back]'): press(page, 's')
-        ring(page, '#quickattack')
+        # 070: the disabled 戻る is skipped at every width: アイテム -S-> クイック攻撃 -D-> 逃げる -W-> アイテム.
+        press(page, 's'); ring(page, '#quickattack')
+        press(page, 'w'); ring(page, '[data-command-choice="item"]')
+        press(page, 's'); ring(page, '#quickattack')
         press(page, 'd'); ring(page, '#flee')
         press(page, 'Space')
         assert page.evaluate('s.logs.some(t=>t.includes("逃走に失敗"))')

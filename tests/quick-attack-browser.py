@@ -62,6 +62,11 @@ with sync_playwright() as p:
         assert 'クイック攻撃' in page.locator('#quickattack').inner_text() and '全員1列目へ攻撃' in page.locator('#quickattack').inner_text()
         assert page.evaluate('!!KeyNav.current()?.matches(\'[data-command-choice="fight"]\')'), 'default stays on 戦う'
         page.screenshot(path=str(out/f'{width}-member1.png'))
+        cur = lambda q: page.evaluate('(q)=>!!KeyNav.current()?.matches(q)', q)
+        # Same at every width: S from the grid skips the disabled 戻る and lands on クイック攻撃; W comes back.
+        page.keyboard.press('s'); assert cur('#quickattack'), ('S skips disabled 戻る', width, page.evaluate('KeyNav.current()?.outerHTML'))
+        page.keyboard.press('d'); assert cur('#flee')
+        page.keyboard.press('w'); assert cur('.commandchoices button'), 'W returns to the grid, not 戻る'
         seen = {counts()}
         # Row choice keeps 戻る in place, no extras.
         press('[data-command-choice="fight"]'); assert page.evaluate('choosingRow===true'); assert back_y() == y; extras(False)
@@ -70,6 +75,9 @@ with sync_playwright() as p:
         press('[data-command-choice="guard"]')
         for n in range(1, 6):
             assert page.evaluate('commandIndex') == n
+            if n == 1:  # an enabled 戻る (member 2+) is still a normal S stop
+                for _ in range(4): page.keyboard.press('s')
+                assert cur('#commandentry [data-command-back]'), page.evaluate('KeyNav.current()?.outerHTML')
             assert back_y() == y, (n, back_y(), y); extras(False); inside(); seen.add(counts())
             page.screenshot(path=str(out/f'{width}-member{n+1}.png'))
             press('[data-command-choice="guard"]')
