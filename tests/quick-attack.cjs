@@ -13,6 +13,8 @@ const logs=()=>J('s.logs.concat(logQueue.map(x=>x.text))');
 setup(`s.members[4].job=3;s.inventory[4]=['shortbow'];s.equipped[4]=0;s.ailments[2].fear=2`);
 assert.equal(g.run('canWeaponAttack(4)'),true,'rear ranged can attack');assert.equal(g.run('canWeaponAttack(5)'),false,'rear melee cannot');
 assert.ok(hasQuick()&&hasFlee(),'first member sees quick attack and flee');
+assert.match(html(),/<div class="commandheading">[\s\S]*id="quickattack"[\s\S]*<\/div>/,'quick attack is in the heading row');
+assert.ok(!html().includes('全員1列目へ攻撃'),'no quick-attack subtext');
 assert.ok(!/id="quickattack"[^>]*data-key-default/.test(html()),'quick attack is not the key default');
 g.run(`var realAttack=attack,seen=null;attack=()=>{seen={c:s.commands.slice(),r:s.attackRows.slice(),review:commandIndex};realAttack()};s.hp[1]=0;s.members[1].status='dead';s.ailments[3].paralysis=3;resetCommandEntry();render();quickAttack()`);
 assert.equal(J('seen.review'),0,'no review screen before the turn');
