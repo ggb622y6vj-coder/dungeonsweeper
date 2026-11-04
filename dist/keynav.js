@@ -220,7 +220,9 @@
   if(group&&(way==='left'||way==='right')){const next=gridMove(selected,group,way);if(next&&next!==selected)return next;}
   // Battle commands are a 2-column grid above full-width 戻る/逃げる: prefer
   // the same visual row/column band, then fall back to 038's centre distance.
-  if(layer.kind==='command'){const next=gridMove(selected,layer.items,way);if(next&&next!==selected)return next;}
+  // 070: a disabled 戻る (first member) is never a W/S/A/D stop, so the move from
+  // the grid to クイック攻撃｜逃げる is the same at every width.
+  if(layer.kind==='command'){const items=layer.items.filter(el=>el===selected||!(el.hasAttribute('data-key-back')&&disabled(el)));const next=gridMove(selected,items,way);if(next&&next!==selected)return next;return nearest(selected,items,way);}
   return nearest(selected,layer.items,way);
  }
  // Tab rows and their lists have an explicit vertical boundary; geometry alone
