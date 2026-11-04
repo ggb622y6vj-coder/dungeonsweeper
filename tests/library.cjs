@@ -7,12 +7,12 @@ function party(){
  return g;
 }
 let g=game();
-assert.equal(g.run('ENEMIES.length'),92);
+assert.equal(g.run('ENEMIES.length'),95);
 assert.equal(g.run('WEAPONS.length'),52);
 assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/92 · アイテム 0/52');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/95 · アイテム 0/52');
 g.run("$('#libraryclose').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),false);
 g=party();
@@ -84,7 +84,7 @@ assert.notEqual(g.run("$('#librarydialog').open"),true,'library is town-only');
 g.run('enterTown();log("待機中");');g.run("$('#libraryopen').onclick()");
 assert.notEqual(g.run("$('#librarydialog').open"),true,'library cannot expose future log results');
 g.drain();
-assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['特殊能力','毒'],['使用呪文','なし'],['経験値','6'],['撃破数','2体']]);
+assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['特殊能力','なし'],['使用呪文','なし'],['経験値','6'],['撃破数','2体']]);
 assert.equal(g.run("libraryMonsterDetails(ENEMIES.find(d=>d.name==='邪眼'),{count:1,firstFloor:8})[5][1].children.map(x=>x.className).join(' ')").includes('ailment-paralysis'),true);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('holysword')))"),/4d8\+5.*hitBonus \+3.*2回.*6000.*迷宮限定/);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('plate')))"),/AC −5/);
@@ -93,19 +93,19 @@ console.log('PASS library: town/idle guards and source-backed monster/item detai
 
 // Render all source records to check ordering, concealed details and safe text.
 g.run("renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
-assert.equal(g.run('entries.length'),92);
+assert.equal(g.run('entries.length'),95);
 assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].textContent==='？？？')"),true);
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 92/92 · アイテム 52/52');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 95/95 · アイテム 52/52');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
 assert.equal(g.run("$('#librarybody').children[0].textContent"),'1F');
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),18);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
-assert.equal(g.run('ENEMIES.length'),92);
+assert.equal(g.run('ENEMIES.length'),95);
 assert.deepEqual(JSON.parse(g.run("JSON.stringify(ENEMIES.filter(d=>/\\d+%/.test(JSON.stringify(libraryMonsterDetails(d,{count:1,firstFloor:1}).map(([k,v])=>typeof v==='string'?v:v.textContent)))).map(d=>d.id))")),[],'no monster details contain numeric percentages');
 const oldRecordSave=reload(g);
 oldRecordSave.run("renderLibrary();var oldEntry=$('#librarybody').children.find(e=>e.className==='library-entry'&&e.children[0].textContent.startsWith('スライム'))");

@@ -168,7 +168,7 @@ with sync_playwright() as p:
             if spell == 'dialko':
                 # 049: the card is unselectable, so the old 「石化を治せない」 message is unreachable by click.
                 card.click(force=True)
-                assert 'ディアルコではBの石化を治せない。' not in page.locator('#log').inner_text()
+                assert '強壮ではBの石化を治せない。' not in page.locator('#log').inner_text()
                 assert page.evaluate("s.members[3].status==='stone'&&s.mp[4]===100")
                 page.locator('#allytargetfieldcancel').click()
                 page.keyboard.press('Escape')

@@ -70,6 +70,7 @@ function prepareTrial(g, opt) {
     s.mp = s.members.map(m => m.maxMP);
     s.ailments = s.members.map(() => ({poison:false,paralysis:0,sleep:0,silence:0,fear:0}));
     s.corpses = [];
+    s.teppeki = false;s.milwaSteps = 0;
     if (${opt.floor} > 1) fresh(${opt.floor});
     s.area = 'dungeon';
     resetPartyCommands();
@@ -140,7 +141,7 @@ function planTurn(g) {
         if (!s.enemy.boss && (targetGroup?.units.filter(e => e.hp > 0).length || 0) >= 2) spellOrder.push('katino');
         spellOrder.push('halito');
         // Skip Lakanito when no living enemy in the target row can be affected
-        // (undead, constructs, guardians), so the sim does not waste 16 MP.
+        // (undead, constructs, demons, guardians), so the sim does not waste 16 MP.
         const lakanitoUseful = !!targetGroup?.units.some(e => e.hp > 0 && lakanitoApplies(e));
         const id = spellOrder
           .find(id => (id !== 'lakanito' || lakanitoUseful) && m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));

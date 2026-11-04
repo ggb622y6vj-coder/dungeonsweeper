@@ -35,7 +35,7 @@ for (const [id,floor,chance] of [['wraith',6,.15],['hellhound',7,.15],['fiendhou
   assert.equal(g.run("ENEMIES.filter(d=>d.statuses.some(a=>a.type==='fear')).length"),4);
   assert.equal(g.run("MAGIC.some(x=>x.effect==='fear')"),false);
   for (const id of ['morlis','mamorlis']) {
-    assert.match(g.run(`magic('${id}').description`),/敵を怯えさせ守りを崩す/);
+    assert.equal(g.run(`magic('${id}').description`),id==='morlis'?'選択した列の敵のAC＋3。戦闘終了まで':'敵全体のAC＋3。戦闘終了まで');
     assert.equal(g.run(`magic('${id}').effect`),'debuff');
   }
   g.run("afflict(0,'fear');afflict(1,'fear')");

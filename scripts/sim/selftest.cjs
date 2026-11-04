@@ -42,7 +42,7 @@ for (let i = 0; i < 10; i++) {
   formations.add(gBase.run('JSON.stringify(s.enemy?.units.map(e => [e.id,e.hp]))'));
   assert.equal(gBase.run('s.members.length'), 6);
   assert.equal(gBase.run('s.members.every(m => m.level === 1)'), true);
-  assert.equal(gBase.run("s.members[4].known.includes('halito')"), true);
+  assert.equal(gBase.run("s.members.find((m,i)=>jobOf(i)===1).known.includes('halito')"), true);
   assert.equal(gBase.run('s.mp.every((mp,i) => mp === s.members[i].maxMP)'), true);
 }
 assert(formations.size > 1, 'trials must not repeat one RNG sequence');
@@ -226,6 +226,9 @@ fearAI.run('s.ailments.forEach(a=>{a.silence=0;a.fear=0})');
 planTurn(fearAI);
 assert.equal(fearAI.run('s.commands[1]'), 'fight', 'fighter resumes attacking when fear ends');
 fearAI.run('s.ailments.forEach(a=>a.fear=3)');
+fearAI.run('s.teppeki=true;s.milwaSteps=17');
 prepareTrial(fearAI, {...opt, jobs:[1,0,2,3,0,2], boss:true});
 assert.equal(fearAI.run('s.ailments.every(a=>a.fear===0)'),true,'next trial cannot inherit fear');
+assert.equal(fearAI.run('s.teppeki'),false,'next trial cannot inherit persistent AC');
+assert.equal(fearAI.run('s.milwaSteps'),0,'next trial cannot inherit short light');
 console.log('PASS simulator fear: spells including low MP/self-cure/rear buff, otherwise guard, silence overlap, recovery and trial reset');

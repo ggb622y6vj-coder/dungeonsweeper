@@ -35,7 +35,7 @@ with sync_playwright() as p:
         # Legacy-shaped records (count + firstFloor, no version) migrate to identified and render without errors.
         page.evaluate('''const r=generateRecruit('A',0);registerRecruit(r);changeRecruitParty(r.members.id,true);
           s.library.monsters={rat:{count:3,firstFloor:1},evileye:{count:1,firstFloor:8},daidaraboti:{count:2,firstFloor:10},
-            slime:{count:1,firstFloor:1}};delete s.library.monsterIdentifyVersion;save();''')
+            slime:{count:1,firstFloor:1},poisonslime:{count:1,firstFloor:2}};delete s.library.monsterIdentifyVersion;save();''')
         page.reload()
         page.locator('#libraryopen').click()
         assert page.locator('#librarybody h3').first.inner_text() == '1F'
@@ -59,20 +59,21 @@ with sync_playwright() as p:
         evileye = page.locator('[data-library-entry="monster-evileye"]')
         assert [t.inner_text() for t in tags('evileye').all()].count('麻痺') == 1
         assert '%' not in evileye.inner_text()
-        assert page.locator('#librarybody .library-entry').count() == 92
+        assert page.locator('#librarybody .library-entry').count() == 95
         assert all('%' not in entry.inner_text() for entry in page.locator('#librarybody .library-entry').all())
         assert page.locator('.library-chance').count() == 0
         assert [t.inner_text() for t in tags('daidaraboti').all()] == ['麻痺', '後衛攻撃', '炎半減', '氷半減']
         assert tags('daidaraboti').nth(2).get_attribute('class') == 'ailment-tag ailment-other'
         assert tags('rat').first.inner_text() == '仲間呼び' and 'ailment-other' in tags('rat').first.get_attribute('class')
+        assert tags('slime').count() == 0, 'slime no longer inflicts poison'
         # Same colours as the party-screen tags (same shared CSS classes).
-        for key, kind in (('slime', 'poison'), ('evileye', 'paralysis'), ('evileye', 'stone')):
+        for key, kind in (('poisonslime', 'poison'), ('evileye', 'paralysis'), ('evileye', 'stone')):
             lib = page.locator(f'[data-library-entry="monster-{key}"] dd .ailment-{kind}')
             ref = page.evaluate(f'''(()=>{{const e=document.createElement('span');e.className='ailment-tag ailment-{kind}';
               document.body.append(e);const c=getComputedStyle(e),v=[c.color,c.backgroundColor,c.borderTopColor].join();e.remove();return v}})()''')
             assert lib.evaluate(STYLE) == ref, (kind, lib.evaluate(STYLE), ref)
         other = tags('rat').first.evaluate(STYLE)
-        assert other != tags('slime').first.evaluate(STYLE)
+        assert other != tags('poisonslime').first.evaluate(STYLE)
         # Tags wrap inside the entry without horizontal overflow.
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert page.evaluate("[...document.querySelectorAll('#librarybody dd')].every(e=>e.scrollWidth<=e.clientWidth+1)")

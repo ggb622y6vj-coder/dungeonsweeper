@@ -1,4 +1,4 @@
-"""063: 10F demons resist ティルトウェイト per individual.
+"""063: 10F demons resist 魔弾 per individual.
 Run: /tmp/pyv/bin/python tests/spell-resist-browser.py [http://127.0.0.1:8000/]
 """
 import os
@@ -57,6 +57,6 @@ with sync_playwright() as p:
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         page.screenshot(path=str(output / f'after-{width}.png'))
         assert not errors, errors
-        print(f'PASS spell-resist Chromium {width}px: ティルトウェイト vs 12 堕天使 (10F, 50%), some resisted / others damaged, readable log; no JS errors')
+        print(f'PASS spell-resist Chromium {width}px: 魔弾 vs 12 堕天使 (10F, 50%), some resisted / others damaged, readable log; no JS errors')
         context.close()
     browser.close()
