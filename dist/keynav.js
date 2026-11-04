@@ -259,7 +259,7 @@
   // Exploration controls are dispatched here once, alongside UI shortcuts.
   if(layer?.kind==='explore'&&layer.id==='explore:'&&typeof move==='function'){
    const action={w:'forward',W:'forward',ArrowUp:'forward',s:'back',S:'back',ArrowDown:'back',a:'left',A:'left',ArrowLeft:'left',d:'right',D:'right',ArrowRight:'right',q:'strafeLeft',Q:'strafeLeft',e:'strafeRight',E:'strafeRight'}[e.key];
-   const active=typeof allyTargetPick!=='undefined'&&allyTargetPick||typeof currentChest==='function'&&currentChest()||s.area!=='dungeon'||s.pendingStairs||s.done||s.enemy||s.pendingBoss||typeof logBusy==='function'&&logBusy();
+   const active=typeof allyTargetPick!=='undefined'&&allyTargetPick||typeof currentChest==='function'&&currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||s.done||s.enemy||s.pendingBoss||typeof logBusy==='function'&&logBusy();
    if(action){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat&&!active)move(action);return;}
    if((e.key==='f'||e.key==='F')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#frontflag').click();return;}
    if((e.key==='g'||e.key==='G')&&!active){consume(e);keyboard=true;doc.documentElement.classList.add('keynav-keyboard');if(!e.repeat)$('#flagopen').click();return;}
