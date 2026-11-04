@@ -34,9 +34,11 @@ function afflictMonster(e,effect){if(monsterResists(e,effect))return false;e[eff
 // The undead-level median is 12; this keeps the formula centered on the intended party level range.
 const DISPEL_LEVEL_OFFSET=12;
 function dispelChance(casterLevel,targetLevel){return Math.max(.05,Math.min(.95,.5+.05*casterLevel-.10*targetLevel+.05*DISPEL_LEVEL_OFFSET))}
+function livingUndeadGroups(combat=s.enemy){return enemyGroups(combat).filter(g=>g.units.some(e=>e.hp>0&&enemyDefinition(e.id).race==='不死'))}
 function dispelUndead(i){
  log(`${NAMES[i]}は呪いを解こうとした。`);
- let targets=s.enemy.units.filter(e=>e.hp>0&&enemyDefinition(e.id).race==='不死');
+ let groups=livingUndeadGroups(),key=s.dispelRows?.[i],group=groups.find(g=>String(g.key)===String(key))||groups[0];
+ let targets=group?group.units.filter(e=>e.hp>0&&enemyDefinition(e.id).race==='不死'):[];
  if(!targets.length){log('効果はなかった。');return}
  for(const e of targets){let chance=dispelChance(s.members[i].level,monsterLevel(e));if(Math.random()<chance){let name=enemyDisplay(e);e.hp=0;e.rewarded=true;e.escaped=true;log(`${name}は消え去った。`)}else log(`${enemyDisplay(e)}には効かなかった。`)}
 }

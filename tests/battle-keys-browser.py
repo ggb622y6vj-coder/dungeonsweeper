@@ -196,9 +196,14 @@ with sync_playwright() as p:
 
         # The remaining command types are reachable without leaving WASD.
         save = fixture(enemy=combat())
+        save['enemy']['units'][0]['id'] = 'skeleton'  # 069: dispel needs a living undead row
         save['roster'][0]['members']['job'] = 2
         context, page = load(save)
         press(page, 's'); ring(page, '[data-command-choice="dispel"]')
+        press(page, 'Space')
+        # 069: dispel now asks for an undead row first; Space confirms the default row.
+        assert page.evaluate('choosingRow==="dispel" && commandIndex===0')
+        ring(page, '[data-row-choice]')
         press(page, 'Space')
         assert page.evaluate('commandIndex===1 && s.commands[0]==="dispel"')
         context.close()
