@@ -1,0 +1,13 @@
+# 013-light-guardian-escort 実装報告
+- コミット: 6c3a771（main へ push 済み）
+- モデル: gpt-6-luna（reasoning low）、1回目で成功
+- 変更: dist/monsters.js monsterFormation(boss) を [守護者, 同階の非守護者1種, 50%でもう1種]（2〜3列、守護者は1列目）に。BALANCE.md の守護者記述を更新。tests/game.cjs の守護者テストを編成3列・随伴だけ撃破で戦闘継続・守護者撃破で下り階段化に更新。MANIFEST.sha256 再生成。
+- テスト: tests/game.cjs、tests/training.cjs、compile-monsters --check、scripts/sim/selftest.cjs すべて PASS。ブラウザ未確認。
+- sim（combat.cjs --jobs 0,0,2,3,1,2 --n 1000 --level 1 --boss）変更前 → 変更後:
+  - boss Lv1/1F: {"winRate":1,"wipeRate":0,"deathsPerBattle":0.005,"hpLossRate":0.10542011834319642,"averageRounds":4.468}
+  - boss Lv1/1F: {"winRate":0.965,"wipeRate":0.035,"deathsPerBattle":0.297,"hpLossRate":0.22457988165680454,"averageRounds":8.172}
+  - boss Lv1/2F: {"winRate":0.991,"wipeRate":0.009,"deathsPerBattle":0.149,"hpLossRate":0.24446153846153856,"averageRounds":2.329}
+  - boss Lv1/2F: {"winRate":0.763,"wipeRate":0.237,"deathsPerBattle":1.689,"hpLossRate":0.4850532544378696,"averageRounds":6.512}
+  - boss Lv1/3F: {"winRate":0.981,"wipeRate":0.019,"deathsPerBattle":0.273,"hpLossRate":0.3389644970414206,"averageRounds":2.929}
+  - boss Lv1/3F: {"winRate":0.389,"wipeRate":0.611,"deathsPerBattle":3.935,"hpLossRate":0.7779289940828398,"averageRounds":7.321}
+- 所見: 守護者戦の勝率 Lv1/1F 100%→96.5%、2F 99.1%→76.3%、3F 98.1%→38.9%。Lv1 は2F・3Fの推奨Lv未満なので厳しめの数値。

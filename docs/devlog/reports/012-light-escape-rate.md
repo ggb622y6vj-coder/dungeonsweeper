@@ -1,0 +1,15 @@
+# 012-light-escape-rate 実装報告
+- コミット: ac1f853（main へ push 済み）
+- モデル: gpt-6-luna（reasoning low）、1回目で成功
+- 変更: dist/game.js escapeChance() を平均Lv差の式（50+5×差+人数補正、10〜95 clamp、有効味方0人→10、ボス/誤旗0）に。docs/SPECIFICATION.md を暫定式として更新。tests/game.cjs に 45/90/60・上限95・0人10 の回帰テスト。MANIFEST.sha256 再生成。
+- テスト: tests/game.cjs、tests/training.cjs、compile-monsters --check、scripts/sim/selftest.cjs すべて PASS
+- sim（--jobs 0,0,2,3,1,2 --n 1000）変更前 → 変更後:
+  - --level 1 --floor 1: {"winRate":0.991,"wipeRate":0,"deathsPerBattle":0.039,"hpLossRate":0.0887278106508879,"averageRounds":5.563}
+  - --level 1 --floor 1: {"winRate":0.991,"wipeRate":0.001,"deathsPerBattle":0.041,"hpLossRate":0.08759171597633167,"averageRounds":5.565}
+  - --level 1 --floor 3: {"winRate":0.524,"wipeRate":0.065,"deathsPerBattle":1.931,"hpLossRate":0.5097633136094667,"averageRounds":7.036}
+  - --level 1 --floor 3: {"winRate":0.531,"wipeRate":0.234,"deathsPerBattle":2.427,"hpLossRate":0.5432899408284022,"averageRounds":7.223}
+  - --level 3 --floor 3: {"winRate":0.657,"wipeRate":0.035,"deathsPerBattle":1.299,"hpLossRate":0.41545630174943,"averageRounds":7.497}
+  - --level 3 --floor 3: {"winRate":0.675,"wipeRate":0.107,"deathsPerBattle":1.509,"hpLossRate":0.41649652335508797,"averageRounds":7.501}
+  - --level 1 --floor 3 --boss: {"winRate":0.981,"wipeRate":0.019,"deathsPerBattle":0.273,"hpLossRate":0.3389644970414206,"averageRounds":2.929}
+  - --level 1 --floor 3 --boss: {"winRate":0.981,"wipeRate":0.019,"deathsPerBattle":0.273,"hpLossRate":0.3389644970414206,"averageRounds":2.929}
+- 所見: Lv1/3F の全滅率 6.5% → 23.4%、Lv3/3F 3.5% → 10.7%（逃走が減った分が全滅に回った）。1F と守護者戦はほぼ不変。
