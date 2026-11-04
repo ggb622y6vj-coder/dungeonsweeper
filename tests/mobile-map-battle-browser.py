@@ -64,6 +64,20 @@ with sync_playwright() as p:
                         assert not toggle.is_visible(), 'hidden during turn/victory playback'
             else:
                 page.evaluate("const r=Math.random;Math.random=()=>0;try{flee()}finally{Math.random=r}")
+                assert page.evaluate("s.logs[0]") == '逃走に成功。一歩前のマスへ戻った。'
+                # Stays hidden until the escape message has finished playing.
+                assert page.evaluate('logBusy()'), 'escape message is playing'
+                checks = 0
+                while True:
+                    # Atomic in-page probe so playback cannot end between the check and the click.
+                    st = page.evaluate("""(()=>{if(!logBusy())return null;const b=$('#maptoggle'),shown=!b.hidden&&b.offsetParent!==null;
+                      b.onclick();const opened=$('#mapdialog').open;if(opened)$('#mapdialog').close();return [shown,opened]})()""")
+                    if st is None:
+                        break
+                    checks += 1
+                    assert st == [False, False], f'hidden and guarded during escape message playback: {st}'
+                    page.wait_for_timeout(50)
+                assert checks > 0
             # While the enemy display remains (victory playback), the button stays hidden.
             if page.evaluate('logBusy() && !!visibleCombat()'):
                 assert not toggle.is_visible(), 'hidden during victory playback'
