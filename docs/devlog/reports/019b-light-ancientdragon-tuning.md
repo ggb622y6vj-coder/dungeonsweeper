@@ -1,0 +1,13 @@
+# 019b-light-ancientdragon-tuning 報告
+- コミット: dfa3ee1（main へ push 済み）
+- モデル: gpt-6-luna / reasoning low（1回目で成功）
+- 変更: data/monsters.csv の古竜(9F)のみ。HP 18d8+36→16d8+32、ブレス発動率 35%→25%（7d8 は据え置き）。dist/monster-data.js 再生成、MANIFEST.sha256 更新。
+- テスト: tests/game.cjs / tests/training.cjs / tests/final-boss.cjs / compile-monsters --check（88体）/ sim selftest すべてPASS。
+- sim（--jobs 0,0,2,3,1,2、詳細は 019b-sim-before.txt / 019b-sim-after.txt）:
+  - 指定装備（店装備 minFloor≤9＋指定12品、各スロット最良を自動選択。/workspace/sim/sim019b.cjs）n=1000:
+    - Lv13: 48.3% → 55.3%
+    - Lv16: 95.9% → 97.8%
+    - ※試遊の事前測定（86.5%→90.7%）と水準が大きく違う。装備の割り当て方がハーネスで異なるとみられる。試遊のハーネスでの再測定をお願いしたい。
+  - --gear drop n=300: 9F Lv13 96.0% → 98.7%
+  - 他の守護者（--gear drop n=300）変化なし: 7F L11 97.0%、8F L12 92.3%、10F L15 99.0%
+- ブラウザ確認は未実施。

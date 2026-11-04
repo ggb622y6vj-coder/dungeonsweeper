@@ -1,0 +1,12 @@
+# 004-bugfix-magicplans-length 検証結果 — 判定: OK
+- 対象: 02431e3（/workspace/verify-clone）
+- テスト: game.cjs・training.cjs・compile-monsters --check すべて成功
+- node:
+  - 6人パーティで ensureMagic() 後の magicPlans.length は 6
+  - 既存プランは保持される: [null,{halito}] → [null,{halito},null,null,null,null]（修正前の 0d94aaa では長さ2のまま。差を確認済み）
+  - 戦闘中に5人目・6人目（魔術師）が halito を唱え、MP 50→48、敵HP 1000→991、ログ「M4はハリトを唱えた。」「M5はハリトを唱えた。」
+  - 旧形式の3人セーブ（ash-v1、partyVersion なし。magicPlans は長さ3のものと欠損したものの2種類）: 例外なし。ensureSixParty で6人に移行し、magicPlans も長さ6。移行時は resetPartyCommands で全部 null になるが、これは既存の仕様
+- 本番（spells.js がリポジトリと一致）headless Chrome（/workspace/pp/v004.cjs）:
+  - 訓練場UIで6人を登録・加入させた。5人目・6人目を呪文職にするため、generateRecruit と setPartyFromRoster（ゲーム関数）で差し替え
+  - 戦闘に入り、5人目と6人目の呪文を openMagic と chooseBattleSpell（UIハンドラが呼ぶゲーム関数。クリック操作ではない）で選択し、attack() を実行。「W4は識別を唱えた」「W5はディオスを唱えた」
+  - 旧3人セーブを localStorage に入れてリロード: members 6、magicPlans 6、town、pageerror 0（404 はリソース1件のみ）

@@ -1,0 +1,11 @@
+# 016-light-floor-config-10f 検証結果 — 判定: OK（todo なし）
+- 対象: 985f4e2（balance.js MAX_FLOOR と trapPower、traps.js、game.js triggerChestTrap、BALANCE.md、テスト）。テスト3つと sim selftest すべて成功
+- 仕様との照合（done/016）: 盤面サイズと trapCount は変更なし。宝箱の罠は needle・poison・paralysis だけで爆発がないので、宝箱は針だけに倍率が掛かる（仕様の「宝箱の針・爆発」とは矛盾しない）。BALANCE.md はルート直下で、仕様の docs/BALANCE.md と場所が違うが、元からルートにある既存ファイルなので問題なし
+- node（/tmp/v16.cjs、Math.random=0.5 に固定）:
+  - trapPower 1/5/10/11 = 1/2/3.25/3.25
+  - 針: 1F 16 → 5F 32 → 10F 52（16×3.25）。爆発（全員）: 11 → 22 → 35（11×3.25=35.75 を切り捨て）。宝箱の針: 16 → 32 → 52
+  - 毒霧・麻痺の針・転移は全階で HP ダメージなし、内容も変わらない
+  - 盤面: 1F〜3F 8/10/12、4F 以降 12×12。罠数は 9,15,23,24,26,27,29,30,31,31（仕様どおり）
+  - 4F〜11F へ travelFloor して encounter: クラッシュなし。敵は 3F の表から出る（017 までは想定内）
+  - 備考: travelFloor(11) も通り、MAX_FLOOR で深さが止まらない（016 の範囲外。01A のラスボスで10F止めにする想定）
+- 本番（balance.js・traps.js・game.js がリポジトリと一致）: trapPower は同じ値。5F 扱いで針の罠「W3に32ダメージ」（1F では16）。pageerror 0。スクリーンショット /workspace/sim/v016.png

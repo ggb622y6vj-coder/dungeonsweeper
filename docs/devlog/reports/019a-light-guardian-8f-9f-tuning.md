@@ -1,0 +1,12 @@
+# 019a-light-guardian-8f-9f-tuning 報告
+- コミット: f8fca08（main へ push 済み）
+- モデル: gpt-6-luna / reasoning low（1回目で成功）
+- 変更: 案A。data/monsters.csv の魔将軍(8F) HP 16d8+40→14d8+35、古竜(9F) HP 20d8+40→18d8+36（約10%減）。dist/monster-data.js 再生成、MANIFEST.sha256 更新。
+- テスト: tests/game.cjs / tests/training.cjs / compile-monsters --check / sim selftest すべてPASS。
+- sim（--jobs 0,0,2,3,1,2 --n 300 --gear drop、詳細は 019a-sim-before.txt / 019a-sim-after.txt）:
+  - 7F守護者 L11: 97.0% → 97.0%
+  - 8F守護者 L12: 91.0% → 92.3%
+  - 9F守護者 L13: 95.0% → 96.0%
+  - 10F守護者 L15: 99.0% → 99.0%
+  - 通常戦 8F L12: 97.3% / 9F L13: 96.7%（変化なし）
+- 注意: sim の --gear drop は「その階までの迷宮産最良装備」で、試遊が使った条件（8F は 5〜6F 産9品、9F は＋7F 産3品）とは異なる。変更前から sim 上は 89〜100% に入っていた。試遊の装備条件での再確認をお願いしたい。
