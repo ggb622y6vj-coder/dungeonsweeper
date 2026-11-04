@@ -58,7 +58,7 @@ with sync_playwright() as p:
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
             assert entry.is_visible() and entry.locator('.ailment-fear').inner_text() == '恐怖'
-            assert entry.locator('.ailment-fear + .library-chance').inner_text() == f'{chance}%'
+            assert entry.locator('.ailment-fear').inner_text() == '恐怖' and entry.locator('.library-chance').count() == 0 and '%' not in entry.inner_text(), chance
             no_overflow(page)
         page.screenshot(path=str(output / f'fear-library-{width}.png'))
         page.locator('#libraryclose').click()

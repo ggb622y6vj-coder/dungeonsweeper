@@ -19,7 +19,7 @@ for (const [id,floor,chance] of [['wraith',6,.15],['hellhound',7,.15],['fiendhou
   const g=party([0]);
   assert.equal(g.run(`enemyDefinition('${id}').floor`),floor);
   assert.deepEqual(json(g,`enemyDefinition('${id}').statuses`),[{type:'fear',chance}]);
-  assert.equal(g.run(`libraryMonsterDetails(enemyDefinition('${id}'),{count:1,firstFloor:${floor}}).find(([k])=>k==='特殊能力')[1].children.some((e,i,a)=>e.textContent==='恐怖'&&e.className.includes('ailment-fear')&&a[i+1]?.textContent===\`${chance*100}%\`)`),true);
+  assert.equal(g.run(`libraryMonsterDetails(enemyDefinition('${id}'),{count:1,firstFloor:${floor}}).find(([k])=>k==='特殊能力')[1].children.some((e,i,a)=>e.textContent==='恐怖'&&e.className.includes('ailment-fear')&&!/%/.test(a.map(x=>x.textContent).join('')))`),true);
   // Keep the real death/drain probabilities: restore the target before each hit.
   g.run(`var hits=0;log=()=>{};
     for(let n=0;n<10000;n++){
