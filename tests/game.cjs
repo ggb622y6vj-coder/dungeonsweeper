@@ -54,6 +54,10 @@ s.enemy={boss:false,chestBattle:true,lootGold:0,units:[{id:'slime',uid:0,hp:1,re
 let killsShown=0;while(timers.length){timers.shift()();if(run("s.logs[0]==='敵を倒した。'")){killsShown++;let icons=run("(drawEnemies().match(/data-enemy-uid=/g)||[]).length");if(icons!==Math.max(0,2-killsShown))throw Error('group kill sequence')}}
 run(`
 if(drawEnemies()!=='')throw Error('battle icons remain');
+var antidoteLog=coloredLog('○○は解毒剤を使った。');
+if(antidoteLog.includes('log-spell')||!antidoteLog.includes('解毒剤'))throw Error('item name must remain plain and unbroken');
+if(!coloredLog('○○は解毒を唱えた。').includes('class="log-spell">解毒</span>'))throw Error('standalone antidote spell color');
+for(const item of [...WEAPONS,...MEDICINES])if(coloredLog(item.name)!==item.name)throw Error('item name color: '+item.name);
 var colored=coloredLog('戦士の攻撃。オーク戦士に12ダメージ。僧侶のHPが8回復した。');
 if(!colored.includes('class="log-ally">戦士</span>')||!colored.includes('class="log-enemy">オーク戦士</span>')||!colored.includes('class="log-damage">12ダメージ</span>')||!colored.includes('class="log-heal">8回復</span>'))throw Error('log colors');
 if(coloredLog('<img src=x onerror=alert(1)>').includes('<img'))throw Error('log escaping');
