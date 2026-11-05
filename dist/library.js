@@ -79,7 +79,7 @@ function libraryEntry(name,details,key=null,subtext=''){
  }
  return entry;
 }
-function renderLibrary(tab='monsters'){
+function renderLibrary(tab='monsters',spellJob=1){
  ensureLibrary();
  const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.identified).length;
  const itemCount=WEAPONS.filter(w=>s.library.items[w.id]).length;
@@ -89,6 +89,11 @@ function renderLibrary(tab='monsters'){
   button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
  }
  const body=$('#librarybody');body.replaceChildren();body.setAttribute('aria-labelledby','librarytab-'+tab);
+ const spellTabs=$('#library-spell-tabs');spellTabs.hidden=tab!=='spells';
+ for(const job of [1,2]){
+  const button=$('#libraryspelltab-'+job),active=tab==='spells'&&job===spellJob;
+  button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
+ }
  if(tab==='monsters'){
   let floor;
   for(const d of [...ENEMIES].sort((a,b)=>a.floors[0]-b.floors[0])){
@@ -112,7 +117,7 @@ function renderLibrary(tab='monsters'){
  if(tab==='spells'){
   // Permanent record: a spell stays discovered once any adventurer has learned it.
   recordLibrarySpells();
-  for(const spell of MAGIC){
+  for(const spell of MAGIC.filter(spell=>spell.job===spellJob)){
   const known=!!s.library.spells[spell.id];
   body.append(libraryEntry(known?spell.name:'？？？',known?[['職業',CLASSES[spell.job].name],['習得レベル',`Lv.${spell.level}`],
    ['消費MP',spell.id==='dumapic'||spell.id==='floodfill'?`${spell.mp}（使用ごとに倍増）`:String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
@@ -129,4 +134,5 @@ function libraryUI(){
   const button=$('#librarytab-'+tab);
   button.onclick=()=>renderLibrary(tab);
  }
+ for(const job of [1,2])$('#libraryspelltab-'+job).onclick=()=>renderLibrary('spells',job);
 }

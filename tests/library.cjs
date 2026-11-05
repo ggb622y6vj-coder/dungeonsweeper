@@ -140,12 +140,22 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  const g=game(null,()=>.5);
  g.run("for(const job of [1,2]){const r=generateRecruit('術者'+job,job);registerRecruit(r);changeRecruitParty(r.members.id,true);}");
  g.run("renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');var learned=new Set(trainingRoster().flatMap(r=>r.members.known));");
- assert.equal(g.run('entries.length'),g.run('MAGIC.length'));
+ assert.equal(g.run('entries.length'),g.run('MAGIC.filter(x=>x.job===1).length'));
+ assert.equal(g.run("$('#library-spell-tabs').hidden"),false);
+ assert.equal(g.run("$('#libraryspelltab-1').attributes['aria-selected']"),'true');
+ assert.equal(g.run("entries.every((e,i)=>MAGIC.filter(x=>x.job===1)[i].job===1)"),true);
  assert.ok(g.run('learned.size')>0&&g.run('learned.size')<g.run('MAGIC.length'));
- assert.equal(g.run("entries.every((e,i)=>learned.has(MAGIC[i].id)?(e.children[0].textContent===MAGIC[i].name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1))"),true);
+ assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1)[i];return learned.has(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true);
  g.run("s.members[0].known.push(MAGIC.find(x=>x.job===1&&!learned.has(x.id)).id);renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
- assert.equal(g.run("entries.filter(e=>e.children[0].textContent!=='？？？').length"),g.run('learned.size')+1);
- console.log('PASS library: spell tab shows unlearned spells as ？？？');
+ assert.equal(g.run("entries.filter(e=>e.children[0].textContent!=='？？？').length"),g.run("MAGIC.filter(x=>x.job===1&&s.library.spells[x.id]).length"));
+ g.run("$('#librarybody').scrollTop=99;$('#libraryspelltab-2').onclick();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
+ assert.equal(g.run("$('#libraryspelltab-2').attributes['aria-selected']"),'true');
+ assert.equal(g.run("$('#libraryspelltab-1').attributes['aria-selected']"),'false');
+ assert.equal(g.run("$('#librarybody').scrollTop"),0);
+ assert.equal(g.run('entries.length'),g.run('MAGIC.filter(x=>x.job===2).length'));
+ assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===2)[i];return learned.has(spell.id)?e.children[0].textContent===spell.name:e.children[0].textContent==='？？？'})"),true);
+ g.run("renderLibrary('items')");assert.equal(g.run("$('#library-spell-tabs').hidden"),true);
+ console.log('PASS library: spell job tabs filter by job, preserve discovery, set aria state and reset scroll');
 }
 
 // 040b: the spell record is permanent and stored in the save like other discoveries.
@@ -163,7 +173,7 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(r.run('trainingRoster().length'),0);
  r=reload(r);
  r.run(`var ids=${ids};renderLibrary('spells');`);r.run("var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
- assert.equal(r.run("entries.every((e,i)=>ids.includes(MAGIC[i].id)?(e.children[0].textContent===MAGIC[i].name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1))"),true,'learned spells stay after deleting the only learner');
+ assert.equal(r.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1)[i];return ids.includes(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true,'learned spells stay after deleting the only learner');
  // Legacy save without spells: seed from party + reserve.
  const h=game(null,()=>.5);
  h.run("var a=generateRecruit('僧侶',2);registerRecruit(a);changeRecruitParty(a.members.id,true);var b=generateRecruit('術者',1);registerRecruit(b);b=trainingRoster()[1];b.members.known.push(MAGIC.find(x=>x.job===1&&x.level===5).id);");
