@@ -98,6 +98,7 @@
 | 070 | 2026-11-04 | 070 戦闘コマンド：「戻る」位置固定・「逃げる」を先頭メンバーのみ・「クイック攻撃」追加 | `0b39a0b` | [spec](specs/070-medium-battle-back-escape-quick.md) | [070-shots](reports/070-shots/), [070-shots-live](reports/070-shots-live/), [070-verify.md](reports/070-verify.md), [070.md](reports/070.md) |
 | 071 | 2026-11-04 | 071 クイック攻撃ボタンを見出し横の小ボタンに（main 30ff726 から） | `4510127` | [spec](specs/071-light-quick-attack-header.md) | [071-shots](reports/071-shots/), [071-shots-live](reports/071-shots-live/), [071-verify.md](reports/071-verify.md), [071.md](reports/071.md) |
 | 072 | 2026-11-04 | 072 Notionのモンスター・呪文DBの更新をゲームデータに反映する | `b73ead5` | [spec](specs/072-heavy-notion-monster-spell-sync.md) | [072-shots](reports/072-shots/), [072-shots-live](reports/072-shots-live/), [072-verify.md](reports/072-verify.md), [072.md](reports/072.md) |
+| 073 | 2026-11-05 | 073 [light][bugfix] ログで「解毒剤」の一部が呪文色になる（hold/073・未push） | `7682f88` | [spec](specs/073-light-antidote-log-color.md) | [073-shots](reports/073-shots/), [073.md](reports/073.md) |
 
 ## 番号なしレポート / Other reports
 
