@@ -300,12 +300,14 @@ magicUI();medicineUI();flagUI();partyUI();libraryUI();
 function coloredLog(text){
  const foes=[...ENEMIES.flatMap(e=>[e.name,e.unknown]),'毒スライム','ゴーストナイト','地獄の犬','オーク戦士','ゴヅメヅ'];
  const spells=MAGIC.map(x=>x.name);
- const flagNames=Object.values(FLAG_NAMES);const names=[...foes,...NAMES,...spells,...flagNames].filter(Boolean).sort((a,b)=>b.length-a.length);
+ const itemNames=[...WEAPONS,...MEDICINES].map(x=>x.name);
+ const flagNames=Object.values(FLAG_NAMES);const names=[...itemNames,...foes,...NAMES,...spells,...flagNames].filter(Boolean).sort((a,b)=>b.length-a.length);
  const escape=t=>t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const pattern=new RegExp(names.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')+'|\\d+(?:\\.\\d+)?(?:ダメージ|回復)','g');
  let result='',last=0;
  for(const match of text.matchAll(pattern)){
   const word=match[0],at=match.index;
+  if(itemNames.includes(word)){result+=escape(text.slice(last,at))+escape(word);last=at+word.length;continue}
   const kind=flagNames.includes(word)?'flag-'+Object.keys(FLAG_NAMES).find(k=>FLAG_NAMES[k]===word):foes.includes(word)?'enemy':NAMES.includes(word)?'ally':spells.includes(word)?'spell':word.endsWith('回復')?'heal':'damage';
   result+=escape(text.slice(last,at))+'<span class="log-'+kind+'">'+escape(word)+'</span>';last=at+word.length;
  }
