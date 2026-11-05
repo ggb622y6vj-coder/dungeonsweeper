@@ -99,6 +99,7 @@
 | 071 | 2026-11-04 | 071 クイック攻撃ボタンを見出し横の小ボタンに（main 30ff726 から） | `4510127` | [spec](specs/071-light-quick-attack-header.md) | [071-shots](reports/071-shots/), [071-shots-live](reports/071-shots-live/), [071-verify.md](reports/071-verify.md), [071.md](reports/071.md) |
 | 072 | 2026-11-04 | 072 Notionのモンスター・呪文DBの更新をゲームデータに反映する | `b73ead5` | [spec](specs/072-heavy-notion-monster-spell-sync.md) | [072-shots](reports/072-shots/), [072-shots-live](reports/072-shots-live/), [072-verify.md](reports/072-verify.md), [072.md](reports/072.md) |
 | 073 | 2026-11-05 | 073 [light][bugfix] ログで「解毒剤」の一部が呪文色になる | `7682f88` | [spec](specs/073-light-antidote-log-color.md) | [073-shots](reports/073-shots/), [073-verify.md](reports/073-verify.md), [073.md](reports/073.md) |
+| 074 | 2026-11-05 | 074 [light] 図書館の呪文を「魔法使い」「僧侶」タブに分ける | `hold/074` | [spec](specs/074-light-library-spell-job-tabs.md) | [074-shots](reports/074-shots/), [074-verify.md](reports/074-verify.md), [074.md](reports/074.md) |
 
 ## 番号なしレポート / Other reports
 

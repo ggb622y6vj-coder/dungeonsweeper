@@ -236,12 +236,17 @@
  // Tab rows and their lists have an explicit vertical boundary; geometry alone
  // would jump back to a header when a long list has scrolled beneath it.
  function tabNavigation(way,key){
-  const tabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
-  if(!tabs.length)return false;
+  const allTabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
+  if(!allTabs.length)return false;
+  const shortcut=key.toLowerCase()==='q'?-1:key.toLowerCase()==='e'?1:0;
+  const selectedGroup=selected?.getAttribute?.('role')==='tab'?selected.parentElement:null;
+  // Nested tablists (library spell jobs) navigate within themselves, while
+  // Q/E remains the shortcut for the dialog's primary tablist.
+  const group=shortcut?allTabs[0].parentElement:selectedGroup||allTabs[0].parentElement;
+  const tabs=allTabs.filter(el=>el.parentElement===group);
   const active=tabs.find(el=>el.getAttribute('aria-selected')==='true')||tabs[0];
   const panel=doc.getElementById(active.getAttribute('aria-controls'));
   const entries=panel?.hasAttribute('data-key-list')?layer.items.filter(el=>el!==panel&&panel.contains(el)):[];
-  const shortcut=key.toLowerCase()==='q'?-1:key.toLowerCase()==='e'?1:0;
   const onTab=tabs.includes(selected),index=entries.indexOf(selected);
   if(shortcut||(onTab&&['left','right'].includes(way))||(onTab&&['Home','End'].includes(key))){
    const step=shortcut||(way==='left'?-1:1);
