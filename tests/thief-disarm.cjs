@@ -77,3 +77,62 @@ for(const floor of [1,2]){
  assert.equal(h.run('s.elevatorNotice'),null);
 }
 console.log('PASS thief disarm Amendment 1: paralysis guards and recovery, elevator unlock, log/dialog order and no duplicate unlock');
+// Amendment 2: opening the last safe cell must not turn it back into unexplored elevator terrain.
+function elevatorDisarmSetup(floor=1,onlyTarget=false){
+ const h=setup();
+ h.run(`s.floor=${floor};s.size=8;s.start=9;s.pos=10;s.dir=1;s.boss=63;
+  s.elevatorFloors=${floor===1?'[]':'[1]'};s.elevatorNotice=null;s.corpses=[];
+  s.cells=Array.from({length:64},(_,i)=>({trap:${onlyTarget}?![9,10,11,63].includes(i):i%7===0,open:false,flag:false,type:''}));
+  s.cells[9].type='stairs';s.cells[63].type='boss';s.cells[11].trap=false;
+  s.cells.forEach((c,i)=>c.open=!c.trap&&i!==11);
+  // Reconstruct the legacy candidate pool, including the 1F distance restriction.
+  var legacyPool=s.cells.map((_,i)=>i).filter(i=>{
+   const c=s.cells[i];return c.type===''&&!c.trap&&!c.chest&&!s.corpses.some(x=>x.floor===s.floor&&x.cell===i)&&i!==s.pos&&i!==s.start&&i!==s.boss;
+  });
+  if(s.floor===1)legacyPool=legacyPool.filter(i=>Math.max(Math.abs(i%size()-s.start%size()),Math.abs((i/size()|0)-(s.start/size()|0)))<=2);
+  var targetIndex=legacyPool.indexOf(11);
+ `);
+ assert.ok(h.run('targetIndex>=0'));
+ assert.equal(h.run('canThiefDisarm(0)'),true);
+ h.run(`var originalRandom=Math.random;Math.random=()=>(targetIndex+.5)/legacyPool.length;
+  try{thiefDisarm(0)}finally{Math.random=originalRandom}`);
+ return h;
+}
+{
+ const h=elevatorDisarmSetup();
+ assert.equal(h.run('s.cells[11].open'),true,'1F: disarmed safe cell 11 remains explored');
+ assert.notEqual(h.run('s.cells[11].type'),'elevator');
+ assert.equal(h.run("s.cells.filter(c=>c.type==='elevator').length"),1);
+ assert.equal(h.run("s.cells.find(c=>c.type==='elevator').open"),false);
+ assert.equal(h.run("legacyPool.includes(s.cells.findIndex(c=>c.type==='elevator'))"),true);
+ assert.equal(h.run("Math.max(Math.abs(s.cells.findIndex(c=>c.type==='elevator')%8-1),Math.abs((s.cells.findIndex(c=>c.type==='elevator')/8|0)-1))<=2"),true);
+ const message='昇降機が使えるようになった！ 昇降機（E）から解放した階へ移動できます。';
+ assert.deepEqual(JSON.parse(h.run('JSON.stringify(logQueue.map(x=>x.text))')),['冒険者0は目の前を調べた。罠はなかった。',message]);
+ assert.equal(h.run('s.elevatorNotice'),message);
+ assert.equal(h.run("!!$('#elevatordialog').open"),false);
+ h.drain();
+ assert.equal(h.run("$('#elevatordialog').open"),true);
+ assert.equal(h.run("$('#elevatormessage').textContent"),message);
+}
+{
+ const h=elevatorDisarmSetup(2);
+ assert.equal(h.run('s.cells[11].open'),true,'2F: disarmed safe cell stays explored despite legacy RNG selecting it');
+ assert.notEqual(h.run('s.cells[11].type'),'elevator');
+ assert.equal(h.run("s.cells.filter(c=>c.type==='elevator').length"),1);
+ assert.equal(h.run("s.cells.find(c=>c.type==='elevator').open"),false);
+ assert.equal(h.run("legacyPool.includes(s.cells.findIndex(c=>c.type==='elevator'))"),true);
+ assert.equal(h.run('s.elevatorFloors.includes(2)'),true);
+ h.drain();
+}
+// Fallback exception: when cell 11 is the ONLY eligible cell, it becomes the elevator and open=false again.
+for(const floor of [1,2]){
+ let h;
+ assert.doesNotThrow(()=>{h=elevatorDisarmSetup(floor,true)});
+ assert.deepEqual(JSON.parse(h.run('JSON.stringify(legacyPool)')),[11]);
+ assert.equal(h.run('s.cells[11].type'),'elevator','only-candidate fallback deliberately reuses the disarmed cell');
+ assert.equal(h.run('s.cells[11].open'),false,'fallback exception deliberately returns cell 11 to unexplored');
+ assert.equal(h.run("s.cells.filter(c=>c.type==='elevator').length"),1);
+ assert.equal(h.run('s.elevatorFloors.includes(s.floor)'),true);
+ h.drain();
+}
+console.log('PASS thief disarm Amendment 2: 1F/2F preserve opened target, hidden eligible elevator, distance limit, log/notice order; sole-candidate fallback reuses target with open=false');
