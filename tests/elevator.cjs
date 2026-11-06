@@ -46,13 +46,27 @@ g.run('s.cells.forEach(c=>c.open=true);var before1=JSON.stringify(s.cells)');
 g.run("$('#elevatorchoices').children[0].onclick()");
 assert.equal(g.run('s.floor'),3);assert.equal(g.run("s.cells[s.pos].type"),'elevator');assert.equal(g.run('s.cells[s.pos].open'),true);assert.equal(g.run('s.pendingElevator'),false);
 assert.equal(g.run('(s.guardiansDefeated||[]).includes(3)'),false);
+// 076: a fresh elevator destination reveals only the arrival E, not the stairs.
+assert.equal(g.run('s.cells[s.start].open'),false,'076: elevator arrival hides fresh stairs');
+assert.deepEqual(J(g,'s.cells.flatMap((c,i)=>c.open?[i]:[])'),[g.run('s.pos')]);
 // 5. Same run: returning restores the saved boards and E cells.
 g.run('var e3=s.pos,before3=JSON.stringify(s.cells);travelElevator(1)');
-assert.equal(g.run('s.floor'),1);assert.equal(g.run('JSON.stringify(s.cells)===before1'),true);assert.equal(g.run('s.pos===e'),true);
+assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.cells[s.start].open'),false);
+// 076 closes only the stairs on arrival; normalize that field to retain full equality for every other cell/field.
+assert.equal(g.run('(()=>{const before=JSON.parse(before1);before[s.start].open=false;return JSON.stringify(s.cells)===JSON.stringify(before)})()'),true);assert.equal(g.run('s.pos===e'),true);
 g.run('travelElevator(3)');assert.equal(g.run('s.pos===e3&&JSON.stringify(s.cells)===before3'),true);
 assert.equal(g.run('travelElevator(2)'),false,'locked floors are not destinations');
+// 076: stepping onto the hidden stairs still opens them and asks to travel.
+g.run('s.pos=[s.start-s.size,s.start+s.size,s.start-1,s.start+1].find(i=>s.cells[i]&&adjacent(i,s.start));cell(s.start)');
+assert.equal(g.run('s.cells[s.start].open'),true);assert.equal(g.run('s.pendingStairs'),true);g.drain();
+// Normal stair travel to a fresh floor keeps its starting stairs open.
+{const stairs=setup(76);stairs.run("s.guardiansDefeated=[1];s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");
+ assert.equal(stairs.run('s.floor'),2);assert.equal(stairs.run('s.pos===s.start&&s.cells[s.start].open'),true);}
+// Defensive guard: a saved arrival cell that is also the start stays open.
+{const same=setup(77);same.run("s.elevatorFloors=[1,3];fresh(3);s.start=s.cells.findIndex(c=>c.type==='elevator');rememberFloor();var savedFloors=s.floors;fresh(1);s.floors=savedFloors;travelElevator(3)");
+ assert.equal(same.run('s.pos===s.start&&s.cells[s.pos].open'),true);}
 // Save mid-choice reopens the picker after reload instead of locking the party.
-g.run("s.pendingElevator=true;save()");const re=game(g.run("localStorage.getItem('ash-v1')"));re.run('render()');
+g.run("s.pendingStairs=false;s.pendingElevator=true;save()");const re=game(g.run("localStorage.getItem('ash-v1')"));re.run('render()');
 assert.equal(re.run("$('#elevatorpick').open"),true);re.run("$('#elevatorcancel').onclick();s.pendingElevator=false;render()");assert.equal(re.run('s.pendingElevator'),false);
 // 6. Legacy save without elevatorFloors loads as [].
 const legacy=J(g,'rosterSaveState()');delete legacy.elevatorFloors;const old=game(JSON.stringify(legacy));old.run('render()');assert.deepEqual(J(old,'s.elevatorFloors'),[]);
