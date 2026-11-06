@@ -10,7 +10,7 @@ const rows = new Map(csv.trimEnd().split(/\r?\n/).slice(1).map(line => {
 const expected = new Map([
   ['有毒スライム', '1d8'], ['ゴーストナイト', '1d8+1'], ['オーク戦士', '1d8+1'],
   ['武者グモ', '1d8+1'], ['洞窟の魔術師', '1d8+1'], ['バンディット', '2d6'],
-  ['コープスイーター', '2d6'], ['ストーンゴーレム', '2d7+1'], ['火トンボ', '1d8'],
+  ['コープスイーター', '2d6'], ['ストーンゴーレム', '2d7+5'], ['火トンボ', '1d8'],
   ['硫化スライム', '2d6+2'], ['骸骨の射手', '2d6+2'], ['オーク呪術師', '2d6+2'],
   ['影の盗人', '2d6+2'], ['フェンリル狼', '2d8+2'],
 ]);
@@ -47,7 +47,16 @@ for (const [name, damage] of expected) {
   const [, n, d, b = '0'] = damage.match(/^(\d+)d(\d+)(?:\+(\d+))?$/);
   assert.deepEqual(m.attack, [+n, +d, +b], `${name} compiled attack ${damage}`);
 }
+// 079 A: plant icons and stable IDs survive the rename and new entry.
+for(const id of ['fungus','kinoko','takenoko','sirakaba','insectivore']){
+  const m=ENEMIES.find(e=>e.id===id);assert.ok(m,id);
+  assert.equal(m.race,'植物');assert.equal(m.icon,'♣');
+}
+assert.equal(ENEMIES.find(e=>e.id==='sirakaba').name,'武者のくくり樹');
+const plant=ENEMIES.find(e=>e.id==='insectivore');
+assert.deepEqual(plant.floors,[3,4]);assert.equal(plant.death,.03);
+assert.deepEqual(plant.statuses,[{type:'poison',chance:.15}]);
 assert.equal(ENEMIES.filter(e=>e.floor===10&&e.boss).length,1);
 assert.equal(ENEMIES.find(e=>e.id==='labyrinthlord').boss,true);
 assert.equal(rows.get('赤兎')[7], '3d4');
-console.log(`PASS monster dice and 95 definitions; 10F additions, boss invariant, guardians and breath unchanged`);
+console.log(`PASS monster dice and 96 definitions; 10F additions, boss invariant, guardians and breath unchanged`);

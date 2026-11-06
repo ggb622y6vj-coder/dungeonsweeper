@@ -53,7 +53,7 @@ with sync_playwright() as p:
         for key in ('slime', 'wolf'):
             entry = page.locator(f'#librarybody [data-library-entry="monster-{key}"]')
             assert entry.locator('h4').inner_text() == page.evaluate(f"enemyDefinition('{key}').name")
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/95 ')
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/96 ')
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         page.screenshot(path=str(output / f'library-{width}.png'))
         assert not errors, errors

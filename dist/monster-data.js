@@ -29,7 +29,7 @@ const ENEMIES=[
     "gold": [
       1,
       4,
-      2
+      0
     ],
     "race": "不定形",
     "mageResist": 0.0,
@@ -130,7 +130,7 @@ const ENEMIES=[
     "gold": [
       2,
       4,
-      2
+      0
     ],
     "race": "不死",
     "mageResist": 0.0,
@@ -179,8 +179,8 @@ const ENEMIES=[
     ],
     "gold": [
       2,
-      5,
-      2
+      4,
+      0
     ],
     "race": "獣",
     "mageResist": 0.0,
@@ -229,8 +229,8 @@ const ENEMIES=[
     ],
     "gold": [
       2,
-      6,
-      2
+      3,
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -280,7 +280,7 @@ const ENEMIES=[
     "gold": [
       1,
       6,
-      2
+      0
     ],
     "race": "獣",
     "mageResist": 0.0,
@@ -330,7 +330,7 @@ const ENEMIES=[
     "gold": [
       1,
       6,
-      2
+      0
     ],
     "race": "獣",
     "mageResist": 0.0,
@@ -380,7 +380,7 @@ const ENEMIES=[
     "gold": [
       1,
       6,
-      2
+      0
     ],
     "race": "虫",
     "mageResist": 0.0,
@@ -430,7 +430,7 @@ const ENEMIES=[
     "gold": [
       1,
       6,
-      2
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -480,7 +480,7 @@ const ENEMIES=[
     "gold": [
       1,
       6,
-      2
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -580,7 +580,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "不定形",
     "mageResist": 0.0,
@@ -618,7 +618,7 @@ const ENEMIES=[
     "hp": [
       2,
       10,
-      4
+      5
     ],
     "ac": 8,
     "hit": 2,
@@ -635,7 +635,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "不死",
     "mageResist": 0.0,
@@ -668,7 +668,7 @@ const ENEMIES=[
     "hp": [
       2,
       6,
-      0
+      10
     ],
     "ac": 8,
     "hit": 2,
@@ -679,13 +679,13 @@ const ENEMIES=[
     ],
     "xp": 24.0,
     "groupSize": [
-      1,
+      2,
       3
     ],
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "虫",
     "mageResist": 0.05,
@@ -743,7 +743,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -788,12 +788,12 @@ const ENEMIES=[
     "xp": 28.0,
     "groupSize": [
       1,
-      2
+      4
     ],
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "虫",
     "mageResist": 0.0,
@@ -801,7 +801,7 @@ const ENEMIES=[
     "swings": 1,
     "rear": false,
     "flee": 0,
-    "summon": 0,
+    "summon": 0.1,
     "steal": 0,
     "drain": 0,
     "death": 0,
@@ -809,7 +809,7 @@ const ENEMIES=[
     "resistance": "なし",
     "boss": false,
     "icon": "✥",
-    "summonCap": 4,
+    "summonCap": 5,
     "breath": null,
     "spell": 0,
     "spellInfo": null
@@ -843,7 +843,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -903,7 +903,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "人型",
     "mageResist": 0.0,
@@ -958,7 +958,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "不死",
     "mageResist": 0.0,
@@ -996,14 +996,14 @@ const ENEMIES=[
     "hp": [
       3,
       10,
-      4
+      5
     ],
     "ac": 6,
     "hit": 4,
     "attack": [
       2,
       7,
-      1
+      5
     ],
     "xp": 50.0,
     "groupSize": [
@@ -1013,7 +1013,7 @@ const ENEMIES=[
     "gold": [
       2,
       6,
-      4
+      0
     ],
     "race": "構造体",
     "mageResist": 0.15,
@@ -1056,7 +1056,7 @@ const ENEMIES=[
     "hp": [
       4,
       14,
-      20
+      30
     ],
     "ac": 6,
     "hit": 4,
@@ -1119,7 +1119,7 @@ const ENEMIES=[
     "hp": [
       3,
       6,
-      6
+      10
     ],
     "ac": 8,
     "hit": 3,
@@ -1191,7 +1191,7 @@ const ENEMIES=[
     "xp": 47.0,
     "groupSize": [
       2,
-      3
+      4
     ],
     "gold": [
       3,
@@ -1246,7 +1246,7 @@ const ENEMIES=[
     "gold": [
       3,
       6,
-      6
+      0
     ],
     "race": "魔獣",
     "mageResist": 0.05,
@@ -1279,7 +1279,7 @@ const ENEMIES=[
     "hp": [
       3,
       6,
-      0
+      10
     ],
     "ac": 7,
     "hit": 3,
@@ -1339,7 +1339,7 @@ const ENEMIES=[
     "hp": [
       3,
       8,
-      0
+      5
     ],
     "ac": 6,
     "hit": 4,
@@ -1406,7 +1406,7 @@ const ENEMIES=[
     "gold": [
       3,
       6,
-      6
+      0
     ],
     "race": "人型",
     "mageResist": 0.05,
@@ -1439,7 +1439,7 @@ const ENEMIES=[
     "hp": [
       3,
       6,
-      0
+      10
     ],
     "ac": 6,
     "hit": 4,
@@ -1502,7 +1502,7 @@ const ENEMIES=[
     "hp": [
       3,
       4,
-      0
+      5
     ],
     "ac": 6,
     "hit": 4,
@@ -1519,7 +1519,7 @@ const ENEMIES=[
     "gold": [
       3,
       6,
-      6
+      0
     ],
     "race": "獣",
     "mageResist": 0.05,
@@ -1550,16 +1550,16 @@ const ENEMIES=[
     ],
     "level": 8,
     "hp": [
-      3,
+      4,
       10,
-      0
+      10
     ],
     "ac": 6,
     "hit": 5,
     "attack": [
       3,
       7,
-      0
+      5
     ],
     "xp": 61.0,
     "groupSize": [
@@ -1569,7 +1569,7 @@ const ENEMIES=[
     "gold": [
       3,
       6,
-      6
+      0
     ],
     "race": "構造体",
     "mageResist": 0.2,
@@ -1617,7 +1617,7 @@ const ENEMIES=[
     "hp": [
       3,
       10,
-      0
+      10
     ],
     "ac": 6,
     "hit": 4,
@@ -1667,7 +1667,7 @@ const ENEMIES=[
     "hp": [
       4,
       6,
-      9
+      10
     ],
     "ac": 5,
     "hit": 5,
@@ -1731,7 +1731,7 @@ const ENEMIES=[
   {
     "id": "ogre",
     "name": "オーガ",
-    "unknown": "大きな鬼",
+    "unknown": "巨大な鬼",
     "floor": 4,
     "floors": [
       4
@@ -1740,7 +1740,7 @@ const ENEMIES=[
     "hp": [
       4,
       8,
-      8
+      20
     ],
     "ac": 5,
     "hit": 5,
@@ -1845,7 +1845,7 @@ const ENEMIES=[
     "hp": [
       3,
       8,
-      4
+      10
     ],
     "ac": 5,
     "hit": 5,
@@ -2950,7 +2950,7 @@ const ENEMIES=[
       8,
       12
     ],
-    "race": "不定形",
+    "race": "植物",
     "mageResist": 0.1,
     "priestResist": 0.1,
     "swings": 1,
@@ -2972,7 +2972,7 @@ const ENEMIES=[
     ],
     "resistance": "毒無効",
     "boss": false,
-    "icon": "◉",
+    "icon": "♣",
     "summonCap": 4,
     "breath": null,
     "spell": 0,
@@ -5108,9 +5108,9 @@ const ENEMIES=[
     "gold": [
       2,
       4,
-      5
+      0
     ],
-    "race": "不定形",
+    "race": "植物",
     "mageResist": 0.0,
     "priestResist": 0.0,
     "swings": 1,
@@ -5123,7 +5123,7 @@ const ENEMIES=[
     "statuses": [],
     "resistance": "なし",
     "boss": false,
-    "icon": "◉",
+    "icon": "♣",
     "summonCap": 5,
     "breath": null,
     "spell": 0,
@@ -5161,7 +5161,7 @@ const ENEMIES=[
       5,
       0
     ],
-    "race": "不定形",
+    "race": "植物",
     "mageResist": 0.0,
     "priestResist": 0.0,
     "swings": 1,
@@ -5174,7 +5174,7 @@ const ENEMIES=[
     "statuses": [],
     "resistance": "なし",
     "boss": false,
-    "icon": "◉",
+    "icon": "♣",
     "summonCap": 4,
     "breath": null,
     "spell": 0,
@@ -5182,8 +5182,8 @@ const ENEMIES=[
   },
   {
     "id": "sirakaba",
-    "name": "デクノボー",
-    "unknown": "人面の木",
+    "name": "武者のくくり樹",
+    "unknown": "首吊りの木",
     "floor": 2,
     "floors": [
       2,
@@ -5193,7 +5193,7 @@ const ENEMIES=[
     "hp": [
       3,
       10,
-      7
+      10
     ],
     "ac": 6,
     "hit": 3,
@@ -5212,7 +5212,7 @@ const ENEMIES=[
       4,
       0
     ],
-    "race": "悪魔",
+    "race": "植物",
     "mageResist": 0.0,
     "priestResist": 0.0,
     "swings": 1,
@@ -5225,7 +5225,63 @@ const ENEMIES=[
     "statuses": [],
     "resistance": "なし",
     "boss": false,
-    "icon": "♜",
+    "icon": "♣",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "insectivore",
+    "name": "髑髏カヅラ",
+    "unknown": "食人植物",
+    "floor": 3,
+    "floors": [
+      3,
+      4
+    ],
+    "level": 8,
+    "hp": [
+      3,
+      4,
+      10
+    ],
+    "ac": 6,
+    "hit": 4,
+    "attack": [
+      2,
+      5,
+      0
+    ],
+    "xp": 50.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      3,
+      10,
+      0
+    ],
+    "race": "植物",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0.03,
+    "statuses": [
+      {
+        "type": "poison",
+        "chance": 0.15
+      }
+    ],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♣",
     "summonCap": 4,
     "breath": null,
     "spell": 0,

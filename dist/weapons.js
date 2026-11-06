@@ -37,14 +37,30 @@ const WEAPONS = [
  {id:'judgehammer',name:'天罰の槌',dice:[3,8,5],classes:[2],price:3200,sell:1600,drop:true,minFloor:8,shop:false,hitBonus:2},
  {id:'ninjato',name:'忍びの刀',dice:[3,6,5],classes:[3],price:3500,sell:1750,drop:true,minFloor:8,shop:false,hitBonus:3},
  {id:'dragonbow',name:'竜骨の弓',range:'ranged',dice:[3,6,5],classes:[0,3],price:3400,sell:1700,drop:true,minFloor:8,shop:false,hitBonus:3},
- {id:'holysword',name:'聖剣',dice:[4,8,5],classes:[0],price:6000,sell:3000,drop:true,minFloor:9,shop:false,hitBonus:3,minAttacks:2}
+ {id:'holysword',name:'聖剣',dice:[4,8,5],classes:[0],price:6000,sell:3000,drop:true,minFloor:9,shop:false,hitBonus:3,minAttacks:2},
+ // 079: Notion同期。特殊効果の発動処理は別工程。
+ {"id":"mitibikinoono","name":"導きの斧","range":"melee","dice":[2,6,3],"classes":[0],"price":1900,"sell":950,"drop":true,"minFloor":6,"shop":false,"desc":"戦闘開始時、周囲8マスの正しい旗1本につき相手に与えるダメージ+1。","effect":{"kind":"flagDamage"}},
+ {"id":"flagaxe","name":"旗印の斧","range":"melee","dice":[2,5,0],"classes":[0],"price":440,"sell":220,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘開始時、周囲8マスの正しい旗1本につき相手に与えるダメージ+1。","effect":{"kind":"flagDamage"}},
+ {"id":"mumeinoken","name":"無名の剣","range":"melee","dice":[2,3,0],"classes":[0],"price":280,"sell":140,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘開始時、現在地の数字が0なら、この戦闘の通常攻撃回数+1（同種効果は重複しない）。","effect":{"kind":"zeroSwings"}},
+ {"id":"zerosword","name":"零式の剣","range":"melee","dice":[2,6,2],"classes":[0],"price":480,"sell":240,"drop":true,"minFloor":4,"shop":false,"desc":"戦闘開始時、現在地の数字が0なら、この戦闘の通常攻撃回数+1（同種効果は重複しない）。","effect":{"kind":"zeroSwings"}},
+ {"id":"reversalblade","name":"精算の刃","range":"melee","dice":[2,6,3],"classes":[3],"price":2800,"sell":1400,"drop":true,"minFloor":7,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、敵のACを−1した状態で攻撃。","effect":{"kind":"flagMatchAC"}},
+ {"id":"flagsword","name":"旗印の刃","range":"melee","dice":[2,4,0],"classes":[0],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、敵のACを−1した状態で攻撃。","effect":{"kind":"flagMatchAC"}},
+ {"id":"hatajirusinosentui","name":"旗印の戦鎚","range":"melee","dice":[2,6,0],"classes":[2],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘勝利時、10％の確率で現在地の周囲8マスにある正しく旗を立てた罠を全て解除する。","effect":{"kind":"victoryDisarm","chance":0.1}},
+ {"id":"sealinghammer","name":"封印の戦槌","range":"melee","dice":[2,8,3],"classes":[2],"price":3360,"sell":1680,"drop":true,"minFloor":8,"shop":false,"desc":"戦闘勝利時、10％の確率で現在地の周囲8マスにある正しく旗を立てた罠を全て解除する。","effect":{"kind":"victoryDisarm","chance":0.1}},
+ {"id":"surveyorstaff","name":"測量師の杖","range":"melee","dice":[2,6,1],"classes":[1],"price":1900,"sell":950,"drop":true,"minFloor":6,"shop":false,"desc":"現在地の数字が偶数なら呪文のダメージ+10%。奇数なら10%の確率で消費MP半減。０は効果なし。","effect":{"kind":"surveyor"}},
+ {"id":"hatajirusinotanken","name":"旗印の短剣","range":"melee","dice":[2,3,0],"classes":[0,3],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘勝利時、20%の確率で隣接する未探索の安全マスを1つ自動で開く。","effect":{"kind":"victoryOpen","chance":0.2}},
+ {"id":"scoutingdagger","name":"探査の短剣","range":"melee","dice":[2,6,4],"classes":[0,3],"price":3600,"sell":1800,"drop":true,"minFloor":8,"shop":false,"desc":"戦闘勝利時、隣接する未探索の安全マスを1つ自動で開く。","effect":{"kind":"victoryOpen","chance":1}},
+ {"id":"eighteyespear","name":"八目の槍","range":"melee","dice":[2,6,2],"classes":[0],"price":1520,"sell":760,"drop":true,"minFloor":5,"shop":false,"desc":"戦闘開始時、現在地に表示された数字1につき相手に与えるダメージ+1。","effect":{"kind":"numberDamage"}},
+ {"id":"hatajirusinoyumi","name":"旗印の弓","range":"ranged","dice":[2,3,0],"classes":[3],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+10%。","effect":{"kind":"flagMatchFirstHit","pct":10}},
+ {"id":"deductiondagger","name":"不意打ちの弓","range":"ranged","dice":[2,4,0],"classes":[3],"price":1400,"sell":700,"drop":true,"minFloor":5,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+15%。","effect":{"kind":"flagMatchFirstHit","pct":15}},
+ {"id":"makyuu","name":"魔弓","range":"ranged","dice":[2,4,3],"classes":[3],"price":4000,"sell":2000,"drop":true,"minFloor":8,"shop":false,"desc":"周囲8マスに未探索のマスがあるなら、戦闘で最初に命中した通常攻撃のダメージ+25%。","effect":{"kind":"firstHitUnexplored","pct":25}}
 ] .map(w=>({range:'melee',hitBonus:0,minAttacks:1,minFloor:1,...w}));
 
 const ARMOR=[
 {id:'cap',name:'革帽子',part:'head',ac:1,classes:[0,1,2,3],price:30,sell:15},
 {id:'helm',name:'鉄兜',part:'head',ac:2,classes:[0,2],price:90,sell:45},
 {id:'robe',name:'ローブ',part:'body',ac:1,classes:[0,1,2,3],price:25,sell:12},
-{id:'leather',name:'革鎧',part:'body',ac:2,classes:[0,2,3],price:65,sell:32},
+{id:'leather',name:'革鎧',part:'body',ac:2,classes:[0,1,2,3],price:65,sell:32},
 {id:'chain',name:'鎖帷子',part:'body',ac:3,classes:[0,2],price:130,sell:65},
 {id:'plate',name:'板金鎧',part:'body',ac:5,classes:[0],price:300,sell:150,minFloor:3},
 {id:'boots',name:'革靴',part:'feet',ac:1,classes:[0,1,2,3],price:30,sell:15},

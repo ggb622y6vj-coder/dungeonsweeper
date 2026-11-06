@@ -8,7 +8,8 @@ def pct(v):
 ids={
   "キューズドバンブー": "takenoko",
   "テングダケ": "kinoko",
-  "デクノボー": "sirakaba",
+  "武者のくくり樹": "sirakaba",
+  "髑髏カヅラ": "insectivore",
   "スライム": "slime",
   "魔物いきれ": "gas",
   "火車髑髏": "kashadokuro",
@@ -73,7 +74,7 @@ for r in rows:
  assert not d['boss'] or len(floors)==1, f"Guardian must have exactly one floor: {id}"
  m=re.search(r'列上限(\d+)体',r['仲間呼び']);d['summonCap']=int(m[1]) if m else 4
  d['breath']=None if r['ブレス']=='なし' else {'element':r['ブレス'].split('/')[0],'dice':dice(r['ブレス'].split('/')[2]),'chance':pct(r['ブレス'])}
- d['spell']=pct(r['呪文']);d['spellInfo']=None if not sp else {'id':MONSTER_SPELLS[sp[1]][0],'name':sp[1],'target':'all' if sp[2]=='全体' else 'one','dice':MONSTER_SPELLS[sp[1]][2],'effect':MONSTER_SPELLS[sp[1]][3]};assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
+ d['spell']=pct(r['呪文']);d['spellInfo']=None if not sp else {'id':MONSTER_SPELLS[sp[1]][0],'name':sp[1],'target':'all' if sp[2]=='全体' else 'one','dice':MONSTER_SPELLS[sp[1]][2],'effect':MONSTER_SPELLS[sp[1]][3]};assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'植物':'♣','不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
 for f in sorted({floor for d in data for floor in d['floors']}):
  assert sum(1 for d in data if f in d['floors'] and d['boss'])==1, f'floor {f} needs exactly one boss'
  assert any(f in d['floors'] and not d['boss'] for d in data), f'floor {f} needs normal monsters'

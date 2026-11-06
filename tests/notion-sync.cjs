@@ -40,11 +40,13 @@ function gameMonster(e){
     rear:e.rear,flee:e.flee,summon:e.summon,steal:e.steal,drain:e.drain,death:e.death,resist:e.resistance==='なし'?[]:e.resistance.split('・').sort(),
     breath:e.breath,spell:e.spell,spellInfo:e.spellInfo&&{id:e.spellInfo.id,target:e.spellInfo.target,dice:e.spellInfo.dice},summonCap:e.summon?e.summonCap:null};
 }
-assert.equal(nm.length,95,'Notion monster rows');assert.equal(ENEMIES.length,95,'game monsters');
+assert.equal(nm.length,96,'Notion monster rows');assert.equal(ENEMIES.length,96,'game monsters');
 const gm=new Map(ENEMIES.map(e=>[e.id,e]));
 for(const r of nm){const id=r['userDefined:ID'];if(!gm.has(id)){diffs.push(`monster ${id} missing in game`);continue}
   const a=gameMonster(gm.get(id)),b=notionMonster(r);for(const k of Object.keys(b))eq(`monster ${id}.${k}`,a[k],b[k])}
 for(const e of ENEMIES)if(!nm.some(r=>r['userDefined:ID']===e.id))diffs.push(`monster ${e.id} not in Notion`);
+
+if(!diffs.length)console.log('PASS notion-sync monsters: 96 definitions match the Notion snapshot field by field');
 
 const JOB={魔法使い:1,僧侶:2},WHERE={探索:'field',戦闘:'battle','戦闘・探索':'both',宝箱:'chest'};
 const TARGET={前方:'front',敵1体:'enemy',敵1列:'group',敵全体:'all',味方1人:'ally',味方全員:'party',階選択:'floor',宝箱:'chest'};
@@ -57,4 +59,4 @@ for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x
   for(const k of Object.keys(b))eq(`spell ${id}.${k}`,x[k],b[k]);}
 for(const x of MAGIC)if(!ns.some(r=>r['userDefined:ID']===x.id))diffs.push(`spell ${x.id} not in Notion`);
 if(diffs.length){console.error(diffs.join('\n'));assert.fail(`${diffs.length} Notion/game differences`)}
-console.log('PASS notion-sync: 95 monsters and 32 spells match the Notion snapshot field by field');
+console.log('PASS notion-sync: 96 monsters and 32 spells match the Notion snapshot field by field');
