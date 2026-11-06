@@ -105,7 +105,7 @@
 | 077 | 2026-11-06 | 077 [light] 階移動ログ／階層テーマカラー／図書館の詳細ウィンドウ廃止／鍛冶屋タブと購入ポップアップ（hold/077・push済み） | `d93606a` | [spec](specs/077-mixed-floorlog-theme-library-shop.md) | [077.md](reports/077.md) |
 | 078 | 2026-11-06 | 078 [light] マス数が多い階で地図のアイコンが下にずれる不具合の修正（hold/078・push済み） | `a3f94a5` | [spec](specs/078-bugfix-map-cell-icon-alignment.md) | [078.md](reports/078.md) |
 | 079 | 2026-11-06 | 079 [mixed] 鍛冶屋のヘッダー固定／テーマカラーを視界とステータス画面へ拡張／Notion同期（モンスター96・アイテム72・呪文34、Amendment 1で新呪文2種と新武器15種の効果まで実装） | `b7a8e46` | [spec](specs/079-shop-header-theme-scene-notion-spells.md) | [079.md](reports/079.md) |
-| 080 | 2026-11-07 | 080 [UI] 図書館のタブ分けと並び替え（呪文はレベル順＋見出し／アイテムは分類タブ＋表示整理／モンスターは階タブ＋2列）（hold/080・未push） | `（実装時）` | [spec](specs/080-library-tabs-sorting.md) | [080.md](reports/080.md) |
+| 080 | 2026-11-07 | 080 [UI] 図書館のタブ分けと並び替え（呪文はレベル順＋見出し／アイテムは分類タブ＋表示整理／モンスターは階タブ＋2列）（hold/080） | `da715ed` | [spec](specs/080-library-tabs-sorting.md) | [080.md](reports/080.md) |
 
 ## 番号なしレポート / Other reports
 
