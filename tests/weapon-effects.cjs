@@ -25,6 +25,21 @@ for(const [id,pct] of [['hatajirusinoyumi',10],['deductiondagger',15],['makyuu',
  const no=setup(id,1,0,false);no.run('dice=()=>({value:19})');assert.equal(attack(no).damage,base);
  g.run('encounter(s.pos);s.enemy.units=[{id:"goblin",uid:0,row:71,hp:999}];Math.random=()=>.99');assert.equal(attack(g).damage,Math.floor(base*(100+pct)/100),'new battle resets');
 }
+// Amendment 2: only the first landed hit, including after an all-miss action.
+for(const [id,pct] of [['hatajirusinoyumi',10],['deductiondagger',15],['makyuu',25]]){
+ for(const base of [19,20]){
+  const g=setup(id,1,1);
+  g.run(`equippedWeapon(actor).minAttacks=3;dice=()=>({value:${base}});Math.random=()=>0`);
+  assert.deepEqual(attack(g),{damage:0,hitsCount:0,count:3});
+  assert.equal(g.run('combatWeaponEffect(actor).owner.firstHit'),false,'all misses preserve bonus');
+  g.run('Math.random=()=>.99');
+  assert.deepEqual(attack(g),{damage:base*2+Math.floor(base*(100+pct)/100),hitsCount:3,count:3});
+  assert.equal(g.run('combatWeaponEffect(actor).owner.firstHit'),true);
+  assert.equal(attack(g).damage,base*3,'later actions have no bonus');
+ }
+ const g=setup(id,1,1);g.run('equippedWeapon(actor).minAttacks=3;dice=()=>({value:20});var rolls=[0,.99,.99];Math.random=()=>rolls.shift()');
+ assert.deepEqual(attack(g),{damage:40+Math.floor(20*pct/100),hitsCount:2,count:3},'miss before first hit does not consume bonus');
+}
 // Surveyor: one proc per cast, only its owner; odd costs round up.
 for(const number of [0,1,2]){
  const g=setup('surveyorstaff',number);g.run('s.members[actor].known.push("mahalito");s.mp[actor]=100;enemyDefinition("goblin").mageResist=0;Math.random=()=>.09;dice=()=>({value:19})');
@@ -54,4 +69,23 @@ for(const id of ['hatajirusinotanken','scoutingdagger']){
 {const g=setup('scoutingdagger');g.run('s.cells[near[0]].safe=true;s.cells[near[1]].safe=true;Math.random=()=>.99');win(g);assert.equal(g.run('near.filter(j=>s.cells[j].open).length'),1);assert.equal(g.run('s.cells[near[1]].open'),true,'random safe candidate');}
 // Stable ownership survives party reorder and saved in-progress battles.
 {const g=setup('flagaxe',2,2);g.run('var owner=s.members[actor].id;for(const key of PARTY_FIELDS){const a=s[key][0];s[key][0]=s[key][1];s[key][1]=a}actor=s.members.findIndex(m=>m.id===owner);save()');assert.equal(attack(g).damage,12);const loaded=game(g.run('localStorage.getItem("ash-v1")'));loaded.run('Math.random=()=>.99');assert.equal(loaded.run('physicalAttack(1,s.enemy.units[0]).damage'),12);}
+
+// Safe special cells may be revealed without activating their movement events.
+for(const type of ['stairs','down','elevator','boss']){
+ const g=setup('scoutingdagger');
+ g.run(`s.elevatorFloors=[1];s.cells.forEach(c=>c.open=true);var special=s.pos+1;s.cells[special]={type:'${type}',trap:false,open:false,safe:true,flag:'magic'};if('${type}'==='stairs')s.start=special;if(['boss','down'].includes('${type}'))s.boss=special;var beforeSpecial=JSON.stringify([s.pos,s.floor,s.relic,s.guardiansDefeated,s.pendingStairs,s.pendingBoss,s.pendingElevator]);Math.random=()=>0`);
+ win(g);
+ assert.equal(g.run('s.cells[special].open'),true,type);
+ assert.equal(g.run('s.cells[special].type'),type);
+ assert.equal(g.run('s.cells[special].flag'),false);
+ assert.equal(g.run('JSON.stringify([s.pos,s.floor,s.relic,s.guardiansDefeated,s.pendingStairs,s.pendingBoss,s.pendingElevator])'),g.run('beforeSpecial'),'reveal preserves progression: '+type);
+ g.drain();
+ const loaded=game(g.run('localStorage.getItem("ash-v1")'));
+ assert.equal(loaded.run('s.cells[s.pos+1].type'),type,'saved special type');
+ g.run('cell(special)');
+ assert.equal(g.run('s.pos===special'),true);
+ if(type==='boss')assert.equal(g.run('s.pendingBoss.previous'),27,'revealed guardian still asks before battle');
+ else if(type==='elevator')assert.equal(g.run('s.pendingElevator'),true,'revealed elevator still offers travel');
+ else assert.equal(g.run('s.pendingStairs'),type==='down'?'down':true,'revealed stairs still offer travel');
+}
 console.log('weapon effects PASS');

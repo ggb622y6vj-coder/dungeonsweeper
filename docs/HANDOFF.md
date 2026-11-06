@@ -254,3 +254,10 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 `tests/weapon-effects.cjs` で全効果の成立／不成立、初回命中、装備本人、隊列変更、戦闘／勝利後の保存・再読込、昇降機解放を検証。旧セーブの進行中戦闘に開始時スナップショットがなければ、その戦闘では新効果を適用しない（次の戦闘から有効）。シミュレータへの武器効果追加は対象外。
 
 ブラウザ検証は Playwright Python モジュールが環境にないため未実施（quick-attack-browser.py の起動時に確認）。公開・pushは実施していない。
+
+
+## 079 Amendment 2: 初回命中ボーナス（2026-11-06）
+
+`physicalAttack` の flagMatchFirstHit / firstHitUnexplored は、その戦闘の最初の命中1ヒットにのみ割合を掛け、切り捨てる。全外しでは消費しない。複数命中・途中の外れ・次行動・戦闘リセットを `tests/weapon-effects.cjs` で検証する。
+
+確認テストでは、抵抗無効化後も守護者への窒息・大窒息の即死免疫が維持される。victoryOpen は safe な階段・下り階段・昇降機・守護者マスも候補に含むが、開放時は位置・階・進行状態を変えず、移動時に通常の確認が働く。両箇所に追加修正は不要。ブラウザは Python の Playwright がなく未実施。
