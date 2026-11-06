@@ -232,3 +232,6 @@ assert.equal(fearAI.run('s.ailments.every(a=>a.fear===0)'),true,'next trial cann
 assert.equal(fearAI.run('s.teppeki'),false,'next trial cannot inherit persistent AC');
 assert.equal(fearAI.run('s.milwaSteps'),0,'next trial cannot inherit short light');
 console.log('PASS simulator fear: spells including low MP/self-cure/rear buff, otherwise guard, silence overlap, recovery and trial reset');
+
+// The simulator loads the actual cast/resistance/drain paths, including guardians.
+require('../../tests/resistance-debuff.cjs');
