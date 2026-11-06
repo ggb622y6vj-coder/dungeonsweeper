@@ -127,7 +127,7 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
 for(const [monster,id,oldName,name] of [
  ['mage','halito','ハリト','火炎'],['sorcerer','mahalito','マハリト','大火炎'],
  ['deathmage','dalto','ダルト','吹雪'],['greaterdemon','madalto','マダルト','大吹雪'],
- ['archmage','tiltowait','ティルトウェイト','魔弾'],['darkpriest','montino','モンティノ','モンティノ']]){
+ ['archmage','tiltowait','ティルトウェイト','魔弾'],['darkpriest','montino','沈黙','沈黙']]){
  const g=party();battle(g,[monster]);
  assert.deepEqual(J(g,`[enemyDefinition('${monster}').spellInfo.id,enemyDefinition('${monster}').spellInfo.name]`),[id,oldName]);
  g.run(`Object.assign(enemyDefinition('${monster}'),{flee:0,summon:0,breath:null,spell:1});
@@ -137,3 +137,12 @@ for(const [monster,id,oldName,name] of [
  if(id==='madalto')assert.deepEqual(J(g,`enemyDefinition('${monster}').spellInfo.dice`),[6,8,0],'enemy dice stay 6d8');
 }
 console.log('PASS spell-sync logic: spawns, elemental damage, persistent AC, 30-step light, all-row per-enemy identification, demon immunity, learning, enemy spell names');
+
+// 079: renamed spells keep their IDs and receive complete log-name coloring.
+{
+ const g=party();
+ for(const [id,name] of [['floodfill','開放'],['lakanito','大窒息'],['makanito','窒息'],['montino','沈黙']]){
+  assert.equal(g.run(`magic('${id}').name`),name);
+  assert.ok(g.run(`coloredLog('術者は${name}を唱えた。')`).includes(`<span class="log-spell">${name}</span>`));
+ }
+}

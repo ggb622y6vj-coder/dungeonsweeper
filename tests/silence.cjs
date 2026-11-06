@@ -20,11 +20,11 @@ const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
  assert.deepEqual(json(g,"[magic('montino').job,magic('montino').level,magic('montino').mp,magic('montino').where,magic('montino').target]"),[2,3,4,'battle','group']);
  for(const [id,chance] of [['darkpriest',.3],['witch',.25]]) {
   assert.equal(g.run(`enemyDefinition('${id}').spell`),chance);
-  assert.deepEqual(json(g,`enemyDefinition('${id}').spellInfo`),{id:'montino',name:'モンティノ',target:'all',dice:null,effect:'silence'});
+  assert.deepEqual(json(g,`enemyDefinition('${id}').spellInfo`),{id:'montino',name:'沈黙',target:'all',dice:null,effect:'silence'});
  }
  assert.equal(g.run("ENEMIES.every(d=>!d.spellInfo||['damage','silence'].includes(d.spellInfo.effect))"),true);
  assert.equal(g.run("ENEMIES.filter(d=>d.spellInfo?.effect==='silence').length"),2);
- assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1,firstFloor:4}).find(([k])=>k==='使用呪文')[1]"),'モンティノ（沈黙・全体）');
+ assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1,firstFloor:4}).find(([k])=>k==='使用呪文')[1]"),'沈黙（全体）');
  g.run("afflict(0,'silence')");
  assert.equal(g.run('s.ailments[0].silence'),3);
  assert.equal(g.run("spellReason(0,magic('dios'))"),'沈黙している');
@@ -104,7 +104,7 @@ for(const end of ['win','enemy-flee','escape','defeat','town']) {
   monsterAction(s.enemy.units[0],s.commands);`);
  assert.deepEqual(json(g,'s.ailments.map(a=>a.silence)'),[3,0,0,0,3,0]);
  assert.deepEqual(json(g,'s.hp'),[10000,10000,0,10000,10000,10000]);
- assert.equal(g.run("logQueue[0].text"),'闇の司祭はモンティノを唱えた。');
+ assert.equal(g.run("logQueue[0].text"),'闇の司祭は沈黙を唱えた。');
  assert.equal(g.run("logQueue.some(e=>e.text==='sim3には効かなかった。')"),true);
  assert.equal(g.run("logQueue.find(e=>e.text==='sim0は沈黙した。').ailments[4].silence"),0,'later outcomes must not leak');
  assert.equal(g.run("logQueue[0].ailments[0].silence"),0,'cast snapshot precedes affliction');
