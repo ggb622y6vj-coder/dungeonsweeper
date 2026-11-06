@@ -184,3 +184,14 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(m.run("JSON.stringify(Object.keys(s.library.spells).sort())"),want,'old save migrates from party + reserve');
  console.log('PASS library: permanent spell record (creation, level up, deletion, reload, legacy migration)');
 }
+
+// 075: spell rows omit job; equipment and medicine retain job restrictions.
+{
+ const g=game();
+ for(const job of [1,2]){
+  g.run(`s.library.spells=Object.fromEntries(MAGIC.map(x=>[x.id,true]));renderLibrary('spells',${job});var es=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
+  assert.equal(g.run("es.every(e=>JSON.stringify(e.children[1].children.filter((_,i)=>i%2===0).map(x=>x.textContent))===JSON.stringify(['習得レベル','消費MP','使用場所','効果']))"),true);
+ }
+ assert.equal(g.run("libraryItemDetails(weapon('sword'))[1][0]"),'装備できる職業');
+ assert.equal(g.run("libraryItemDetails(weapon('healingPotion'))[1][0]"),'使用できる職業');
+}
