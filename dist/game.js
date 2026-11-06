@@ -34,7 +34,7 @@ function enemyGroups(combat=s.enemy){return [...new Set(combat.units.filter(e=>!
 function attackRowUI(i){let combat=visibleCombat();if(!combat)return '';let groups=enemyGroups(combat).filter(g=>g.units.some(e=>!e.rewarded)),chosen=s.attackRows[i];if(!groups.some(g=>String(g.key)===String(chosen)))chosen=groups[0]?.key;return `<label class="attackrow"><span class="sr-only">${NAMES[i]}の攻撃対象の列</span><select data-attack-row="${i}" ${logBusy()||s.commands[i]!=='fight'||s.hp[i]<=0?'disabled':''}>${groups.map(g=>`<option value="${g.key}" ${String(chosen)===String(g.key)?'selected':''}>${g.index+1}列：${enemyDisplay(g.units[0])} ×${g.units.filter(e=>!e.rewarded).length}</option>`).join('')}</select></label>`}
 function encounterRate(i,wasOpen,action='forward'){return (wasOpen ? .10+num(i)*.005 : .16)+(['strafeLeft','strafeRight'].includes(action) ? .01 : 0)}
 function rollInitiative(action='forward',boss=false){if(boss)return 'normal';let r=Math.random(),enemyChance=action==='back' ? .12 : .10;if(r<enemyChance)return s.watchful?'normal':'enemy';return r<enemyChance+.10?'party':'normal'}
-function encounter(i,unexplored=false,action='forward'){let boss=s.cells[i].type==='boss',formation=monsterFormation(boss),units=[];for(let [row,id] of formation.slice(0,3).entries()){let [min,max]=enemyDefinition(id).groupSize,n=min+(Math.random()*(max-min+1)|0);for(let j=0;j<n;j++)units.push({...makeEnemy(id,units.length),row})}resetCommandEntry();s.attackRows=s.members.map(()=>0);s.dispelRows=s.members.map(()=>null);s.enemy={dataVersion:1,flagEffect:flagEffect(),boss,chestBattle:unexplored,lootGold:0,units,target:0,escapeTo:s.previousPos??s.start,initiative:rollInitiative(action,boss)};recordLibraryEncounter(s.enemy);identifyEnemies();let message={normal:'敵が現れた！',enemy:'敵の奇襲！',party:'敵はまだ気づいていない！'}[s.enemy.initiative];log(message,{encounter:true});if(s.enemy.flagEffect.bad)log('誤った旗がパーティーを惑わせた！');if(s.enemy.initiative==='enemy'){s.enemy.initiative='normal';enemyTurn(s.members.map(()=>'fight'))}}
+function encounter(i,unexplored=false,action='forward'){let boss=s.cells[i].type==='boss',formation=monsterFormation(boss),units=[];for(let [row,id] of formation.slice(0,3).entries()){let [min,max]=enemyDefinition(id).groupSize,n=min+(Math.random()*(max-min+1)|0);for(let j=0;j<n;j++)units.push({...makeEnemy(id,units.length),row})}resetCommandEntry();s.attackRows=s.members.map(()=>0);s.dispelRows=s.members.map(()=>null);s.enemy={dataVersion:1,flagEffect:flagEffect(),weaponEffects:snapshotWeaponEffects(i),boss,chestBattle:unexplored,lootGold:0,units,target:0,escapeTo:s.previousPos??s.start,initiative:rollInitiative(action,boss)};recordLibraryEncounter(s.enemy);identifyEnemies();let message={normal:'敵が現れた！',enemy:'敵の奇襲！',party:'敵はまだ気づいていない！'}[s.enemy.initiative];log(message,{encounter:true});if(s.enemy.flagEffect.bad)log('誤った旗がパーティーを惑わせた！');if(s.enemy.initiative==='enemy'){s.enemy.initiative='normal';enemyTurn(s.members.map(()=>'fight'))}}
 function answerBoss(yes){if(logBusy()||!s.pendingBoss)return;let pending=s.pendingBoss;s.pendingBoss=null;if(yes)encounter(s.pos);else{s.pos=pending.previous;log('戦闘を避け、一歩前のマスへ戻った。')}render()}
 function snapshotVitals(){return {hp:s.hp.slice(),mp:s.mp.slice(),ailments:structuredClone(s.ailments),members:structuredClone(s.members),ac:s.members.map((m,i)=>CLASSES[m.job??i].ac-Object.values(s.armor[i]||{}).reduce((n,k)=>n+(weapon(s.inventory[i]?.[k])?.ac||0),0)-Math.max(s.teppeki?2:0,s.enemy?.partyAC||0))}}
 function log(t,options={}){if(displayCombat===undefined)displayCombat=structuredClone(s.enemy);if(!displayVitals)displayVitals=snapshotVitals();logQueue.push({enemy:structuredClone(s.enemy),text:t,encounter:!!options.encounter,trap:!!options.trap,...snapshotVitals()});if(logTimer===null)logTimer=setTimeout(pumpLog,0)}function pumpLog(){encounterNotice='';if(!logQueue.length){logTimer=null;displayVitals=null;displayCombat=undefined;if(s.defeatPending){finishDefeat();return}render();return}let entry=logQueue.shift();if(entry.encounter)encounterNotice=entry.text;if(entry.trap)encounterNotice='！';displayCombat=entry.enemy;displayVitals={hp:entry.hp,mp:entry.mp,ailments:entry.ailments,members:entry.members,ac:entry.ac};s.logs.unshift(entry.text);s.logs=s.logs.slice(0,30);logTimer=setTimeout(pumpLog,entry.encounter||entry.trap?500:300);render();$('#log').scrollTop=0}
@@ -46,7 +46,56 @@ function dice(n,d,add=0){let rolls=Array.from({length:n},()=>1+(Math.random()*d|
 function strengthFor(job,level){return Math.min(18,([15,9,12,12][job]??10)+Math.floor((Math.max(1,level)-1)/5))}
 function strengthBonus(str){return str<=5?str-6:str>=16?str-15:0}
 function migrateStrength(m,job){if(m.str==null)m.str=strengthFor(job,m.level);}
-function physicalAttack(i,e){let m=s.members[i],w=equippedWeapon(i),bonus=strengthBonus(m.str),count=Math.min(10,Math.max(w.minAttacks??1,jobOf(i)===0?1+Math.floor(m.level/5):1)),classHit=[0,2].includes(jobOf(i))?2+Math.floor(m.level/3):Math.floor(m.level/5),threshold=Math.max(1,Math.min(19,21-(enemyDefinition(e.id).ac+(e.acPenalty||0))-classHit-(w.hitBonus||0)-bonus+3*(s.enemy?enemyGroups().findIndex(g=>g.key===rowKey(e)):(e.row||0)))),damage=0,hitsCount=0;for(let n=0;n<count;n++)if((Math.random()*20|0)>=threshold){hitsCount++;damage+=Math.max(1,dice(...w.dice).value+bonus)}return {damage,hitsCount,count}}
+// Freeze terrain and equipment ownership before any combat action or log playback.
+function snapshotWeaponEffects(pos=s.pos){
+ const cells=around(pos).map(j=>s.cells[j]);
+ return {pos,number:num(pos),flags:cells.filter(c=>c.flag).length,
+  correctFlags:cells.filter(c=>c.flag&&c.trap).length,unexplored:cells.some(c=>!c.open),
+  members:s.members.flatMap((m,i)=>activeMember(i)?[{id:m.id,weapon:equippedWeapon(i).id,firstHit:false}]:[])};
+}
+function combatWeaponEffect(i){
+ const state=s.enemy?.weaponEffects;if(!state||!activeMember(i))return null;
+ const w=equippedWeapon(i),owner=state.members.find(m=>m.id===s.members[i].id&&m.weapon===w.id);
+ return owner&&w.effect?{...state,owner,...w.effect}:null;
+}
+function victoryWeaponEffects(combat){
+ if(!combat.weaponEffects||combat.weaponVictoryDone)return;
+ combat.weaponVictoryDone=true;
+ for(let i=0;i<s.members.length;i++){
+  const effect=combatWeaponEffect(i);
+  if(!effect||!['victoryDisarm','victoryOpen'].includes(effect.kind)||Math.random()>=effect.chance)continue;
+  const neighbors=around(effect.pos);
+  if(effect.kind==='victoryDisarm'){
+   let count=0;
+   for(const j of neighbors){const c=s.cells[j];if(c.trap&&c.flag){c.trap=false;c.disarmed=true;c.flag=false;count++}}
+   log(`${NAMES[i]}の武器が周囲の罠を${count}個解除した。`);
+  }else{
+   const candidates=neighbors.filter(j=>s.cells[j].safe&&!s.cells[j].open&&!s.cells[j].trap);
+   if(candidates.length){
+    const j=candidates[Math.random()*candidates.length|0];s.cells[j].open=true;s.cells[j].flag=false;
+    log(`${NAMES[i]}の武器が周囲の安全なマスを1つ開いた。`);
+    checkElevatorUnlock(j);
+   }else log(`${NAMES[i]}の武器が周囲を探ったが、開ける安全なマスはなかった。`);
+  }
+ }
+}
+function physicalAttack(i,e){
+ const m=s.members[i],w=equippedWeapon(i),effect=combatWeaponEffect(i),bonus=strengthBonus(m.str);
+ const extraSwing=effect?.kind==='zeroSwings'&&effect.number===0?1:0;
+ const count=Math.min(10,Math.max(w.minAttacks??1,jobOf(i)===0?1+Math.floor(m.level/5):1)+extraSwing);
+ const classHit=[0,2].includes(jobOf(i))?2+Math.floor(m.level/3):Math.floor(m.level/5);
+ // In this hit formula higher AC is easier to hit: lower the threshold for the weapon bonus.
+ const accuracy=effect?.kind==='flagMatchAC'&&effect.flags===effect.number?1:0;
+ const threshold=Math.max(1,Math.min(19,21-accuracy-(enemyDefinition(e.id).ac+(e.acPenalty||0))-classHit-(w.hitBonus||0)-bonus+3*(s.enemy?enemyGroups().findIndex(g=>g.key===rowKey(e)):(e.row||0))));
+ const addedDamage=effect?.kind==='flagDamage'?effect.correctFlags:effect?.kind==='numberDamage'?effect.number:0;
+ let damage=0,hitsCount=0;
+ for(let n=0;n<count;n++)if((Math.random()*20|0)>=threshold){hitsCount++;damage+=Math.max(1,dice(...w.dice).value+bonus+addedDamage)}
+ if(hitsCount&&effect&&!effect.owner.firstHit){
+  if((effect.kind==='flagMatchFirstHit'&&effect.flags===effect.number)||(effect.kind==='firstHitUnexplored'&&effect.unexplored))damage=Math.floor(damage*(100+effect.pct)/100);
+  effect.owner.firstHit=true;
+ }
+ return {damage,hitsCount,count};
+}
 function hits(hit,ac){let roll=dice(1,20).value;return roll===20||(roll!==1&&roll+hit+ac>=20)}
 function reachableEnemyGroups(i,combat=s.enemy){let groups=enemyGroups(combat).filter(g=>g.units.some(e=>e.hp>0));return equippedWeapon(i)?.range==='ranged'?groups:groups.slice(0,2)}
 function selectedEnemy(i){let key=s.attackRows?.[i];if(key==null){let legacy=s.enemy.units.find(e=>e.uid===s.enemy.target);key=legacy?rowKey(legacy):rowKey(s.enemy.units[0])}if(!reachableEnemyGroups(i).some(g=>String(g.key)===String(key)))return undefined;return s.enemy.units.find(e=>String(rowKey(e))===String(key)&&e.hp>0)}

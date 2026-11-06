@@ -313,3 +313,4 @@ require('./floodfill.cjs');
 
 require('./notion-sync.cjs');
 require('./spell-sync-logic.cjs');
+require('./weapon-effects.cjs');

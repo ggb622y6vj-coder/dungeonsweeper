@@ -38,7 +38,7 @@ const WEAPONS = [
  {id:'ninjato',name:'忍びの刀',dice:[3,6,5],classes:[3],price:3500,sell:1750,drop:true,minFloor:8,shop:false,hitBonus:3},
  {id:'dragonbow',name:'竜骨の弓',range:'ranged',dice:[3,6,5],classes:[0,3],price:3400,sell:1700,drop:true,minFloor:8,shop:false,hitBonus:3},
  {id:'holysword',name:'聖剣',dice:[4,8,5],classes:[0],price:6000,sell:3000,drop:true,minFloor:9,shop:false,hitBonus:3,minAttacks:2},
- // 079: Notion同期。特殊効果の発動処理は別工程。
+ // 079: Notion同期。特殊効果は戦闘開始時の状態に基づいて発動。
  {"id":"mitibikinoono","name":"導きの斧","range":"melee","dice":[2,6,3],"classes":[0],"price":1900,"sell":950,"drop":true,"minFloor":6,"shop":false,"desc":"戦闘開始時、周囲8マスの正しい旗1本につき相手に与えるダメージ+1。","effect":{"kind":"flagDamage"}},
  {"id":"flagaxe","name":"旗印の斧","range":"melee","dice":[2,5,0],"classes":[0],"price":440,"sell":220,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘開始時、周囲8マスの正しい旗1本につき相手に与えるダメージ+1。","effect":{"kind":"flagDamage"}},
  {"id":"mumeinoken","name":"無名の剣","range":"melee","dice":[2,3,0],"classes":[0],"price":280,"sell":140,"drop":true,"minFloor":2,"shop":false,"desc":"戦闘開始時、現在地の数字が0なら、この戦闘の通常攻撃回数+1（同種効果は重複しない）。","effect":{"kind":"zeroSwings"}},
