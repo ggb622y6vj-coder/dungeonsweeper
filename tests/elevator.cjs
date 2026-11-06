@@ -56,6 +56,7 @@ assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.cells[s.start].open'),fal
 assert.equal(g.run('(()=>{const before=JSON.parse(before1);before[s.start].open=false;return JSON.stringify(s.cells)===JSON.stringify(before)})()'),true);assert.equal(g.run('s.pos===e'),true);
 g.run('travelElevator(3)');assert.equal(g.run('s.pos===e3&&JSON.stringify(s.cells)===before3'),true);
 assert.equal(g.run('travelElevator(2)'),false,'locked floors are not destinations');
+g.drain(); // Arrival log playback blocks movement until finished.
 // 076: stepping onto the hidden stairs still opens them and asks to travel.
 g.run('s.pos=[s.start-s.size,s.start+s.size,s.start-1,s.start+1].find(i=>s.cells[i]&&adjacent(i,s.start));cell(s.start)');
 assert.equal(g.run('s.cells[s.start].open'),true);assert.equal(g.run('s.pendingStairs'),true);g.drain();
@@ -80,4 +81,33 @@ g.run("s.pendingStairs=false;s.pendingElevator=true;save()");const re=game(g.run
 assert.equal(re.run("$('#elevatorpick').open"),true);re.run("$('#elevatorcancel').onclick();s.pendingElevator=false;render()");assert.equal(re.run('s.pendingElevator'),false);
 // 6. Legacy save without elevatorFloors loads as [].
 const legacy=J(g,'rosterSaveState()');delete legacy.elevatorFloors;const old=game(JSON.stringify(legacy));old.run('render()');assert.deepEqual(J(old,'s.elevatorFloors'),[]);
+// 077: saved stairs (both directions) and elevator arrivals log exactly once.
+function arrival(g,code,floor,fresh=false){
+ g.drain();g.run('s.logs=[]');g.run(code);g.drain();
+ assert.equal(g.run(`s.logs.filter(t=>t==='地下${floor}階に到着した。').length`),fresh?0:1);
+ assert.equal(g.run("s.logs.filter(t=>t==='迷宮に到着。守護者のいる部屋を探そう。').length"),fresh?1:0);
+}
+{const stairs=setup(177);
+ arrival(stairs,"s.guardiansDefeated=[1];s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)",2,true);
+ arrival(stairs,'travelFloor(1)',1);
+ arrival(stairs,'s.pos=s.boss;travelFloor(2)',2);
+ stairs.run('s.logs=[];travelFloor(3)');stairs.drain();
+ assert.equal(stairs.run("s.logs.some(t=>/地下.*階に到着した。/.test(t))"),false,'failed stairs have no arrival');
+}
+{const lift=setup(178);lift.run('s.elevatorFloors=[1,3]');
+ arrival(lift,'travelElevator(3)',3,true);
+ arrival(lift,'travelElevator(1)',1);
+ arrival(lift,'travelElevator(3)',3);
+ lift.run('s.logs=[];travelElevator(3);travelElevator(2)');lift.drain();
+ assert.equal(lift.run('s.logs.length'),0,'same or locked floor has no arrival');
+}
+// 077: render centrally derives every band, including town at a deep saved floor.
+{const theme=setup(179);
+ for(const [floor,band] of [[1,'green'],[2,'blue'],[3,'blue'],[4,'yellow'],[5,'yellow'],[6,'orange'],[7,'orange'],[8,'red'],[9,'red'],[10,'purple']]){
+  theme.run(`s.floor=${floor};render()`);
+  assert.equal(theme.run("$('body').attributes['data-floor-theme']"),band);
+ }
+ theme.run("s.area='town';render()");
+ assert.equal(theme.run("$('body').attributes['data-floor-theme']"),'green');
+}
 console.log('PASS elevator: unlock dialog once after logs, hidden E placement (1F<=2, deeper anywhere), ride without guardian/encounter, movement lock, revisit, save/reload, legacy');
