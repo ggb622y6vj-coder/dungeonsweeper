@@ -7,7 +7,7 @@ function game(saved = null, random = Math.random) {
   let nextTimer = 0;
   let storage = saved;
   const elements = new Map();
-  const element = () => ({ style: {}, value: '0', children: [], attributes: {}, classList: { toggle() {} }, setAttribute(key, value) { this.attributes[key] = value; }, addEventListener() {}, append(...items) { this.children.push(...items); }, replaceChildren(...items) { this.children = items; }, showModal() { this.open = true; }, close() { this.open = false; } });
+  const element = (tag = '') => ({ tagName: tag.toUpperCase(), style: {}, value: '0', children: [], attributes: {}, classList: { toggle() {} }, setAttribute(key, value) { this.attributes[key] = value; }, addEventListener() {}, append(...items) { this.children.push(...items); }, replaceChildren(...items) { this.children = items; }, showModal() { this.open = true; }, close() { this.open = false; } });
   const ctx = {
     crypto: require('node:crypto').webcrypto,
     structuredClone,

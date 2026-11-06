@@ -50,13 +50,12 @@ function libraryMonsterDetails(d,record){
   ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];
 }
-function libraryItemKind(w){return w.kind==='medicine'?'薬':w.part?({head:'防具（頭）',body:'防具（胴体）',feet:'防具（足）'})[w.part]:'武器'}
 function libraryItemDetails(w){
  const medicine=w.kind==='medicine',shop=!medicine&&w.shop!==false;
  const performance=medicine?w.description:w.part?`AC −${w.ac}`:
-  `攻撃 ${libraryDice(w.dice)} / ${w.range==='ranged'?'遠距離':'近距離'} / hitBonus ${w.hitBonus>=0?'+':''}${w.hitBonus} / 最低攻撃回数 ${w.minAttacks}回`;
- return [['種類',libraryItemKind(w)],[medicine?'使用できる職業':'装備できる職業',w.classes.map(i=>CLASSES[i].name).join('・')],
-  ['性能',performance],...(w.desc?[['追加効果',w.desc]]:[]),['価格',`${Number.isFinite(w.price)?w.price+' G（基準価格）':'購入価格なし'} / 売却 ${w.sell} G`],
+  `攻撃 ${libraryDice(w.dice)} / hitBonus ${w.hitBonus>=0?'+':''}${w.hitBonus} / 最低攻撃回数 ${w.minAttacks}回`;
+ return [['職業',w.classes.map(i=>CLASSES[i].name).join('・')],
+  ['性能',performance],...(w.desc?[['追加効果',w.desc]]:[]),['価格',`${Number.isFinite(w.price)?w.price+' G':'購入価格なし'} / 売却 ${w.sell} G`],
   ['入手先',`${shop?'店売り・迷宮':'迷宮限定'}（地下${w.minFloor||1}階〜）`]];
 }
 function libraryElement(tag,text){const el=document.createElement(tag);el.textContent=text;return el}
@@ -72,7 +71,7 @@ function libraryEntry(name,details,key=null,subtext=''){
  }
  return entry;
 }
-function renderLibrary(tab='monsters',spellJob=1){
+function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon'){
  ensureLibrary();
  const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.identified).length;
  const itemCount=WEAPONS.filter(w=>s.library.items[w.id]).length;
@@ -85,6 +84,11 @@ function renderLibrary(tab='monsters',spellJob=1){
  const spellTabs=$('#library-spell-tabs');spellTabs.hidden=tab!=='spells';
  for(const job of [1,2]){
   const button=$('#libraryspelltab-'+job),active=tab==='spells'&&job===spellJob;
+  button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
+ }
+ const itemTabs=$('#library-item-tabs');itemTabs.hidden=tab!=='items';
+ for(const kind of ['weapon','head','body','feet','medicine']){
+  const button=$('#libraryitemtab-'+kind),active=tab==='items'&&kind===itemKind;
   button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
  }
  if(tab==='monsters'){
@@ -100,20 +104,24 @@ function renderLibrary(tab='monsters',spellJob=1){
    body.append(entry);
   }
  }else if(tab==='items'){
-  for(const kind of ['武器','防具（頭）','防具（胴体）','防具（足）','薬']){
-   body.append(libraryElement('h3',kind==='薬'?`薬（別枠） ${MEDICINES.filter(w=>s.library.items[w.id]).length}/${MEDICINES.length}`:kind));
-   for(const w of [...WEAPONS,...MEDICINES].filter(w=>libraryItemKind(w)===kind)){
-    const known=!!s.library.items[w.id];body.append(libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,'item-'+w.id));
+  if(itemKind==='medicine')body.append(libraryElement('p',`薬 ${MEDICINES.filter(w=>s.library.items[w.id]).length}/${MEDICINES.length}`));
+  for(const w of [...WEAPONS,...MEDICINES].filter(w=>(w.kind==='medicine'?'medicine':w.part||'weapon')===itemKind)){
+   const known=!!s.library.items[w.id];
+   const entry=libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,'item-'+w.id);
+   if(known&&itemKind==='weapon'){
+    const tag=libraryElement('span',w.range==='ranged'?'遠距離':'近距離');tag.className='ailment-tag ailment-other';entry.children[0].append(tag);
    }
+   body.append(entry);
   }
  }
  if(tab==='spells'){
   // Permanent record: a spell stays discovered once any adventurer has learned it.
   recordLibrarySpells();
-  for(const spell of MAGIC.filter(spell=>spell.job===spellJob)){
+  let level;
+  for(const spell of MAGIC.filter(spell=>spell.job===spellJob).sort((a,b)=>a.level-b.level)){
+  if(spell.level!==level){level=spell.level;body.append(libraryElement('h3',`Lv.${level}`))}
   const known=!!s.library.spells[spell.id];
-  body.append(libraryEntry(known?spell.name:'？？？',known?[['習得レベル',`Lv.${spell.level}`],
-   ['消費MP',spell.id==='dumapic'||spell.id==='floodfill'?`${spell.mp}（使用ごとに倍増）`:String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
+  body.append(libraryEntry(known?spell.name:'？？？',known?[['消費MP',spell.id==='dumapic'||spell.id==='floodfill'?`${spell.mp}（使用ごとに倍増）`:String(spell.mp)],['使用場所',({field:'探索',battle:'戦闘',both:'探索・戦闘',chest:'宝箱'})[spell.where]||spell.where],
    ['効果',spell.description]]:null,'spell-'+spell.id));
   }
  }
@@ -126,5 +134,6 @@ function libraryUI(){
   const button=$('#librarytab-'+tab);
   button.onclick=()=>renderLibrary(tab);
  }
+ for(const kind of ['weapon','head','body','feet','medicine'])$('#libraryitemtab-'+kind).onclick=()=>renderLibrary('items',1,kind);
  for(const job of [1,2])$('#libraryspelltab-'+job).onclick=()=>renderLibrary('spells',job);
 }

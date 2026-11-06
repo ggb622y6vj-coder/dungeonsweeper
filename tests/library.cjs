@@ -111,13 +111,13 @@ const oldRecordSave=reload(g);
 oldRecordSave.run("renderLibrary();var oldEntry=$('#librarybody').children.find(e=>e.className==='library-entry'&&e.children[0].textContent.startsWith('スライム'))");
 assert.equal(oldRecordSave.run("oldEntry.children[2].children.some(e=>e.textContent==='初撃破階')"),false);
 g.run("renderLibrary('items');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
-assert.equal(g.run('entries.length'),72);
+assert.equal(g.run('entries.length'),g.run('WEAPONS.filter(w=>!w.part).length'));
 assert.equal(g.run('entries.every(e=>e.children.length===2)'),true);
 g.run(`ENEMIES[0].name='<img src=x onerror=alert(1)>';WEAPONS[0].name='<script>bad()</script>';
  renderLibrary();var first=$('#librarybody').children[1].children[0];`);
 assert.equal(g.run('first.textContent'),'<img src=x onerror=alert(1)>');
 assert.equal(g.run('first.innerHTML'),undefined);
-g.run("renderLibrary('items');var first=$('#librarybody').children[1].children[0]");
+g.run("renderLibrary('items');var first=$('#librarybody').children[0].children[0]");
 assert.equal(g.run('first.textContent'),'<script>bad()</script>');
 assert.equal(g.run('first.innerHTML'),undefined);
 console.log('PASS library: complete catalog rendering, floor order, guardian/lord marks, hidden details and textContent names');
@@ -143,9 +143,9 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(g.run('entries.length'),g.run('MAGIC.filter(x=>x.job===1).length'));
  assert.equal(g.run("$('#library-spell-tabs').hidden"),false);
  assert.equal(g.run("$('#libraryspelltab-1').attributes['aria-selected']"),'true');
- assert.equal(g.run("entries.every((e,i)=>MAGIC.filter(x=>x.job===1)[i].job===1)"),true);
+ assert.equal(g.run("entries.every((e,i)=>MAGIC.filter(x=>x.job===1).sort((a,b)=>a.level-b.level)[i].job===1)"),true);
  assert.ok(g.run('learned.size')>0&&g.run('learned.size')<g.run('MAGIC.length'));
- assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1)[i];return learned.has(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true);
+ assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1).sort((a,b)=>a.level-b.level)[i];return learned.has(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true);
  g.run("s.members[0].known.push(MAGIC.find(x=>x.job===1&&!learned.has(x.id)).id);renderLibrary('spells');var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
  assert.equal(g.run("entries.filter(e=>e.children[0].textContent!=='？？？').length"),g.run("MAGIC.filter(x=>x.job===1&&s.library.spells[x.id]).length"));
  g.run("$('#librarybody').scrollTop=99;$('#libraryspelltab-2').onclick();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
@@ -153,7 +153,7 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(g.run("$('#libraryspelltab-1').attributes['aria-selected']"),'false');
  assert.equal(g.run("$('#librarybody').scrollTop"),0);
  assert.equal(g.run('entries.length'),g.run('MAGIC.filter(x=>x.job===2).length'));
- assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===2)[i];return learned.has(spell.id)?e.children[0].textContent===spell.name:e.children[0].textContent==='？？？'})"),true);
+ assert.equal(g.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===2).sort((a,b)=>a.level-b.level)[i];return learned.has(spell.id)?e.children[0].textContent===spell.name:e.children[0].textContent==='？？？'})"),true);
  g.run("renderLibrary('items')");assert.equal(g.run("$('#library-spell-tabs').hidden"),true);
  console.log('PASS library: spell job tabs filter by job, preserve discovery, set aria state and reset scroll');
 }
@@ -173,7 +173,7 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(r.run('trainingRoster().length'),0);
  r=reload(r);
  r.run(`var ids=${ids};renderLibrary('spells');`);r.run("var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');");
- assert.equal(r.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1)[i];return ids.includes(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true,'learned spells stay after deleting the only learner');
+ assert.equal(r.run("entries.every((e,i)=>{const spell=MAGIC.filter(x=>x.job===1).sort((a,b)=>a.level-b.level)[i];return ids.includes(spell.id)?(e.children[0].textContent===spell.name&&e.children.length===2):(e.children[0].textContent==='？？？'&&e.children.length===1)})"),true,'learned spells stay after deleting the only learner');
  // Legacy save without spells: seed from party + reserve.
  const h=game(null,()=>.5);
  h.run("var a=generateRecruit('僧侶',2);registerRecruit(a);changeRecruitParty(a.members.id,true);var b=generateRecruit('術者',1);registerRecruit(b);b=trainingRoster()[1];b.members.known.push(MAGIC.find(x=>x.job===1&&x.level===5).id);");
@@ -190,10 +190,10 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  const g=game();
  for(const job of [1,2]){
   g.run(`s.library.spells=Object.fromEntries(MAGIC.map(x=>[x.id,true]));renderLibrary('spells',${job});var es=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
-  assert.equal(g.run("es.every(e=>JSON.stringify(e.children[1].children.filter((_,i)=>i%2===0).map(x=>x.textContent))===JSON.stringify(['習得レベル','消費MP','使用場所','効果']))"),true);
+  assert.equal(g.run("es.every(e=>JSON.stringify(e.children[1].children.filter((_,i)=>i%2===0).map(x=>x.textContent))===JSON.stringify(['消費MP','使用場所','効果']))"),true);
  }
- assert.equal(g.run("libraryItemDetails(weapon('sword'))[1][0]"),'装備できる職業');
- assert.equal(g.run("libraryItemDetails(weapon('healingPotion'))[1][0]"),'使用できる職業');
+ assert.equal(g.run("libraryItemDetails(weapon('sword'))[0][0]"),'職業');
+ assert.equal(g.run("libraryItemDetails(weapon('healingPotion'))[0][0]"),'職業');
 }
 
 // 077: catalog details stay inline; entries have no dialog/button behavior.
@@ -203,3 +203,28 @@ for(const tab of ['monsters','items','spells']){
 }
 assert.equal(require('node:fs').readFileSync('dist/index.html','utf8').includes('id="librarydetaildialog"'),false);
 console.log('PASS library: inline entries remain noninteractive, detail dialog removed');
+
+// 080: stable level grouping and item subtabs share the spell-tab contract.
+{
+ const g=game();
+ for(const job of [1,2]){
+  g.run(`renderLibrary('spells',${job});var spells=MAGIC.filter(x=>x.job===${job}).sort((a,b)=>a.level-b.level);`);
+  assert.equal(g.run("JSON.stringify($('#librarybody').children.filter(e=>e.tagName==='H3').map(e=>e.textContent))"),g.run("JSON.stringify([...new Set(spells.map(x=>'Lv.'+x.level))])"));
+  assert.equal(g.run("JSON.stringify($('#librarybody').children.filter(e=>e.className==='library-entry').map(e=>e.attributes['data-library-entry']))"),g.run("JSON.stringify(spells.map(x=>'spell-'+x.id))"));
+ }
+ for(const kind of ['weapon','head','body','feet','medicine']){
+  g.run(`s.library.items={};renderLibrary('items',1,'${kind}');var es=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
+  assert.equal(g.run("es.every(e=>e.children.length===1&&e.children[0].textContent==='？？？'&&e.children[0].children.length===0)"),true);
+  g.run(`s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));$('#librarybody').scrollTop=99;$('#libraryitemtab-${kind}').onclick();var es=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
+  assert.equal(g.run("$('#librarybody').scrollTop"),0);
+  assert.equal(g.run("$('#library-item-tabs').hidden"),false);
+  assert.equal(g.run(`$('#libraryitemtab-${kind}').attributes['aria-selected']`),'true');
+  assert.equal(g.run(`$('#libraryitemtab-${kind}').tabIndex`),0);
+  assert.equal(g.run(`['weapon','head','body','feet','medicine'].every(k=>$('#libraryitemtab-'+k).attributes['aria-selected']===String(k==='${kind}')&&$('#libraryitemtab-'+k).tabIndex===(k==='${kind}'?0:-1))`),true);
+  if(kind==='weapon')assert.equal(g.run("es.every(e=>{const w=weapon(e.attributes['data-library-entry'].slice(5));return e.children[0].children[0].textContent===(w.range==='ranged'?'遠距離':'近距離')})"),true);
+  assert.equal(g.run("es.length"),g.run(`[...WEAPONS,...MEDICINES].filter(w=>(w.kind==='medicine'?'medicine':w.part||'weapon')==='${kind}').length`));
+  assert.equal(g.run(`es.every(e=>e.children[0].children.length===${kind==='weapon'?1:0})`),true);
+ }
+ g.run("renderLibrary('monsters')");assert.equal(g.run("$('#library-item-tabs').hidden"),true);
+}
+console.log('PASS library: level headings/order, five item tabs, discovery concealment, range tags and aria state');

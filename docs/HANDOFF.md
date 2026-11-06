@@ -261,3 +261,10 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 `physicalAttack` の flagMatchFirstHit / firstHitUnexplored は、その戦闘の最初の命中1ヒットにのみ割合を掛け、切り捨てる。全外しでは消費しない。複数命中・途中の外れ・次行動・戦闘リセットを `tests/weapon-effects.cjs` で検証する。
 
 確認テストでは、抵抗無効化後も守護者への窒息・大窒息の即死免疫が維持される。victoryOpen は safe な階段・下り階段・昇降機・守護者マスも候補に含むが、開放時は位置・階・進行状態を変えず、移動時に通常の確認が働く。両箇所に追加修正は不要。ブラウザは Python の Playwright がなく未実施。
+
+
+## 080 変更1〜3: 図書館の呪文・アイテム（2026-11-07）
+
+`hold/080` で呪文を職業別に習得レベル昇順・同レベルはデータ順にし、h3「Lv.N」を追加。詳細の習得レベル欄は削除。アイテムは武器・頭・胴体・足・薬の下位タブへ分割し、既存の呪文タブと同じ見た目・ARIA・tabIndex・切替時スクロール初期化を適用。武器の距離は名前横のタグへ移し、種類欄・「基準価格」表記を削除、職業欄を「職業」に統一した。薬の独立収集数は薬タブ内に保持。`renderLibrary(tab, spellJob, itemKind)` の第3引数で分類を指定し、既存の0〜2引数の呼び出しは維持する。`s.library`・`ash-v1` とモンスター表示は変更なし（変更4は未着手）。
+
+検証: `node tests/game.cjs`、全 `tests/*.cjs` 37本、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs` は全PASS。Notion照合は元の観点を維持し、図書館の表示検証を追加。更新したPythonブラウザテストは構文確認済み。`python3 tests/library-spell-tabs-browser.py` は Playwright 未導入（ModuleNotFoundError）で起動できず、ブラウザテスト全本と実画面確認は未実施。後続環境で再実行すること。push・公開は実施しない。
