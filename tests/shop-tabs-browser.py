@@ -21,12 +21,16 @@ with sync_playwright() as p:
           s.gold=10000;render();
         }""")
         page.locator('#blacksmith').click()
+        geometry = []
         for tab in ('weapon','head','body','feet'):
             page.locator('#shoptab-'+tab).click()
+            geometry.append((page.locator('#shopdialog .dialoghead').bounding_box()['y'],
+                             page.locator('#shopdialog').bounding_box()['height']))
             actual = page.locator('#shopitems [data-buy]').evaluate_all('(els)=>els.map(e=>e.dataset.buy)')
             expected = page.evaluate("WEAPONS.filter(w=>w.shop!==false&&(w.part||'weapon')===shopTab&&w.classes.includes(jobOf(+$('#shopmember').value))).map(w=>w.id)")
             assert actual == expected
             assert page.locator('#shoptab-'+tab).get_attribute('aria-selected') == 'true'
+        assert all(abs(y-geometry[0][0]) < 0.5 and abs(h-geometry[0][1]) < 0.5 for y,h in geometry), geometry
         page.locator('#shopmember').select_option('1')
         assert page.evaluate('shopTab') == 'feet'
         page.locator('#shopclose').click(); page.locator('#blacksmith').click()

@@ -56,7 +56,7 @@ def silence_cast(page):
     for frame in frames:
         assert frame['names'] == 'ABCDEF', frame
         assert frame['tags'] == frame['expected'], frame
-    assert frames[0]['text'] == '闇の司祭はモンティノを唱えた。'
+    assert frames[0]['text'] == '闇の司祭は沈黙を唱えた。'
     assert frames[0]['tags'] == [False] * 6
     assert frames[1]['text'] == 'Aは沈黙した。'
     assert frames[1]['tags'] == [True, False, False, False, False, False]
@@ -83,7 +83,7 @@ with sync_playwright() as p:
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
             assert entry.is_visible()
-            assert 'モンティノ（沈黙・全体）' in entry.inner_text() and '%' not in entry.inner_text(), (chance, entry.inner_text())
+            assert '沈黙（全体）' in entry.inner_text() and '%' not in entry.inner_text(), (chance, entry.inner_text())
             no_overflow(page)
             page.screenshot(path=str(output / f'montino-library-{chance}-{width}.png'))
         page.locator('#libraryclose').click()
@@ -100,7 +100,7 @@ with sync_playwright() as p:
         page.locator('[data-command-choice="spell"]').click()
         montino = page.locator('[data-spell="montino"]')
         assert montino.is_visible() and montino.is_enabled()
-        assert 'モンティノ' in montino.inner_text() and 'MP 4' in montino.inner_text()
+        assert '沈黙' in montino.inner_text() and 'MP 4' in montino.inner_text()
         assert 'Lv.3' in montino.inner_text() and '選択した列の敵に沈黙判定' in montino.inner_text()
         assert '麻痺・睡眠・沈黙・恐怖を治す' in page.locator('[data-spell="dialko"]').inner_text()
         no_overflow(page)

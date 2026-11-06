@@ -46,7 +46,7 @@ function libraryMonsterDetails(d,record){
  if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag)}}else attacks.textContent='なし';
  return [
   ['種族',d.race],['出現階',d.floors.map(f=>`${f}F`).join('・')],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
-  ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（沈黙・全体）`:(d.spellInfo?.name||'ハリト')):'なし'],
+  ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（${d.spellInfo.name==='沈黙'?'':'沈黙・'}全体）`:(d.spellInfo?.name||'ハリト')):'なし'],
   ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];
 }

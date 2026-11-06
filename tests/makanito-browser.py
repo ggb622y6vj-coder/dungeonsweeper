@@ -70,9 +70,9 @@ with sync_playwright() as p:
         assert page.evaluate('s.members[0].xp-xpBefore===expectedXP')
         assert page.locator('#scene [data-enemy-uid]').count() == 0
         log = page.locator('#log').inner_text()
-        assert 'マカニトを唱えた。' in log and log.count('息絶えた。') == 3, log
+        assert '窒息を唱えた。' in log and log.count('息絶えた。') == 3, log
         frames = page.evaluate('framesSeen')
-        cast = next(f for f in frames if 'マカニトを唱えた。' in f['text'])
+        cast = next(f for f in frames if '窒息を唱えた。' in f['text'])
         assert sorted(cast['shown']) == [100, 101, 102], cast
         for frame in frames:
             assert sorted(frame['shown']) == sorted(frame['expected']), frame

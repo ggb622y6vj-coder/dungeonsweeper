@@ -224,3 +224,13 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 `tests/attack-retarget.cjs` を追加し `tests/game.cjs` からも実行。2人の同一列予約、次列への攻撃、ログ非追加、スナップショット順、安定ID、近接／射程武器の範囲、対象なし、呪文切替を検証する。既存の守護者戦テストは随伴だけを倒す入力を1人の攻撃へ変更し、ログ同期テストの撃破ログ期待値を現行の「敵を倒した。」へ合わせた。
 
 `tests/battle-keys-browser.py` に1280/390pxで実際に2人が同じ前列を選んで戦い、次列への攻撃とログ数を確認するケースを追加。HTTPサーバー・Chromium起動を試みたが、ソケット権限制限（Operation not permitted）で停止したため実ブラウザ検証は未完了。Node全18本、敵CSV整合チェック、sim/selftest、ブラウザテストのPython構文確認はPASS。公開は未実施。
+
+## 079 変更1・2（2026-11-06）
+
+鍛冶屋を固定高の縦フレックスにし、商品一覧だけをスクロールさせる。一人称視界の環境色と重ね表示の背景、パーティー詳細のカード内ボタンを既存の階層テーマへ追随させた。帯の判定はrender内で一度だけ保持し、町・1Fは従来配色。現コードの面上の数字・「？」は指定資料の例と異なり #e8d2a2 なので、その従来色も保持する。通路線 #829079 と通常記号 #e8d2a2 も緑帯では維持する。
+
+回帰テスト: tests/scene-theme.cjs、tests/scene-theme-browser.py（全帯のSVG・ボタン・重ね表示背景・スクリーンショット、1280/390px）、tests/shop-tabs-browser.py（4タブのヘッダーY・高さ一致を追加）。HTTPサーバーがソケット権限制限（Operation not permitted）で起動できず、ブラウザ実行・目視確認は未実施。
+
+変更3（Notion同期）は本作業の対象外。既存の notion-sync.cjs は更新済みスナップショットと未同期の呪文データの6差分で失敗し、これを呼び出す game.cjs も同じ理由で失敗する。テスト期待値は変更していない。
+
+検証結果: tests/*.cjs 全34本を実行し32本PASS、game.cjs／notion-sync.cjsの2本は上記6差分でFAIL。HEADのデータとテストを/tmpへ展開した比較でも同じ6差分を再現した。compile-monsters.py --check（95種）、シミュレーション自己テスト、追加・更新ブラウザテストのPython構文検査はPASS。MANIFEST.sha256は再生成して照合済み。公開・pushは行っていない。

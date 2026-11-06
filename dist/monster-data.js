@@ -2038,7 +2038,7 @@ const ENEMIES=[
     "spell": 0.3,
     "spellInfo": {
       "id": "montino",
-      "name": "モンティノ",
+      "name": "沈黙",
       "target": "all",
       "dice": null,
       "effect": "silence"
@@ -3807,7 +3807,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "montino",
-      "name": "モンティノ",
+      "name": "沈黙",
       "target": "all",
       "dice": null,
       "effect": "silence"

@@ -1,4 +1,4 @@
-"""057: ミルワピック live cast at 1280px / 390px.
+"""057: 開放 live cast at 1280px / 390px.
 Old-save Lv5+ priest learns it on load; real dialog clicks cast it; region/boundary opens, no battle;
 numbered cell opens nothing; cost 4→8→16 and reload keeps state; battle shows 探索専用; town resets to 4.
 Run: python3 tests/floodfill-browser.py [http://127.0.0.1:8000/]
@@ -80,7 +80,7 @@ with sync_playwright() as p:
         v = page.evaluate("({enemy:s.enemy,boss:s.pendingBoss,stairs:s.pendingStairs,pos:s.pos,mp:s.mp[1],log:s.logs[0]})")
         assert v['enemy'] is None and not v['boss'] and not v['stairs'] and v['pos'] == POS and v['mp'] == mp0 - 4, v
         assert v['log'] == f'{len(want)-1}マスを探索済みにした。', v
-        assert page.locator('#log').inner_text().count('ミルワピックを唱えた。') == 1
+        assert page.locator('#log').inner_text().count('開放を唱えた。') == 1
         # 2nd cast (nothing new) costs 8, then reload: next cost is 16 and cells stay explored.
         assert 'MP 8' in cast(page)
         assert page.evaluate('s.logs[0]') == '新たに探索できるマスはなかった。'
