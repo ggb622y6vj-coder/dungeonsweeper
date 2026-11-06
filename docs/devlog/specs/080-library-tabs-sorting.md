@@ -50,3 +50,10 @@
 - `node tests/game.cjs`、全 `tests/*.cjs` 37本、敵CSV整合チェック、シミュレーション自己テストは全PASS。
 - ブラウザテストはPlaywright未導入で起動不可。実画面確認・ブラウザテスト全本は後続環境で実施する。
 - 変更4（モンスター）は今回の対象外。pushは実施しない。
+
+## 実施記録（2026-11-07、変更4）
+- モンスターを主出現階 `floors[0]` の数字タブ1〜10に分割し、階見出しを削除。PC幅はカード2列、700px以下は1列。タブ行・進捗は全幅のまま。
+- 識別状態ごとの内容・守護者／主の印・詳細・セーブ形式は維持。`renderLibrary` の既存引数を維持し、末尾の第4引数で階を指定する。
+- 図書館のNode／ブラウザ回帰テストを追随し、階タブとレスポンシブ配置のブラウザテストを追加。
+- ブラウザはPlaywright未導入（`ModuleNotFoundError`）で未実施。実画面確認・ブラウザテスト全本は後続環境で実施する。push・公開は実施しない。
+- 検証: `node tests/game.cjs`、全 `tests/*.cjs` 37本（旧階見出し前提の `monster-floors.cjs` を更新後、同テストを再実行）、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs` は全PASS。ブラウザテストのPython構文検査と `git diff --check` もPASS。

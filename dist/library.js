@@ -71,7 +71,8 @@ function libraryEntry(name,details,key=null,subtext=''){
  }
  return entry;
 }
-function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon'){
+function libraryMonsterFloors(){return [...new Set(ENEMIES.map(d=>d.floors[0]))].sort((a,b)=>a-b)}
+function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon',monsterFloor=libraryMonsterFloors()[0]){
  ensureLibrary();
  const monsterCount=ENEMIES.filter(d=>s.library.monsters[d.id]?.identified).length;
  const itemCount=WEAPONS.filter(w=>s.library.items[w.id]).length;
@@ -91,10 +92,14 @@ function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon'){
   const button=$('#libraryitemtab-'+kind),active=tab==='items'&&kind===itemKind;
   button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
  }
+ const monsterTabs=$('#library-monster-tabs');monsterTabs.hidden=tab!=='monsters';
+ body.classList.toggle('library-monsters',tab==='monsters');
+ for(const floor of libraryMonsterFloors()){
+  const button=$('#librarymonstertab-'+floor),active=tab==='monsters'&&floor===monsterFloor;
+  button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
+ }
  if(tab==='monsters'){
-  let floor;
-  for(const d of [...ENEMIES].sort((a,b)=>a.floors[0]-b.floors[0])){
-   if(d.floor!==floor){floor=d.floor;body.append(libraryElement('h3',`${floor}F`))}
+  for(const d of ENEMIES.filter(d=>d.floors[0]===monsterFloor)){
    const record=s.library.monsters[d.id],identified=!!record?.identified,seen=!!record?.seen||record?.count>0;
    const mark=d.id==='labyrinthlord'?' ★ 迷宮の主':d.boss?' ◆ 守護者':'';
    let entry;
@@ -128,6 +133,14 @@ function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon'){
  body.scrollTop=0;
 }
 function libraryUI(){
+ const monsterTabs=$('#library-monster-tabs');monsterTabs.replaceChildren();
+ for(const floor of libraryMonsterFloors()){
+  const button=libraryElement('button',String(floor));button.id='librarymonstertab-'+floor;
+  button.setAttribute('role','tab');button.setAttribute('aria-controls','librarybody');
+  button.setAttribute('aria-selected','false');button.tabIndex=-1;
+  monsterTabs.append(button);
+  $('#librarymonstertab-'+floor).onclick=()=>renderLibrary('monsters',1,'weapon',floor);
+ }
  $('#libraryopen').onclick=()=>{if(s.area!=='town'||!idle()||s.done)return;renderLibrary();$('#librarydialog').showModal()};
  $('#libraryclose').onclick=()=>$('#librarydialog').close();
  for(const tab of ['monsters','items','spells']){

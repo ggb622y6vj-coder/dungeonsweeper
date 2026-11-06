@@ -254,13 +254,13 @@ with sync_playwright() as p:
             page.keyboard.press(key); ring(page, '#librarytab-'+expected)
             assert page.locator('#librarytab-'+expected).get_attribute('aria-selected') == 'true'
         spell_total = page.evaluate('MAGIC.filter(x=>x.job===1).length')
-        for index, (tab, total) in enumerate(zip(tabs, (96,72,spell_total))):
+        for index, (tab, total) in enumerate(zip(tabs, (page.evaluate('ENEMIES.filter(d=>d.floors[0]===1).length'),page.evaluate('WEAPONS.filter(w=>!w.part).length'),spell_total))):
             assert page.locator('#librarytab-'+tab).get_attribute('aria-selected') == 'true'
             page.keyboard.press('s'); ring(page, '#librarybody')
             assert page.locator('#librarybody .library-entry').count() == total
             for _ in range(total):
                 page.keyboard.press('s')
-            assert page.locator('#librarybody').evaluate('(e)=>e.scrollTop>0')
+            assert page.locator('#librarybody').evaluate('(e)=>e.scrollTop>0 || e.scrollHeight<=e.clientHeight')
             last = '#librarybody .library-entry:last-child'
             title = page.locator(last+' h4').inner_text()
             before = page.locator(last).inner_text()

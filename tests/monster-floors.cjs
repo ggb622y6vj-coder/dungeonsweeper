@@ -66,13 +66,16 @@ for (const id of ['succubus', 'daidaraboti']) {
   assert.equal(value, '9F・10F');
 }
 
-// Library: both listed under the 9F heading (first floor), not under 10F.
+// Library: multi-floor monsters appear only on their primary floor tab.
 {
   const { game } = require('../scripts/sim/harness.cjs');
   const g = game(null, () => .5);
-  const order = JSON.parse(g.run(`s.library.monsters={succubus:{identified:true,count:1},daidaraboti:{identified:true,count:1}};renderLibrary();
-    let h='';JSON.stringify($('#librarybody').children.map(e=>e.className==='library-entry'?[h,e.attributes['data-library-entry']]:(h=e.textContent,null)).filter(Boolean))`));
-  for (const id of ['succubus', 'daidaraboti']) assert.equal(order.find(([, k]) => k === 'monster-' + id)[0], '9F', id + ' under 9F');
+  for (const floor of [9, 10]) {
+    g.run(`renderLibrary('monsters',1,'weapon',${floor})`);
+    for (const id of ['succubus', 'daidaraboti', 'kashadokuro']) {
+      assert.equal(g.run(`$('#librarybody').children.some(e=>e.attributes['data-library-entry']==='monster-${id}')`), floor === 9, `${id} on primary floor tab ${floor}`);
+    }
+  }
 }
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'monster-floors-'));

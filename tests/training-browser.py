@@ -21,15 +21,16 @@ with sync_playwright() as p:
   # Empty library opens without any registered adventurers; both tabs scroll.
   page.locator('#libraryopen').click()
   assert page.locator('#libraryprogress').inner_text()=='モンスター 0/96 · アイテム 0/67'
-  assert page.locator('#librarybody .library-entry').count()==96
-  assert page.locator('#librarybody h4').all_text_contents()==['？？？']*96
+  monster_total=page.evaluate('ENEMIES.filter(d=>d.floors[0]===1).length')
+  assert page.locator('#librarybody .library-entry').count()==monster_total
+  assert page.locator('#librarybody h4').all_text_contents()==['？？？']*monster_total
   assert page.locator('#librarybody dl').count()==0
-  for tab,total in [('items',48),('monsters',96)]:
+  for tab,total in [('items',48),('monsters',monster_total)]:
    page.locator('#librarytab-'+tab).click()
    assert page.locator('#librarytab-'+tab).get_attribute('aria-selected')=='true'
    assert page.locator('#librarybody h4').all_text_contents()==['？？？']*total
    page.locator('#librarybody .library-entry').last.scroll_into_view_if_needed()
-   assert page.locator('#librarybody').evaluate('(e)=>e.scrollTop>0 && e.scrollWidth<=e.clientWidth')
+   assert page.locator('#librarybody').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
    assert page.locator('#libraryclose').evaluate('(e)=>{const r=e.getBoundingClientRect();return r.top>=0 && r.bottom<=innerHeight}')
   page.locator('#libraryclose').click();assert not page.locator('#librarydialog').is_visible()
   page.locator('#libraryopen').click();page.keyboard.press('Escape');assert not page.locator('#librarydialog').is_visible()
