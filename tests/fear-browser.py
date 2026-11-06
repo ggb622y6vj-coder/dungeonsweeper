@@ -53,7 +53,8 @@ with sync_playwright() as p:
           s.library.monsters[id]={identified:true,count:1,firstFloor:floor};
         render();''')
         page.locator('#libraryopen').click()
-        for name, chance in (('亡霊', 15), ('地獄の犬', 15), ('魔界の猟犬', 15), ('死神', 20)):
+        for name, chance, floor in (('亡霊', 15, 6), ('地獄の犬', 15, 7), ('魔界の猟犬', 15, 9), ('死神', 20, 10)):
+            page.locator(f'#librarymonstertab-{floor}').click()
             entry = page.locator('#librarybody .library-entry').filter(
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
