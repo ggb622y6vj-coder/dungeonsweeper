@@ -38,8 +38,11 @@ with sync_playwright() as p:
         page.locator('#libraryopen').click()
         assert page.locator('#libraryprogress').inner_text().startswith('モンスター 96/96'), page.locator('#libraryprogress').inner_text()
         for r in monsters:
+            floor = page.evaluate('(id)=>enemyDefinition(id).floors[0]', r['userDefined:ID'])
+            page.locator(f'#librarymonstertab-{floor}').click()
             h4 = page.locator(f'[data-library-entry="monster-{r["userDefined:ID"]}"] h4').inner_text()
             assert h4.startswith(r['名前']), (r['userDefined:ID'], h4, r['名前'])
+        page.locator('#librarymonstertab-'+str(page.evaluate("enemyDefinition('takenoko').floors[0]"))).click()
         page.locator('[data-library-entry="monster-takenoko"]').scroll_into_view_if_needed()
         page.screenshot(path=str(output / f'library-{width}.png'))
         page.reload()

@@ -93,16 +93,16 @@ console.log('PASS library: town/idle guards and source-backed monster/item detai
 
 // Render all source records to check ordering, concealed details and safe text.
 g.run("renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry')");
-assert.equal(g.run('entries.length'),96);
+assert.equal(g.run('entries.length'),g.run('ENEMIES.filter(d=>d.floors[0]===1).length'));
 assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].textContent==='？？？')"),true);
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
- renderLibrary();var entries=$('#librarybody').children.filter(e=>e.className==='library-entry');`);
+ var entries=libraryMonsterFloors().flatMap(f=>{renderLibrary('monsters',1,'weapon',f);return $('#librarybody').children.filter(e=>e.className==='library-entry')});`);
 assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 96/96 · アイテム 67/67');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
-assert.equal(g.run("$('#librarybody').children[0].textContent"),'1F');
+assert.equal(g.run("$('#librarybody').children.some(e=>e.tagName==='H3')"),false);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),18);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
 assert.equal(g.run('ENEMIES.length'),96);
@@ -114,7 +114,7 @@ g.run("renderLibrary('items');var entries=$('#librarybody').children.filter(e=>e
 assert.equal(g.run('entries.length'),g.run('WEAPONS.filter(w=>!w.part).length'));
 assert.equal(g.run('entries.every(e=>e.children.length===2)'),true);
 g.run(`ENEMIES[0].name='<img src=x onerror=alert(1)>';WEAPONS[0].name='<script>bad()</script>';
- renderLibrary();var first=$('#librarybody').children[1].children[0];`);
+ renderLibrary();var first=$('#librarybody').children[0].children[0];`);
 assert.equal(g.run('first.textContent'),'<img src=x onerror=alert(1)>');
 assert.equal(g.run('first.innerHTML'),undefined);
 g.run("renderLibrary('items');var first=$('#librarybody').children[0].children[0]");
@@ -228,3 +228,22 @@ console.log('PASS library: inline entries remain noninteractive, detail dialog r
  g.run("renderLibrary('monsters')");assert.equal(g.run("$('#library-item-tabs').hidden"),true);
 }
 console.log('PASS library: level headings/order, five item tabs, discovery concealment, range tags and aria state');
+
+// 080 change 4: each monster appears exactly once, on its primary floor.
+{
+ const g=game();
+ assert.equal(g.run('JSON.stringify(libraryMonsterFloors())'),'[1,2,3,4,5,6,7,8,9,10]');
+ g.run('var before=JSON.stringify(s.library);var all=[]');
+ for(let floor=1;floor<=10;floor++){
+  g.run(`$('#librarybody').scrollTop=99;$('#librarymonstertab-${floor}').onclick();all.push(...$('#librarybody').children.map(e=>e.attributes['data-library-entry']));`);
+  assert.equal(g.run("$('#librarybody').scrollTop"),0);
+  assert.equal(g.run("$('#library-monster-tabs').hidden"),false);
+  assert.equal(g.run(`libraryMonsterFloors().every(f=>$('#librarymonstertab-'+f).attributes['aria-selected']===String(f===${floor})&&$('#librarymonstertab-'+f).tabIndex===(f===${floor}?0:-1))`),true);
+  assert.equal(g.run("JSON.stringify($('#librarybody').children.map(e=>e.attributes['data-library-entry']))"),g.run(`JSON.stringify(ENEMIES.filter(d=>d.floors[0]===${floor}).map(d=>'monster-'+d.id))`));
+ }
+ assert.equal(g.run('all.length===ENEMIES.length&&new Set(all).size===ENEMIES.length'),true);
+ assert.equal(g.run('JSON.stringify(s.library)'),g.run('before'));
+ for(const tab of ['items','spells']){g.run(`renderLibrary('${tab}',2)`);assert.equal(g.run("$('#library-monster-tabs').hidden"),true);}
+ g.run('renderLibrary()');assert.equal(g.run("$('#librarymonstertab-1').tabIndex"),0);
+}
+console.log('PASS library: primary-floor tabs, complete unique catalog, ARIA, scroll, defaults and unchanged records');

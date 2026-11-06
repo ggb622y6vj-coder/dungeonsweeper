@@ -268,3 +268,10 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 `hold/080` で呪文を職業別に習得レベル昇順・同レベルはデータ順にし、h3「Lv.N」を追加。詳細の習得レベル欄は削除。アイテムは武器・頭・胴体・足・薬の下位タブへ分割し、既存の呪文タブと同じ見た目・ARIA・tabIndex・切替時スクロール初期化を適用。武器の距離は名前横のタグへ移し、種類欄・「基準価格」表記を削除、職業欄を「職業」に統一した。薬の独立収集数は薬タブ内に保持。`renderLibrary(tab, spellJob, itemKind)` の第3引数で分類を指定し、既存の0〜2引数の呼び出しは維持する。`s.library`・`ash-v1` とモンスター表示は変更なし（変更4は未着手）。
 
 検証: `node tests/game.cjs`、全 `tests/*.cjs` 37本、`python3 scripts/compile-monsters.py --check`、`node scripts/sim/selftest.cjs` は全PASS。Notion照合は元の観点を維持し、図書館の表示検証を追加。更新したPythonブラウザテストは構文確認済み。`python3 tests/library-spell-tabs-browser.py` は Playwright 未導入（ModuleNotFoundError）で起動できず、ブラウザテスト全本と実画面確認は未実施。後続環境で再実行すること。push・公開は実施しない。
+
+### 080 変更4: モンスターの階タブ（2026-11-07）
+
+図書館のモンスター一覧を、主出現階（`floors[0]`）ごとの数字のみの下位タブへ変更。開いた直後は1、切替時は一覧先頭へ戻る。カードはPC幅で2列、既存の700pxブレークポイント以下で1列。進捗とタブ行は全幅、呪文・アイテムの配置と識別状態別の内容は維持。`renderLibrary` は末尾の第4引数で階を受け取り、既存引数とセーブ形式は維持する。
+
+Node回帰テストと既存ブラウザテストの階別表示前提を更新し、`tests/library-monster-tabs-browser.py` に全階巡回・重複なし・ARIA・キー操作・1280/390pxの列数・記録不変を追加。ブラウザ実行はPlaywright未導入（`ModuleNotFoundError`）で未実施。実行可能な環境でブラウザテスト全本と実画面確認が必要。push・公開は未実施。
+検証: `node tests/game.cjs`、全 `tests/*.cjs` 37本（表示前提修正後の再実行を含む）、敵CSV整合チェック、シミュレーション自己テストは全PASS。ブラウザテスト全ファイルのPython構文検査・差分の空白検査もPASS。

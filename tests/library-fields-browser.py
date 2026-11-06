@@ -38,11 +38,12 @@ with sync_playwright() as p:
             slime:{count:1,firstFloor:1},poisonslime:{count:1,firstFloor:2}};delete s.library.monsterIdentifyVersion;save();''')
         page.reload()
         page.locator('#libraryopen').click()
-        assert page.locator('#librarybody h3').first.inner_text() == '1F'
-        assert page.locator('#librarybody h3').all_inner_texts()[-1] == '10F'
+        assert page.locator('#librarybody h3').count() == 0
+        assert page.locator('#library-monster-tabs button').all_inner_texts() == [str(f) for f in range(1,11)]
         assert '地下' not in page.locator('#librarybody').inner_text()
         assert '初撃破階' not in page.locator('#librarybody').inner_text()
         for key, (race, floor, hp, dmg, xp) in CSV.items():
+            page.locator('#librarymonstertab-'+str(page.evaluate('(id)=>enemyDefinition(id).floors[0]', key))).click()
             e = page.locator(f'[data-library-entry="monster-{key}"]')
             e.scroll_into_view_if_needed()
             assert e.locator('h4').inner_text().startswith(page.evaluate(f"enemyDefinition('{key}').name"))
@@ -54,12 +55,16 @@ with sync_playwright() as p:
             box = e.bounding_box()
             assert box['x'] >= 0 and box['x'] + box['width'] <= width
             page.screenshot(path=str(output / f'{key}-{width}.png'))
-        tags = lambda key: page.locator(f'[data-library-entry="monster-{key}"] dd .ailment-tag')
+        def select(key):
+            page.locator('#librarymonstertab-'+str(page.evaluate('(id)=>enemyDefinition(id).floors[0]', key))).click()
+        def tags(key):
+            select(key)
+            return page.locator(f'[data-library-entry="monster-{key}"] dd .ailment-tag')
         assert [t.inner_text() for t in tags('evileye').all()] == ['麻痺', '石化', '後衛攻撃']
         evileye = page.locator('[data-library-entry="monster-evileye"]')
         assert [t.inner_text() for t in tags('evileye').all()].count('麻痺') == 1
         assert '%' not in evileye.inner_text()
-        assert page.locator('#librarybody .library-entry').count() == 96
+        assert page.locator('#librarybody .library-entry').count() == page.evaluate('ENEMIES.filter(d=>d.floors[0]===8).length')
         assert all('%' not in entry.inner_text() for entry in page.locator('#librarybody .library-entry').all())
         assert page.locator('.library-chance').count() == 0
         assert [t.inner_text() for t in tags('daidaraboti').all()] == ['麻痺', '後衛攻撃', '炎半減', '氷半減']
@@ -68,6 +73,7 @@ with sync_playwright() as p:
         assert tags('slime').count() == 0, 'slime no longer inflicts poison'
         # Same colours as the party-screen tags (same shared CSS classes).
         for key, kind in (('poisonslime', 'poison'), ('evileye', 'paralysis'), ('evileye', 'stone')):
+            select(key)
             lib = page.locator(f'[data-library-entry="monster-{key}"] dd .ailment-{kind}')
             ref = page.evaluate(f'''(()=>{{const e=document.createElement('span');e.className='ailment-tag ailment-{kind}';
               document.body.append(e);const c=getComputedStyle(e),v=[c.color,c.backgroundColor,c.borderTopColor].join();e.remove();return v}})()''')
@@ -77,6 +83,7 @@ with sync_playwright() as p:
         # Tags wrap inside the entry without horizontal overflow.
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert page.evaluate("[...document.querySelectorAll('#librarybody dd')].every(e=>e.scrollWidth<=e.clientWidth+1)")
+        select('daidaraboti')
         page.locator('[data-library-entry="monster-daidaraboti"]').click()
         assert page.locator('#librarydetaildialog').count() == 0
         assert page.locator('[data-library-entry="monster-daidaraboti"] dt').all_inner_texts() == ORDER

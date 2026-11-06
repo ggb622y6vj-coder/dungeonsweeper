@@ -25,7 +25,7 @@ assert.equal(g.run("wo.children[0].textContent"),g.run("enemyDefinition('wolf').
 assert.equal(g.run('wo.children.length'),2);
 assert.equal(g.run("wo.children[1].children.map(c=>c.textContent).join('')"),'撃破数0体');
 assert.equal(g.run("sl.children[1].children.map(c=>c.textContent).join('')"),'撃破数2体');
-assert.equal(g.run("es.filter(x=>x.children[0].textContent==='？？？').length"),94,'unseen stay ？？？');
+assert.equal(g.run("es.filter(x=>x.children[0].textContent==='？？？').length"),g.run('ENEMIES.filter(d=>d.floors[0]===1).length')-2,'unseen stay ？？？');
 g.run("s.library={monsters:{slime:{count:2,firstFloor:1},wolf:{seen:true,count:0}},items:{}};ensureLibrary()");
 assert.equal(g.run('s.library.monsterIdentifyVersion'),1);
 assert.equal(g.run('s.library.monsters.slime.identified'),true);

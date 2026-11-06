@@ -79,6 +79,8 @@ with sync_playwright() as p:
 
         page.locator('#libraryopen').click()
         for name, chance in (('闇の司祭', 30), ('魔女', 25)):
+            floor = page.evaluate('(name)=>ENEMIES.find(d=>d.name===name).floors[0]', name)
+            page.locator(f'#librarymonstertab-{floor}').click()
             entry = page.locator('#librarybody .library-entry').filter(
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
