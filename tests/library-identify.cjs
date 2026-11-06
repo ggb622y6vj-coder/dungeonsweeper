@@ -13,7 +13,8 @@ assert.equal(g.run("$('#libraryprogress').textContent").split(' · ')[0],'モン
 assert.equal(g.run("e.children[1].textContent"),g.run("enemyDefinition('slime').unknown"));
 assert.equal(g.run("e.children[1].className"),'library-subtext');
 assert.equal(g.run('e.children.length'),3,'identified entry keeps details');
-g.run("e.onclick()");assert.equal(g.run("$('#librarydetailbody').children[0].children.length"),3,'detail dialog keeps subtext and details');
+assert.equal(g.run("!e.onclick&&e.tabIndex===undefined&&!e.attributes.role&&!e.attributes['aria-haspopup']"),true,'identified entry no longer opens a detail dialog');
+assert.equal(require('node:fs').readFileSync('dist/index.html','utf8').includes('id="librarydetaildialog"'),false,'detail dialog element removed');
 const saved=g.run("save();localStorage.getItem('ash-v1')");
 assert.equal(game(saved).run('s.library.monsters.slime.identified'),true);
 g.run("s.library.monsters={slime:{count:2,firstFloor:1},wolf:{seen:true,count:0}};s.library.monsterIdentifyVersion=1;renderLibrary();var es=$('#librarybody').children.filter(x=>x.className==='library-entry');var sl=es.find(x=>x.attributes['data-library-entry']==='monster-slime'),wo=es.find(x=>x.attributes['data-library-entry']==='monster-wolf')");

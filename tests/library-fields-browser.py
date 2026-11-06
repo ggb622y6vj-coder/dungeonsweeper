@@ -78,8 +78,9 @@ with sync_playwright() as p:
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert page.evaluate("[...document.querySelectorAll('#librarybody dd')].every(e=>e.scrollWidth<=e.clientWidth+1)")
         page.locator('[data-library-entry="monster-daidaraboti"]').click()
-        assert page.locator('#librarydetailbody dt').all_inner_texts() == ORDER
-        assert page.locator('#librarydetailbody .ailment-tag').count() == 4
+        assert page.locator('#librarydetaildialog').count() == 0
+        assert page.locator('[data-library-entry="monster-daidaraboti"] dt').all_inner_texts() == ORDER
+        assert page.locator('[data-library-entry="monster-daidaraboti"] .ailment-tag').count() == 4
         page.screenshot(path=str(output / f'detail-{width}.png'))
         assert not errors, errors
         print(f'PASS library-fields Chromium {width}px: order, nF, CSV values, tags/colours, wrap, legacy firstFloor; no JS errors')

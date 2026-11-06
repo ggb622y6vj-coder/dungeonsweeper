@@ -64,14 +64,7 @@ function libraryEntry(name,details,key=null,subtext=''){
  const entry=document.createElement('article');entry.className='library-entry';
  entry.append(libraryElement('h4',name));
  if(subtext){const sub=libraryElement('small',subtext);sub.className='library-subtext';entry.append(sub)}
- if(key){
-  entry.tabIndex=0;entry.setAttribute('role','button');entry.setAttribute('data-library-entry',key);
-  entry.setAttribute('aria-haspopup','dialog');
-  entry.onclick=()=>{
-   $('#librarydetailbody').replaceChildren(libraryEntry(name,details,null,subtext));
-   $('#librarydetaildialog').showModal();
-  };
- }
+ if(key)entry.setAttribute('data-library-entry',key);
  if(details){
   const list=document.createElement('dl');
   for(const [label,value] of details){list.append(libraryElement('dt',label));const dd=typeof value==='string'?libraryElement('dd',value):value;list.append(dd)}
@@ -128,7 +121,6 @@ function renderLibrary(tab='monsters',spellJob=1){
 }
 function libraryUI(){
  $('#libraryopen').onclick=()=>{if(s.area!=='town'||!idle()||s.done)return;renderLibrary();$('#librarydialog').showModal()};
- $('#librarydetailclose').onclick=()=>$('#librarydetaildialog').close();
  $('#libraryclose').onclick=()=>$('#librarydialog').close();
  for(const tab of ['monsters','items','spells']){
   const button=$('#librarytab-'+tab);
