@@ -103,7 +103,7 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  assert.equal(g.run('s.mp[1]'),997);
 }
 {
- const g=party();battle(g,['sirakaba']);g.run('Math.random=()=>0');
+ const g=party();battle(g,['lesserdemon']);g.run("enemyDefinition('lesserdemon').mageResist=0;Math.random=()=>0");
  assert.equal(g.run("castMagic(1,'lakanito',100)"),true);assert.equal(g.run('s.enemy.units[0].hp'),1000);
  assert.equal(J(g,'logQueue.map(e=>e.text)').some(t=>t.endsWith('には効かない！')),true,'demon immunity has its own log');
  assert.equal(g.run('s.enemy.pendingXP||0'),0);

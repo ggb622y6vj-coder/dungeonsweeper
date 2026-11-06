@@ -1,5 +1,5 @@
 """072: Notion-synced names in the real UI at 1280 and 390 px: battle spell menu (name+description from
-data/notion-spells.json), monster library (95 names from data/notion-monsters.json incl. 3 new) and enemy spell log.
+data/notion-spells.json), monster library (96 names from data/notion-monsters.json incl. 3 new) and enemy spell log.
 Run: /tmp/pyv/bin/python tests/notion-sync-browser.py [http://127.0.0.1:8000/]
 """
 import json, os, sys
@@ -32,11 +32,11 @@ with sync_playwright() as p:
         page.reload()
         page.evaluate('''[1,2,0,0,0,0].forEach((job,i)=>{
           const r=generateRecruit('ABCDEF'[i],job);registerRecruit(r);changeRecruitParty(r.members.id,true);});render();''')
-        # Library: all 95 identified; names equal the Notion rows (incl. the 3 additions).
+        # Library: all 96 identified; names equal the Notion rows (incl. the 3 additions).
         page.evaluate('''s.library.monsters=Object.fromEntries(ENEMIES.map(e=>[e.id,{count:1,firstFloor:e.floor,identified:true}]));
           delete s.library.monsterIdentifyVersion;save();render();''')
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 95/95'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 96/96'), page.locator('#libraryprogress').inner_text()
         for r in monsters:
             h4 = page.locator(f'[data-library-entry="monster-{r["userDefined:ID"]}"] h4').inner_text()
             assert h4.startswith(r['名前']), (r['userDefined:ID'], h4, r['名前'])
@@ -74,6 +74,6 @@ with sync_playwright() as p:
         page.screenshot(path=str(output / f'enemy-spell-log-{width}.png'))
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
-        print(f'PASS notion-sync Chromium {width}px: {len(battle_mage)} battle spells, enemy log 火炎, 95 library names; no JS errors')
+        print(f'PASS notion-sync Chromium {width}px: {len(battle_mage)} battle spells, enemy log 火炎, 96 library names; no JS errors')
         context.close()
     browser.close()

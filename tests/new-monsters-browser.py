@@ -29,7 +29,7 @@ with sync_playwright() as p:
           s.library.monsterIdentifyVersion=1;save();''')
         page.reload()
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/95'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/96'), page.locator('#libraryprogress').inner_text()
         heads = page.evaluate('''(()=>{let h='',o={};for(const e of document.querySelector('#librarybody').children){
           if(e.tagName==='H3')h=e.textContent;const k=e.dataset&&e.dataset.libraryEntry;if(k)o[k]=h;}return o})()''')
         assert heads['monster-gas'] == '2F' and heads['monster-kashadokuro'] == '9F', heads
@@ -45,4 +45,4 @@ with sync_playwright() as p:
         assert not errors, errors
         context.close()
     browser.close()
-print('PASS new-monsters Chromium 1280/390px: 魔物いきれ 2F・3F, 火車髑髏 9F・10F, 2/95, no overflow, no JS errors')
+print('PASS new-monsters Chromium 1280/390px: 魔物いきれ 2F・3F, 火車髑髏 9F・10F, 2/96, no overflow, no JS errors')

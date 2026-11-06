@@ -59,7 +59,7 @@ with sync_playwright() as p:
         evileye = page.locator('[data-library-entry="monster-evileye"]')
         assert [t.inner_text() for t in tags('evileye').all()].count('麻痺') == 1
         assert '%' not in evileye.inner_text()
-        assert page.locator('#librarybody .library-entry').count() == 95
+        assert page.locator('#librarybody .library-entry').count() == 96
         assert all('%' not in entry.inner_text() for entry in page.locator('#librarybody .library-entry').all())
         assert page.locator('.library-chance').count() == 0
         assert [t.inner_text() for t in tags('daidaraboti').all()] == ['麻痺', '後衛攻撃', '炎半減', '氷半減']
