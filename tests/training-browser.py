@@ -24,7 +24,7 @@ with sync_playwright() as p:
   assert page.locator('#librarybody .library-entry').count()==96
   assert page.locator('#librarybody h4').all_text_contents()==['？？？']*96
   assert page.locator('#librarybody dl').count()==0
-  for tab,total in [('items',72),('monsters',96)]:
+  for tab,total in [('items',48),('monsters',96)]:
    page.locator('#librarytab-'+tab).click()
    assert page.locator('#librarytab-'+tab).get_attribute('aria-selected')=='true'
    assert page.locator('#librarybody h4').all_text_contents()==['？？？']*total
@@ -77,11 +77,10 @@ with sync_playwright() as p:
   assert page.locator('#librarybody dl').count()==1
   page.screenshot(path=f'/tmp/library-monsters-{width}.png')
   page.locator('#librarytab-items').click()
-  assert '鉄兜' in page.locator('#librarybody h4').all_text_contents()
-  assert '板金鎧' in page.locator('#librarybody h4').all_text_contents()
-  assert '傷薬' in page.locator('#librarybody h4').all_text_contents()
-  assert page.locator('#librarybody dl').count()==3
-  page.get_by_role('heading',name='板金鎧',exact=True).scroll_into_view_if_needed()
+  for kind, name in [('head','鉄兜'),('body','板金鎧'),('medicine','傷薬')]:
+    page.locator('#libraryitemtab-'+kind).click()
+    assert name in page.locator('#librarybody h4').all_text_contents()
+    assert page.locator('#librarybody dl').count()==1
   page.screenshot(path=f'/tmp/library-items-{width}.png')
   assert page.locator('#librarydialog').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')

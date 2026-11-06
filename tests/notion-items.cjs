@@ -50,3 +50,11 @@ for(const [id,effect] of Object.entries(effects)){
 assert.equal(g.run("itemDescription(weapon('sword'))"),'1d6+2 · 近距離');
 assert.equal(g.run("libraryItemDetails(weapon('sword')).some(([label])=>label==='追加効果')"),false);
 console.log('PASS notion-items: 15 descriptors and library/shop/inventory descriptions; ordinary weapon display unchanged');
+
+for(const w of items){
+ const details=JSON.parse(g.run(`JSON.stringify(libraryItemDetails(weapon('${w.id}')))`));
+ assert.equal(details[0][0],'職業');
+ assert.ok(!details.some(([label])=>label==='種類'));
+ assert.ok(!details.find(([label])=>label==='価格')[1].includes('基準価格'));
+ if(w.dice)assert.ok(!/近距離|遠距離/.test(details.find(([label])=>label==='性能')[1]));
+}
