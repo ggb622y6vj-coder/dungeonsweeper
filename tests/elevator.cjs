@@ -62,6 +62,16 @@ assert.equal(g.run('s.cells[s.start].open'),true);assert.equal(g.run('s.pendingS
 // Normal stair travel to a fresh floor keeps its starting stairs open.
 {const stairs=setup(76);stairs.run("s.guardiansDefeated=[1];s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");
  assert.equal(stairs.run('s.floor'),2);assert.equal(stairs.run('s.pos===s.start&&s.cells[s.start].open'),true);}
+// 076 Amendment 1: stair arrival reopens a saved start hidden by elevator travel.
+{const stairs=setup(78);stairs.run('s.elevatorFloors=[1,2];travelElevator(2)');
+ assert.equal(stairs.run('s.cells[s.start].open'),false);
+ stairs.run("var explored=s.cells.findIndex((c,i)=>i!==s.start&&i!==s.pos&&!c.trap&&c.type==='');s.cells[explored].open=true;var beforeStairs=JSON.stringify(s.cells);travelElevator(1)");
+ assert.equal(stairs.run('s.floors[2].cells[s.floors[2].start].open'),false,'saved stairs remain hidden');
+ stairs.run("s.guardiansDefeated=[1];s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");
+ assert.equal(stairs.run('s.floor'),2);assert.equal(stairs.run('s.pos===s.start'),true);
+ assert.equal(stairs.run('s.cells[s.start].open'),true,'076 Amendment 1: stair arrival opens the saved start');
+ assert.equal(stairs.run('s.cells[explored].open'),true,'other explored cells remain open');
+ assert.equal(stairs.run('(()=>{const before=JSON.parse(beforeStairs);before[s.start].open=true;return JSON.stringify(s.cells)===JSON.stringify(before)})()'),true,'all other cell state is preserved');}
 // Defensive guard: a saved arrival cell that is also the start stays open.
 {const same=setup(77);same.run("s.elevatorFloors=[1,3];fresh(3);s.start=s.cells.findIndex(c=>c.type==='elevator');rememberFloor();var savedFloors=s.floors;fresh(1);s.floors=savedFloors;travelElevator(3)");
  assert.equal(same.run('s.pos===s.start&&s.cells[s.pos].open'),true);}
