@@ -71,7 +71,8 @@ with sync_playwright() as p:
         assert entry(page, 'goblin').locator('h4').inner_text() == '？？？'
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         slime.click()
-        detail = page.locator('#librarydetailbody')
+        assert page.locator('#librarydetaildialog').count() == 0
+        detail = slime
         assert detail.locator('.library-subtext').inner_text() == sub.inner_text()
         assert detail.locator('dt').count() > 1
         page.screenshot(path=str(output / f'detail-{width}.png'))

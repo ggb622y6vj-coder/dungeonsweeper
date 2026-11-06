@@ -199,10 +199,16 @@ with sync_playwright() as p:
 
         # Shop stock, buying twice, selling once, then transferring to A.
         choose(page, '#blacksmith')
+        tab_to(page, '#shoptab-weapon')
+        page.keyboard.press('d'); ring(page, '#shoptab-head')
+        assert page.locator('#shoptab-head').get_attribute('aria-selected') == 'true'
         before = page.evaluate('({gold:s.gold,inventory:structuredClone(s.inventory)})')
         price = page.evaluate("weapon('helm').price")
         sell_price = page.evaluate("weapon('helm').sell")
-        choose(page, '[data-buy="helm"]'); page.keyboard.press('Space')
+        choose(page, '[data-buy="helm"]')
+        page.locator('#shoppurchasedialog').wait_for(state='hidden')
+        choose(page, '[data-buy="helm"]')
+        page.locator('#shoppurchasedialog').wait_for(state='hidden')
         assert page.evaluate('s.gold') == before['gold']-price*2
         assert page.evaluate('s.inventory[0].slice(-2)') == ['helm', 'helm']
         choose(page, '#shopinventory')
@@ -223,16 +229,22 @@ with sync_playwright() as p:
         assert page.evaluate('s.inventory[1]') == before['inventory'][1]+['helm']
         escape(page, '#inventorydialog', '#shopdialog')
         assert focused(page, '#shopinventory')
-        # Reach the last stock entry using downward movement and auto-scroll.
+        # Reach the last weapon entry using downward movement and auto-scroll.
+        tab_to(page, '#shoptab-head')
+        page.keyboard.press('a'); ring(page, '#shoptab-weapon')
+        assert page.locator('#shoptab-weapon').get_attribute('aria-selected') == 'true'
         tab_to(page, '#shopitems .shopitem:first-child button')
         for _ in range(page.locator('#shopitems button').count()-1):
             page.keyboard.press('s')
         ring(page, '#shopitems .shopitem:last-child button')
-        assert page.locator('#shopdialog').evaluate('(e)=>e.scrollTop>0')
+        # With the stock split into tabs, the weapon list alone may fit the
+        # dialog without overflowing; auto-scroll applies only when it does.
+        if page.locator('#shopdialog').evaluate('(e)=>e.scrollHeight>e.clientHeight'):
+            assert page.locator('#shopdialog').evaluate('(e)=>e.scrollTop>0')
         escape(page, '#shopdialog', '#town')
 
         # All three tabs, wrap-around, shortcut from list/close button, stable
-        # first/last list navigation and nested detail return for every catalog.
+        # Tab navigation and noninteractive catalog scrolling.
         choose(page, '#libraryopen')
         tabs = ['monsters', 'items', 'spells']
         for key, expected in [('d','items'),('d','spells'),('d','monsters'),
@@ -244,29 +256,24 @@ with sync_playwright() as p:
         spell_total = page.evaluate('MAGIC.filter(x=>x.job===1).length')
         for index, (tab, total) in enumerate(zip(tabs, (95,57,spell_total))):
             assert page.locator('#librarytab-'+tab).get_attribute('aria-selected') == 'true'
-            page.keyboard.press('s'); ring(page, '#librarybody .library-entry:first-of-type')
-            page.keyboard.press('w'); ring(page, '#librarytab-'+tab)
-            page.keyboard.press('s')
+            page.keyboard.press('s'); ring(page, '#librarybody')
             assert page.locator('#librarybody .library-entry').count() == total
-            for _ in range(total-1):
+            for _ in range(total):
                 page.keyboard.press('s')
-            last = '#librarybody .library-entry:last-child'
-            ring(page, last)
             assert page.locator('#librarybody').evaluate('(e)=>e.scrollTop>0')
-            page.keyboard.press('s'); ring(page, last)
+            last = '#librarybody .library-entry:last-child'
             title = page.locator(last+' h4').inner_text()
-            page.keyboard.press('Space')
-            assert page.locator('#librarydetaildialog').is_visible()
-            assert page.locator('#librarydetailbody h4').inner_text() == title
-            # Undiscovered entries (any tab) hide name and details.
-            assert page.locator('#librarydetailbody dl').count() == (0 if title == '？？？' else 1)
+            before = page.locator(last).inner_text()
+            page.locator(last).click()
+            assert page.locator('#librarydetaildialog').count() == 0
+            assert page.locator(last).inner_text() == before
+            assert page.locator(last+' dl').count() == (0 if title == '？？？' else 1)
             if tab == 'spells':
                 names = page.locator('#librarybody .library-entry h4').all_inner_texts()
                 hidden = [n for n in names if n == '？？？']
                 assert 0 < len(hidden) < total, names
                 assert page.locator('#librarybody .library-entry:has(dl)').count() == total-len(hidden)
             layout(page)
-            escape(page, '#librarydetaildialog', '#librarydialog'); ring(page, last)
             if index < 2:
                 page.keyboard.press('e')
                 ring(page, '#librarytab-'+tabs[index+1])

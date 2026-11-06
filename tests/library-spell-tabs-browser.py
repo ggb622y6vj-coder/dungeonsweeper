@@ -35,8 +35,11 @@ with sync_playwright() as p:
         assert page.locator('#librarybody .library-entry').evaluate_all("""els=>els.every((e,i)=>e.dataset.libraryEntry==='spell-'+MAGIC.filter(x=>x.job===1)[i].id)""")
         mage_known = page.locator('#librarybody .library-entry:has(dl)').first
         assert mage_known.locator('h4').inner_text() != '？？？'
-        mage_known.click(); assert page.locator('#librarydetaildialog').is_visible()
-        page.keyboard.press('Escape'); assert not page.locator('#librarydetaildialog').is_visible()
+        before = mage_known.inner_text()
+        mage_known.click()
+        assert page.locator('#librarydetaildialog').count() == 0
+        assert mage_known.inner_text() == before
+        assert mage_known.get_attribute('role') is None
 
         page.locator('#librarybody').evaluate('(e)=>e.scrollTop=e.scrollHeight')
         page.locator('#libraryspelltab-2').click()
@@ -51,9 +54,9 @@ with sync_playwright() as p:
         page.locator('#libraryspelltab-2').focus(); page.keyboard.press('Space')
         assert page.locator('#libraryspelltab-2').get_attribute('aria-selected') == 'true'
         priest_known = page.locator('#librarybody .library-entry:has(dl)').first
-        priest_known.focus(); page.keyboard.press('Enter')
-        assert page.locator('#librarydetaildialog').is_visible()
-        page.keyboard.press('Escape'); assert not page.locator('#librarydetaildialog').is_visible()
+        priest_known.click()
+        assert page.locator('#librarydetaildialog').count() == 0
+        assert priest_known.locator('dl').count() == 1
 
         assert page.locator('#librarydialog').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')

@@ -195,3 +195,11 @@ console.log('PASS library: summoned units counted individually, idempotence and 
  assert.equal(g.run("libraryItemDetails(weapon('sword'))[1][0]"),'装備できる職業');
  assert.equal(g.run("libraryItemDetails(weapon('healingPotion'))[1][0]"),'使用できる職業');
 }
+
+// 077: catalog details stay inline; entries have no dialog/button behavior.
+for(const tab of ['monsters','items','spells']){
+ g.run(`renderLibrary('${tab}')`);
+ assert.equal(g.run("$('#librarybody').children.filter(e=>e.className==='library-entry').every(e=>!e.onclick&&e.tabIndex===undefined&&!e.attributes.role&&!e.attributes['aria-haspopup'])"),true);
+}
+assert.equal(require('node:fs').readFileSync('dist/index.html','utf8').includes('id="librarydetaildialog"'),false);
+console.log('PASS library: inline entries remain noninteractive, detail dialog removed');

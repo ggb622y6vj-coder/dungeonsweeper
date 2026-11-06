@@ -55,7 +55,7 @@ with sync_playwright() as p:
   page.reload();assert page.evaluate('JSON.stringify(trainingRoster())')==before;assert page.evaluate('s.members.map(m=>m.id)')==order
   # Purchase via the shop and win a deterministic 1F combat via the real turn path.
   page.evaluate('s.gold=1000;render()')
-  page.locator('#blacksmith').click();page.locator('[data-buy="helm"]').click();page.locator('#shopclose').click()
+  page.locator('#blacksmith').click();page.locator('#shoptab-head').click();page.locator('[data-buy="helm"]').click();page.locator('#shoppurchasedialog').wait_for(state='hidden');page.locator('#shopclose').click()
   page.locator('#entrance').click();page.wait_for_function('!logBusy()')
   page.evaluate("s.enemy={units:[{id:'slime',uid:0,row:0,hp:1,rewarded:false}],initiative:'party',chestBattle:true};s.attackRows=s.members.map(()=>0);resetPartyCommands();Math.random=()=>.999;attack()")
   page.wait_for_function('!logBusy()')

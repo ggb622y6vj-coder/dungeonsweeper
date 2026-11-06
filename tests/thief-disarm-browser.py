@@ -31,8 +31,9 @@ with sync_playwright() as p:
         page.locator('#libraryopen').click()
         page.locator('#librarytab-spells').click()
         page.locator('#librarybody .library-entry').first.click()
-        assert page.locator('#librarydetaildialog dt').all_text_contents()==['習得レベル','消費MP','使用場所','効果']
-        page.locator('#librarydetaildialog').screenshot(path=str(out/f'spell-{width}.png'))
+        assert page.locator('#librarydetaildialog').count() == 0
+        assert page.locator('#librarybody .library-entry').first.locator('dt').all_text_contents()==['習得レベル','消費MP','使用場所','効果']
+        page.locator('#librarydialog').screenshot(path=str(out/f'spell-{width}.png'))
         assert not errors,errors
         print(f'PASS 075 Chromium {width}px')
         page.close()

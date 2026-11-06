@@ -254,6 +254,8 @@
    const target=key==='Home'?tabs[0]:key==='End'?tabs.at(-1):tabs[(tabs.indexOf(current)+step+tabs.length)%tabs.length];
    activate(target);sync();focus(target);return true;
   }
+  if(onTab&&way==='down'&&panel?.id==='librarybody'){focus(panel);return true;}
+  if(selected===panel&&panel?.id==='librarybody'&&way==='up'){focus(active);return true;}
   if(onTab&&way==='down'&&entries.length){focus(entries[0]);return true;}
   if(index>=0&&(way==='up'||way==='down')){
    focus(way==='up'?(index===0?active:entries[index-1]):entries[Math.min(index+1,entries.length-1)]);return true;
@@ -261,6 +263,7 @@
   return false;
  }
  function keydown(e){
+  if($('#shoppurchasedialog')?.open){consume(e);return;}
   if(ignores(e))return;
   const inField=editing(e.target);
   if(inField&&e.key!=='Escape'){
@@ -289,6 +292,10 @@
   // Focus set by Tab, mouse, or existing UI is authoritative, except for the
   // logical disabled cursor whose DOM focus intentionally lives on the layer.
   if(layer.items.includes(doc.activeElement))focus(doc.activeElement,false);
+  if(selected?.id==='librarybody'&&(way==='down'||way==='up')){
+   const body=selected,delta=way==='down'?120:-120;
+   if(delta>0||body.scrollTop>0){consume(e);body.scrollTop+=delta;return;}
+  }
   if(e.key==='Escape'){
    consume(e);
    if(e.repeat)return;
