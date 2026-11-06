@@ -51,7 +51,7 @@ if(!diffs.length)console.log('PASS notion-sync monsters: 96 definitions match th
 const JOB={魔法使い:1,僧侶:2},WHERE={探索:'field',戦闘:'battle','戦闘・探索':'both',宝箱:'chest'};
 const TARGET={前方:'front',敵1体:'enemy',敵1列:'group',敵全体:'all',味方1人:'ally',味方全員:'party',階選択:'floor',宝箱:'chest'};
 const value=t=>{t=unesc(t);if(!t)return null;const m=/^(\d+)d(\d+)$/.exec(t);return m?[+m[1],+m[2]]:+t};
-assert.equal(ns.length,32,'Notion spell rows');assert.equal(MAGIC.length,32,'game spells');
+assert.equal(ns.length,34,'Notion spell rows');assert.equal(MAGIC.length,34,'game spells');
 for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x){diffs.push(`spell ${id} missing in game`);continue}
   const mp=unesc(r.MP);
   const b={name:r['名前'],job:JOB[r['系統']],level:r['習得Lv'],mp:/^\d+$/.test(mp)?+mp:id==='dumapic'?2:parseInt(mp),guaranteed:r['確定習得']==='確定',
@@ -59,4 +59,4 @@ for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x
   for(const k of Object.keys(b))eq(`spell ${id}.${k}`,x[k],b[k]);}
 for(const x of MAGIC)if(!ns.some(r=>r['userDefined:ID']===x.id))diffs.push(`spell ${x.id} not in Notion`);
 if(diffs.length){console.error(diffs.join('\n'));assert.fail(`${diffs.length} Notion/game differences`)}
-console.log('PASS notion-sync: 96 monsters and 32 spells match the Notion snapshot field by field');
+console.log('PASS notion-sync: 96 monsters and 34 spells match the Notion snapshot field by field');
