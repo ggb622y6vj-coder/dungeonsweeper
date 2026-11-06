@@ -102,6 +102,7 @@
 | 074 | 2026-11-05 | 074 [light] 図書館の呪文を「魔法使い」「僧侶」タブに分ける | `hold/074` | [spec](specs/074-light-library-spell-job-tabs.md) | [074-shots](reports/074-shots/), [074-verify.md](reports/074-verify.md), [074.md](reports/074.md) |
 | 075 | 2026-11-06 | 075 [light] 図書館の呪文詳細から「職業」欄を削除／盗賊の罠解除（遠征中1回）（hold/075・push済み） | `78b879b` | [spec](specs/075-light-spell-job-row-and-thief-disarm.md) | [075-shots](reports/075-shots/), [075.md](reports/075.md) |
 | 076 | 2026-11-06 | 076 [light] エレベーター到着時に上昇する階段を最初から見せない（hold/076・push済み） | `16a8efc` | [spec](specs/076-light-elevator-stairs-hidden.md) | [076.md](reports/076.md) |
+| 077 | 2026-11-06 | 077 [light] 階移動ログ／階層テーマカラー／図書館の詳細ウィンドウ廃止／鍛冶屋タブと購入ポップアップ（hold/077・push済み） | `d93606a` | [spec](specs/077-mixed-floorlog-theme-library-shop.md) | [077.md](reports/077.md) |
 
 ## 番号なしレポート / Other reports
 
