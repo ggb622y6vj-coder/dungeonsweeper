@@ -68,4 +68,15 @@ for(const boss of [false,true]){
   assert.deepEqual(read(g,'[s.mp[1],s.members[1].level]'),before);
  }
 }
+
+// Nullifying resistance must never remove either instant-death boss immunity.
+for(const spell of ['makanito','lakanito']){
+ const g=setup(true);
+ g.run(`s.members[1].known.push('${spell}');s.members[1].level=30;s.mp[1]=100;def.level=1;def.race='人間';Math.random=()=>0;castMagic(1,'mahaman',800)`);
+ assert.equal(g.run('enemySpellResist(s.enemy.units[0],1)'),0);
+ const before=read(g,'s.enemy.units.map(e=>[e.hp,e.rewarded])');
+ assert.equal(g.run(`castMagic(1,'${spell}',800)`),true);
+ assert.deepEqual(read(g,'s.enemy.units.map(e=>[e.hp,e.rewarded])'),before,spell+' guardian immunity after resistance nullification');
+ assert(g.run('logQueue.some(e=>e.text.includes("効かなかった")||e.text.includes("効かない"))'));
+}
 console.log('resistance debuffs PASS');

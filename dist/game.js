@@ -89,10 +89,14 @@ function physicalAttack(i,e){
  const threshold=Math.max(1,Math.min(19,21-accuracy-(enemyDefinition(e.id).ac+(e.acPenalty||0))-classHit-(w.hitBonus||0)-bonus+3*(s.enemy?enemyGroups().findIndex(g=>g.key===rowKey(e)):(e.row||0))));
  const addedDamage=effect?.kind==='flagDamage'?effect.correctFlags:effect?.kind==='numberDamage'?effect.number:0;
  let damage=0,hitsCount=0;
- for(let n=0;n<count;n++)if((Math.random()*20|0)>=threshold){hitsCount++;damage+=Math.max(1,dice(...w.dice).value+bonus+addedDamage)}
- if(hitsCount&&effect&&!effect.owner.firstHit){
-  if((effect.kind==='flagMatchFirstHit'&&effect.flags===effect.number)||(effect.kind==='firstHitUnexplored'&&effect.unexplored))damage=Math.floor(damage*(100+effect.pct)/100);
-  effect.owner.firstHit=true;
+ for(let n=0;n<count;n++)if((Math.random()*20|0)>=threshold){
+  hitsCount++;
+  let hitDamage=Math.max(1,dice(...w.dice).value+bonus+addedDamage);
+  if(effect&&!effect.owner.firstHit){
+   if((effect.kind==='flagMatchFirstHit'&&effect.flags===effect.number)||(effect.kind==='firstHitUnexplored'&&effect.unexplored))hitDamage=Math.floor(hitDamage*(100+effect.pct)/100);
+   effect.owner.firstHit=true;
+  }
+  damage+=hitDamage;
  }
  return {damage,hitsCount,count};
 }
