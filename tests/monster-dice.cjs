@@ -59,4 +59,4 @@ assert.deepEqual(plant.statuses,[{type:'poison',chance:.15}]);
 assert.equal(ENEMIES.filter(e=>e.floor===10&&e.boss).length,1);
 assert.equal(ENEMIES.find(e=>e.id==='labyrinthlord').boss,true);
 assert.equal(rows.get('赤兎')[7], '3d4');
-console.log(`PASS monster dice and 96 definitions; 10F additions, boss invariant, guardians and breath unchanged`);
+console.log(`PASS monster dice and 100 definitions; 10F additions, boss invariant, guardians and breath unchanged`);

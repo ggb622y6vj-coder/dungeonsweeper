@@ -36,7 +36,7 @@ with sync_playwright() as p:
         page.evaluate('''s.library.monsters=Object.fromEntries(ENEMIES.map(e=>[e.id,{count:1,firstFloor:e.floor,identified:true}]));
           delete s.library.monsterIdentifyVersion;save();render();''')
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 96/96'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 100/100'), page.locator('#libraryprogress').inner_text()
         for r in monsters:
             floor = page.evaluate('(id)=>enemyDefinition(id).floors[0]', r['userDefined:ID'])
             page.locator(f'#librarymonstertab-{floor}').click()
@@ -58,7 +58,8 @@ with sync_playwright() as p:
         shown = {}
         for el in page.locator('[data-spell]').all():
             shown[el.get_attribute('data-spell')] = el.inner_text()
-        battle_mage = [r for r in spells if r['系統'] == '魔法使い' and '戦闘' in r['使用場面']]
+        # tempt （誘惑）: Notion は探索・戦闘だが、戦闘中の効果が未定義のため戦闘一覧には出さない（083の判断。ユーザー確認待ち）
+        battle_mage = [r for r in spells if r['系統'] == '魔法使い' and '戦闘' in r['使用場面'] and r['userDefined:ID'] != 'tempt']
         assert {r['userDefined:ID'] for r in battle_mage} <= set(shown), (sorted(shown), width)
         by_id = {r['userDefined:ID']: r for r in spells}
         for r in (by_id[k] for k in shown):

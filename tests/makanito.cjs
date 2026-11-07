@@ -178,7 +178,7 @@ for(const [ids,mp,known,silence,fear,want] of [
   const g=battle(['thief','goblin','harpy']);
   g.run('s.enemy.units[0].hp=0');planTurn(g);
   assert.equal(g.run("s.magicPlans[0]?.id==='makanito'"),false,'dead individuals do not count');
-  assert.equal(g.run("ENEMIES.filter(d=>d.floor>=5).every(d=>!thresholdDeathApplies({id:d.id},7))"),true);
+  assert.deepEqual(JSON.parse(g.run("JSON.stringify(ENEMIES.filter(d=>d.floor>=5&&thresholdDeathApplies({id:d.id},7)).map(d=>d.id))")),['poisongiant'],'Lv7 poison giant is the high-floor exception');
 }
 {
   const g=battle(['thief','goblin','harpy']);

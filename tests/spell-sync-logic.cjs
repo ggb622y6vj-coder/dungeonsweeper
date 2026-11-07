@@ -121,7 +121,8 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  for(const id of switched)assert.equal(resumed.run(`s.members.some(m=>m.known.includes('${id}'))`),false,`${id} is not granted on load`);
  g.run("s.members[0].known=[];s.members[0].level=5;Math.random=()=>0;learnMagic(0,5)");
  assert.equal(g.run("s.members[0].known.includes('lomilwa')"),false);
- g.run('s.members[0].level=6;learnMagic(0,6)');assert.equal(g.run("s.members[0].known.includes('lomilwa')"),true);
+ g.run('s.members[0].level=6;learnMagic(0,6)');assert.equal(g.run("s.members[0].known.includes('lomilwa')"),false);
+ g.run('s.members[0].level=7;learnMagic(0,7)');assert.equal(g.run("s.members[0].known.includes('lomilwa')"),true);
 }
 // Enemy spell IDs and old data keys remain stable; the battle log reads the display name.
 for(const [monster,id,oldName,name] of [
