@@ -29,7 +29,7 @@ with sync_playwright() as p:
           s.library.monsterIdentifyVersion=1;save();''')
         page.reload()
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/96'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 2/100'), page.locator('#libraryprogress').inner_text()
         for key, name, floor in (('gas', '魔物いきれ', '2F・3F'), ('kashadokuro', '火車髑髏', '9F・10F')):
             page.locator('#librarymonstertab-'+str(page.evaluate('(id)=>enemyDefinition(id).floors[0]', key))).click()
             e = page.locator(f'[data-library-entry="monster-{key}"]')
@@ -43,4 +43,4 @@ with sync_playwright() as p:
         assert not errors, errors
         context.close()
     browser.close()
-print('PASS new-monsters Chromium 1280/390px: 魔物いきれ 2F・3F, 火車髑髏 9F・10F, 2/96, no overflow, no JS errors')
+print('PASS new-monsters Chromium 1280/390px: 魔物いきれ 2F・3F, 火車髑髏 9F・10F, 2/100, no overflow, no JS errors')

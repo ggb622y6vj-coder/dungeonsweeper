@@ -3702,7 +3702,13 @@ const ENEMIES=[
         8,
         0
       ],
-      "chance": 0.25
+      "chance": 0.25,
+      "statuses": [
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ]
     },
     "spell": 0,
     "spellInfo": null
@@ -4048,7 +4054,8 @@ const ENEMIES=[
     "unknown": "悪魔",
     "floor": 9,
     "floors": [
-      9
+      9,
+      10
     ],
     "level": 17,
     "hp": [
@@ -4087,7 +4094,7 @@ const ENEMIES=[
     "resistance": "なし",
     "boss": false,
     "icon": "♜",
-    "summonCap": 3,
+    "summonCap": 4,
     "breath": null,
     "spell": 0.1,
     "spellInfo": {
@@ -4713,7 +4720,7 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 4,
     "breath": {
-      "element": "冷気",
+      "element": "氷",
       "dice": [
         6,
         8,
@@ -5284,6 +5291,239 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "dendenko",
+    "name": "デンデンツボロ",
+    "unknown": "小さな蝸牛",
+    "floor": 2,
+    "floors": [
+      2,
+      3
+    ],
+    "level": 4,
+    "hp": [
+      3,
+      6,
+      10
+    ],
+    "ac": 6,
+    "hit": 2,
+    "attack": [
+      2,
+      10,
+      0
+    ],
+    "xp": 25.0,
+    "groupSize": [
+      1,
+      2
+    ],
+    "gold": [
+      2,
+      5,
+      0
+    ],
+    "race": "虫",
+    "mageResist": 0.1,
+    "priestResist": 0.1,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "✥",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "dynamotuboro",
+    "name": "ダイナモツボロ",
+    "unknown": "巨大な蝸牛",
+    "floor": 3,
+    "floors": [
+      3,
+      4
+    ],
+    "level": 8,
+    "hp": [
+      3,
+      7,
+      10
+    ],
+    "ac": 5,
+    "hit": 3,
+    "attack": [
+      2,
+      10,
+      5
+    ],
+    "xp": 50.0,
+    "groupSize": [
+      1,
+      2
+    ],
+    "gold": [
+      3,
+      10,
+      0
+    ],
+    "race": "虫",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "✥",
+    "summonCap": 4,
+    "breath": {
+      "element": "雷",
+      "dice": [
+        2,
+        8,
+        0
+      ],
+      "chance": 0.5,
+      "statuses": [
+        {
+          "type": "paralysis",
+          "chance": 0.1
+        }
+      ]
+    },
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "akumaikire",
+    "name": "悪魔いきれ",
+    "unknown": "意思を持つ煙",
+    "floor": 3,
+    "floors": [
+      3,
+      4
+    ],
+    "level": 8,
+    "hp": [
+      3,
+      8,
+      10
+    ],
+    "ac": 6,
+    "hit": 4,
+    "attack": [
+      2,
+      5,
+      2
+    ],
+    "xp": 40.0,
+    "groupSize": [
+      1,
+      5
+    ],
+    "gold": [
+      2,
+      15,
+      0
+    ],
+    "race": "不定形",
+    "mageResist": 0.0,
+    "priestResist": 0.5,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "◉",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "poisongiant",
+    "name": "毒の巨人",
+    "unknown": "ただれた大男",
+    "floor": 7,
+    "floors": [
+      7,
+      8,
+      9
+    ],
+    "level": 7,
+    "hp": [
+      16,
+      9,
+      0
+    ],
+    "ac": -1,
+    "hit": 10,
+    "attack": [
+      3,
+      7,
+      0
+    ],
+    "xp": 500.0,
+    "groupSize": [
+      1,
+      3
+    ],
+    "gold": [
+      10,
+      10,
+      0
+    ],
+    "race": "人型",
+    "mageResist": 0.4,
+    "priestResist": 0.4,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♟",
+    "summonCap": 4,
+    "breath": {
+      "element": "毒",
+      "dice": [
+        7,
+        8,
+        0
+      ],
+      "chance": 0.25,
+      "statuses": [
+        {
+          "type": "poison",
+          "chance": 0.3
+        }
+      ]
+    },
     "spell": 0,
     "spellInfo": null
   }
