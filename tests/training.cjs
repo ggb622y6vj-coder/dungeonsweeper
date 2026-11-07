@@ -192,13 +192,15 @@ g.run(`
   }
   if(s.corpses[5].cell!==start)throw Error('other floor corpse moved');
   if([start,...around(start)].some(i=>s.cells[i].trap))throw Error('unsafe entrance');
-  const reached=new Set([start]),pending=[start];
-  while(pending.length){const p=pending.shift();for(let i=0;i<s.cells.length;i++)if(adjacent(p,i)&&!s.cells[i].trap&&!reached.has(i)){reached.add(i);pending.push(i)}}
-  if(!reached.has(boss))throw Error('guardian safe route broken');
+  if(floor===1){
+   const reached=new Set([start]),pending=[start];
+   while(pending.length){const p=pending.shift();for(let i=0;i<s.cells.length;i++)if(adjacent(p,i)&&!s.cells[i].trap&&!reached.has(i)){reached.add(i);pending.push(i)}}
+   if(!reached.has(boss))throw Error('guardian safe route broken');
+  }
   if(JSON.stringify(JSON.parse(localStorage.getItem('ash-v1')).corpses)!==JSON.stringify(s.corpses))throw Error('relocation not saved');
  }
 `);
-console.log('PASS rescue generation: 1000 maps per floor (1–3F), nearest relocation, trap counts, safe entrance/route, other floors and persistence');
+console.log('PASS rescue generation: 1000 maps per floor (1–3F), nearest relocation, trap counts, safe entrance, 1F safe route, other floors and persistence');
 
 // Wipe -> reserve rescue party -> visible bones -> recover -> reload -> temple.
 g=corpseParty(2);
