@@ -16,29 +16,19 @@ drain();run(`for(let floor of [1,2,3]){
     fresh(floor);
     if(s.cells.filter(c=>c.trap).length!==expected)throw Error('generated trap count');
     if([s.start,...around(s.start),s.boss].some(i=>s.cells[i].trap))throw Error('unsafe start area or guardian');
-    if(floor===1){
-      // Explore both monotone choices: a greedy branch can miss the protected route.
-      let reached=new Set([s.start]);
-      for(const p of reached){
-        let choices=[];
-        if(p%size()!==s.boss%size())choices.push(p+(p%size()<s.boss%size()?1:-1));
-        if((p/size()|0)!==(s.boss/size()|0))choices.push(p+(p<s.boss?size():-size()));
-        for(const i of choices)if(!s.cells[i].trap)reached.add(i);
-      }
-      if(!reached.has(s.boss))throw Error('trapped floor 1 guardian path');
-      continue;
-    }
-    let p=s.start;
-    while(p!==s.boss){
+    // Explore both monotone choices: a greedy branch can miss the protected route.
+    let reached=new Set([s.start]);
+    for(const p of reached){
       let choices=[];
       if(p%size()!==s.boss%size())choices.push(p+(p%size()<s.boss%size()?1:-1));
       if((p/size()|0)!==(s.boss/size()|0))choices.push(p+(p<s.boss?size():-size()));
-      p=choices.find(i=>i===s.boss||!s.cells[i].trap);
-      if(p===undefined){blockedPaths++;break}
+      for(const i of choices)if(!s.cells[i].trap)reached.add(i);
     }
+    if(floor===1){if(!reached.has(s.boss))throw Error('trapped floor 1 guardian path');continue}
+    if(!reached.has(s.boss))blockedPaths++;
   }
   if(floor>1&&blockedPaths===0)throw Error('guardian path protection remains above floor 1');
-  console.log('PASS floor '+floor+': 1000 maps, greedy path blocked '+blockedPaths+' times');
+  console.log('PASS floor '+floor+': 1000 maps, maps without a trap-free monotone path: '+blockedPaths);
 }`);ctx.Math.random=generationRandom;drain();console.log('PASS floor trap counts and safe start area/guardian on all floors; path protection only on floor 1');
 drain();run(`s.enemy=null;s.pendingStairs=false;s.done=false;s.area='dungeon';fresh(1);s.scan=2;var firstStart=s.start;s.cells[5].flag=true;s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2);var secondStart=s.start;s.cells[7].safe=true;if(s.cells.length!==100||s.scan!==2)throw Error('descend');travelFloor(1);if(s.start!==firstStart||!s.cells[5].flag||s.pos!==s.boss)throw Error('ascend persistence');s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2);if(s.start!==secondStart||!s.cells[7].safe||s.pos!==s.start)throw Error('revisit');travelFloor(1);`);drain();run(`enterTown();enterDungeon();if(s.floor!==1||s.pos!==s.start)throw Error('town entrance');`);console.log('PASS floor round trips, exploration persistence, charge persistence and town entrance');
 
