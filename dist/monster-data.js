@@ -864,7 +864,7 @@ const ENEMIES=[
     "spell": 0.5,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -1034,7 +1034,7 @@ const ENEMIES=[
     "spell": 0.5,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -1317,7 +1317,7 @@ const ENEMIES=[
     "spell": 0.5,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -1595,7 +1595,7 @@ const ENEMIES=[
     "spell": 0.6,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -1718,7 +1718,7 @@ const ENEMIES=[
     "spell": 0.1,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -2094,7 +2094,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -2518,7 +2518,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -2691,7 +2691,7 @@ const ENEMIES=[
     "spell": 0.35,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -3028,7 +3028,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -3143,7 +3143,7 @@ const ENEMIES=[
     "spell": 0.2,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -3411,7 +3411,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "dalto",
-      "name": "ダルト",
+      "name": "吹雪",
       "target": "all",
       "dice": [
         5,
@@ -3639,7 +3639,7 @@ const ENEMIES=[
     "spell": 0.2,
     "spellInfo": {
       "id": "mahalito",
-      "name": "マハリト",
+      "name": "大火炎",
       "target": "all",
       "dice": [
         4,
@@ -3978,7 +3978,7 @@ const ENEMIES=[
     "spell": 0.4,
     "spellInfo": {
       "id": "halito",
-      "name": "ハリト",
+      "name": "火炎",
       "target": "one",
       "dice": [
         1,
@@ -4038,7 +4038,7 @@ const ENEMIES=[
     "spell": 0.3,
     "spellInfo": {
       "id": "dalto",
-      "name": "ダルト",
+      "name": "吹雪",
       "target": "all",
       "dice": [
         5,
@@ -4099,7 +4099,7 @@ const ENEMIES=[
     "spell": 0.1,
     "spellInfo": {
       "id": "madalto",
-      "name": "マダルト",
+      "name": "大吹雪",
       "target": "all",
       "dice": [
         6,
@@ -4209,7 +4209,7 @@ const ENEMIES=[
     "spell": 0.15,
     "spellInfo": {
       "id": "dalto",
-      "name": "ダルト",
+      "name": "吹雪",
       "target": "all",
       "dice": [
         5,
@@ -4377,7 +4377,7 @@ const ENEMIES=[
     "spell": 0.25,
     "spellInfo": {
       "id": "madalto",
-      "name": "マダルト",
+      "name": "大吹雪",
       "target": "all",
       "dice": [
         6,
@@ -4608,7 +4608,7 @@ const ENEMIES=[
     "spell": 0.15,
     "spellInfo": {
       "id": "madalto",
-      "name": "マダルト",
+      "name": "大吹雪",
       "target": "all",
       "dice": [
         6,
@@ -4844,7 +4844,7 @@ const ENEMIES=[
     "spell": 0.15,
     "spellInfo": {
       "id": "tiltowait",
-      "name": "ティルトウェイト",
+      "name": "魔弾",
       "target": "all",
       "dice": [
         8,
@@ -5075,7 +5075,7 @@ const ENEMIES=[
     "spell": 0.35,
     "spellInfo": {
       "id": "tiltowait",
-      "name": "ティルトウェイト",
+      "name": "魔弾",
       "target": "all",
       "dice": [
         8,

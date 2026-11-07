@@ -124,13 +124,13 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  g.run('s.members[0].level=6;learnMagic(0,6)');assert.equal(g.run("s.members[0].known.includes('lomilwa')"),false);
  g.run('s.members[0].level=7;learnMagic(0,7)');assert.equal(g.run("s.members[0].known.includes('lomilwa')"),true);
 }
-// Enemy spell IDs and old data keys remain stable; the battle log reads the display name.
+// 085: enemy spell IDs stay stable; data and battle logs use current names.
 for(const [monster,id,oldName,name] of [
  ['mage','halito','ハリト','火炎'],['sorcerer','mahalito','マハリト','大火炎'],
  ['deathmage','dalto','ダルト','吹雪'],['greaterdemon','madalto','マダルト','大吹雪'],
  ['archmage','tiltowait','ティルトウェイト','魔弾'],['darkpriest','montino','沈黙','沈黙']]){
  const g=party();battle(g,[monster]);
- assert.deepEqual(J(g,`[enemyDefinition('${monster}').spellInfo.id,enemyDefinition('${monster}').spellInfo.name]`),[id,oldName]);
+ assert.deepEqual(J(g,`[enemyDefinition('${monster}').spellInfo.id,enemyDefinition('${monster}').spellInfo.name]`),[id,name]);
  g.run(`Object.assign(enemyDefinition('${monster}'),{flee:0,summon:0,breath:null,spell:1});
   Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)`);
  const logs=J(g,'logQueue.map(e=>e.text)');assert(logs.some(t=>t.includes(`は${name}を唱えた。`)));
