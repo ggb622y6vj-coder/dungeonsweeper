@@ -109,7 +109,6 @@ function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon',monsterFloor=
    body.append(entry);
   }
  }else if(tab==='items'){
-  if(itemKind==='medicine')body.append(libraryElement('p',`薬 ${MEDICINES.filter(w=>s.library.items[w.id]).length}/${MEDICINES.length}`));
   for(const w of [...WEAPONS,...MEDICINES].filter(w=>(w.kind==='medicine'?'medicine':w.part||'weapon')===itemKind)){
    const known=!!s.library.items[w.id];
    const entry=libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,'item-'+w.id);

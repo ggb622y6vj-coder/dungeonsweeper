@@ -29,3 +29,17 @@ g.run("s.area='town';render()");assert.equal(g.run('currentFloorTheme'),'green')
 assert.equal(g.run('face(-1).fill'),'#202722');
 assert.equal(g.run('face(target()).color'),'#e8d2a2');
 console.log('PASS scene palettes, green compatibility, semantic number and flag colors');
+
+// 085: stairs share the concealed-cell symbols in every first-person panel.
+g.run("s.pendingBoss=null;s.light=false;s.pos=size()*3+3;s.dir=0");
+for(const [type,icon] of [['stairs','⇧'],['down','⇩']]){
+ for(const [state,symbol] of [[{},'？'],[{safe:true},'✓'],[{disarmed:true},'✓'],[{flag:'power'},'⚑'],[{open:true},icon]]){
+  g.run(`for(const i of [target(),target(-1),target(1)])Object.assign(s.cells[i],{type:'${type}',open:false,safe:false,disarmed:false,flag:false,chest:null},${JSON.stringify(state)});scene()`);
+  for(const offset of [0,-1,1])assert.equal(g.run(`face(target(${offset})).symbol`),symbol);
+  const svg=g.run("$('#scene').innerHTML");
+  assert.ok(svg.includes(`aria-label="正面：${state.open?'探索済み':state.safe?'安全確認済み':'未探索'} ${symbol}、`));
+  if(!state.open)assert.ok(!svg.includes(icon),'concealed stairs absent from SVG and ARIA');
+  else assert.equal((svg.match(new RegExp(`>${icon}</text>`,'g'))||[]).length,3);
+ }
+}
+console.log('PASS scene: unopened stairs concealed in front/left/right, fallback symbols and explored icons');

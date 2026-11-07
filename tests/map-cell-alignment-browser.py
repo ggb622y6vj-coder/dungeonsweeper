@@ -27,7 +27,7 @@ with sync_playwright() as p:
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.goto(URL)
         page.wait_for_function('!!globalThis.KeyNav && !logBusy()')
-        for floor, n in ((3, 12), (1, 8)):
+        for floor, n in ((3, 12), (1, 8), (1, 8)):
             # Use the actual floor sizing/rendering, with deterministic visible numbers.
             # No movement or encounters are needed for this layout regression.
             page.evaluate('''floor => {
@@ -47,6 +47,12 @@ with sync_playwright() as p:
             if width == 390:
                 page.locator('#maptoggle').tap()
             assert page.locator(root).is_visible()
+            assert page.locator('#maptitle').text_content() == f'地図（地下{floor}階）'
+            assert page.locator('.maplocation').text_content() == f'地下{floor}階'
+            if width == 390:
+                assert page.locator('#maptitle').is_visible()
+            else:
+                assert page.locator('#mapdock .maplocation').is_visible()
             assert page.locator(f'{root} .cell').count() == n * n
             page.evaluate('document.fonts.ready')
             offsets = page.locator(f'{root} .cell-number').evaluate_all('''spans =>
@@ -63,6 +69,12 @@ with sync_playwright() as p:
             bad = [o for o in offsets if o['width'] <= 0 or o['height'] <= 0
                    or abs(o['dx']) > 2 or abs(o['dy']) > 2]
             assert not bad, f'{width}px {n}x{n}: number center outside ±2px: {bad}'
+            if floor == 3:
+                page.evaluate('travelFloor(2)')
+                page.wait_for_function('!logBusy()')
+                assert page.evaluate('s.floor') == 2
+                assert page.locator('#maptitle').text_content() == '地図（地下2階）'
+                assert page.locator('.maplocation').text_content() == '地下2階'
             if width == 390:
                 page.locator('#mapclose').click()
                 page.wait_for_function("!document.querySelector('#mapdialog').open")

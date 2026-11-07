@@ -247,3 +247,15 @@ console.log('PASS library: level headings/order, five item tabs, discovery conce
  g.run('renderLibrary()');assert.equal(g.run("$('#librarymonstertab-1').tabIndex"),0);
 }
 console.log('PASS library: primary-floor tabs, complete unique catalog, ARIA, scroll, defaults and unchanged records');
+
+// 085: medicine entries remain, without a separate collection-count paragraph.
+{
+ const g=game();
+ for(const acquired of [false,true]){
+  g.run(`s.library.items=${acquired?"Object.fromEntries(MEDICINES.map(w=>[w.id,true]))":"{}"};renderLibrary('items',1,'medicine')`);
+  assert.equal(g.run("$('#librarybody').children.length"),g.run('MEDICINES.length'));
+  assert.equal(g.run("$('#librarybody').children.every(e=>e.className==='library-entry')"),true);
+  assert.equal(g.run("$('#librarybody').children.every(e=>e.children[0].textContent==='？？？')"),!acquired);
+ }
+}
+console.log('PASS library: medicine tab omits count for empty and complete collections');

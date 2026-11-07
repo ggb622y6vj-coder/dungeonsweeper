@@ -54,7 +54,7 @@ ids={
 }
 BOSSES=['guardian','general','watcher','minogate','necromancer','vampire','ettin','demongeneral','ancientdragon','labyrinthlord']
 # 敵の呪文：名前→(id,対象,ダイス,効果)。全体は生存する味方全員に個別ダイス。
-MONSTER_SPELLS={'沈黙':('montino','全体',None,'silence'),'ハリト':('halito','単体',[1,8,0],'damage'),'マハリト':('mahalito','全体',[4,6,0],'damage'),'ダルト':('dalto','全体',[5,6,0],'damage'),'マダルト':('madalto','全体',[6,8,0],'damage'),'ティルトウェイト':('tiltowait','全体',[8,8,0],'damage')}
+MONSTER_SPELLS={'沈黙':('montino','全体',None,'silence'),'火炎':('halito','単体',[1,8,0],'damage'),'大火炎':('mahalito','全体',[4,6,0],'damage'),'吹雪':('dalto','全体',[5,6,0],'damage'),'大吹雪':('madalto','全体',[6,8,0],'damage'),'魔弾':('tiltowait','全体',[8,8,0],'damage')}
 data=[]
 for r in rows:
  id=ids[r['確定名']]
