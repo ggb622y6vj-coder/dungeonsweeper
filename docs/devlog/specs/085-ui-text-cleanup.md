@@ -70,3 +70,11 @@ scripts/compile-monsters.py の MONSTER_SPELLS のキーも現在名に置き換
 - 図書館: 薬タブ先頭に「薬 n/5」が出ないこと。他タブ不変。
 - 同期: notion-sync / notion-items とも差分0。compile-monsters --check 合格。
 - 全 node テスト・全ブラウザテスト合格。
+
+## Amendment 1（ChatGPT レビュー対応、2026-11-07）
+
+ChatGPT レビューは「条件付き合格」。必須対応2点を実施者が直接対応した。
+
+- 図書館の使用呪文欄のフォールバックに旧名「ハリト」が残っていた（spellInfo.name が無い場合の表示）。通常データでは発生しないが、旧名称整理の趣旨に合わせ「不明」に変更。
+- 地図タイトルのテスト強化: 階シーケンスを 3F→1F→3F の往復に変更し、実経路の階段移動（travelFloor）に加えて、セーブ→再読み込み後もタイトルと階表示が復元した階に一致することを確認する行程を追加（再読み込み後はダイアログが閉じているため、閉じる操作は開いている場合だけ行うよう追随）。
+- 対応後に該当テスト（library.cjs、game.cjs、map-cell-alignment-browser.py）を再実行し合格。

@@ -27,7 +27,7 @@ with sync_playwright() as p:
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.goto(URL)
         page.wait_for_function('!!globalThis.KeyNav && !logBusy()')
-        for floor, n in ((3, 12), (1, 8), (1, 8)):
+        for floor, n in ((3, 12), (1, 8), (3, 12)):
             # Use the actual floor sizing/rendering, with deterministic visible numbers.
             # No movement or encounters are needed for this layout regression.
             page.evaluate('''floor => {
@@ -75,7 +75,13 @@ with sync_playwright() as p:
                 assert page.evaluate('s.floor') == 2
                 assert page.locator('#maptitle').text_content() == '地図（地下2階）'
                 assert page.locator('.maplocation').text_content() == '地下2階'
-            if width == 390:
+                # Save/restore: the dialog title must follow the restored floor.
+                page.evaluate('save()')
+                page.reload()
+                page.wait_for_function('!!globalThis.KeyNav && !logBusy()')
+                assert page.locator('#maptitle').text_content() == '地図（地下2階）'
+                assert page.locator('.maplocation').text_content() == '地下2階'
+            if width == 390 and page.evaluate("document.querySelector('#mapdialog').open"):
                 page.locator('#mapclose').click()
                 page.wait_for_function("!document.querySelector('#mapdialog').open")
             print(f'PASS map-cell-alignment {width}px {n}x{n}: '
