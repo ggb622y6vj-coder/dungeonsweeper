@@ -23,7 +23,8 @@ for(const floor of [1,2,10])for(const killed of [false,true])for(const location 
  assert.equal(after.cells.filter(c=>c.trap).length,g.run('trapCount(s.floor,size())'));
  assert.equal(after.cells[after.start].type,'stairs');assert.equal(after.start===after.pos,location==='start');
  assert.notEqual(after.boss,after.pos);assert.notEqual(after.boss,after.start);
- assert.equal(after.cells[after.boss].type,killed?'down':'boss');
+ assert.equal(after.cells[after.boss].type,killed&&floor<10?'down':'boss');
+ if(floor===10&&killed&&location!=='down')assert(!after.cells.some(c=>c.type==='down'),'10F: no down stairs to a nonexistent 11F');
  assert(g.run('Math.max(Math.abs(s.boss%size()-s.start%size()),Math.abs((s.boss/size()|0)-(s.start/size()|0)))>2'));
  assert.equal(after.cells.filter(c=>c.type==='elevator').length,1);
  assert(g.run('[s.pos,...around(s.pos),s.boss,s.start].every(i=>!s.cells[i].trap)'));

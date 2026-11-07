@@ -21,4 +21,13 @@ for(const [id,type,chance] of [['dynamotuboro','paralysis',.1],['bluedragon','pa
  g.run(`var details=libraryMonsterDetails(enemyDefinition('${id}'),{count:0});`);
  assert.ok(g.run("details.find(x=>x[0]==='特殊能力')[1].children.map(x=>x.textContent).join(' ')").includes(type==='poison'?'毒':'麻痺'));
 }
+{
+ // ダメージ0でも、ブレスを受けた生存者には付随効果を判定する
+ const g=game(null,()=>.5);createParty(g,[0,2]);
+ g.run(`s.area='dungeon';var foe=makeEnemy('dynamotuboro',1);s.enemy={units:[foe],flagEffect:{}};
+ s.members.forEach(m=>m.status='ok');s.hp=[100,100];s.ailments=s.members.map(()=>freshAilments());
+ dice=()=>({value:0});var rolls=[0,0,0,0];Math.random=()=>rolls.shift();monsterAction(foe,[]);`);
+ assert.equal(g.run('s.hp.join()'),'100,100');
+ assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.ailments.map(a=>!!a.paralysis))')),[true,true]);
+}
 console.log('PASS breath statuses: individual probability boundaries, death/stone exclusion, normal logs and library display');
