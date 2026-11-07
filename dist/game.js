@@ -15,7 +15,7 @@ function reloadFloor(){
  s.boss=pick(indices.filter(i=>i!==pos&&i!==s.start&&Math.max(Math.abs(i%size()-s.start%size()),Math.abs((i/size()|0)-(s.start/size()|0)))>2));
  s.cells=indices.map(i=>i===pos?current:{trap:false,open:false,flag:false,type:''});
  if(s.start!==pos)s.cells[s.start].type='stairs';
- s.cells[s.boss].type=(s.guardiansDefeated||[]).includes(s.floor)||s.relic?'down':'boss';
+ s.cells[s.boss].type=s.floor<MAX_FLOOR&&(s.guardiansDefeated||[]).includes(s.floor)?'down':'boss';
  const safe=floorTrapSafety(pos,s.boss,s.floor);safe.add(s.start);
  const pool=indices.filter(i=>!safe.has(i));
  const count=Math.min(Math.max(0,trapCount(s.floor,size())-(current.trap?1:0)),pool.length);

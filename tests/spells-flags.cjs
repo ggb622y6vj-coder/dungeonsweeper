@@ -34,6 +34,13 @@ for(const id of ['flagkill','flagkill2','flagdebuff','flagdebuff2']){
  assert.deepEqual(read(g,'s.enemy.units.map(e=>e.acPenalty||0)'),[0,3,0]);assert.equal(g.run('s.unlockChecks'),1);
 }
 {
+ // 重ねがけ: AC補正は既存の減退系呪文と同じ最大値方式で、合算しない
+ const g=setup();g.run("s.enemy.units.forEach(e=>e.acPenalty=2);s.cells[6].trap=true;s.cells[6].flag=true;castMagic(0,'flagdebuff2',800)");
+ assert.deepEqual(read(g,'s.enemy.units.map(e=>e.acPenalty||0)'),[2,2,2]);
+ const h=setup();h.run("s.enemy.units.forEach(e=>e.acPenalty=2);for(const j of [6,7,8])Object.assign(s.cells[j],{trap:true,flag:true});castMagic(0,'flagdebuff2',800)");
+ assert.deepEqual(read(h,'s.enemy.units.map(e=>e.acPenalty||0)'),[3,3,2]);
+}
+{
  const g=setup();g.run("s.enemy=null;for(const j of [0,6,24])Object.assign(s.cells[j],{trap:true,flag:true});s.cells[1].flag=true;s.cells[2].trap=true;castMagic(1,'sweep',null)");
  assert.equal(g.run('s.cells.filter(c=>c.disarmed).length'),3);assert.equal(g.run('s.cells[1].flag'),true);assert.equal(g.run('s.cells[2].trap'),true);assert.equal(g.run('s.mp[1]'),90);assert.equal(g.run('s.unlockChecks'),1);assert(g.run('logQueue.some(e=>e.text.includes("3個の罠"))'));
 }
@@ -45,6 +52,13 @@ for(const id of ['flagkill','flagkill2','flagdebuff','flagdebuff2']){
 }
 console.log('PASS spells flags, sweep and tempt');
 
+{
+ // 重ねがけ: AC補正は既存の減退系呪文と同じ最大値方式で、合算しない
+ const g=setup();g.run("s.enemy.units.forEach(e=>e.acPenalty=2);s.cells[6].trap=true;s.cells[6].flag=true;castMagic(0,'flagdebuff2',800)");
+ assert.deepEqual(read(g,'s.enemy.units.map(e=>e.acPenalty||0)'),[2,2,2]);
+ const h=setup();h.run("s.enemy.units.forEach(e=>e.acPenalty=2);for(const j of [6,7,8])Object.assign(s.cells[j],{trap:true,flag:true});castMagic(0,'flagdebuff2',800)");
+ assert.deepEqual(read(h,'s.enemy.units.map(e=>e.acPenalty||0)'),[3,3,2]);
+}
 {
  const g=setup();g.run("s.enemy=null;s.members[0].level=6;s.members[0].known=['mamahalito'];s.members[1].level=6;s.members[1].known=['lomilwa'];ensureMagic()");
  assert(g.run("s.members[0].known.includes('mamahalito')&&s.members[1].known.includes('lomilwa')"),'previously learned spells retained');
