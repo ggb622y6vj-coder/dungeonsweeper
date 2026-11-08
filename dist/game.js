@@ -344,19 +344,36 @@ function tickAilments(logPoison=true){
  markDeaths();if(!activeMembers().length)defeat();else autoReorderParty('ailment-tick');
 }
 function currentChest(){let c=s.cells[s.pos]?.chest;return c&&!c.opened?c:null}
-function triggerChestTrap(c){if(c.trap==='none')return;log('罠だ！',{trap:true});let alive=activeMembers(),i=alive[Math.random()*alive.length|0];if(i===undefined)return;if(c.trap==='pitfall'){if(s.floor>=MAX_FLOOR){log('落とし穴の罠は不発に終わった。');return false}log('落とし穴の罠！ 一行は下の階へ落ちた。');delete s.cells[s.pos].chest;descendPitfall();return true}if(c.trap==='needle'){let damage=Math.max(1,Math.floor(dice(3,6,4).value*trapPower(s.floor)));s.hp[i]=Math.max(0,s.hp[i]-damage);markDeaths();log(`針の罠！ ${NAMES[i]}に${damage}ダメージ。`)}else{log((c.trap==='poison'?'毒':'麻痺')+'の罠！');afflict(i,c.trap)}if(!activeMembers().length)defeat();else autoReorderParty('chest-trap');return false}
+function triggerChestTrap(c){
+ // 針のダメージ式と末尾の全滅判定・並び替えは triggerFloorTrap (traps.js) と意図的に対応。変更時は双方を確認・同期し、並び替え理由などの意図的な違いは保つ。
+ if(c.trap==='none')return;log('罠だ！',{trap:true});let alive=activeMembers(),i=alive[Math.random()*alive.length|0];if(i===undefined)return;if(c.trap==='pitfall'){if(s.floor>=MAX_FLOOR){log('落とし穴の罠は不発に終わった。');return false}log('落とし穴の罠！ 一行は下の階へ落ちた。');delete s.cells[s.pos].chest;descendPitfall();return true}if(c.trap==='needle'){let damage=Math.max(1,Math.floor(dice(3,6,4).value*trapPower(s.floor)));s.hp[i]=Math.max(0,s.hp[i]-damage);markDeaths();log(`針の罠！ ${NAMES[i]}に${damage}ダメージ。`)}else{log((c.trap==='poison'?'毒':'麻痺')+'の罠！');afflict(i,c.trap)}if(!activeMembers().length)defeat();else autoReorderParty('chest-trap');return false}
 function chestItemPool(floor){let loot=CHEST_LOOT,cap=loot.priceCap[floor-1]??loot.priceCap.at(-1),pool=WEAPONS.filter(w=>(w.drop===true||w.part)&&w.price<=cap&&(w.minFloor??1)<=floor).map(w=>({item:w,weight:w.shop===false&&w.minFloor===floor?.5:w.minFloor!==undefined&&w.minFloor<=floor-3?.3:1}));if(!pool.length){let item=WEAPONS.filter(w=>w.drop===true||w.part).reduce((a,b)=>a.price<=b.price?a:b);return [{item,weight:1}]}return pool}
 function rewardChest(c){c.opened=true;s.gold+=c.gold*3;log(`宝箱を開けた。金貨${c.gold*3}枚を獲得。`);if(Math.random()<CHEST_LOOT.itemChance[s.floor-1]){let w=weightedLoot(chestItemPool(s.floor)),i=lootRecipient(w);if(i>=0){s.inventory[i].push(w.id);recordLibraryItem(w.id);log(`${w.name}を入手。${NAMES[i]}が受け取った。`)}else log(`${w.name}を見つけたが、アイテムがいっぱいだ。`)}dropMedicine()}
 function openChest(){let c=currentChest();if(!c||logBusy()||s.enemy||s.done)return;fixChestTrap(c);c.opened=true;let fell=triggerChestTrap(c);if(!fell&&!s.done)rewardChest(c);render()}
 $('#chestcalfo').onclick=()=>{let i=calfoCaster();if(i>=0&&!logBusy()){castMagic(i,'calfo',null);render()}};
 $('#chestopen').onclick=()=>openChest(false);
 
-function rememberFloor(){s.floors??={};s.floors[s.floor]={floor:s.floor,size:s.size,cells:structuredClone(s.cells),start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun};}
+function rememberFloor(){
+ // 保存項目は floor, size, cells, start, boss, relic, guardianKilledThisRun の7項目。追加時は tests/travel-characterization.cjs の保存項目の期待値も更新する。
+ s.floors??={};s.floors[s.floor]={floor:s.floor,size:s.size,cells:structuredClone(s.cells),start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun};}
+function enterFloor(next,{keepLog}={}){
+ rememberFloor();
+ const floors=s.floors,scan=s.scan,saved=floors[next];
+ if(saved){
+  Object.assign(s,structuredClone(saved));
+  s.area='dungeon';s.done=false;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;
+  return false;
+ }
+ const pending=keepLog?logQueue.slice():[];
+ fresh(next);s.floors=floors;s.scan=scan;
+ if(pending.length){logQueue.push(...pending);if(logTimer===null)logTimer=setTimeout(pumpLog,0)}
+ return true;
+}
 function placeElevator(exclude=-1){if(!s.elevatorFloors.includes(s.floor))return;const eligible=i=>{const c=s.cells[i];return c&&c.type===''&&!c.trap&&!c.chest&&!s.corpses.some(x=>x.floor===s.floor&&x.cell===i)&&i!==s.pos&&i!==s.start&&i!==s.boss};let pool=s.cells.map((_,i)=>i).filter(i=>eligible(i));if(s.floor===1)pool=pool.filter(i=>Math.max(Math.abs(i%size()-s.start%size()),Math.abs((i/size()|0)-(s.start/size()|0)))<=2);// If exclusion leaves no candidate after the floor distance limit, keep the legacy pool so the elevator is not lost.
 const filtered=pool.filter(i=>i!==exclude);if(filtered.length)pool=filtered;if(!pool.length)return;const i=pool[Math.random()*pool.length|0];s.cells[i].type='elevator';s.cells[i].open=false;}
 function checkElevatorUnlock(exclude=-1){if(s.elevatorFloors.includes(s.floor)||!s.cells.every(c=>c.trap||c.open))return;s.elevatorFloors.push(s.floor);s.elevatorFloors.sort((a,b)=>a-b);placeElevator(exclude);const msg=s.floor===1?'昇降機が使えるようになった！ 昇降機（E）から解放した階へ移動できます。':`地下${s.floor}階に昇降機が止まるようになった。`;log(msg);s.elevatorNotice=msg;}
-function travelElevator(n){if(!s.elevatorFloors.includes(n)||n===s.floor)return false;s.milwaSteps=0;rememberFloor();const floors=s.floors,scan=s.scan,saved=floors[n];let generated=false;if(saved){Object.assign(s,structuredClone(saved));s.area='dungeon';s.done=false;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;log(`地下${n}階に到着した。`);}else{generated=true;fresh(n);s.floors=floors;s.scan=scan;}s.pos=s.cells.findIndex(c=>c.type==='elevator');if(s.pos<0){placeElevator();s.pos=s.cells.findIndex(c=>c.type==='elevator')}s.cells[s.pos].open=true;if(generated&&s.start!==s.pos)s.cells[s.start].open=false;s.clearNotice=false;s.pendingStairs=false;s.pendingElevator=false;render();return true;}
-function travelFloor(next,fromTown=false){if(!Number.isInteger(next)||next<1||next>MAX_FLOOR)return false;let previous=s.floor;if(next>previous&&!(fromTown&&s.floors?.[next])&&(next!==previous+1||(!(s.relic||((s.guardiansDefeated||[]).includes(s.floor)&&s.floor<MAX_FLOOR)))||s.cells[s.boss].type!=='down'||s.pos!==s.boss)){log('次の階層へ進むには守護者を倒す必要がある。');render();return false;}if(next!==previous)s.milwaSteps=0;rememberFloor();let floors=s.floors,scan=s.scan;let saved=floors[next];if(saved){Object.assign(s,structuredClone(saved));s.area='dungeon';s.done=false;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;if(!fromTown&&next!==previous)log(`地下${next}階に到着した。`)}else{fresh(next);s.floors=floors;s.scan=scan;}s.clearNotice=false;s.pos=fromTown||next>previous||!s.relic?s.start:s.boss;if(s.pos===s.start)s.cells[s.pos].open=true;s.pendingStairs=false;render();}
+function travelElevator(n){if(!s.elevatorFloors.includes(n)||n===s.floor)return false;s.milwaSteps=0;const generated=enterFloor(n);if(!generated)log(`地下${n}階に到着した。`);s.pos=s.cells.findIndex(c=>c.type==='elevator');if(s.pos<0){placeElevator();s.pos=s.cells.findIndex(c=>c.type==='elevator')}s.cells[s.pos].open=true;if(generated&&s.start!==s.pos)s.cells[s.start].open=false;s.clearNotice=false;s.pendingStairs=false;s.pendingElevator=false;render();return true;}
+function travelFloor(next,fromTown=false){if(!Number.isInteger(next)||next<1||next>MAX_FLOOR)return false;let previous=s.floor;if(next>previous&&!(fromTown&&s.floors?.[next])&&(next!==previous+1||(!(s.relic||((s.guardiansDefeated||[]).includes(s.floor)&&s.floor<MAX_FLOOR)))||s.cells[s.boss].type!=='down'||s.pos!==s.boss)){log('次の階層へ進むには守護者を倒す必要がある。');render();return false;}if(next!==previous)s.milwaSteps=0;const generated=enterFloor(next);if(!generated&&!fromTown&&next!==previous)log(`地下${next}階に到着した。`);s.clearNotice=false;s.pos=fromTown||next>previous||!s.relic?s.start:s.boss;if(s.pos===s.start)s.cells[s.pos].open=true;s.pendingStairs=false;render();}
 
 function abandonChest(){if(logBusy()||s.enemy||!currentChest())return;delete s.cells[s.pos].chest;log('宝箱を放棄した。');render()}
 $('#chestabandon').onclick=abandonChest;
