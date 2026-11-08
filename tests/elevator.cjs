@@ -51,9 +51,9 @@ assert.equal(g.run('s.cells[s.start].open'),false,'076: elevator arrival hides f
 assert.deepEqual(J(g,'s.cells.flatMap((c,i)=>c.open?[i]:[])'),[g.run('s.pos')]);
 // 5. Same run: returning restores the saved boards and E cells.
 g.run('var e3=s.pos,before3=JSON.stringify(s.cells);travelElevator(1)');
-assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.cells[s.start].open'),false);
-// 076 closes only the stairs on arrival; normalize that field to retain full equality for every other cell/field.
-assert.equal(g.run('(()=>{const before=JSON.parse(before1);before[s.start].open=false;return JSON.stringify(s.cells)===JSON.stringify(before)})()'),true);assert.equal(g.run('s.pos===e'),true);
+assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.cells[s.start].open'),true,'087: explored stairs stay visible on elevator return');
+// 087: a saved floor is restored exactly, including the explored stairs cell.
+assert.equal(g.run('JSON.stringify(s.cells)===before1'),true);assert.equal(g.run('s.pos===e'),true);
 g.run('travelElevator(3)');assert.equal(g.run('s.pos===e3&&JSON.stringify(s.cells)===before3'),true);
 assert.equal(g.run('travelElevator(2)'),false,'locked floors are not destinations');
 g.drain(); // Arrival log playback blocks movement until finished.
@@ -73,6 +73,17 @@ assert.equal(g.run('s.cells[s.start].open'),true);assert.equal(g.run('s.pendingS
  assert.equal(stairs.run('s.cells[s.start].open'),true,'076 Amendment 1: stair arrival opens the saved start');
  assert.equal(stairs.run('s.cells[explored].open'),true,'other explored cells remain open');
  assert.equal(stairs.run('(()=>{const before=JSON.parse(beforeStairs);before[s.start].open=true;return JSON.stringify(s.cells)===JSON.stringify(before)})()'),true,'all other cell state is preserved');}
+// 087: elevator return preserves the saved stairs state in both directions.
+{const lift=setup(87);
+ lift.run('s.elevatorFloors=[1,2];travelElevator(2)');
+ assert.equal(lift.run('s.cells[s.start].open'),false,'087: fresh floor stairs stay hidden');
+ lift.run('travelElevator(1);travelElevator(2)');
+ assert.equal(lift.run('s.cells[s.start].open'),false,'087: unexplored stairs stay hidden after a round trip');
+ lift.drain(); // Arrival log playback blocks movement until finished.
+ lift.run('s.pos=[s.start-s.size,s.start+s.size,s.start-1,s.start+1].find(i=>s.cells[i]&&adjacent(i,s.start));cell(s.start)');
+ assert.equal(lift.run('s.cells[s.start].open'),true);
+ lift.run('s.pendingStairs=false;travelElevator(1);travelElevator(2)');
+ assert.equal(lift.run('s.cells[s.start].open'),true,'087: explored stairs stay visible after a round trip');}
 // Defensive guard: a saved arrival cell that is also the start stays open.
 {const same=setup(77);same.run("s.elevatorFloors=[1,3];fresh(3);s.start=s.cells.findIndex(c=>c.type==='elevator');rememberFloor();var savedFloors=s.floors;fresh(1);s.floors=savedFloors;travelElevator(3)");
  assert.equal(same.run('s.pos===s.start&&s.cells[s.pos].open'),true);}
