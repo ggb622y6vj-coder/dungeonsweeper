@@ -125,7 +125,7 @@ with sync_playwright() as p:
 
         # Inspect the same spell dialog directly: each spell is blocked as well.
         page.evaluate('openMagic(0)')
-        for spell_id in ('montino', 'dialko', 'madi'):
+        for spell_id in ('montino', 'dialko'):
             assert page.locator(f'[data-spell="{spell_id}"]').is_disabled()
         assert '沈黙している' in page.locator('[data-spell="dialko"]').inner_text()
         no_overflow(page)

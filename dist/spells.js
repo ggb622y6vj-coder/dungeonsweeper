@@ -96,7 +96,15 @@ function spellTargetLabel(x,t){if(x.target==='ally')return NAMES[t];if(x.target=
 function spellStats(i){let m=s.members[i];return `<dt>IQ</dt><dd>${m.intelligence}</dd><dt>PIE</dt><dd>${m.piety}</dd>`}
 let spellMember=1,spellBrowse=false,spellSelected=null;
 function openMagic(i,browse=false){spellMember=i;spellBrowse=browse;spellSelected=null;renderMagic();$('#magicdialog').showModal()}
-function renderMagic(){let i=spellMember,m=s.members[i];$('#magictitle').textContent=`${NAMES[i]}の呪文 · MP ${s.mp[i]}/${m.maxMP}`;$('#magiclist').innerHTML=MAGIC.filter(x=>x.job===jobOf(i)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{let known=m.known.includes(x.id),reason=spellReason(i,x);return `<button ${index===0?'data-key-default':''} title="${!spellBrowse?reason:''}" class="spellrow ${known?'learned':''}" data-spell="${x.id}" ${s.enemy&&!spellBrowse&&reason?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>MP ${spellCost(x)}</span></b><small>${known?'習得済み':m.level<x.level?'未解禁':'未習得'} · Lv.${x.level} · ${x.guaranteed?'確定習得':'習得率50%'}${!spellBrowse&&known&&reason?' · '+reason:''}</small><p>${x.description}</p></button>`}).join('');renderMagicChoice()}
+function renderMagic(){
+ let i=spellMember,m=s.members[i];
+ $('#magictitle').textContent=`${NAMES[i]}の呪文 · MP ${s.mp[i]}/${m.maxMP}`;
+ $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===jobOf(i)&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{
+  let reason=spellReason(i,x),fieldBattleOnly=!s.enemy&&x.where==='battle';
+  return `<button ${index===0?'data-key-default':''} title="${reason}" class="spellrow learned" data-spell="${x.id}" ${fieldBattleOnly||(s.enemy&&!spellBrowse&&reason)?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>MP ${spellCost(x)}</span></b><small>習得済み · Lv.${x.level} · ${x.guaranteed?'確定習得':'習得率50%'}${reason?' · '+reason:''}</small><p>${x.description}</p></button>`
+ }).join('')||'<p>習得済みの呪文がありません</p>';
+ renderMagicChoice();
+}
 function renderMagicChoice(){let x=magic(spellSelected),i=spellMember;let box=$('#magictargets');box.innerHTML='';$('#magicpick').hidden=spellBrowse||!x||x.target!=='ally'||!!s.enemy;$('#magicpick').disabled=!x||!!spellReason(i,x)||logBusy();$('#magiccast').hidden=spellBrowse||!x||x.target==='ally';$('#magicnotice').textContent='';if(!x)return;if(s.enemy&&!spellBrowse){$('#magiccast').hidden=true;return}let options=[];if(x.target==='group'||x.target==='enemy')options=s.enemy?enemyGroups().filter(g=>g.units.some(e=>e.hp>0)).map(g=>[g.units.find(e=>e.hp>0).uid,`${g.index+1}列：${enemyDisplay(g.units[0])} ×${g.units.filter(e=>e.hp>0).length}`]):[];else if(x.target==='floor')options=[...new Set([s.floor,...Object.keys(s.floors).map(Number)])].sort((a,b)=>a-b).map(f=>[f,`地下${f}階の上り階段`]);if(!spellBrowse&&options.length)box.innerHTML=`<label>対象 <select id="magictarget">${options.map(([v,label])=>`<option value="${v}">${label}</option>`).join('')}</select></label>`;let reason=spellReason(i,x);$('#magicnotice').textContent=spellBrowse?x.description:reason;$('#magiccast').disabled=!!reason||logBusy();$('#magiccast').textContent=s.enemy?'この呪文で行動する':'発動する'}
 function commitMagicChoice(i,x,t){
  if(logBusy()||spellReason(i,x)||!validMagicTarget(x,t)){render();return}
