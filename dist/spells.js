@@ -51,7 +51,19 @@ function learnMagic(i,level){let m=s.members[i],learned=[];for(let x of MAGIC.fi
 function ensureMakanito(m,job){if(job===1&&m.level>=magic('makanito').level&&m.known&&!m.known.includes('makanito'))m.known.push('makanito')}
 function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.length)s.magicPlans.push(null);s.members.forEach((m,i)=>{m.intelligence??=jobOf(i)===1?15:10;m.piety??=jobOf(i)===2?15:10;if(!m.known){m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level===1&&x.guaranteed).map(x=>x.id);for(let lv=2;lv<=m.level;lv++)learnMagic(i,lv)}if(jobOf(i)===2&&m.level>=3&&!m.known.includes('watchful'))m.known.push('watchful');if(jobOf(i)===2&&m.level>=5&&!m.known.includes('floodfill'))m.known.push('floodfill');if(jobOf(i)===1&&!m.known.includes('identifyfoe'))m.known.push('identifyfoe');if(jobOf(i)===1&&!m.known.includes('dumapic'))m.known.push('dumapic');ensureMakanito(m,jobOf(i))});for(const r of s.reserve||[])ensureMakanito(r.members,r.members.job);if(typeof recordLibrarySpells==='function')recordLibrarySpells();s.commands=s.commands?.map(c=>c==='heal'?'fight':c)}
 function magicContext(){return s.enemy?'battle':currentChest()?'chest':'field'}
-function spellReason(i,x){if(x.id==='mahaman'&&s.members[i].level<=1)return 'Lv.1では使用不可';if(s.ailments[i].silence>0)return '沈黙している';if(!s.members[i].known.includes(x.id))return s.members[i].level<x.level?`Lv.${x.level}で解禁`:'未習得';if(s.members[i].status==='stone')return '石化';if(!activeMember(i))return '死亡';if(s.ailments[i].paralysis>0)return '麻痺';if(s.area!=='dungeon'||s.done||s.pendingBoss||s.pendingStairs)return '今は使用不可';let ctx=magicContext();if(x.id==='tempt'&&ctx==='battle')return '探索専用';if(x.where!==ctx&&!(x.where==='both'&&(ctx==='battle'||ctx==='field')))return {battle:'戦闘専用',field:'探索専用',chest:'宝箱専用'}[x.where]||'今は使用不可';if(s.mp[i]<spellCost(x))return 'MP不足';return ''}
+function activeSpellEffects(){
+ const effects=[];
+ if(s.milwaSteps>0||s.light)effects.push({name:'透視',description:'左右斜め前のマスを壁越しに表示する。未探索の数字は隠したまま',remaining:s.light?'町へ戻るまで':`あと${s.milwaSteps}歩`});
+ if(s.watchful)effects.push({name:'警戒結界',description:'敵の奇襲を防ぐ',remaining:'町へ戻るまで'});
+ if(s.teppeki)effects.push({name:'鉄壁',description:'味方全員のAC-2',remaining:'町に戻るまで'});
+ return effects;
+}
+function renderActiveSpells(){
+ const effects=activeSpellEffects();
+ $('#activespells').hidden=effects.length===0;
+ $('#activespellbody').innerHTML=effects.map(effect=>`<div class="statcard"><b>${effect.name}</b><p>${effect.description}</p><p>${effect.remaining}</p></div>`).join('');
+}
+function spellReason(i,x){if(x.id==='mahaman'&&s.members[i].level<=1)return 'Lv.1では使用不可';if(s.ailments[i].silence>0)return '沈黙している';if(!s.members[i].known.includes(x.id))return s.members[i].level<x.level?`Lv.${x.level}で解禁`:'未習得';if(s.members[i].status==='stone')return '石化';if(!activeMember(i))return '死亡';if(s.ailments[i].paralysis>0)return '麻痺';if(s.area!=='dungeon'||s.done||s.pendingBoss||s.pendingStairs)return '今は使用不可';let ctx=magicContext();if(x.id==='tempt'&&ctx==='battle')return '探索専用';if(x.where!==ctx&&!(x.where==='both'&&(ctx==='battle'||ctx==='field')))return {battle:'戦闘専用',field:'探索専用',chest:'宝箱専用'}[x.where]||'今は使用不可';if(s.mp[i]<spellCost(x))return 'MP不足';if((['milwa','lomilwa'].includes(x.id)&&(s.milwaSteps>0||s.light))||(x.id==='watchful'&&s.watchful)||(x.id==='teppeki'&&s.teppeki))return '発動中';return ''}
 function validAllyTarget(t){return Number.isInteger(t)&&s.hp[t]>0&&['ok','stone'].includes(s.members[t]?.status)}
 function allyTargetCandidates(){return s.members.flatMap((_,i)=>validAllyTarget(i)?[i]:[])}
 function validMagicTarget(x,t){if(x.target==='ally')return validAllyTarget(t);if(x.target==='enemy'||x.target==='group')return !!s.enemy?.units.some(e=>e.uid===t&&e.hp>0);if(x.target==='floor')return Number.isInteger(t)&&(t===s.floor||!!s.floors[t]);return true}
