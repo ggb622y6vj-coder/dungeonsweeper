@@ -57,4 +57,49 @@ const plain="(()=>{const c=s.cells[s.pos];return !c.type&&!c.trap&&!c.flag&&!c.c
  assert.equal(g.run('descendPitfall()'),true);
  assert.equal(g.run('s.floor===4&&s.pos===s.start&&s.previousPos===s.pos&&s.cells[s.pos].open'),true);
 }
+// Amendment 2 (ChatGPT review follow-up): guardian skip/return, log playback, consecutive falls, cleared-floor restore, chest persistence, 10F fizzle state.
+{const g=setup();
+ g.run('fresh(3);s.guardiansDefeated=[];s.relic=false');
+ assert.equal(floorTrap(g),true);
+ assert.equal(g.run('logBusy()'),true);
+ g.drain();
+ assert.equal(g.run('logBusy()'),false);
+ assert.equal(g.run('displayVitals===null'),true);
+ assert.equal(g.run("s.logs.filter(t=>t.includes('落とし穴の罠！')).length"),1);
+ assert.equal(g.run("s.logs.filter(t=>t==='罠だ！').length"),1);
+ assert.equal(g.run("(()=>{const i1=s.logs.findIndex(t=>t.startsWith('警告')),i2=s.logs.findIndex(t=>t.includes('落とし穴の罠！')),i3=s.logs.findIndex(t=>t==='罠だ！');return i1>=0&&i1<i2&&i2<i3})()"),true);
+ g.run('travelFloor(3)');g.drain();
+ assert.equal(g.run('s.floor'),3);
+ assert.equal(g.run('s.pos===s.start&&!s.pendingBoss'),true);
+ assert.equal(g.run("s.cells[s.boss].type"),'boss');
+ g.run('var b=s.boss,adj=[b-s.size,b+s.size,b-1,b+1].find(i=>i>=0&&i<s.cells.length&&adjacent(i,b));s.pos=adj;s.cells[adj].open=true');g.drain();
+ g.run('cell(s.boss)');g.drain();
+ assert.equal(g.run('!!s.pendingBoss'),true);
+}
+{const g=setup();
+ g.run('fresh(3)');
+ assert.equal(floorTrap(g),true);assert.equal(g.run('s.floor'),4);
+ assert.equal(floorTrap(g),true);assert.equal(g.run('s.floor'),5);
+ assert.equal(g.run('!!s.floors[3]&&!!s.floors[4]'),true);
+ assert.equal(g.run(plain),true);
+}
+{const g=setup();
+ g.run('s.guardiansDefeated=[4];fresh(4);s.elevatorFloors=[3,4];travelElevator(3)');g.drain();
+ assert.equal(g.run('s.relic'),false);
+ assert.equal(floorTrap(g),true);
+ assert.equal(g.run('s.floor'),4);
+ assert.equal(g.run('s.relic'),true);
+ assert.equal(g.run("s.cells[s.boss].type"),'down');
+ assert.equal(g.run(plain),true);
+}
+{const g=setup();chest(g,5);g.run('openChest()');
+ assert.equal(g.run('s.floor'),6);
+ g.run('travelFloor(5)');g.drain();
+ assert.equal(g.run('s.floor'),5);
+ assert.equal(g.run('s.cells[fromPos].chest===undefined&&!currentChest()'),true);
+}
+{const g=setup();g.run('fresh(10)');const before=g.run('s.pos');assert.equal(floorTrap(g),true);
+ assert.equal(g.run('s.pos'),before);
+ assert.equal(g.run("s.cells[s.pos].spent&&s.cells[s.pos].trapKind==='pitfall'"),true);
+}
 console.log('PASS 088 pitfall: weights, floor descent/fizzle, saved floor restore, chest loss/reward, trap boundaries, thief destination safety and landing fallback');
