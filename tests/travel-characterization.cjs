@@ -1,8 +1,11 @@
 // 089: characterization tests for the three floor-travel routes.
 // These pin CURRENT behavior (main 89d85e4) before any refactoring of the
 // shared save/restore skeleton in travelFloor / travelElevator / descendPitfall.
-// If a future change breaks a case here, decide whether that change is intended;
-// do not silently update the expectations.
+// How to treat a failure here: pins that come from the specs (076/077/087/088)
+// must not change. Pins that merely record current behavior (marked OBSERVED)
+// may be updated only together with an intentional behavior change, and the
+// change must be recorded in the instruction that makes it. Never update an
+// expectation silently just to make the suite green.
 // Recorded per travel: floor, position kind, start/boss open state and boss type,
 // milwaSteps, pendingBoss/pendingStairs/pendingElevator, clearNotice, relic, scan,
 // the log queue right after the call, the played-back s.logs order, the return
@@ -12,10 +15,11 @@
 // - Guaranteed behavior: what the specs (076/077/087/088) promise the player.
 // - Observed implementation values: facts about the current internal structure
 //   that a future refactoring may legitimately change when the final state a
-//   player sees stays equivalent. The render() call counts are observed values,
-//   not a design contract. The pendingElevator asymmetry (see the travelFloor
-//   saved-floor block) is a known asymmetry whose intended spec is undecided:
-//   it is recorded as observed, and an intentional fix may update it.
+//   player sees stays equivalent. The render() call counts and travelFloor's
+//   undefined return value on success are observed values, not a design
+//   contract. The pendingElevator asymmetry (see the travelFloor saved-floor
+//   block) is a known asymmetry whose intended spec is undecided: it is
+//   recorded as observed, and an intentional fix may update it.
 const assert=require('node:assert/strict');
 const {game}=require('../scripts/sim/harness.cjs');
 function rng(seed){let a=seed>>>0||1;return()=>{a=(a*1664525+1013904223)>>>0;return a/4294967296}}
@@ -63,9 +67,29 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  g.drain();
  assert.deepEqual(J(g,'s.logs'),['地下1階に到着した。',ARRIVAL],'played-back logs are newest first');}
 
+// travelFloor DOWN to a SAVED floor (the saved-floor stairs case also needs the
+// descending direction). Arrival is the start cell, a start cell left closed in
+// the save is opened by the arrival (076 Amendment 1), the arrival log is queued,
+// milwaSteps resets, and the render count is the saved-path one.
+{const g=setup(108);
+ g.run("s.guardiansDefeated=[1];s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");g.drain();
+ g.run('travelFloor(1)');g.drain(); // back up; arrival is the 1F boss cell (relic)
+ g.run('s.floors[2].cells[s.floors[2].start].open=false'); // saved start left closed, as elevator travel leaves it
+ wrap(g);
+ g.run('s.milwaSteps=3');
+ const ret=g.run('travelFloor(2)');
+ assert.equal(ret,undefined);
+ const {queue,renders,...rest}=J(g,SNAP);
+ assert.equal(rest.floor,2);assert.equal(rest.posKind,'start','descending arrival is the start cell');
+ assert.equal(rest.startOpen,true,'stair arrival opens the saved start cell');
+ assert.equal(rest.milwa,0);assert.equal(renders,1,'saved path renders once');
+ assert.deepEqual(queue,['地下2階に到着した。']);
+ g.drain();}
+
 // travelFloor with fromTown=true to the SAME floor: travelFloor saves the current
 // floor first (rememberFloor), so the same floor is then restored from that snapshot.
-// No arrival log and, because the floor does not change, milwaSteps is preserved.
+// No arrival log. OBSERVED: milwaSteps is preserved because the current code resets
+// it only when the floor changes; recorded as current behavior, not a spec promise.
 {const g=setup(103);
  wrap(g);
  g.run('s.milwaSteps=9;var boardBefore=JSON.stringify(s.cells)');
@@ -126,9 +150,10 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
 {const g=setup(106);
  g.run('fresh(4);var mark=s.cells.findIndex(c=>!c.type&&!c.trap);s.cells[mark].open=true;rememberFloor();var sf=s.floors;fresh(3);s.floors=sf;s.milwaSteps=12;s.scan=2');
  wrap(g);
- g.run("log('先行ログ')");
+ g.run("log('先行ログ');var origin=s.pos");
  const trig=g.run("s.cells[s.pos].trap=true;Math.random=()=>.87;triggerFloorTrap(s.cells[s.pos])");
  assert.equal(trig,true);
+ assert.equal(g.run('s.floors[3].cells[origin].trapKind'), 'pitfall','the pinned roll really drew the pitfall');
  const snap=J(g,SNAP);
  assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,0);assert.equal(snap.scan,2,'scan is carried over');
  assert.equal(snap.pElev,false);assert.equal(snap.notice,false);
@@ -146,9 +171,10 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
 {const g=setup(107);
  g.run('fresh(3);s.milwaSteps=12;s.scan=2;s.floors={}');
  wrap(g);
- g.run("log('先行ログ')");
+ g.run("log('先行ログ');var origin=s.pos");
  const trig=g.run("s.cells[s.pos].trap=true;Math.random=()=>.87;triggerFloorTrap(s.cells[s.pos])");
  assert.equal(trig,true);
+ assert.equal(g.run('s.floors[3].cells[origin].trapKind'), 'pitfall','the pinned roll really drew the pitfall');
  const snap=J(g,SNAP);
  assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,0);assert.equal(snap.scan,2);
  assert.deepEqual(snap.queue.slice(0,3),['先行ログ','罠だ！','落とし穴の罠！ 一行は下の階へ落ちた。']);
@@ -176,6 +202,14 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
  g.run('rememberFloor()');
  assert.deepEqual(J(g,'s.floors[s.floor]'),before,'rememberFloor itself stores the current state verbatim');}
+
+// The saved snapshot is detached (structuredClone): after restoring a floor and
+// changing the live board, the stored copy must not move.
+{const g=setup(208);
+ g.run('s.elevatorFloors=[1,2];travelElevator(2);travelElevator(1)');g.drain();
+ const stored=J(g,'s.floors[1].cells[s.start]');
+ g.run('s.cells[s.start].open=!s.cells[s.start].open;s.cells[s.start].flag=!s.cells[s.start].flag');
+ assert.deepEqual(J(g,'s.floors[1].cells[s.start]'),stored,'live edits do not leak into the saved floor');}
 
 // Elevator round trip to a floor whose stairs were never explored: the stairs stay
 // hidden in both directions (087 pinned from the unexplored side as well).
