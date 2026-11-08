@@ -336,3 +336,5 @@ require('./notion-sync.cjs');
 require('./spell-sync-logic.cjs');
 require('./weapon-effects.cjs');
 require('./reload.cjs');
+
+require('./spell-list.cjs');

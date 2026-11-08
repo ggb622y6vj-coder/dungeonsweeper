@@ -1,0 +1,36 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const { game } = require('../scripts/sim/harness.cjs');
+const { createParty, seededRandom } = require('../scripts/sim/combat.cjs');
+const g = game(null, seededRandom(86));
+createParty(g, [1, 2, 0]);
+g.run(`s.area='dungeon';s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.done=false;
+ s.members[0].known=['halito','reload','tempt','dios'];s.members[0].level=5;s.mp[0]=100;
+ openMagic(0)`);
+const list = () => g.run("$('#magiclist').innerHTML");
+const row = id => list().match(new RegExp(`<button[^>]*data-spell="${id}"[^>]*>[^]*?</button>`))?.[0];
+assert.deepEqual([...list().matchAll(/data-spell="([^"]+)"/g)].map(m=>m[1]), ['reload','tempt','halito']);
+assert(!/未解禁|未習得/.test(list()));
+assert.match(row('halito'), / disabled/);
+assert.match(row('halito'), /習得済み · Lv\.1 · 確定習得 · 戦闘専用/);
+assert.match(row('reload'), /習得率50%/);
+assert(!/ disabled/.test(row('reload')));
+const css = fs.readFileSync(require('node:path').join(__dirname, '../dist/index.html'), 'utf8');
+assert.match(css, /\.spellrow:disabled\{[^}]*opacity:\.4/,'disabled rows use existing dimming');
+g.run("openMagic(0,true)");
+assert.match(row('halito'), / disabled/);
+assert.match(row('halito'), /戦闘専用/,'browse rows retain reason');
+g.run("s.chest={};openMagic(0)");
+assert.match(row('halito'), / disabled/,'chest also counts as outside battle');
+g.run(`s.chest=null;s.enemy={units:[{...makeEnemy('goblin',860),row:44,hp:999}],initiative:'party'};openMagic(0)`);
+assert(!/ disabled/.test(row('halito')),'learned battle spell selectable in battle');
+assert(!row('tempt'),'battle exclusion retained');
+assert(!row('katino'),'unlearned battle spell hidden');
+g.run("s.mp[0]=0;renderMagic()");
+assert.match(row('halito'), / disabled/);
+assert.match(row('halito'), /MP不足/,'battle availability unchanged');
+for (const i of [0, 2]) {
+ g.run(`s.enemy=null;s.members[${i}].known=[];openMagic(${i})`);
+ assert.equal(list(), '<p>習得済みの呪文がありません</p>');
+}
+console.log('PASS 086 learned-only spell list, field/browse/chest dimming, battle availability and empty state');
