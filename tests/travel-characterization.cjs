@@ -7,6 +7,15 @@
 // milwaSteps, pendingBoss/pendingStairs/pendingElevator, clearNotice, relic, scan,
 // the log queue right after the call, the played-back s.logs order, the return
 // value, and the number of render() calls.
+//
+// Two kinds of expectations live in this file (ChatGPT review, 089):
+// - Guaranteed behavior: what the specs (076/077/087/088) promise the player.
+// - Observed implementation values: facts about the current internal structure
+//   that a future refactoring may legitimately change when the final state a
+//   player sees stays equivalent. The render() call counts are observed values,
+//   not a design contract. The pendingElevator asymmetry (see the travelFloor
+//   saved-floor block) is a known asymmetry whose intended spec is undecided:
+//   it is recorded as observed, and an intentional fix may update it.
 const assert=require('node:assert/strict');
 const {game}=require('../scripts/sim/harness.cjs');
 function rng(seed){let a=seed>>>0||1;return()=>{a=(a*1664525+1013904223)>>>0;return a/4294967296}}
@@ -37,8 +46,10 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  assert.deepEqual(J(g,'s.logs'),[ARRIVAL],'fresh() reset the log history');}
 
 // travelFloor up to a SAVED floor whose guardian is defeated: arrival is the boss cell,
-// the arrival log is queued, milwaSteps resets (floor changed), render runs once,
-// and pendingElevator is NOT cleared on the saved path.
+// the arrival log is queued, milwaSteps resets (floor changed), render runs once.
+// OBSERVED, spec undecided: pendingElevator is NOT cleared on this path, unlike the
+// elevator and pitfall routes. This asymmetry is recorded, not endorsed; whether it
+// is reachable in real play is unverified, and an intentional fix may change it.
 {const g=setup(102);
  g.run("s.guardiansDefeated=[1];s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");g.drain();
  wrap(g);
@@ -151,6 +162,29 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  assert.deepEqual(logs.slice(0,4),[snap.queue[3],snap.queue[2],snap.queue[1],snap.queue[0]],'preserved logs replay newest first');
  assert.equal(logs[4],ARRIVAL,'the fresh floor arrival line sits below the preserved logs');}
 
+// rememberFloor stores the values as they were at save time: mutating distinctive
+// state and travelling away must leave an exact copy of the departure floor behind.
+// (Added on ChatGPT's recommendation: the skeleton refactor must not break this.)
+{const g=setup(205);
+ g.run("var mark=s.cells.findIndex(c=>!c.type&&!c.trap);s.cells[mark].open=true;s.relic=true;s.guardianKilledThisRun=true");
+ const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
+ g.run('s.elevatorFloors=[1,2];travelElevator(2)');
+ assert.deepEqual(J(g,'s.floors[1]'),before,'the departure floor is saved verbatim');
+ g.drain();}
+{const g=setup(206);
+ g.run('var mark=s.cells.findIndex(c=>!c.type&&!c.trap);s.cells[mark].open=true');
+ const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
+ g.run('rememberFloor()');
+ assert.deepEqual(J(g,'s.floors[s.floor]'),before,'rememberFloor itself stores the current state verbatim');}
+
+// Elevator round trip to a floor whose stairs were never explored: the stairs stay
+// hidden in both directions (087 pinned from the unexplored side as well).
+{const g=setup(207);
+ g.run('s.elevatorFloors=[1,2];travelElevator(2)');g.drain();
+ assert.equal(g.run('s.cells[s.start].open'),false,'fresh arrival hides the stairs');
+ g.run('travelElevator(1);travelElevator(2)');g.drain();
+ assert.equal(g.run('s.cells[s.start].open'),false,'unexplored stairs stay hidden after a round trip');}
+
 // Save compatibility: an ash-v1 save holding several floors loads back to the identical
 // state, and travelling after the load behaves exactly like travelling without the load.
 {const g=setup(204);
@@ -169,4 +203,4 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const travelB=J(g2,'({floor:s.floor,pos:s.pos,cells:s.cells,queue:logQueue.map(x=>x.text)})');g2.drain();
  assert.deepEqual(travelB,travelA,'travel after load matches travel without load');}
 
-console.log('PASS 089 characterization: floor-travel routes (stairs/elevator/pitfall x fresh/saved), from-town and refusal, pendingElevator asymmetry, log queue order, render counts, rememberFloor fields, save/load travel equivalence');
+console.log('PASS 089 characterization: floor-travel routes (stairs/elevator/pitfall x fresh/saved), from-town and refusal, pendingElevator asymmetry, log queue order, render counts, rememberFloor fields and values, unexplored-stairs round trip, save/load travel equivalence');
