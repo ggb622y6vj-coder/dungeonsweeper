@@ -339,3 +339,4 @@ require('./reload.cjs');
 
 require('./spell-list.cjs');
 require('./pitfall.cjs');
+require('./travel-characterization.cjs');
