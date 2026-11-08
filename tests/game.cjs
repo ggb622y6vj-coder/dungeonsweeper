@@ -338,3 +338,4 @@ require('./weapon-effects.cjs');
 require('./reload.cjs');
 
 require('./spell-list.cjs');
+require('./pitfall.cjs');
