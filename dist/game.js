@@ -356,6 +356,7 @@ $('#chestopen').onclick=()=>openChest(false);
 function rememberFloor(){
  // 保存項目は floor, size, cells, start, boss, relic, guardianKilledThisRun の7項目。追加時は tests/travel-characterization.cjs の保存項目の期待値も更新する。
  s.floors??={};s.floors[s.floor]={floor:s.floor,size:s.size,cells:structuredClone(s.cells),start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun};}
+// enterFloor: 現在階を保存し、移動先の階を復元または新規生成する。戻り値は新規生成なら true、保存済みの階の復元なら false。
 function enterFloor(next,{keepLog}={}){
  rememberFloor();
  const floors=s.floors,scan=s.scan,saved=floors[next];
