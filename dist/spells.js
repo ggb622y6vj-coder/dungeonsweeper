@@ -47,9 +47,11 @@ function spellCost(x){return flagSpellCost(baseSpellCost(x))}
 function magic(id){return MAGIC.find(x=>x.id===id)}
 function spellResistance(x){let element=x.description.includes('冷気')?'氷':(['halito','mahalito','mamahalito'].includes(x.id)?'炎':null);return element?`${element}半減`:null}
 function spellHalvedBy(x,e){const r=spellResistance(x);return !!r&&enemyDefinition(e.id).resistance.split('・').includes(r)}
-function learnMagic(i,level){let m=s.members[i],learned=[];for(let x of MAGIC.filter(x=>x.job===jobOf(i)&&x.level<=level&&!m.known.includes(x.id))){if(x.guaranteed||Math.random()<(jobOf(i)===1?m.intelligence:m.piety)/30){m.known.push(x.id);learned.push(x.name)}}if(typeof recordLibrarySpells==='function')recordLibrarySpells(m.known);return learned}
-function ensureMakanito(m,job){if(job===1&&m.level>=magic('makanito').level&&m.known&&!m.known.includes('makanito'))m.known.push('makanito')}
-function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.length)s.magicPlans.push(null);s.members.forEach((m,i)=>{m.intelligence??=jobOf(i)===1?15:10;m.piety??=jobOf(i)===2?15:10;if(!m.known){m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level===1&&x.guaranteed).map(x=>x.id);for(let lv=2;lv<=m.level;lv++)learnMagic(i,lv)}if(jobOf(i)===2&&m.level>=3&&!m.known.includes('watchful'))m.known.push('watchful');if(jobOf(i)===2&&m.level>=5&&!m.known.includes('floodfill'))m.known.push('floodfill');if(jobOf(i)===1&&!m.known.includes('identifyfoe'))m.known.push('identifyfoe');if(jobOf(i)===1&&!m.known.includes('dumapic'))m.known.push('dumapic');ensureMakanito(m,jobOf(i))});for(const r of s.reserve||[])ensureMakanito(r.members,r.members.job);if(typeof recordLibrarySpells==='function')recordLibrarySpells();s.commands=s.commands?.map(c=>c==='heal'?'fight':c)}
+// Each entry describes a spell school and its effective learning level.
+function magicLearning(job,level){return ({1:[{job:1,level}],2:[{job:2,level}]})[job]||[]}
+function learnMagic(i,level){let m=s.members[i],learned=[],schools=magicLearning(jobOf(i),level);for(let x of MAGIC.filter(x=>schools.some(school=>x.job===school.job&&x.level<=school.level)&&!m.known.includes(x.id))){if(x.guaranteed||Math.random()<(x.job===1?m.intelligence:m.piety)/30){m.known.push(x.id);learned.push(x.name)}}if(typeof recordLibrarySpells==='function')recordLibrarySpells(m.known);return learned}
+function ensureMakanito(m,job){if(!m.careerHistory?.length&&job===1&&m.level>=magic('makanito').level&&m.known&&!m.known.includes('makanito'))m.known.push('makanito')}
+function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.length)s.magicPlans.push(null);s.members.forEach((m,i)=>{m.intelligence??=jobOf(i)===1?15:10;m.piety??=jobOf(i)===2?15:10;if(m.careerHistory?.length){m.known??=[];return}if(!m.known){m.known=MAGIC.filter(x=>x.job===jobOf(i)&&x.level===1&&x.guaranteed).map(x=>x.id);for(let lv=2;lv<=m.level;lv++)learnMagic(i,lv)}if(jobOf(i)===2&&m.level>=3&&!m.known.includes('watchful'))m.known.push('watchful');if(jobOf(i)===2&&m.level>=5&&!m.known.includes('floodfill'))m.known.push('floodfill');if(jobOf(i)===1&&!m.known.includes('identifyfoe'))m.known.push('identifyfoe');if(jobOf(i)===1&&!m.known.includes('dumapic'))m.known.push('dumapic');ensureMakanito(m,jobOf(i))});for(const r of s.reserve||[])ensureMakanito(r.members,r.members.job);if(typeof recordLibrarySpells==='function')recordLibrarySpells();s.commands=s.commands?.map(c=>c==='heal'?'fight':c)}
 function magicContext(){return s.enemy?'battle':currentChest()?'chest':'field'}
 function activeSpellEffects(){
  const effects=[];
@@ -75,7 +77,7 @@ function lakanitoApplies(e){let d=enemyDefinition(e.id);return !d.boss&&!['不�
 function enemySpellResist(e,job){const d=enemyDefinition(e.id),base=job===1?d.mageResist:d.priestResist;if(e.spellResistNullified)return 0;return e.spellResistReduced?Math.floor(Math.round(base*100)/2)/100:base}
 function resistsEnemySpell(e,x){return Math.random()<enemySpellResist(e,x.job)}
 function disarmSpellFlags(indices){for(const j of indices)Object.assign(s.cells[j],{trap:false,disarmed:true,flag:false,open:true});checkElevatorUnlock()}
-function castMagic(i,id,t){let x=magic(id);if(!x||x.job!==jobOf(i)||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'&&x.effect!=='restore'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
+function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'&&x.effect!=='restore'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
  // Count first; consume once before the first unresisted effect. All-resisted casts preserve flags.
  const flagSpell=['flagkill','flagkill2','flagdebuff','flagdebuff2'].includes(x.id);
  const flags=flagSpell?around(s.pos).filter(j=>s.cells[j].flag&&s.cells[j].trap).sort((a,b)=>a-b):[];
@@ -106,12 +108,18 @@ function fixChestTrap(c){if(c.trap!==undefined)return;let r=Math.random();c.trap
 function magicActions(i){if(!hasSpells(i))return ''; let plan=s.magicPlans[i],x=magic(plan?.id);return `<button data-magic="${i}" ${logBusy()||s.done?'disabled':''}>${s.enemy&&s.commands[i]==='spell'&&x?x.name+' · 変更':'呪文を選ぶ'}</button>${s.enemy&&s.commands[i]==='spell'&&x?`<small class="spellplan">MP ${spellCost(x)} · ${spellTargetLabel(x,plan.target)}</small>`:''}`}
 function spellTargetLabel(x,t){if(x.target==='ally')return NAMES[t];if(x.target==='group'||x.target==='enemy'){let e=s.enemy.units.find(e=>e.uid===t),g=e&&enemyGroups().find(g=>g.key===rowKey(e));return g?`${g.index+1}列：${enemyDisplay(g.units[0])}`:'対象なし'}if(x.target==='enemy')return enemyDefinition(s.enemy.units.find(e=>e.uid===t)?.id||s.enemy.units[0].id).name+(x.target==='group'?'の組':'');return {party:'味方全員',all:'敵全体',chest:'宝箱',floor:`地下${t}階`}[x.target]}
 function spellStats(i){let m=s.members[i];return `<dt>IQ</dt><dd>${m.intelligence}</dd><dt>PIE</dt><dd>${m.piety}</dd>`}
-let spellMember=1,spellBrowse=false,spellSelected=null;
-function openMagic(i,browse=false){spellMember=i;spellBrowse=browse;spellSelected=null;renderMagic();$('#magicdialog').showModal()}
+let spellMember=1,spellBrowse=false,spellSelected=null,spellSchool=null;
+function initialSpellSchool(i){const schools=[1,2].filter(job=>MAGIC.some(x=>x.job===job&&s.members[i].known.includes(x.id)));return schools.includes(jobOf(i))?jobOf(i):schools[0]??null}
+function selectSpellSchool(job){spellSchool=job;spellSelected=null;renderMagic();$('#magiclist').scrollTop=0}
+function openMagic(i,browse=false){spellMember=i;spellBrowse=browse;spellSelected=null;spellSchool=initialSpellSchool(i);renderMagic();$('#magicdialog').showModal()}
 function renderMagic(){
  let i=spellMember,m=s.members[i];
  $('#magictitle').textContent=`${NAMES[i]}の呪文 · MP ${s.mp[i]}/${m.maxMP}`;
- $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===jobOf(i)&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{
+ const schools=[1,2].filter(job=>MAGIC.some(x=>x.job===job&&m.known.includes(x.id)));
+ $('#magictabs').hidden=schools.length<2;
+ for(const job of [1,2]){const b=$('#magictab-'+job);b.setAttribute('aria-selected',String(spellSchool===job));b.tabIndex=spellSchool===job?0:-1}
+ $('#magiclist').setAttribute('aria-labelledby',schools.length>1?'magictab-'+spellSchool:'magictitle');
+ $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===spellSchool&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{
   let reason=spellReason(i,x),fieldBattleOnly=!s.enemy&&x.where==='battle';
   return `<button ${index===0?'data-key-default':''} title="${reason}" class="spellrow learned" data-spell="${x.id}" ${fieldBattleOnly||(s.enemy&&!spellBrowse&&reason)?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>MP ${spellCost(x)}</span></b><small>習得済み · Lv.${x.level} · ${x.guaranteed?'確定習得':'習得率50%'}${reason?' · '+reason:''}</small><p>${x.description}</p></button>`
  }).join('')||'<p>習得済みの呪文がありません</p>';
@@ -132,6 +140,7 @@ function pickFieldSpell(){
   onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>{renderMagic();$('#magicdialog').showModal();$('#magicpick').focus()}});
 }
 function magicUI(){
+ for(const job of [1,2])$('#magictab-'+job).onclick=()=>selectSpellSchool(job);
  $('#magicclose').onclick=()=>$('#magicdialog').close();
  $('#magicpick').onclick=pickFieldSpell;
  $('#magiclist').onclick=e=>{
@@ -146,7 +155,7 @@ function magicUI(){
  };
  $('#magicdialog').addEventListener('click',e=>{let d=e.currentTarget,r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
 }
-function calfoCaster(){return currentChest()?s.members.findIndex((m,i)=>magic('calfo').job===jobOf(i)&&!spellReason(i,magic('calfo'))):-1}
+function calfoCaster(){return currentChest()?s.members.findIndex((m,i)=>!spellReason(i,magic('calfo'))):-1}
 function hasLight(){return !!s.light||s.milwaSteps>0}
 function diagonalSight(){if(!hasLight())return [];let dx=[0,1,0,-1][s.dir],dy=[-1,0,1,0][s.dir];return [-1,1].map(side=>{let x=s.pos%size()+dx-dy*side,y=(s.pos/size()|0)+dy+dx*side;return x<0||x>=size()||y<0||y>=size()?-1:y*size()+x})}
 function distantSight(){let cells=diagonalSight();if(!cells.some(i=>i>=0))return '';return `<g fill="none" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"><path d="M200 100L260 150H380L440 100M200 300L260 250H380L440 300M260 150V250M380 150V250"/></g>`+cells.map((i,k)=>{if(i<0)return '';let v=face(i),x=k?411:229;return `<g class="透視" aria-label="${k?'右':'左'}前方：${v.label} ${v.symbol}"><path d="${k?'M440 100L380 150V250L440 300Z':'M200 100L260 150V250L200 300Z'}" fill="${v.fill}" fill-opacity=".35" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"/><text x="${x}" y="210" text-anchor="middle" fill="${v.color||'#e8d2a2'}" font-family="system-ui,sans-serif" font-size="30" font-weight="700">${v.symbol}</text></g>`}).join('')}

@@ -341,3 +341,5 @@ require('./spell-list.cjs');
 require('./pitfall.cjs');
 require('./travel-characterization.cjs');
 require('./action-order.cjs');
+
+require('./class-change.cjs');

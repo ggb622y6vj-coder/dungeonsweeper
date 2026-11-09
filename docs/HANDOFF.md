@@ -275,3 +275,17 @@ Node全17本、CSV整合チェック、sim/selftest、構文チェックはPASS�
 
 Node回帰テストと既存ブラウザテストの階別表示前提を更新し、`tests/library-monster-tabs-browser.py` に全階巡回・重複なし・ARIA・キー操作・1280/390pxの列数・記録不変を追加。ブラウザ実行はPlaywright未導入（`ModuleNotFoundError`）で未実施。実行可能な環境でブラウザテスト全本と実画面確認が必要。push・公開は未実施。
 検証: `node tests/game.cjs`、全 `tests/*.cjs` 37本（表示前提修正後の再実行を含む）、敵CSV整合チェック、シミュレーション自己テストは全PASS。ブラウザテスト全ファイルのPython構文検査・差分の空白検査もPASS。
+
+## 094 転職システム第1段階（2026-11-09）
+
+既存4職間の転職を実装。`recruits.js` に純粋な可否・比較関数とID再検索による確定処理、`training.js` / `index.html` に条件表示・比較・確認ダイアログを追加。`weapons.js` の `canEquipJob` を転職・装備・購入表示で共用する。武器性能とACは変更後の職業・装備スロットから既存関数で算出し、別キャッシュは持たない。
+
+`spells.js` は使用権限と系統別習得を分離し、両系統タブを追加。`party.js` / `game.js` は習得済み呪文の有無でコマンドを表示し、前職表示・履歴補完を追加。旧セーブの特別付与は未転職者だけへ適用する解釈。転職済みは確定時・読込時に新職の呪文を増やさず、Lvアップで習得する。習得0件では術者職でも呪文ボタンなし。
+
+追加テスト：`tests/class-change.cjs`（game.cjs登録）、`tests/class-change-browser.py`（1280/390px、キーボード・取消・条件変化・保存/読込・両系統の実詠唱）。Nodeでは12回の転職、成長上限、混在所持品、控え・6人編成・並替え・帰還・全滅・遺体回収、旧セーブ補完、複数回読込の不変性を検証。既存テストの期待値変更・削除・緩和はなし。
+
+ブラウザ実行は未完了。HTTPサーバー起動は `PermissionError: [Errno 1] Operation not permitted`、新規ブラウザテスト起動は `ModuleNotFoundError: No module named 'playwright'`。後続環境で新規・既存の `tests/*-browser.py` を実行すること。MANIFEST.sha256はユーザー指示により再生成しない。コミット・push・公開も実施しない。
+
+実行担当：Codex。実装は gpt-6-astra / 推論 high（実行ヘッダーで確認、135,073トークン）。ブラウザテストの開き方修正のみ追加実行 gpt-6.1-sol / low（32,124トークン）。
+
+最終検証：`node tests/game.cjs` を含む `tests/*.cjs` 全45本PASS、`python3 scripts/compile-monsters.py --check`（100種）PASS、`node scripts/sim/selftest.cjs` PASS。全dist JS・全ブラウザテストPython・新規ブラウザテスト内35箇所のJS構文、HTML ID重複なし、`git diff --check` を確認。MANIFEST照合は今回編集した既存10ファイルだけが不一致（未再生成による想定どおり、新規テスト2本は未登録）。
