@@ -7,7 +7,7 @@ function showRecruitPreview(){
  $('#recruitpreview').replaceChildren();
  const title=document.createElement('p');title.textContent=`${m.name} · ${CLASSES[m.job].name}　ボーナス ${m.creationBonus}点`;$('#recruitpreview').append(title);
  const grid=document.createElement('dl');grid.className='recruit-metrics';
- for(const [label,key] of [['STR','str'],['IQ','intelligence'],['PIE','piety'],['HP','maxHP'],['MP','maxMP'],['AC','ac']]){
+ for(const [label,key] of [['STR','str'],['AGI','agi'],['IQ','intelligence'],['PIE','piety'],['HP','maxHP'],['MP','maxMP'],['AC','ac']]){
   const item=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;
   const delta=old?m[key]-old[key]:0;dd.textContent=String(m[key])+(old&&key!=='ac'?` (${delta>0?'+':''}${delta})`:'');item.append(dt,dd);grid.append(item);
  }
@@ -26,7 +26,7 @@ function renderTraining(){
   const m=r.members,index=s.members.findIndex(x=>x.id===m.id),row=document.createElement('section');row.dataset.recruitId=m.id;
   const title=document.createElement('h4');title.textContent=`${m.name}${m.status==='stone'?'（石化）':''} · ${CLASSES[m.job].name} Lv.${m.level}`;
   const status=document.createElement('p'),ailment={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[m.status];status.textContent=ailment?`${index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`}・${ailment}`:index<0?'控え':`${index+1}番・${index<3?'前衛':'後衛'}`;
-  const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
+  const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AGI ${m.agi??10} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
   row.append(title,status,stats);const actions=document.createElement('div');actions.className='recruit-actions';row.append(actions);
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b)};
   button(index<0?'加入':'離脱',()=>{if(changeRecruitParty(m.id,index<0)){trainingNotice(index<0?'パーティに加入しました。':'控えに移しました。');renderTraining()}},index<0&&(s.members.length>=6||m.status!=='ok'));
