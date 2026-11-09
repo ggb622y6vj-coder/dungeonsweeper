@@ -343,3 +343,4 @@ require('./travel-characterization.cjs');
 require('./action-order.cjs');
 
 require('./class-change.cjs');
+require('./elite-jobs.cjs');

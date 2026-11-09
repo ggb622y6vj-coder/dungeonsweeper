@@ -289,3 +289,21 @@ Node回帰テストと既存ブラウザテストの階別表示前提を更新�
 実行担当：Codex。実装は gpt-6-astra / 推論 high（実行ヘッダーで確認、135,073トークン）。ブラウザテストの開き方修正のみ追加実行 gpt-6.1-sol / low（32,124トークン）。
 
 最終検証：`node tests/game.cjs` を含む `tests/*.cjs` 全45本PASS、`python3 scripts/compile-monsters.py --check`（100種）PASS、`node scripts/sim/selftest.cjs` PASS。全dist JS・全ブラウザテストPython・新規ブラウザテスト内35箇所のJS構文、HTML ID重複なし、`git diff --check` を確認。MANIFEST照合は今回編集した既存10ファイルだけが不一致（未再生成による想定どおり、新規テスト2本は未登録）。
+
+## 095 上級4職・転職履歴の補完根拠（2026-11-09）
+
+`hold/095` で侍4・君主5・忍者6・司教7を追加。正本は `docs/devlog/specs/095-elite-jobs.md`。8職の転職候補・指定の特徴文・直前の職業条件を実装し、新規作成は0〜3だけを維持した。装備互換は `canEquipJob` へ集約し、装備・購入・転職時の付け替え・戦利品で共用する。アイテムのclassesと薬の扱いは変更しない。空所持品の救済武器は侍／君主＝剣、忍者＝短剣、司教＝メイス（転職時の無償付与には使わない）。
+
+侍・君主はLv4からMP成長と遅延習得を開始し、司教は両系統を遅れて習得する。転職時のMP上限と既習得呪文を保持し、呪文タブは現職に対応する優先系統で開く。物理攻撃の回数・命中成長を拡張し、君主の解呪、忍者の床罠／宝箱解除を追加。宝箱は行動可能な盗賊・忍者のパーティー順先頭が担い、その現職で85%／75%を判定、ボタン名にも反映する。忍者の即死・司教の鑑定は追加していない。
+
+履歴は不正要素だけを除去する。`classChanged` は確定時にtrue、有効履歴の読込時にもtrueを補完し、履歴が全件壊れても既存trueを保持する。未転職者へfalseを追加する移行は行わず、任意項目のまま扱う。`classChanged===true` または履歴1件以上で `ensureMagic`／`ensureMakanito` の旧セーブ向け補完を止める。`ensureProfile` の既存共通経路でパーティー・控え・遺体すべてを修復し、`ash-v1`・`rosterVersion:1`・PARTY_FIELDSは維持する。
+
+変更ファイル：`dist/balance.js`、`dist/recruits.js`、`dist/training.js`、`dist/weapons.js`、`dist/items.js`、`dist/party.js`、`dist/game.js`、`dist/spells.js`、`dist/combatui.js`、`tests/game.cjs`、新規 `tests/elite-jobs.cjs`／`tests/elite-jobs-browser.py`、本書、`docs/SPECIFICATION.md`（第13節と関連する戦闘・成長・罠の記述）。
+
+Node新規テストは64通りの前職／転職先、特徴文、生成拒否、MP開始境界、両系統習得とIQ／PIE、全アイテム互換、購入／装備／受取先、攻撃回数と命中境界、君主の解呪コマンド実行、忍者の床罠操作、宝箱の確率境界、履歴破損と補完抑止を検証する。6人の編成・控え・並替え・全滅・遺体保存／回収・繰り返し読込、魔法使いLv10→司教→保存／読込→探索と戦闘で旧／新系統を唱える通し経路も含む。既存テストの期待値の変更・削除・緩和はない。
+
+ブラウザテストは依頼に従い実行していない。新規テストは1280px／390pxで訓練所の実操作による4職への転職、理由表示・取消・再読込、司教の両系統詠唱、侍／君主／忍者の実戦攻撃回数、君主の解呪、忍者の床罠／宝箱操作を確認する。実行先で `python3 tests/elite-jobs-browser.py [URL]` を実行すること。
+
+既存ブラウザテストの仕様衝突（静的確認）：`tests/class-change-browser.py:44` の「武器不足」はメイスだけを持つ僧侶Lv10で、同ファイル51〜54行は転職ボタン無効を期待する。095ではメイスを装備できる君主・司教への前職条件を満たすため、ボタン有効が正しい。この旧期待値は依頼に従い変更していない。ブラウザ全件合格には、このケースのfixture／期待値の扱いを依頼側で調整する必要がある。新仕様を満たす実装で旧期待値まで満たすことはできない。
+
+検証済み：`node tests/game.cjs`（elite-jobs登録済み）と、同テストから呼ばれない既存18本を合わせたNode全46本、`python3 scripts/compile-monsters.py --check`（100種）、`node scripts/sim/selftest.cjs` はPASS。新規ブラウザテストのPython構文と静的なJavaScript39箇所もPASS。MANIFEST.sha256は照合のみで再生成せず、変更対象の既存12ファイルが不一致、新規テスト2本は未登録。コミット・push・公開は行っていない。

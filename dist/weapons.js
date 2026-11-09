@@ -81,5 +81,5 @@ const ARMOR=[
 ].map(a=>({minFloor:1,...a}));
 WEAPONS.push(...ARMOR);
 
-// Central equipment compatibility hook for future profession mappings.
-function canEquipJob(item,job){return !!item?.classes.includes(job)}
+// Item classes remain basic jobs; elite jobs share their compatible equipment.
+function canEquipJob(item,job){return (({4:[0],5:[0,2],6:[3],7:[1,2]})[job]||[job]).some(base=>!!item?.classes.includes(base))}

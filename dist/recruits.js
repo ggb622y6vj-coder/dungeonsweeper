@@ -77,9 +77,10 @@ function generateClassXP(job){
 }
 function ensureCareerHistory(m){
  if(!m)return;
- if(!Array.isArray(m.careerHistory)||!m.careerHistory.every(h=>h&&
+ m.careerHistory=Array.isArray(m.careerHistory)?m.careerHistory.filter(h=>h&&
   Number.isInteger(h.from)&&!!CLASSES[h.from]&&Number.isInteger(h.to)&&!!CLASSES[h.to]&&h.from!==h.to&&
-  Number.isInteger(h.fromLevel)&&h.fromLevel>=10&&h.fromLevel<=LEVEL_CAP))m.careerHistory=[];
+  Number.isInteger(h.fromLevel)&&h.fromLevel>=10&&h.fromLevel<=LEVEL_CAP):[];
+ if(m.careerHistory.length)m.classChanged=true;
 }
 // Pure queries over a complete roster record, shared by preview and commit.
 function classWeaponSlot(record,toJob){
@@ -87,11 +88,12 @@ function classWeaponSlot(record,toJob){
  return usable(record.equipped)?record.equipped:record.inventory.findIndex((_,slot)=>usable(slot));
 }
 function canChangeClass(record,toJob){
- const m=record?.members;
+ const m=record?.members,previousJobs=({4:[0,1],5:[0,2],6:[0,3],7:[1,2]})[toJob];
  const reason=!m?'冒険者が見つかりません。':m.status!=='ok'?'正常な冒険者だけ転職できます。':
   m.level<10?'転職にはLv.10以上が必要です。':
-  !Number.isInteger(toJob)||toJob<0||toJob>3?'転職先を選んでください。':
+  !Number.isInteger(toJob)||toJob<0||toJob>7?'転職先を選んでください。':
   m.job===toJob?'現在と同じ職業には転職できません。':
+  previousJobs&&!previousJobs.includes(m.job)?`前職が${previousJobs.map(job=>CLASSES[job].name).join('または')}である必要があります。`:
   classWeaponSlot(record,toJob)<0?'転職先で装備できる武器を所持していません。':'';
  return {ok:!reason,reason};
 }
@@ -110,6 +112,7 @@ function changeClass(id,toJob){
  const record=index>=0?partyRecords()[index]:s.reserve?.[reserveIndex],check=canChangeClass(record,toJob);
  if(!check.ok)return check;
  const next=classChangePreview(record,toJob);
+ next.members.classChanged=true;
  next.members.xpTargets=generateClassXP(toJob);next.members.xpCurveVersion=2;
  if(index>=0){for(const key of PARTY_FIELDS)s[key][index]=next[key]}
  else s.reserve[reserveIndex]=next;

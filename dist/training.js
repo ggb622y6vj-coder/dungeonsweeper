@@ -31,7 +31,7 @@ function renderTraining(){
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b);return b};
   button(index<0?'加入':'離脱',()=>{if(changeRecruitParty(m.id,index<0)){trainingNotice(index<0?'パーティに加入しました。':'控えに移しました。');renderTraining()}},index<0&&(s.members.length>=6||m.status!=='ok'));
   if(index>=0)for(const [text,offset] of [['前へ',-1],['後ろへ',1]])button(text,()=>{const order=s.members.map((_,i)=>i);[order[index],order[index+offset]]=[order[index+offset],order[index]];reorderParty(order);renderTraining()},index+offset<0||index+offset>=s.members.length);
-  const checks=[0,1,2,3].filter(job=>job!==m.job).map(job=>canChangeClass(r,job));
+  const checks=[0,1,2,3,4,5,6,7].filter(job=>job!==m.job).map(job=>canChangeClass(r,job));
   const reason=checks.some(check=>check.ok)?'':checks[0].reason;
   const change=button('転職',()=>openClassChange(m.id),!!reason);change.setAttribute('data-class-change',m.id);change.title=reason;
   if(reason){const note=document.createElement('p');note.textContent=reason;row.append(note)}
@@ -98,7 +98,7 @@ $('#trainingordercancel').onclick=cancelTrainingOrderPick;
 $('#trainingorderdialog').addEventListener('close',()=>{if(!$('#trainingorderdialog').open)trainingOrderPicked=null});
 
 let classChangeId=null,classChangeJob=null;
-const CLASS_FEATURES=['武器による前衛戦闘とHP成長が得意。','魔法使い系の呪文を習得する。','僧侶系の呪文を習得し、呪いを解く。','床罠・宝箱の罠解除が得意。'];
+const CLASS_FEATURES=['武器による前衛戦闘とHP成長が得意。','魔法使い系の呪文を習得する。','僧侶系の呪文を習得し、呪いを解く。','床罠・宝箱の罠解除が得意。','武器による前衛戦闘が得意で、Lv4から魔法使い系の呪文を遅れて習得する。','武器による前衛戦闘が得意で、Lv4から僧侶系の呪文を遅れて習得し、呪いを解く。','床罠・宝箱の罠解除が得意。','魔法使い系と僧侶系の両方の呪文を習得する。習得は遅い。'];
 function openClassChange(id){
  if(s.area!=='town'||!idle()||!$('#training').open)return;
  classChangeId=id;classChangeJob=null;renderClassChange();$('#classchangedialog').showModal();
@@ -107,7 +107,7 @@ function renderClassChange(){
  const record=trainingRoster().find(r=>r.members.id===classChangeId);
  $('#classchangename').textContent=record?`${record.members.name}の転職（無料）`:'';
  const list=$('#classchangejobs');list.replaceChildren();
- for(const job of [0,1,2,3]){
+ for(const job of [0,1,2,3,4,5,6,7]){
   const check=canChangeClass(record,job),b=document.createElement('button');
   b.setAttribute('data-class-job',String(job));b.setAttribute('aria-pressed',String(job===classChangeJob));
   b.textContent=`${CLASSES[job].name}：${CLASS_FEATURES[job]} ${check.ok?'転職可能':check.reason}`;
