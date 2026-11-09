@@ -61,7 +61,7 @@ with sync_playwright() as p:
               const r=generateRecruit('転職候補',job===7?1:0);
               registerRecruit(r);changeRecruitParty(r.members.id,true);
               const m=s.members[0];m.level=10;m.maxHP=5000;s.hp[0]=5000;
-              m.maxMP=100;s.mp[0]=100;m.known=job===7?['halito','dumapic']:[];
+              m.maxMP=100;s.mp[0]=100;m.known=job===7?['halito','dumapic','identifyfoe','makanito']:[];
               s.inventory[0]=['sword','staff','mace','dagger'];s.equipped[0]=m.job;
               render();return m.id;
             }""", job)
@@ -101,7 +101,7 @@ with sync_playwright() as p:
 
             if job == 7:
                 # Old mage spell is immediately usable after conversion and reload.
-                assert page.evaluate('s.members[0].known') == ['halito', 'dumapic']
+                assert page.evaluate('s.members[0].known') == ['halito', 'dumapic', 'identifyfoe', 'makanito']
                 open_field_magic(page)
                 page.locator('[data-spell="dumapic"]').click()
                 page.locator('#magiccast').click()
