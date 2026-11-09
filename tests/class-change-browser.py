@@ -42,6 +42,7 @@ with sync_playwright() as p:
           const junior=generateRecruit('見習い',3);registerRecruit(junior);
           const stone=generateRecruit('石化候補',0);stone.members.status='stone';stone.members.level=10;registerRecruit(stone);
           const noWeapon=generateRecruit('武器不足',2);noWeapon.members.level=10;registerRecruit(noWeapon);
+          s.reserve.find(r=>r.members.id===noWeapon.members.id).inventory=[];
           render();window.candidateId=m.id;window.juniorId=junior.members.id;
         }""")
         candidate = page.evaluate('candidateId')
