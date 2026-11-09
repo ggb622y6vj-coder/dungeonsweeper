@@ -3,7 +3,7 @@ const RECRUIT_BASES = [[12,8,8,10],[8,12,8,9],[10,8,12,9],[10,10,8,14]];
 const RECRUIT_WEIGHTS = [[0,0,0,1,2,3],[0,1,1,1,2,3],[0,1,2,2,2,3],[0,0,1,1,2,3,3]];
 function generateRecruit(name, job) {
  name = String(name).trim().replace(/[<>&"'\u0000-\u001f]/g, '').slice(0,20);
- if (!name || !Number.isInteger(job) || !CLASSES[job]) return null;
+ if (!name || !Number.isInteger(job) || job<0 || job>3 || !CLASSES[job]) return null;
  const c = CLASSES[job], stats = RECRUIT_BASES[job].slice();
  const bonus = 3 + Math.floor(Math.random()*7);
  for (let n=0;n<bonus;n++) {
@@ -12,8 +12,8 @@ function generateRecruit(name, job) {
  }
  const hp=c.hp-3+Math.floor(Math.random()*7), mp=c.mp?c.mp-2+Math.floor(Math.random()*5):0;
  const m={id:crypto.randomUUID(),name,job,level:1,xp:0,maxHP:hp,maxMP:mp,attack:c.attack,ac:c.ac,str:stats[0],baseStr:stats[0],intelligence:stats[1],piety:stats[2],agi:stats[3],baseAgi:stats[3],creationBonus:bonus,xpTargets:[0,0],xpCurveVersion:2,
-  known:MAGIC.filter(x=>x.job===job&&x.level===1&&x.guaranteed).map(x=>x.id)};
- for(let l=2;l<=LEVEL_CAP;l++)m.xpTargets[l]=m.xpTargets[l-1]+Math.round(115*(l-1)*c.xpFactor*(.9+Math.random()*.2));
+  careerHistory:[],known:MAGIC.filter(x=>x.job===job&&x.level===1&&x.guaranteed).map(x=>x.id)};
+ m.xpTargets=generateClassXP(job);
  return {members:m,hp,mp,inventory:[['sword','staff','mace','dagger'][job]],equipped:0,armor:{},ailments:freshAilments()};
 }
 function trainingRoster(){return [...partyRecords(),...(s.reserve||[])]}
@@ -69,3 +69,50 @@ function deleteRecruit(id) {
  return setPartyFromRoster(roster,ids.map(i=>roster.findIndex(r=>r.members.id===i)));
 }
 function recruitAC(record){return record.members.ac-Object.values(record.armor).reduce((sum,slot)=>sum+(weapon(record.inventory[slot])?.ac||0),0)}
+
+function generateClassXP(job){
+ const targets=[0,0];
+ for(let l=2;l<=LEVEL_CAP;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*CLASSES[job].xpFactor*(.9+Math.random()*.2));
+ return targets;
+}
+function ensureCareerHistory(m){
+ if(!m)return;
+ if(!Array.isArray(m.careerHistory)||!m.careerHistory.every(h=>h&&
+  Number.isInteger(h.from)&&!!CLASSES[h.from]&&Number.isInteger(h.to)&&!!CLASSES[h.to]&&h.from!==h.to&&
+  Number.isInteger(h.fromLevel)&&h.fromLevel>=10&&h.fromLevel<=LEVEL_CAP))m.careerHistory=[];
+}
+// Pure queries over a complete roster record, shared by preview and commit.
+function classWeaponSlot(record,toJob){
+ const usable=slot=>{const w=weapon(record.inventory[slot]);return !!w&&!w.part&&w.kind!=='medicine'&&canEquipJob(w,toJob)};
+ return usable(record.equipped)?record.equipped:record.inventory.findIndex((_,slot)=>usable(slot));
+}
+function canChangeClass(record,toJob){
+ const m=record?.members;
+ const reason=!m?'冒険者が見つかりません。':m.status!=='ok'?'正常な冒険者だけ転職できます。':
+  m.level<10?'転職にはLv.10以上が必要です。':
+  !Number.isInteger(toJob)||toJob<0||toJob>3?'転職先を選んでください。':
+  m.job===toJob?'現在と同じ職業には転職できません。':
+  classWeaponSlot(record,toJob)<0?'転職先で装備できる武器を所持していません。':'';
+ return {ok:!reason,reason};
+}
+function classChangePreview(record,toJob){
+ if(!canChangeClass(record,toJob).ok)return null;
+ const next=structuredClone(record),m=next.members,c=CLASSES[toJob];
+ m.careerHistory=[...(m.careerHistory||[]),{from:m.job,fromLevel:m.level,to:toJob}];
+ Object.assign(m,{job:toJob,level:1,xp:0,attack:c.attack,ac:c.ac,maxMP:Math.max(m.maxMP,c.mp),baseStr:m.str,baseAgi:m.agi});
+ next.hp=m.maxHP;next.mp=m.maxMP;next.equipped=classWeaponSlot(record,toJob);
+ for(const [part,slot] of Object.entries(next.armor))if(!canEquipJob(weapon(next.inventory[slot]),toJob))delete next.armor[part];
+ return next;
+}
+function changeClass(id,toJob){
+ if(s.area!=='town'||!idle()||!$('#training').open)return {ok:false,reason:'町の訓練所で転職してください。'};
+ const index=s.members.findIndex(m=>m.id===id),reserveIndex=(s.reserve||[]).findIndex(r=>r.members.id===id);
+ const record=index>=0?partyRecords()[index]:s.reserve?.[reserveIndex],check=canChangeClass(record,toJob);
+ if(!check.ok)return check;
+ const next=classChangePreview(record,toJob);
+ next.members.xpTargets=generateClassXP(toJob);next.members.xpCurveVersion=2;
+ if(index>=0){for(const key of PARTY_FIELDS)s[key][index]=next[key]}
+ else s.reserve[reserveIndex]=next;
+ displayVitals=null;refreshNames();render();
+ return {ok:true,reason:''};
+}

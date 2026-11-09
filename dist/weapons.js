@@ -80,3 +80,6 @@ const ARMOR=[
 {id:'dragonmail',name:'竜鱗の鎧',part:'body',ac:9,classes:[0],price:6000,sell:3000,minFloor:9,shop:false}
 ].map(a=>({minFloor:1,...a}));
 WEAPONS.push(...ARMOR);
+
+// Central equipment compatibility hook for future profession mappings.
+function canEquipJob(item,job){return !!item?.classes.includes(job)}

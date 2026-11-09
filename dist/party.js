@@ -1,7 +1,7 @@
 // Member identity and profession are independent of formation position.
 function jobOf(i){return s.members[i].job??i}
 function memberClass(i){return CLASSES[jobOf(i)]}
-function hasSpells(i){return [1,2].includes(jobOf(i))}
+function hasSpells(i){return !!s.members[i]?.known?.length}
 function starterWeapon(i){return ['sword','staff','mace','dagger'][jobOf(i)]}
 const PARTY_FIELDS=['members','hp','mp','inventory','equipped','armor','ailments'];
 function refreshNames(){NAMES.splice(0,NAMES.length,...s.members.map((m,i)=>m.name||memberClass(i).name))}
