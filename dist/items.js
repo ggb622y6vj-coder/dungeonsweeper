@@ -7,7 +7,7 @@ const MEDICINES=[
  {id:'elixir',name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,1,2,3],sell:80,weight:20,minFloor:7}
 ];
 let medicineMember=0;
-function lootRecipient(w){let i=s.members.findIndex((m,i)=>w.classes.includes(jobOf(i))&&s.inventory[i].length<10);return i>=0?i:s.members.findIndex((m,i)=>s.inventory[i].length<10)}
+function lootRecipient(w){let i=s.members.findIndex((m,i)=>canEquipJob(w,jobOf(i))&&s.inventory[i].length<10);return i>=0?i:s.members.findIndex((m,i)=>s.inventory[i].length<10)}
 function medicineSlots(i){return s.inventory[i].flatMap((id,slot)=>MEDICINES.some(w=>w.id===id)?[{slot,item:weapon(id)}]:[])}
 function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&!partyIncapacitated(i)}
 function medicineAction(i){if(!s.enemy||!medicineSlots(i).length)return '';let plan=s.itemPlans[i],w=plan&&weapon(plan.id);return `<button data-medicine="${i}" ${!canChooseMedicine(i)?'disabled':''}>${s.commands[i]==='item'&&w?w.name+' → '+NAMES[plan.target]:'薬を使う'}</button>`}

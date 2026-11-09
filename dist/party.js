@@ -2,7 +2,7 @@
 function jobOf(i){return s.members[i].job??i}
 function memberClass(i){return CLASSES[jobOf(i)]}
 function hasSpells(i){return !!s.members[i]?.known?.length}
-function starterWeapon(i){return ['sword','staff','mace','dagger'][jobOf(i)]}
+function starterWeapon(i){return ['sword','staff','mace','dagger','sword','sword','dagger','mace'][jobOf(i)]}
 const PARTY_FIELDS=['members','hp','mp','inventory','equipped','armor','ailments'];
 function refreshNames(){NAMES.splice(0,NAMES.length,...s.members.map((m,i)=>m.name||memberClass(i).name))}
 function ensureSixParty(){
@@ -57,8 +57,8 @@ function setTownPartyFromRoster(roster,order){let active=order.filter(i=>i>=0);i
 function tavernStatusName(m){return ({dead:'（死亡）',ash:'（灰）',lost:'（ロスト）',stone:'（石化）'})[m.status]||''}
 function renderTavern(){ $('#tavernslots').innerHTML=tavernOrder.map((id,slot)=>`<label>${slot<3?'前衛':'後衛'} ${slot%3+1}<select data-tavern-slot="${slot}"><option value="-1" ${id<0?'selected':''}>空き</option>${tavernRoster.map((r,i)=>`<option value="${i}" ${id===i?'selected':''} ${r.members.status!=='ok'?'disabled':''}>${r.members.name}${tavernStatusName(r.members)} · Lv.${r.members.level}</option>`).join('')}</select></label>`).join('');$('#tavernsave').disabled=false}
 function partyUI(){ $('#tavernopen').onclick=()=>{if(s.area!=='town'||!idle())return;tavernRoster=[...partyRecords(),...(s.reserve||[])];tavernOrder=Array.from({length:6},(_,i)=>i<s.members.length?i:-1);$('#tavernnotice').textContent='';renderTavern();$('#taverndialog').showModal()};$('#tavernclose').onclick=()=>$('#taverndialog').close();$('#tavernslots').onchange=e=>{let slot=Number(e.target.dataset.tavernSlot),id=Number(e.target.value),other=id<0?-1:tavernOrder.indexOf(id);if(!Number.isInteger(slot))return;if(other>=0)tavernOrder[other]=tavernOrder[slot];tavernOrder[slot]=id;renderTavern()};$('#tavernsave').onclick=()=>{if(setTownPartyFromRoster(tavernRoster,tavernOrder))$('#taverndialog').close()};$('#chestthief').onclick=thiefOpenChest}
-function thiefMember(){return s.members.findIndex((m,i)=>jobOf(i)===3&&!partyIncapacitated(i))}
-function thiefOpenChest(){let c=currentChest(),i=thiefMember();if(!c||i<0||logBusy()||s.enemy||s.done)return;fixChestTrap(c);if(Math.random()<.85){log(NAMES[i]+'が宝箱の罠を解除した。');rewardChest(c)}else{c.opened=true;log(NAMES[i]+'は宝箱の解除に失敗した！');let fromFloor=s.floor,fromPos=s.pos;triggerChestTrap(c);if(s.floor===fromFloor)delete s.cells[fromPos].chest;log('宝箱は失われた。')}render()}
+function thiefMember(){return s.members.findIndex((m,i)=>[3,6].includes(jobOf(i))&&!partyIncapacitated(i))}
+function thiefOpenChest(){let c=currentChest(),i=thiefMember();if(!c||i<0||logBusy()||s.enemy||s.done)return;fixChestTrap(c);if(Math.random()<(jobOf(i)===6?.75:.85)){log(NAMES[i]+'が宝箱の罠を解除した。');rewardChest(c)}else{c.opened=true;log(NAMES[i]+'は宝箱の解除に失敗した！');let fromFloor=s.floor,fromPos=s.pos;triggerChestTrap(c);if(s.floor===fromFloor)delete s.cells[fromPos].chest;log('宝箱は失われた。')}render()}
 
 function renderEquipmentSummary(i){$('#equipmentsummary').innerHTML=[['武器',s.equipped[i]],['頭',s.armor[i].head],['胴体',s.armor[i].body],['足',s.armor[i].feet]].map(([label,slot])=>`<div><small>${label}</small><b>${weapon(s.inventory[i][slot])?.name||'−'}</b></div>`).join('')}
 function renderTransfer(i){let slots=s.inventory[i].map((id,slot)=>({id,slot})).filter(x=>!isEquipped(i,x.slot));$('#transferitem').innerHTML=slots.map(x=>`<option value="${x.slot}">${x.slot+1}. ${weapon(x.id).name}</option>`).join('');$('#transfermember').innerHTML=NAMES.map((name,j)=>j===i?'':`<option value="${j}" ${s.inventory[j].length>=10?'disabled':''}>${name} (${s.inventory[j].length}/10)</option>`).join('');$('#transfergive').disabled=!idle()||!slots.length||!s.inventory.some((a,j)=>j!==i&&a.length<10);$('#transfernotice').textContent=slots.length?'':'装備中のアイテムは渡せません。'}
