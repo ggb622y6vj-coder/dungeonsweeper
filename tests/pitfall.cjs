@@ -103,3 +103,24 @@ const plain="(()=>{const c=s.cells[s.pos];return !c.type&&!c.trap&&!c.flag&&!c.c
  assert.equal(g.run("s.cells[s.pos].spent&&s.cells[s.pos].trapKind==='pitfall'"),true);
 }
 console.log('PASS 088 pitfall: weights, floor descent/fizzle, saved floor restore, chest loss/reward, trap boundaries, thief destination safety and landing fallback');
+
+// 093: a pitfall fall that generates the floor below must not reveal its
+// up-stairs (fresh() opens the start cell; only stair/elevator arrivals and
+// the no-candidate fallback land there).
+{const g=setup();
+ g.run('fresh(3);s.guardiansDefeated=[]');
+ assert.equal(floorTrap(g),true);
+ assert.equal(g.run('s.floor'),4);
+ assert.equal(g.run('s.pos!==s.start'),true);
+ assert.equal(g.run('s.cells[s.start].open'),false,'floor pitfall: fresh floor start stays hidden');
+ assert.equal(g.run('s.cells[s.pos].open'),true,'landing cell is open');
+ g.drain();
+ assert.equal(g.run("$('#board').innerHTML.includes('⇧')"),false,'map shows no up-stairs after the fall');
+}
+{const g=setup();chest(g,5);g.run('openChest()');
+ assert.equal(g.run('s.floor'),6);
+ assert.equal(g.run('s.pos!==s.start'),true);
+ assert.equal(g.run('s.cells[s.start].open'),false,'chest pitfall: fresh floor start stays hidden');
+ assert.equal(g.run('s.cells[s.pos].open'),true,'landing cell is open');
+}
+console.log('PASS pitfall: falls generating the floor below keep its up-stairs hidden (093)');
