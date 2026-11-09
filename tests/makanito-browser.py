@@ -40,6 +40,11 @@ with sync_playwright() as p:
         # absent because the spell is required to spare them even on 1F.
         page.evaluate('''s.pendingStairs=false;s.pendingBoss=null;
           s.cells.forEach(c=>{c.flag=false;delete c.chest});
+          // Since 092 the action order is interleaved, so a goblin can act
+          // before the cast: fleeing pays no XP and summoning adds a fourth
+          // unit, and both break this test's fixed-trio premise. Neither is
+          // what this test exercises: pin both off for the trio.
+          ['slime','goblin','wolf'].forEach(id=>{const d=enemyDefinition(id);d.flee=0;d.summon=0});
           s.enemy={dataVersion:1,boss:false,chestBattle:true,
             units:['slime','goblin','wolf'].map((id,i)=>({
               ...makeEnemy(id,100+i),row:17+i*11,identified:true})),
