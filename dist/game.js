@@ -187,6 +187,7 @@ function attack(){
    const e=s.enemy.units.find(e=>e.uid===entry.uid);if(!e||e.hp<=0)continue;
    enemyAction(e,commandsById);
    if(!activeMembers().length){defeat();break}
+   if(!s.enemy.units.some(e=>e.hp>0))break;
   }
  }
  if(s.enemy&&!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();

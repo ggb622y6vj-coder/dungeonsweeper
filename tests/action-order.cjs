@@ -164,3 +164,33 @@ for (const base of [null,14,18]) {
     'stats display AGI from the visible snapshot');
 }
 console.log('PASS action-order: party/reserve load migration, fallback, retained AGI, level-up/drain, cap, report and stat snapshot');
+
+// Amendment 1 (ChatGPT review): an enemy action that ends the battle by itself
+// (the last enemy flees in monsterAction) must stop the loop immediately, so
+// later party members do not spend MP or act after the battle is decided.
+{
+  const g = party([2,0], 'rat');
+  g.run(`enemyDefinition('rat').flee=1;
+    s.members[0].known.push('dios');s.mp=[10,0];
+    s.commands=['spell','fight'];s.magicPlans=[{id:'dios',target:0},null];attack()`);
+  assert.equal(g.run('s.enemy'), null, 'battle ends after the last enemy flees');
+  assert.equal(g.run('s.mp[0]'), 10, 'priest never casts after the battle ended');
+  assert.deepEqual(json(g, 's.members.map(m=>m.xp)'), [0,0], 'escaped enemy pays no XP');
+  const texts = lines(g);
+  assert.equal(texts.filter(t=>t.includes('逃げ出した')).length, 1, 'flee logged once');
+  assert(!texts.some(t=>t.includes('を唱えた')), 'no spell is cast after the flee');
+  assert(!texts.some(t=>allyAttack(t)), 'no party attack after the flee');
+}
+console.log('PASS action-order: last enemy fleeing ends the turn loop at once');
+
+// Each living enemy acts exactly once per turn, tracked by uid; an enemy that
+// is already dead when the order is built never acts.
+{
+  const g = party([0], 'slime');
+  g.run(`s.enemy.units.push({...makeEnemy('slime',92),row:17,hp:99999,identified:true},{...makeEnemy('slime',93),row:17,hp:99999,identified:true});
+    s.enemy.units[1].hp=0;
+    var acts={};var originalEnemyAction=enemyAction;enemyAction=(e,c)=>{acts[e.uid]=(acts[e.uid]||0)+1;originalEnemyAction(e,c)};
+    attack()`);
+  assert.deepEqual(json(g, 'acts'), {91:1, 93:1}, 'living enemies act once each; dead uid is skipped');
+}
+console.log('PASS action-order: enemy actions are once per living uid');
