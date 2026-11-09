@@ -169,6 +169,23 @@ g.run('delete s.members[0].known;ensureMagic()');assert.deepEqual(read(g,'s.memb
 g.run("s.members[0].classChanged=false;s.members[0].careerHistory=[{from:0,to:1,fromLevel:10}];ensureMagic();ensureMakanito(s.members[0],1)");assert.deepEqual(read(g,'s.members[0].known'),[]);
 console.log('PASS elite jobs: partial history repair, valid-history backfill, monotonic classChanged and no renewed spell supplementation');
 
+// Elite jobs cannot receive legacy spells even when all career evidence is missing.
+for(const job of [4,5,6,7])for(const flag of ['missing','false']){
+ g=setup();
+ g.run(`recruit(0);s.members[0].job=${job};s.members[0].level=10;s.members[0].careerHistory=[];delete s.members[0].known;${flag==='missing'?'delete s.members[0].classChanged':'s.members[0].classChanged=false'}`);
+ const check=()=>{
+  assert.equal(g.run('s.members[0].job'),job);
+  assert.deepEqual(read(g,'s.members[0].careerHistory'),[]);
+  assert.equal(g.run('s.members[0].classChanged'),flag==='missing'?undefined:false);
+  assert.deepEqual(read(g,'s.members[0].known'),[],`job ${job}, classChanged ${flag}: no legacy spells`);
+ };
+ for(let n=0;n<3;n++){
+  g.run('ensureProfile();ensureProfile()');check();
+  g.run('save()');g=setup(g.run("localStorage.getItem('ash-v1')"));check();
+ }
+}
+console.log('PASS elite jobs: missing known stays empty without career history or classChanged evidence across profile repair and repeated save/load');
+
 // All four elite jobs survive reserve/join, six-slot reorder, repeated saves, wipe and recovery.
 g=setup();g.run('var ids=[4,5,6,7].map(job=>elite(job));var helper=recruit(0);var reserveId=elite(7,false);changeRecruitParty(reserveId,true);reorderParty([5,3,2,1,0,4]);changeRecruitParty(ids[2],false);changeRecruitParty(ids[2],true);save()');
 let records=read(g,'trainingRoster()');
