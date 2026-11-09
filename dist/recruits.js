@@ -1,6 +1,6 @@
 // 本作用の配分。Wizardryの能力値範囲を参考にし、原作の生成式とは区別する。
-const RECRUIT_BASES = [[12,8,8],[8,12,8],[10,8,12],[10,10,8]];
-const RECRUIT_WEIGHTS = [[0,0,0,1,2],[0,1,1,1,2],[0,1,2,2,2],[0,0,1,1,2]];
+const RECRUIT_BASES = [[12,8,8,10],[8,12,8,9],[10,8,12,9],[10,10,8,14]];
+const RECRUIT_WEIGHTS = [[0,0,0,1,2,3],[0,1,1,1,2,3],[0,1,2,2,2,3],[0,0,1,1,2,3,3]];
 function generateRecruit(name, job) {
  name = String(name).trim().replace(/[<>&"'\u0000-\u001f]/g, '').slice(0,20);
  if (!name || !Number.isInteger(job) || !CLASSES[job]) return null;
@@ -11,7 +11,7 @@ function generateRecruit(name, job) {
   stats[choices[Math.floor(Math.random()*choices.length)]]++;
  }
  const hp=c.hp-3+Math.floor(Math.random()*7), mp=c.mp?c.mp-2+Math.floor(Math.random()*5):0;
- const m={id:crypto.randomUUID(),name,job,level:1,xp:0,maxHP:hp,maxMP:mp,attack:c.attack,ac:c.ac,str:stats[0],baseStr:stats[0],intelligence:stats[1],piety:stats[2],creationBonus:bonus,xpTargets:[0,0],xpCurveVersion:2,
+ const m={id:crypto.randomUUID(),name,job,level:1,xp:0,maxHP:hp,maxMP:mp,attack:c.attack,ac:c.ac,str:stats[0],baseStr:stats[0],intelligence:stats[1],piety:stats[2],agi:stats[3],baseAgi:stats[3],creationBonus:bonus,xpTargets:[0,0],xpCurveVersion:2,
   known:MAGIC.filter(x=>x.job===job&&x.level===1&&x.guaranteed).map(x=>x.id)};
  for(let l=2;l<=LEVEL_CAP;l++)m.xpTargets[l]=m.xpTargets[l-1]+Math.round(115*(l-1)*c.xpFactor*(.9+Math.random()*.2));
  return {members:m,hp,mp,inventory:[['sword','staff','mace','dagger'][job]],equipped:0,armor:{},ailments:freshAilments()};

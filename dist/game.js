@@ -74,6 +74,9 @@ function dice(n,d,add=0){let rolls=Array.from({length:n},()=>1+(Math.random()*d|
 function strengthFor(job,level){return Math.min(18,([15,9,12,12][job]??10)+Math.floor((Math.max(1,level)-1)/5))}
 function strengthBonus(str){return str<=5?str-6:str>=16?str-15:0}
 function migrateStrength(m,job){if(m.str==null)m.str=strengthFor(job,m.level);}
+function agilityFor(job,level){return Math.min(18,([10,9,9,14][job]??10)+Math.floor((Math.max(1,level)-1)/5))}
+function migrateAgility(m,job){if(m.agi==null)m.agi=agilityFor(job,m.level)}
+function memberAgility(i){return s.members[i].agi??agilityFor(jobOf(i),s.members[i].level)}
 // Freeze terrain and equipment ownership before any combat action or log playback.
 function snapshotWeaponEffects(pos=s.pos){
  const cells=around(pos).map(j=>s.cells[j]);
@@ -172,14 +175,22 @@ function attack(){
  if(s.done){render();return}
  identifyEnemies();log('── ターン開始 ──');
  for(let i=0;i<s.members.length;i++)if(!partyIncapacitated(i)&&s.commands[i]==='guard')log(`${NAMES[i]}は身を守る。`);
- for(const id of s.members.map(m=>m.id)){
-  partyAction(s.members.findIndex(m=>m.id===id));
-  autoReorderParty('ally-action');
-  if(!s.enemy.units.some(e=>e.hp>0))break;
+ const commandsById=new Map(s.members.map((m,i)=>[m.id,s.commands[i]]));
+ for(const entry of combatActionOrder()){
+  if(entry.side==='party'){
+   const idx=s.members.findIndex(m=>m.id===entry.id);if(idx<0)continue;
+   partyAction(idx);
+   autoReorderParty('ally-action');
+   if(!s.enemy.units.some(e=>e.hp>0))break;
+  }else{
+   if(s.enemy.initiative==='party')continue;
+   const e=s.enemy.units.find(e=>e.uid===entry.uid);if(!e||e.hp<=0)continue;
+   enemyAction(e,commandsById);
+   if(!activeMembers().length){defeat();break}
+  }
  }
- if(!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
- else if(s.enemy.initiative==='party')s.enemy.initiative='normal';
- else enemyTurn(s.commands);
+ if(s.enemy&&!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
+ else if(s.enemy?.initiative==='party')s.enemy.initiative='normal';
  tickBattleSilence();tickBattleFear();
  resetCommandEntry();resetPartyCommands();
  if(s.enemy){const next=s.enemy.units.find(e=>e.hp>0);s.attackRows=s.attackRows.map(key=>s.enemy.units.some(e=>String(rowKey(e))===String(key)&&e.hp>0)?key:rowKey(next))}
@@ -189,15 +200,15 @@ function quickAttack(){if(logBusy()||!s.enemy||s.done)return;const members=comma
 function ensureStats(){if(!s.members){s.members=CLASSES.slice(0,3).map(c=>({level:1,xp:0,maxHP:c.hp,maxMP:c.mp,attack:c.attack,ac:c.ac}));s.mp=CLASSES.slice(0,3).map((c,i)=>i===1?Math.min(c.mp,(s.spell===undefined?c.mp:s.spell*SPELLS.blast.cost)):i===2?Math.min(c.mp,(s.heal===undefined?c.mp:s.heal*SPELLS.heal.cost)):0);if(s.area==='town')s.mp=s.members.map(m=>m.maxMP);delete s.spell;delete s.heal}s.mp??=s.members.map(m=>m.maxMP);if(s.enemy&&!s.enemy.units){let old=s.enemy,id=old.boss?'guardian':'skeleton';s.enemy={boss:old.boss,target:0,units:[{id,uid:0,hp:old.hp,rewarded:false}]}}}
 function shownMember(i){return displayVitals?.members?.[i]||s.members[i]}
 function maxHP(i){return s.members[i].maxHP}
-function levelUp(indices=s.members.map((_,i)=>i)){let reports=[];indices.forEach(i=>{let m=s.members[i];if(!m)return;let old={...m};while(m.level<LEVEL_CAP&&m.xp>=requiredXP(m.level+1,i)){m.level++;m.maxHP+=dice(...memberClass(i).hpGrowth).value;m.maxMP+=dice(...memberClass(i).mpGrowth).value;m.str=m.baseStr==null?strengthFor(jobOf(i),m.level):Math.min(18,m.baseStr+Math.floor((m.level-1)/5));let learned=learnMagic(i,m.level);if(learned.length)reports.push(`${NAMES[i]}は${learned.join("・")}を習得した。`);}if(m.level!==old.level)reports.push(`${NAMES[i]} Lv.${old.level} → ${m.level}　HP +${m.maxHP-old.maxHP} / MP +${m.maxMP-old.maxMP} / STR +${m.str-(old.str??strengthFor(jobOf(i),old.level))}`)});s.levelReport=reports}
-function renderStats(){ renderActiveSpells(); $('#partyreorder').disabled=!idle()||s.done; $('#statsbody').innerHTML=s.members.map((_,i)=>{let m=shownMember(i);let values=[['HP',`${(displayVitals?.hp||s.hp)[i]}/${m.maxHP}`],['MP',`${(displayVitals?.mp||s.mp)[i]}/${m.maxMP}`],['STR',m.str],['AC',displayVitals?.ac?.[i]??effectiveAC(i)],['IQ',m.intelligence],['PIE',m.piety],['経験値',m.xp],['NEXT',m.level>=LEVEL_CAP?'上限':Math.max(0,m.xpTargets[m.level+1]-m.xp)]];return `<article class="statcard" tabindex="0" data-stat-member="${i}"><h3>${m.name||CLASSES[m.job??i].name} <small>Lv.${m.level} · ${i<3?'前衛':'後衛'}</small>${ailmentTags(i)}</h3><dl class="stat-metrics">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="stat-actions"><button data-stat-inventory="${i}" ${!idle()?'disabled':''}>アイテム</button>${jobOf(i)===3?`<button data-stat-disarm="${i}" ${canThiefDisarm(i)?'':'disabled'}>罠解除</button>`:''}${[1,2].includes(m.job??i)?`<button data-stat-cast="${i}" ${s.enemy||logBusy()?'disabled':''}>呪文</button>`:''}</div></article>`}).join('')}
+function levelUp(indices=s.members.map((_,i)=>i)){let reports=[];indices.forEach(i=>{let m=s.members[i];if(!m)return;let old={...m};while(m.level<LEVEL_CAP&&m.xp>=requiredXP(m.level+1,i)){m.level++;m.maxHP+=dice(...memberClass(i).hpGrowth).value;m.maxMP+=dice(...memberClass(i).mpGrowth).value;m.str=m.baseStr==null?strengthFor(jobOf(i),m.level):Math.min(18,m.baseStr+Math.floor((m.level-1)/5));m.agi=m.baseAgi==null?agilityFor(jobOf(i),m.level):Math.min(18,m.baseAgi+Math.floor((m.level-1)/5));let learned=learnMagic(i,m.level);if(learned.length)reports.push(`${NAMES[i]}は${learned.join("・")}を習得した。`);}if(m.level!==old.level)reports.push(`${NAMES[i]} Lv.${old.level} → ${m.level}　HP +${m.maxHP-old.maxHP} / MP +${m.maxMP-old.maxMP} / STR +${m.str-(old.str??strengthFor(jobOf(i),old.level))} / AGI +${m.agi-(old.agi??agilityFor(jobOf(i),old.level))}`)});s.levelReport=reports}
+function renderStats(){ renderActiveSpells(); $('#partyreorder').disabled=!idle()||s.done; $('#statsbody').innerHTML=s.members.map((_,i)=>{let m=shownMember(i);let values=[['HP',`${(displayVitals?.hp||s.hp)[i]}/${m.maxHP}`],['MP',`${(displayVitals?.mp||s.mp)[i]}/${m.maxMP}`],['STR',m.str],['AGI',m.agi??agilityFor(jobOf(i),m.level)],['AC',displayVitals?.ac?.[i]??effectiveAC(i)],['IQ',m.intelligence],['PIE',m.piety],['経験値',m.xp],['NEXT',m.level>=LEVEL_CAP?'上限':Math.max(0,m.xpTargets[m.level+1]-m.xp)]];return `<article class="statcard" tabindex="0" data-stat-member="${i}"><h3>${m.name||CLASSES[m.job??i].name} <small>Lv.${m.level} · ${i<3?'前衛':'後衛'}</small>${ailmentTags(i)}</h3><dl class="stat-metrics">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="stat-actions"><button data-stat-inventory="${i}" ${!idle()?'disabled':''}>アイテム</button>${jobOf(i)===3?`<button data-stat-disarm="${i}" ${canThiefDisarm(i)?'':'disabled'}>罠解除</button>`:''}${[1,2].includes(m.job??i)?`<button data-stat-cast="${i}" ${s.enemy||logBusy()?'disabled':''}>呪文</button>`:''}</div></article>`}).join('')}
 function showLevelReport(){if(!s.levelReport?.length)return;$('#levelreport').textContent=s.levelReport.join('\n');if(!$('#leveldialog').open)$('#leveldialog').showModal()}
 function showTempleCarryReport(){if(!s.templeReport?.length){showLevelReport();return}const lines=[],normal=s.templeReport.filter(r=>r.status==='dead'||r.status==='ash'),lost=s.templeReport.filter(r=>r.status==='lost'),stone=s.templeReport.filter(r=>r.status==='stone');if(normal.length)lines.push(`${normal.map(r=>`${r.name}（${r.status==='dead'?'死亡':'灰'}）`).join('、')}を寺院に運んだ。寺院で蘇生できます。`);if(stone.length)lines.push(`${stone.map(r=>`${r.name}（石化）`).join('、')}を寺院に運んだ。寺院で石化を解除できます。`);for(const r of lost)lines.push(`${r.name}（ロスト）はパーティーから外れた。ロストは蘇生できません。`);$('#templecarrylist').textContent=lines.join('\n');$('#templecarrydialog').showModal()}
 function canWeaponAttack(i){return !(s.ailments[i].fear>0)&&(i<3||equippedWeapon(i)?.range==='ranged')}
 function itemDescription(w){return diceLabel(w)+(w.dice?' · '+(w.range==='ranged'?'遠距離':'近距離'):'')+(w.desc?' · '+w.desc:'')}
 function renderCatalog(){ $('#catalogbody').innerHTML=`<table><thead><tr><th>敵</th><th>HP</th><th>攻撃</th><th>AC</th><th>経験値</th><th>群れ</th><th>金貨</th></tr></thead><tbody>${ENEMIES.map(e=>`<tr><td>${e.name}</td><td>${diceLabel({dice:e.hp})}</td><td>${diceLabel({dice:e.attack})}</td><td>${e.ac}</td><td>${e.xp}</td><td>${e.groupSize.join("〜")}体</td><td>${diceLabel({dice:e.gold})} ÷3（切捨）</td></tr>`).join('')}</tbody></table>`}
 function drawEnemies(){let combat=visibleCombat();if(!combat)return '';let groups=enemyGroups(combat),height=Math.min(130,260/groups.length);return groups.map((g,row)=>{let y=62+row*height;let visible=g.units.filter(e=>!e.rewarded);return visible.map((e,col)=>{if(e.rewarded)return '';let width=Math.min(108,560/visible.length-8),x=320+(col-(visible.length-1)/2)*(width+8);return `<g data-enemy-uid="${e.uid}"><rect x="${x-width/2}" y="${y}" width="${width}" height="${height-9}" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="${y+height*.65}" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text><text x="${x}" y="${y+height-18}" text-anchor="middle" fill="#dac595" font-size="16">${e.sleep>0?'Zzz':''}</text></g>`}).join('')}).join('')}
-function ensureProfile(){s.milwaSteps??=0;s.teppeki??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;ensureStats();ensureSixParty();for(let floor of [s,...Object.values(s.floors||{})])for(let c of floor.cells||[])if(c.flag===true)c.flag=s.flagKind||'power';if(!s.immediateChestVersion){delete s.score;delete s.history;for(const f of Object.values(s.floors||{})){delete f.score;for(const c of f.cells||[])delete c.chest}for(let i=0;i<s.cells.length;i++)if(i!==s.pos||s.area==='town')delete s.cells[i].chest;s.logs=(s.logs||[]).filter(t=>!t.includes('スコア'));s.immediateChestVersion=1;}s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.armor??=[{},{},{}];s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0)}ensureMagic();ensureProgression();s.attackRows??=[null,null,null];s.itemPlans??=[null,null,null];s.inventory??=[['sword'],['staff'],['mace']];s.equipped??=[0,0,0];s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id)).slice(0,10);if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
+function ensureProfile(){s.milwaSteps??=0;s.teppeki??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;ensureStats();ensureSixParty();for(let floor of [s,...Object.values(s.floors||{})])for(let c of floor.cells||[])if(c.flag===true)c.flag=s.flagKind||'power';if(!s.immediateChestVersion){delete s.score;delete s.history;for(const f of Object.values(s.floors||{})){delete f.score;for(const c of f.cells||[])delete c.chest}for(let i=0;i<s.cells.length;i++)if(i!==s.pos||s.area==='town')delete s.cells[i].chest;s.logs=(s.logs||[]).filter(t=>!t.includes('スコア'));s.immediateChestVersion=1;}s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.armor??=[{},{},{}];s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i));migrateAgility(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0);migrateAgility(r.members,r.members.job??0)}ensureMagic();ensureProgression();s.attackRows??=[null,null,null];s.itemPlans??=[null,null,null];s.inventory??=[['sword'],['staff'],['mace']];s.equipped??=[0,0,0];s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id)).slice(0,10);if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
 function weapon(id){return WEAPONS.find(w=>w.id===id)||MEDICINES.find(w=>w.id===id)}
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
 function diceLabel(w){if(w.kind==='medicine')return w.description;if(w.part)return `${{head:"頭",body:"胴体",feet:"足"}[w.part]} AC −${w.ac}`;return `${w.dice[0]}d${w.dice[1]}${w.dice[2]?'+'+w.dice[2]:''}`}
@@ -381,30 +392,41 @@ function travelFloor(next,fromTown=false){if(!Number.isInteger(next)||next<1||ne
 function abandonChest(){if(logBusy()||s.enemy||!currentChest())return;delete s.cells[s.pos].chest;log('宝箱を放棄した。');render()}
 $('#chestabandon').onclick=abandonChest;
 
+function enemyAction(e,commandsById){
+ const currentCommands=s.members.map(m=>commandsById.get(m.id));
+ if(e.sleep>0){e.sleep--;log(`${enemyDisplay(e)}は眠っている。`)}
+ else if(!monsterAction(e,currentCommands)){
+  const d=enemyDefinition(e.id);
+  for(let n=0;n<d.swings;n++){
+   const alive=activeMembers(),front=alive.filter(i=>i<3),pool=d.rear||!front.length?alive:front;
+   if(!pool.length)break;
+   const i=pool[Math.random()*pool.length|0];
+   if(!hits(d.hit+levelHitBonus(e,i),effectiveAC(i))){log(`${NAMES[i]}は${enemyDisplay(e)}の攻撃をかわした。`);continue}
+   monsterHurt(i,dice(...d.attack).value,currentCommands,enemyDisplay(e));if(s.hp[i]>0)monsterOnHit(e,i);
+  }
+ }
+ if(activeMembers().length>0)autoReorderParty('enemy-action');
+}
 function enemyTurn(cmds){
  // Guard/flee commands belong to people even when a previous enemy moved them.
  const commandsById=new Map(s.members.map((m,i)=>[m.id,cmds[i]]));
  for(const e of s.enemy.units.filter(e=>e.hp>0)){
   if(!activeMembers().length)break;
-  const currentCommands=s.members.map(m=>commandsById.get(m.id));
-  if(e.sleep>0){e.sleep--;log(`${enemyDisplay(e)}は眠っている。`)}
-  else if(!monsterAction(e,currentCommands)){
-   const d=enemyDefinition(e.id);
-   for(let n=0;n<d.swings;n++){
-    const alive=activeMembers(),front=alive.filter(i=>i<3),pool=d.rear||!front.length?alive:front;
-    if(!pool.length)break;
-    const i=pool[Math.random()*pool.length|0];
-    if(!hits(d.hit+levelHitBonus(e,i),effectiveAC(i))){log(`${NAMES[i]}は${enemyDisplay(e)}の攻撃をかわした。`);continue}
-    monsterHurt(i,dice(...d.attack).value,currentCommands,enemyDisplay(e));if(s.hp[i]>0)monsterOnHit(e,i);
-   }
-  }
-  if(activeMembers().length>0)autoReorderParty('enemy-action');
+  enemyAction(e,commandsById);
  }
  if(!activeMembers().length){defeat();return}
  if(!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
 }
 
 function monsterLevel(e){return enemyDefinition(e.id).level}
+function enemyAgility(e){return Math.min(18,6+Math.floor((monsterLevel(e)-1)/2))}
+function agilityInitiativeBonus(agi){return agi<=3?-2:agi<=5?-1:agi<=8?0:agi<=12?1:agi<=15?2:3}
+function combatActionOrder(){
+ const entries=[...s.members.map((m,i)=>({side:'party',id:m.id,agi:memberAgility(i)})),...s.enemy.units.filter(e=>e.hp>0).map(e=>({side:'enemy',uid:e.uid,agi:enemyAgility(e)}))];
+ for(const entry of entries)entry.key=(1+Math.floor(Math.random()*10))-agilityInitiativeBonus(entry.agi);
+ // Array.sort is stable, preserving the original sequence after both tie-breaks.
+ return entries.sort((a,b)=>a.key-b.key||b.agi-a.agi||(a.side===b.side?0:a.side==='party'?-1:1));
+}
 // Relative levels preserve the floor-tuned CSV hit values at the intended party level.
 function levelHitBonus(e,i){return Math.max(-3,Math.min(3,Math.trunc((monsterLevel(e)-s.members[i].level)/3)))||0}
 function escapeChance(){if(!s.enemy||s.enemy.boss||s.enemy.flagEffect?.bad)return 0;let party=s.members.reduce((a,m,i)=>{if(activeMember(i)&&!s.ailments[i].poison&&!s.ailments[i].paralysis){a.total+=m.level;a.count++}return a},{total:0,count:0}),enemies=s.enemy.units.reduce((a,e)=>{if(e.hp>0&&!e.sleep){a.total+=monsterLevel(e);a.count++}return a},{total:0,count:0});if(!party.count)return 10;let bonus=party.count===1?15:party.count===2?10:party.count===3?5:0,partyAverage=party.total/party.count,enemyAverage=enemies.count?enemies.total/enemies.count:0;return Math.max(10,Math.min(95,50+5*(partyAverage-enemyAverage)+bonus))}

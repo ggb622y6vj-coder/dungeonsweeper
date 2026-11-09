@@ -18,7 +18,7 @@ for(let job=0;job<4;job++){
  for(let n=0;n<100;n++){
   const r=g.run(`generateRecruit('冒険者',${job})`),m=r.members;
   assert(!ids.has(m.id));ids.add(m.id);assert.equal(m.level,1);assert.equal(m.xp,0);
-  const base=[[12,8,8],[8,12,8],[10,8,12],[10,10,8]][job],stats=[m.str,m.intelligence,m.piety];
+  const base=[[12,8,8,10],[8,12,8,9],[10,8,12,9],[10,10,8,14]][job],stats=[m.str,m.intelligence,m.piety,m.agi];
   stats.forEach((v,i)=>assert(v>=base[i]&&v<=18));assert.equal(stats.reduce((a,b)=>a+b)-base.reduce((a,b)=>a+b),m.creationBonus);
   assert(m.creationBonus>=3&&m.creationBonus<=9);assert(m.maxHP>=[29,21,23,22][job]&&m.maxHP<=[35,27,29,28][job]);
   assert(m.maxMP>=[0,18,13,0][job]&&m.maxMP<=[0,22,17,0][job]);assert.equal(m.ac,[6,9,7,8][job]);

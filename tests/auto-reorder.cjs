@@ -179,7 +179,7 @@ console.log('PASS wipe skips all reordering and preserves corpse records, reserv
 {
  const g=party();battle(g);
  g.run(`var acted=[],originalAction=partyAction;partyAction=i=>{acted.push(s.members[i].name);originalAction(i);if(s.members[i].name==='A')afflict(i,'paralysis')};s.commands=s.members.map(()=> 'guard');attack()`);
- assert.equal(g.run('acted.join(\'\')'),'ABCDEF');
+ assert.equal(g.run('acted.slice().sort().join(\'\')'),'ABCDEF');assert.equal(g.run('acted.length'),6);
  assert.equal(g.run('order()'),'BCDAEF');
  assert.equal(g.run("logQueue.filter(e=>e.text==='Aが後列に下がった。').length"),1);
 }
