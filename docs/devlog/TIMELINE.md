@@ -121,7 +121,7 @@
 | 095 | 2026-11-09 | 転職システム第2段階：上級4職（侍・君主・忍者・司教）の追加（前職条件、遅れて進む呪文習得、装備互換、固有の戦闘・罠能力、履歴修復と classChanged） | (hold/095) | `9ebba41` |
 | 085 | 2026-11-07 | 一人称ビューの未探索階段アイコン秘匿、地図ウィンドウのヘッダーに階表示、図書館の薬タブの件数表示削除、旧呪文名の整理（薬の説明とモンスター使用呪文） | (hold/085) | `0e84371` |
 
-| 096 | 2026-11-10 | 旗視（魔法使いLv5・MP5・確率習得）：周囲の旗数を探索者マス左下に表示し、町帰還まで持続 | `d95f008` | [spec](specs/096-medium-mage-flag-count-spell.md) | [096.md](reports/096.md) |
+| 096 | 2026-11-10 | 旗視（魔法使いLv5・MP5・確率習得）：周囲の旗数を探索者マス左下に表示し、町帰還まで持続 | `d95f008` | [spec](specs/096-medium-mage-flag-count-spell.md) | [096.md](reports/096.md), [Grok Build 中断メモ](grok-build-notes.md) |
 
 | 096b | 2026-11-10 | 旗視レビュー修正：発動中の理由優先、Lv5位置、旗数の読み上げ、遡及抽選なしの固定、075画像復元と出力先修正 | `5d836f8` | [spec](specs/096b-medium-flagview-review-fixes.md) | [096b.md](reports/096b.md) |
 | 097 | 2026-11-10 | 麻痺の自然回復を廃止（tick で解けず、治療は強壮・気付け薬・真回復・帰還のみ） | (hold/097) | `8bc5710` |
@@ -133,3 +133,4 @@
 - [monster-spell-resist.md](reports/monster-spell-resist.md)
 - [spell-guaranteed-why.md](reports/spell-guaranteed-why.md)
 - [spell-learning-vs-original.md](reports/spell-learning-vs-original.md)
+- [grok-build-notes.md](grok-build-notes.md)（096 の Grok Build 中断と、次に指示するときの注意）
