@@ -346,3 +346,4 @@ require('./class-change.cjs');
 require('./elite-jobs.cjs');
 
 require('./flag-sight.cjs');
+require('./stat-growth.cjs');

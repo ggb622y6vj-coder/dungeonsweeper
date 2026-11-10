@@ -149,16 +149,16 @@ console.log('PASS action-order: real attack interleaving, lethal first strike, s
 for (const base of [null,14,18]) {
   const g = party([3]);
   g.run(`s.members[0].level=5;s.members[0].baseAgi=${base};
-    s.members[0].agi=${base??14};s.members[0].xp=s.members[0].xpTargets[6];levelUp();`);
+    s.members[0].agi=${base??14};s.members[0].xp=s.members[0].xpTargets[6];Math.random=()=>0;levelUp();`);
   assert.equal(g.run('s.members[0].agi'), base===18?18:15);
-  assert.match(g.run('s.levelReport.at(-1)'), new RegExp(` / AGI \\+${base===18?0:1}$`));
+  assert.match(g.run('s.levelReport.at(-1)'), new RegExp(` / AGI ${base===18?'±0':'\\+1'} / IQ `));
   assert.equal(g.run('lowerMemberLevel(0)'), true);
-  assert.equal(g.run('s.members[0].agi'), base??14);
+  assert.equal(g.run('s.members[0].agi'), base===18?18:15);
 }
 {
   const g = party([3]);
-  g.run('s.members[0].level=5;delete s.members[0].agi;delete s.members[0].baseAgi;s.members[0].xp=s.members[0].xpTargets[6];levelUp()');
-  assert.match(g.run('s.levelReport.at(-1)'), / \/ AGI \+1$/);
+  g.run('s.members[0].level=5;delete s.members[0].agi;delete s.members[0].baseAgi;ensureProfile();s.members[0].xp=s.members[0].xpTargets[6];Math.random=()=>0;levelUp()');
+  assert.match(g.run('s.levelReport.at(-1)'), / \/ AGI \+1 \/ IQ /);
   g.run('displayVitals=snapshotVitals();s.members[0].agi=18;renderStats()');
   assert.match(g.run("$('#statsbody').innerHTML"), /<dt>STR<\/dt><dd>\d+<\/dd><\/div><div><dt>AGI<\/dt><dd>15<\/dd>/,
     'stats display AGI from the visible snapshot');
