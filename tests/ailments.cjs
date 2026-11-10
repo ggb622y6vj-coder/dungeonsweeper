@@ -25,3 +25,43 @@ assert.equal(jsonLoaded(loaded, 's.reserve.length'), 0, 'single member is restor
 assert.equal(loaded.run("JSON.parse(localStorage.getItem('ash-v1')).roster.every(r=>Object.keys(r.ailments).sort().join(',')==='fear,paralysis,poison,silence,sleep')"), true);
 console.log('PASS fresh ailments, legacy load completion, reserve migration, unknown affliction no-op and warning');
 function jsonLoaded(target, expression) { return JSON.parse(target.run(`JSON.stringify(${expression})`)); }
+
+
+// 097: elapsed ticks and real movement never cure paralysis; existing cures remain.
+{
+ const g=game(null,()=>.99);
+ g.run(`
+  [0,2].forEach((job,i)=>{const r=generateRecruit(['Target','Healer'][i],job);registerRecruit(r);changeRecruitParty(r.members.id,true)});
+  enterDungeon();
+ `);
+ g.drain();
+ g.run("afflict(0,'paralysis')");
+ assert.equal(g.run('s.ailments[0].paralysis'),4,'affliction retains its saved numeric value');
+ g.drain();
+ for(let n=0;n<8;n++) {
+  g.run('tickAilments()');
+  assert.equal(g.run('s.ailments[0].paralysis'),4,'repeated ticks leave paralysis unchanged');
+ }
+ g.run("s.cells.forEach(c=>{c.type='';c.trap=false;c.flag=false;c.open=true;delete c.chest});s.pos=0;s.logs=[]");
+ for(let n=0;n<8;n++) {
+  const destination=n%2===0?1:0;
+  g.run(`cell(${destination})`);
+  assert.equal(g.run('s.pos'),destination,'movement really occurs');
+  assert.equal(g.run('s.ailments[0].paralysis'),4,'movement ticks leave paralysis unchanged');
+  g.drain();
+ }
+ assert.equal(g.run("s.logs.some(text=>text.includes('麻痺が解けた'))"),false,'no natural recovery log');
+ g.run("s.members[1].known.push('dialko')");
+ assert.equal(g.run("castMagic(1,'dialko',0)"),true,'field Dialko succeeds');
+ assert.equal(g.run('s.ailments[0].paralysis'),0,'Dialko cures persistent paralysis');
+ g.drain();
+ g.run("afflict(0,'paralysis')");
+ assert.equal(g.run('s.ailments[0].paralysis'),4);
+ g.drain();
+ g.run('enterTown()');
+ assert.equal(g.run('s.area'),'town','return really occurs');
+ assert.deepEqual(jsonLoaded(g,'s.ailments[0]'),expected,'town return clears paralysis');
+}
+loaded.run('tickAilments(false)');
+assert.equal(loaded.run('s.ailments[0].paralysis'),1,'loaded legacy paralysis does not expire');
+console.log('PASS persistent paralysis across repeated ticks, movement and legacy load; Dialko and town return cure it');

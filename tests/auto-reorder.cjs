@@ -193,10 +193,15 @@ console.log('PASS wipe skips all reordering and preserves corpse records, reserv
  assert.equal(f.run('order()'),'ACDBEF');assert.equal(f.run('s.enemy'),null);
  assert.equal(f.run("logQueue.filter(e=>e.text==='Bが後列に下がった。').length"),1);
  const cure=party();cure.run("s.ailments[1].paralysis=1;autoReorderParty('paralysed')");cure.drain();cure.run('tickAilments()');
- assert.equal(cure.run('order()'),'ACDBEF');assert.equal(cure.run("s.ailments[index('B')].paralysis"),0);
+ assert.equal(cure.run('order()'),'ACDBEF');assert.equal(cure.run("s.ailments[index('B')].paralysis"),1,'tick never cures paralysis, including legacy value 1');
+ assert.equal(cure.run("logQueue.some(e=>e.text==='Bの麻痺が解けた。')"),false);
+ cure.run("s.members[index('E')].known.push('dialko')");
+ assert.equal(cure.run("castMagic(index('E'),'dialko',index('B'))"),true);
+ assert.equal(cure.run("s.ailments[index('B')].paralysis"),0);
+ assert.equal(cure.run('order()'),'ACDBEF','field cure keeps recovered member in rear');
  assert.equal(cure.run("logQueue.filter(e=>e.text.includes('後列に下がった')).length"),0);
 }
-console.log('PASS mid-action actor IDs prevent skips/repeats; town and battle-end hooks, flee and natural paralysis expiry');
+console.log('PASS mid-action actor IDs prevent skips/repeats; town and battle-end hooks, flee, persistent paralysis and field cure stays rear');
 
 {
  const source=party();
