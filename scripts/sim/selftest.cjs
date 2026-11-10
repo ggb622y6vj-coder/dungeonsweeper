@@ -57,17 +57,23 @@ prepareTrial(gBase, opt);
 assert.equal(resolveBattle(gBase).outcome, 'win', 'enemy retreat during an ambush is a completed battle');
 gBase.run('rollInitiative=simOriginalInitiative; enemyTurn=simOriginalEnemyTurn');
 
+gBase.run(`var simOriginalLevelUp=levelUp,simGrowthStart;
+  levelUp=function(...args){simGrowthStart=structuredClone(s.members);return simOriginalLevelUp(...args)}`);
 for (let i = 0; i < 10; i++) {
   prepareTrial(gBase, {...opt, level:6, floor:1, boss:true});
   assert.equal(gBase.run('s.members.every(m => m.level === 6)'), true);
+  assert.deepEqual(JSON.parse(gBase.run('JSON.stringify(simGrowthStart)')),
+    JSON.parse(gBase.run('JSON.stringify(simBase.map(r=>({...r.members,xp:r.members.xpTargets[6]})))')),
+    'all member fields must be restored to Lv1 before growth on every trial');
   assert.equal(gBase.run(`s.members.every((m,i) => {
     const base = simBase[i].members, c = memberClass(i);
-    return m.maxHP >= base.maxHP + 5 * (c.hpGrowth[0] + c.hpGrowth[2]) &&
-      m.maxHP <= base.maxHP + 5 * (c.hpGrowth[0] * c.hpGrowth[1] + c.hpGrowth[2]);
-  })`), true, 'growth must start from Lv1 every trial');
+    const sides={fighter:10,mage:4,priest:8,thief:6}[c.id];
+    return m.maxHP >= base.maxHP + 5 && m.maxHP <= Math.max(base.maxHP+5,6*(sides+3));
+  })`), true, '099 HP stays within +1 floors and maximum reroll candidates');
   // Mimic battle rewards, drain, gear drops and ailments before the next reset.
-  gBase.run("s.members[0].level=2; s.members[0].xp=999999; s.inventory[0].push('healingPotion'); s.ailments[0].poison=true");
+  gBase.run("s.members[0].level=2; s.members[0].xp=999999; s.members[0].maxHP=999; s.members[0].vit=3; s.inventory[0].push('healingPotion'); s.ailments[0].poison=true");
 }
+gBase.run('levelUp=simOriginalLevelUp');
 prepareTrial(gBase, opt);
 assert.equal(gBase.run('s.members[0].xp'), 0);
 assert.equal(gBase.run('s.inventory[0].length'), 1);

@@ -11,6 +11,15 @@ const CLASSES = [
 ];
 const SPELLS={blast:{name:'呪文',cost:4,dice:[3,6,0]},heal:{name:'回復',cost:3,dice:[2,6,4]}};
 const LEVEL_CAP=30;
+// 099: maximum-HP candidate; hpGrowth remains the level-drain approximation.
+function vitBonus(vit){return vit===3?-2:vit<=5?-1:vit<=15?0:vit-15}
+function hpCandidate(job,level,vit){
+ const sides={fighter:10,lord:10,priest:8,samurai:8,thief:6,bishop:6,ninja:6,mage:4}[job];
+ const rolls=level+(job==='samurai'?1:0),bonus=vitBonus(vit);
+ let hp=0;
+ for(let n=0;n<rolls;n++)hp+=Math.max(1,1+Math.floor(Math.random()*sides)+bonus);
+ return hp;
+}
 const MAX_FLOOR=10;
 const CHEST_LOOT={itemChance:[.20,.22,.25,.28,.30,.32,.35,.38,.40,.45],priceCap:[150,200,350,500,1800,2200,3000,3600,6000,6000]};
 function trapPower(floor){return 1+0.25*(Math.min(floor,MAX_FLOOR)-1)}
