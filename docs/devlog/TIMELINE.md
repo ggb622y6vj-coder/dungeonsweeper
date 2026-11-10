@@ -124,6 +124,7 @@
 | 096 | 2026-11-10 | 旗視（魔法使いLv5・MP5・確率習得）：周囲の旗数を探索者マス左下に表示し、町帰還まで持続 | `d95f008` | [spec](specs/096-medium-mage-flag-count-spell.md) | [096.md](reports/096.md) |
 
 | 096b | 2026-11-10 | 旗視レビュー修正：発動中の理由優先、Lv5位置、旗数の読み上げ、遡及抽選なしの固定、075画像復元と出力先修正 | `5d836f8` | [spec](specs/096b-medium-flagview-review-fixes.md) | [096b.md](reports/096b.md) |
+| 097 | 2026-11-10 | 麻痺の自然回復を廃止（tick で解けず、治療は強壮・気付け薬・真回復・帰還のみ） | (hold/097) | `8bc5710` |
 
 ## 番号なしレポート / Other reports
 
