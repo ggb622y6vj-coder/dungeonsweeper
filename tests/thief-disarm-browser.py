@@ -1,10 +1,19 @@
-"""075: stats disarm and library spell rows, 1280/390px."""
-import sys
+"""075: stats disarm and library spell rows, 1280/390px.
+Screenshots default to /tmp (do not overwrite committed docs/devlog/reports/075-shots).
+"""
+import os, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-out=Path('docs/devlog/reports/075-shots')
+out=Path(os.environ.get('THIEF_DISARM_SCREENSHOT_DIR','/tmp/thief-disarm-browser'))
+out.mkdir(parents=True,exist_ok=True)
+chrome_path=os.environ.get('CHROME_PATH') or next((p for p in (
+    '/usr/bin/chromium','/usr/bin/google-chrome','/usr/bin/chromium-browser',
+    '/opt/google/chrome/chrome','/opt/ungoogled-chromium/chrome',
+) if Path(p).exists()), None)
 with sync_playwright() as p:
-    browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+    options={'headless':True,'args':['--no-sandbox']}
+    if chrome_path: options['executable_path']=chrome_path
+    browser=p.chromium.launch(**options)
     for width in (1280,390):
         page=browser.new_page(viewport={'width':width,'height':900})
         errors=[]

@@ -26,6 +26,10 @@ function shownCount(g) {
   assert.match(here[0][0], /class="direction-marker"/);
   return Number(counts[0][1]);
 }
+function hereLabel(g) {
+  const board = g.run("$('#board').innerHTML");
+  return board.match(/<button class="cell [^"]*\bhere\b[^>]*aria-label="([^"]*)"/)[1];
+}
 
 {
   const g = setup();
@@ -45,8 +49,49 @@ function shownCount(g) {
 }
 {
   const g = setup();
+  g.run("s.members[1].known=['dumapic','identifyfoe','halito','katino'];Math.random=()=>0;ensureMagic()");
+  assert.equal(g.run("s.members[1].known.includes('flagview')"), false,
+    'existing Lv5 known list gets no retroactive flagview roll, even with Math.random() === 0');
+  g.run('s.members[1].level=6;learnMagic(1,6)');
+  assert.equal(g.run("s.members[1].known.includes('flagview')"), true, 'next level-up can learn it');
+  g.run("s.members[1].known.push('mahalito');openMagic(1)");
+  const ids = [...g.run("$('#magiclist').innerHTML").matchAll(/data-spell="([^"]+)"/g)].map(m => m[1]);
+  for (const id of ['dumapic', 'identifyfoe', 'halito', 'katino']) {
+    assert(ids.includes(id) && ids.indexOf(id) < ids.indexOf('flagview'), `${id} precedes flagview in renderMagic`);
+  }
+  assert.equal(ids[ids.indexOf('flagview') + 1], 'mahalito');
+  assert.equal(g.run("MAGIC[MAGIC.findIndex(x=>x.id==='flagview')+1].id"), 'mahalito');
+}
+{
+  const g = setup();
+  g.run('s.mp[1]=5');
+  assert.equal(g.run("castMagic(1,'flagview',null)"), true);
+  assert.equal(g.run('s.mp[1]'), 0);
+  g.drain();
+  assert.equal(g.run("spellReason(1,magic('flagview'))"), '発動中', 'active flagview wins over MP shortage');
+  assert.equal(g.run("castMagic(1,'flagview',null)"), false);
+  assert.equal(g.run('s.mp[1]'), 0);
+}
+// Both light flags block both light spells, including when no MP remains.
+for (const [id, state] of [
+  ['milwa', 's.milwaSteps=30'], ['lomilwa', 's.milwaSteps=30'],
+  ['milwa', 's.light=true'], ['lomilwa', 's.light=true'],
+  ['watchful', 's.watchful=true'], ['teppeki', 's.teppeki=true'],
+]) {
+  const g = setup();
+  g.run(`s.members[1].known.push('${id}');s.mp[1]=0;${state}`);
+  assert.equal(g.run(`spellReason(1,magic('${id}'))`), '発動中', `${id}: ${state} at 0 MP`);
+  g.run('s.ailments[1].silence=1');
+  assert.equal(g.run(`spellReason(1,magic('${id}'))`), '沈黙している', 'earlier reasons retain priority');
+  g.run("s.ailments[1].silence=0;s.area='town'");
+  assert.equal(g.run(`spellReason(1,magic('${id}'))`), '今は使用不可');
+}
+{
+  const g = setup();
   assert.equal(g.run('s.flagSight'), false);
   assert.equal(shownCount(g), null);
+  const inactiveLabel = hereLabel(g);
+  assert(!inactiveLabel.includes('旗'));
   assert.equal(g.run("castMagic(1,'flagview',null)"), true);
   assert.equal(g.run('s.flagSight'), true);
   assert.equal(g.run('s.mp[1]'), 15);
@@ -55,6 +100,7 @@ function shownCount(g) {
   ]);
   g.drain();
   assert.equal(shownCount(g), 0, 'active zero is visible');
+  assert.equal(hereLabel(g), inactiveLabel + '、周囲の旗0本');
   assert.equal(g.run("spellReason(1,magic('flagview'))"), '発動中');
   assert.equal(g.run("castMagic(1,'flagview',null)"), false);
   assert.equal(g.run('s.mp[1]'), 15, 'recast does not consume MP');
@@ -71,6 +117,9 @@ function shownCount(g) {
       s.cells[0].flag='magic';s.cells[s.pos].flag='guard';render()`);
     assert.equal(g.run('flagSightCount()'), n, 'count excludes the current and distant cells, regardless of traps');
     assert.equal(shownCount(g), n);
+    assert.equal(hereLabel(g), inactiveLabel + `、周囲の旗${n}本`);
+    const labels = [...g.run("$('#board').innerHTML").matchAll(/aria-label="([^"]*)"/g)].map(m => m[1]);
+    assert.equal(labels.filter(label => label.includes('周囲の旗')).length, 1, 'only current cell announces the count');
   }
   for (const pos of [0, 7, 56, 63]) {
     g.run(`s.pos=${pos};s.cells.forEach(c=>c.flag='power');render()`);
@@ -79,6 +128,7 @@ function shownCount(g) {
   }
   g.run('s.flagSight=false;render();renderActiveSpells()');
   assert.equal(shownCount(g), null);
+  assert(!hereLabel(g).includes('周囲の旗'), 'inactive label has no flag count phrase');
   assert.deepEqual(read(g, 'activeSpellEffects()'), []);
   assert.equal(g.run("$('#activespells').hidden"), true);
 }
@@ -148,4 +198,4 @@ function shownCount(g) {
   assert.equal(g.run('s.flagSight'), false, 'finishDefeat clears the effect on town return');
   assert.equal(shownCount(g), null);
 }
-console.log('PASS flag-sight: Lv5 IQ/30 learning, cast/logs/MP, recast, active effects, 0..8 counts, flag/movement rendering, travel/save persistence, town/defeat reset and battle refusal');
+console.log('PASS flag-sight: Lv5 IQ/30 learning, no retroactive roll, spell order, cast/logs/MP, active-before-MP reasons, aria labels, active effects, 0..8 counts, flag/movement rendering, travel/save persistence, town/defeat reset and battle refusal');

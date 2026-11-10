@@ -39,15 +39,21 @@ with sync_playwright() as p:
         page.evaluate('''s.pendingStairs=false;s.pendingBoss=null;s.done=false;
           s.cells.forEach(c=>{c.flag=false;c.trap=false;c.type='';c.open=false;delete c.chest});
           s.pos=27;s.dir=1;s.cells[s.pos].open=true;
-          s.members[1].known=MAGIC.filter(m=>m.job===1).map(m=>m.id);s.mp[1]=999;render();''')
+          s.members[1].known=MAGIC.filter(m=>m.job===1).map(m=>m.id);s.mp[1]=5;render();''')
         # Inactive: no count element.
         assert page.locator('.flag-sight-count').count() == 0
+        inactive_label = page.locator('#board .cell.here').get_attribute('aria-label')
+        assert '周囲の旗' not in inactive_label
         page.locator('#party').click()
         assert page.locator('#statsdialog').is_visible()
         assert page.locator('#activespells').is_hidden()
         page.locator('#statsclose').click()
         # Cast 旗視 via magic dialog.
         page.evaluate('openMagic(1)')
+        ids = page.locator('#magiclist [data-spell]').evaluate_all('(rows)=>rows.map(row=>row.dataset.spell)')
+        for spell_id in ('dumapic', 'identifyfoe', 'halito', 'katino'):
+            assert ids.index(spell_id) < ids.index('flagview'), ids
+        assert ids[ids.index('flagview') + 1] == 'mahalito', ids
         spell = page.locator('[data-spell="flagview"]')
         assert '旗視' in spell.inner_text()
         assert '町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。' in spell.inner_text()
@@ -55,12 +61,17 @@ with sync_playwright() as p:
         page.locator('#magiccast').click()
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.flagSight') is True
+        assert page.evaluate('s.mp[1]') == 0
+        assert page.evaluate("spellReason(1,magic('flagview'))") == '発動中'
         assert page.locator('.flag-sight-count').inner_text() == '0'
+        assert page.locator('#board .cell.here').get_attribute('aria-label') == inactive_label + '、周囲の旗0本'
         # Place 3 flags around current cell (and one far away that must not count).
         page.evaluate('''const near=around(s.pos).slice(0,3);
           near.forEach((j,k)=>s.cells[j].flag=['power','guard','magic'][k]);
           s.cells[0].flag='power';render();''')
         assert page.locator('.flag-sight-count').first.inner_text() == '3'
+        assert page.locator('#board .cell.here').get_attribute('aria-label') == inactive_label + '、周囲の旗3本'
+        assert page.locator('#board [aria-label*="周囲の旗"]').count() == 1
         # On mobile the board only has size inside the map dialog; open it first.
         if width < 700:
             page.locator('#maptoggle').tap()
@@ -107,8 +118,12 @@ with sync_playwright() as p:
         # Removing a flag updates the count immediately.
         page.evaluate('s.cells[around(s.pos)[0]].flag=false;render()')
         assert page.locator('.flag-sight-count').inner_text() == '2'
+        assert page.locator('#board .cell.here').get_attribute('aria-label') == inactive_label + '、周囲の旗2本'
+        page.evaluate('s.flagSight=false;render()')
+        assert page.locator('.flag-sight-count').count() == 0
+        assert page.locator('#board .cell.here').get_attribute('aria-label') == inactive_label
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
-        print(f'PASS flag-sight Chromium {width}px: count 0→3→2, active UI, map dialog, no overlap; no JS errors')
+        print(f'PASS flag-sight Chromium {width}px: spell order, 0 MP recast, count 0→3→2, aria labels, active UI, map dialog, no overlap; no JS errors')
         context.close()
     browser.close()
