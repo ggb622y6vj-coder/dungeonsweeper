@@ -343,13 +343,15 @@ with sync_playwright() as p:
         assert page.evaluate('s.hp[3]>30 && s.inventory[0].length===3 && !allyTargetPick')
         context.close()
 
-        # Dead and petrified cards are skipped by keyboard, while Madi can still
-        # select stone. Run in both field and battle without changing live state.
-        for battle in (False, True):
+        # 098: Dios and Madi skip dead/stone cards through both Tab and WASD.
+        # Also cover two stone members, in both field and battle.
+        for battle, blocked_status in ((False, 'dead'), (True, 'dead'),
+                                       (False, 'stone'), (True, 'stone')):
             save = fixture(enemy=combat() if battle else None)
             save['roster'][0]['members']['job'] = 2
             save['roster'][0]['members']['known'] = ['dios', 'madi']
-            save['roster'][1]['members']['status'] = 'dead'; save['roster'][1]['hp'] = 0
+            save['roster'][1]['members']['status'] = blocked_status
+            save['roster'][1]['hp'] = 0 if blocked_status == 'dead' else 30
             save['roster'][4]['members']['status'] = 'stone'
             context, page = load(save)
             if battle:
@@ -371,10 +373,48 @@ with sync_playwright() as p:
             if battle:
                 tab_to(page, '[data-command-choice="spell"]'); press(page, 'Space')
             spell(page, 'madi')
-            # Use Tab to inspect the full candidate set too; no dead card stops.
-            tab_to(page, '[data-ally-target="4"]')
+            ring(page, '[data-ally-target="0"]')
+            before = state(page)
+            blocked = page.evaluate('JSON.stringify(s.members.map((m,i)=>({id:m.id,status:m.status,hp:s.hp[i],ailments:s.ailments[i]})).filter(m=>["battle-keys-1","battle-keys-4"].includes(m.id)))')
+            for index in (1, 4):
+                card = page.locator(f'[data-ally-target="{index}"]')
+                assert card.get_attribute('aria-disabled') == 'true'
+                assert 'untargetable' in card.get_attribute('class').split()
+            # Inspect full forward and reverse Tab cycles, including cancel.
+            for key in ('Tab', 'Shift+Tab'):
+                seen = set()
+                for _ in range(12):
+                    press(page, key)
+                    target = page.evaluate('KeyNav.current()?.dataset.allyTarget ?? null')
+                    if target is not None:
+                        assert int(target) not in (1, 4)
+                        seen.add(int(target))
+                assert seen == {0, 2, 3, 5}, (key, seen)
+            tab_to(page, '[data-ally-target="0"]')
+            press(page, 'd'); ring(page, '[data-ally-target="2"]')
+            press(page, 's'); ring(page, '[data-ally-target="5"]')
+            press(page, 'a'); ring(page, '[data-ally-target="3"]')
+            for key in ('d', 's', 's', 'd', 'w', 'a', 'w'):
+                press(page, key)
+                assert page.evaluate('![1,4].includes(+(KeyNav.current()?.dataset.allyTarget ?? -1))')
+                assert selected(page, '[data-ally-target]')
+            assert state(page) == before
+            # An eligible wounded member still receives Madi, including actual
+            # turn execution after reservation in battle. No fixture writes.
+            tab_to(page, '[data-ally-target="2"]')
             press(page, 'Space')
-            assert page.evaluate('s.magicPlans[0]?.target===4' if battle else 's.members.find(m=>m.id==="battle-keys-4").status==="ok"')
+            if battle:
+                assert page.evaluate('commandIndex===1 && s.commands[0]==="spell" && s.magicPlans[0]?.id==="madi" && s.magicPlans[0]?.target===2 && s.hp[2]===30 && s.mp[0]===100')
+                for ordinal, index in enumerate((2, 3, 5), start=1):
+                    assert page.evaluate('commandIndex') == ordinal
+                    assert page.evaluate('commandMembers()[commandIndex]') == index
+                    tab_to(page, '[data-command-choice="guard"]'); press(page, 'Space')
+                ring(page, '#attack'); press(page, 'Space')
+            assert page.evaluate('s.hp[s.members.findIndex(m=>m.id==="battle-keys-2")]===s.members.find(m=>m.id==="battle-keys-2").maxHP')
+            assert page.evaluate('s.mp[s.members.findIndex(m=>m.id==="battle-keys-0")]') == 85
+            assert page.evaluate('s.members.find(m=>m.id==="battle-keys-2").status==="ok" && !allyTargetPick')
+            assert page.evaluate('JSON.stringify(s.members.map((m,i)=>({id:m.id,status:m.status,hp:s.hp[i],ailments:s.ailments[i]})).filter(m=>["battle-keys-1","battle-keys-4"].includes(m.id)))') == blocked
+            assert page.locator('#party .ailment-stone').count() == (2 if blocked_status == 'stone' else 1)
             context.close()
 
         assert not errors, errors

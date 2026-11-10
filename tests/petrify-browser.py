@@ -70,7 +70,7 @@ def petrify_hit(page):
 def target_b(page):
     index = page.evaluate("s.members.findIndex(m=>m.name==='B')")
     card = page.locator(f'#party [data-ally-target="{index}"]')
-    assert 'targetable' in card.get_attribute('class')
+    assert card.count() == 1
     return card
 
 
@@ -137,8 +137,7 @@ with sync_playwright() as p:
         page.wait_for_function('!logBusy()')
         no_overflow(page)
 
-        # A fresh field fixture tests disabled stone cards for ineffective spells,
-        # medicine, and normal selection for Madi.
+        # 098: neither field spell can cure stone; both cards stay disabled.
         seed(page)
         petrify_hit(page)
         page.evaluate("s.enemy=null;const i=s.members.findIndex(m=>m.name==='E');s.members[i].known.push('madi','dialko');s.mp[i]=100;render()")
@@ -146,38 +145,29 @@ with sync_playwright() as p:
             page.locator('#party').click()
             page.locator('#statsbody .statcard').filter(has=page.locator('h3', has_text='E ')).locator('[data-stat-cast]').click()
             page.locator(f'[data-spell="{spell}"]').click()
-            card = target_b(page)
-            if spell == 'dialko':
-                assert 'untargetable' in card.get_attribute('class')
+            for attempt in range(2):
+                card = target_b(page)
+                assert 'untargetable' in card.get_attribute('class').split()
+                assert 'targetable' not in card.get_attribute('class').split()
+                assert card.get_attribute('aria-disabled') == 'true'
                 assert card.evaluate("e=>getComputedStyle(e).opacity") == '0.4'
                 assert card.evaluate("e=>getComputedStyle(e).cursor") == 'not-allowed'
                 assert card.evaluate("e=>getComputedStyle(e).animationName") == 'none'
-                before = page.evaluate('s.logs.length')
+                before = page.evaluate('JSON.stringify([s.logs,s.members,s.hp,s.mp,s.ailments,s.inventory])')
                 card.click(force=True)  # real pointer click on an aria-disabled card
-                assert page.evaluate('s.logs.length') == before
-                assert page.evaluate('s.mp[4]') == 100
-                assert page.locator('#allytargetbar').is_visible()
-                page.locator('#allytargetfieldcancel').click()
-                assert page.locator("#magicdialog").is_visible()  # cancel returns to the spell list
-                page.locator(f'[data-spell="{spell}"]').click()
-                card = target_b(page)
-                assert 'untargetable' in card.get_attribute('class')
-            else:
-                assert 'targetable' in card.get_attribute('class')
-            no_overflow(page)
-            if spell == 'dialko':
-                # 049: the card is unselectable, so the old 「石化を治せない」 message is unreachable by click.
-                card.click(force=True)
-                assert '強壮ではBの石化を治せない。' not in page.locator('#log').inner_text()
-                assert page.evaluate("s.members[3].status==='stone'&&s.mp[4]===100")
-                page.locator('#allytargetfieldcancel').click()
-                page.keyboard.press('Escape')
-            else:
-                card.click()
                 page.wait_for_function('!logBusy()')
-                assert 'Bの石化が解けた。' in page.locator('#log').inner_text()
-                assert page.evaluate("s.members[3].status==='ok'&&s.hp[3]===s.members[3].maxHP&&s.mp[4]===85")
-                assert page.locator('#party .ailment-stone').count() == 0
+                assert page.evaluate('JSON.stringify([s.logs,s.members,s.hp,s.mp,s.ailments,s.inventory])') == before
+                assert page.evaluate("s.members[3].status==='stone'&&s.mp[4]===100")
+                assert page.locator('#party .ailment-stone').count() == 1
+                assert page.locator('#allytargetbar').is_visible()
+                assert 'Bの石化が解けた。' not in page.locator('#log').inner_text()
+                assert ('強壮' if spell == 'dialko' else '真回復') + 'ではBの石化を治せない。' not in page.locator('#log').inner_text()
+                no_overflow(page)
+                page.locator('#allytargetfieldcancel').click()
+                assert page.locator('#magicdialog').is_visible()
+                if attempt == 0:
+                    page.locator(f'[data-spell="{spell}"]').click()
+            page.keyboard.press('Escape')
         # Medicine follows the same disabled-card rule and cannot consume stock.
         seed(page)
         petrify_hit(page)
@@ -191,25 +181,28 @@ with sync_playwright() as p:
         card.click(force=True)  # real pointer click on an aria-disabled card
         assert page.evaluate("({logs:s.logs.length,items:s.inventory[4].length})") == before
         assert page.locator('#allytargetbar').is_visible()
-        # Battle Dios: the stone card is dimmed and a click changes nothing; Madi can pick it.
+        # Battle Dios and Madi: stone stays disabled and cannot create a reservation.
         seed(page)
         petrify_hit(page)
         page.evaluate("const i=s.members.findIndex(m=>m.name==='E');s.members[i].known.push('dios','madi');s.mp[i]=100;s.enemy=s.enemy||{dataVersion:1,units:[{id:ENEMIES[0].id,uid:91,row:17,hp:999,identified:true}],initiative:'normal'};render();chooseBattleSpell(i,magic('dios'))")
-        card = target_b(page)
-        assert 'untargetable' in card.get_attribute('class').split()
-        assert card.evaluate("e=>getComputedStyle(e).opacity") == '0.4'
-        assert card.evaluate("e=>getComputedStyle(e).cursor") == 'not-allowed'
-        no_overflow(page)
-        before = page.evaluate("JSON.stringify([s.logs.length,s.mp,s.commands])")
-        card.click(force=True)  # real pointer click on an aria-disabled card
-        assert page.evaluate("JSON.stringify([s.logs.length,s.mp,s.commands])") == before
-        assert page.evaluate("!!allyTargetPick")
-        page.evaluate("endAllyTargetPick();pendingSpell=null;chooseBattleSpell(s.members.findIndex(m=>m.name==='E'),magic('madi'))")
-        card = target_b(page)
-        assert 'targetable' in card.get_attribute('class').split()
-        card.click()
-        assert page.evaluate("s.magicPlans[s.members.findIndex(m=>m.name==='E')]?.target===s.members.findIndex(m=>m.name==='B')")
-        no_overflow(page)
+        for spell in ('dios', 'madi'):
+            if spell == 'madi':
+                page.evaluate("endAllyTargetPick();pendingSpell=null;chooseBattleSpell(s.members.findIndex(m=>m.name==='E'),magic('madi'))")
+            card = target_b(page)
+            assert 'untargetable' in card.get_attribute('class').split()
+            assert 'targetable' not in card.get_attribute('class').split()
+            assert card.get_attribute('aria-disabled') == 'true'
+            assert card.evaluate("e=>getComputedStyle(e).opacity") == '0.4'
+            assert card.evaluate("e=>getComputedStyle(e).cursor") == 'not-allowed'
+            assert card.evaluate("e=>getComputedStyle(e).animationName") == 'none'
+            no_overflow(page)
+            before = page.evaluate("JSON.stringify([s.logs,s.members,s.hp,s.mp,s.ailments,s.inventory,s.commands,s.magicPlans,commandIndex])")
+            card.click(force=True)
+            page.wait_for_function('!logBusy()')
+            assert page.evaluate("JSON.stringify([s.logs,s.members,s.hp,s.mp,s.ailments,s.inventory,s.commands,s.magicPlans,commandIndex])") == before
+            assert page.evaluate("!!allyTargetPick&&s.members[3].status==='stone'&&s.mp[4]===100")
+            assert page.locator('#party .ailment-stone').count() == 1
+            assert 'Bの石化が解けた。' not in page.locator('#log').inner_text()
         assert not errors, errors
         print(f'PASS petrify Chromium {width}px: evil-eye hit, snapshot order, auto-retreat, reload, carry, blocked joining, temple cure/rejoin, Dialko/Madi cards; no JS errors or horizontal scroll')
         context.close()
