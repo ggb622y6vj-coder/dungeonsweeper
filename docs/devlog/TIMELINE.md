@@ -136,3 +136,5 @@
 - [spell-guaranteed-why.md](reports/spell-guaranteed-why.md)
 - [spell-learning-vs-original.md](reports/spell-learning-vs-original.md)
 - [grok-build-notes.md](grok-build-notes.md)（096 の Grok Build 中断と、次に指示するときの注意）
+
+| 100 | 寺院の蘇生成功率をVIT依存にする（上限は維持） | docs/devlog/specs/100-temple-chance-by-vit.md |
