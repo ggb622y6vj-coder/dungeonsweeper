@@ -125,6 +125,7 @@
 
 | 096b | 2026-11-10 | 旗視レビュー修正：発動中の理由優先、Lv5位置、旗数の読み上げ、遡及抽選なしの固定、075画像復元と出力先修正 | `5d836f8` | [spec](specs/096b-medium-flagview-review-fixes.md) | [096b.md](reports/096b.md) |
 | 097 | 2026-11-10 | 麻痺の自然回復を廃止（tick で解けず、治療は強壮・気付け薬・真回復・帰還のみ） | (hold/097) | `8bc5710` |
+| 098 | 2026-11-10 | 石化は町（寺院）でのみ治療可能に（真回復で治せない）。Codex と Grok Build の比較実験で実装し Grok Build 版を採用 | (hold/098-grok) | [spec](specs/098-stone-cure-town-only.md) | [098.md](reports/098.md) |
 
 ## 番号なしレポート / Other reports
 
