@@ -58,7 +58,6 @@
 
 |id|name|job|level|mp|guaranteed|where|target|effect|value|description|
 |---|---|---|---|---|---|---|---|---|---|---|
-|flagview|旗視|1|5|5|false|field|party|flagcount|null|町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。|
 |reload|再抽選|1|4|4|false|field|party|restore|null|現在地のマス以外をすべて未探索状態にし、罠・階段・昇降機などのイベントマスの位置も全てランダマイズされる|
 |sweep|一掃|2|4|10|false|field|party|restore|null|罠に立ててある旗とその下にある罠がすべて解除され、探索済みになる。|
 |flagkill|生贄の旗|1|4|5|true|battle|enemy|damage|[2,5,2]|周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵1体に魔属性2d5+2。|
@@ -72,6 +71,7 @@
 |halito|火炎|1|1|2|true|battle|enemy|damage|[1,8]|敵1体に火炎1d8|
 |katino|誘睡|1|1|3|true|battle|group|sleep|null|選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止|
 |dilto|減退|1|3|3|true|battle|group|debuff|2|選択した列の敵のAC＋2。戦闘終了まで|
+|flagview|旗視|1|5|5|false|field|party|flagcount|null|町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。|
 |mahalito|大火炎|1|5|7|false|battle|group|damage|[4,6]|選択した列の敵に火炎4d6|
 |mamahalito|超火炎|1|8|10|false|battle|group|damage|[6,6]|選択した列の敵に火炎6d6|
 |morlis|大減退|1|7|5|false|battle|group|debuff|3|選択した列の敵のAC＋3。戦闘終了まで|
