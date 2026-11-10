@@ -1,6 +1,6 @@
 # ゲームデータ一覧（現コードから抽出）
 
-呪文・モンスターは2026-11-04の072反映後、その他は2026-11-01の参照用スナップショット。編集正本は各dist/*.js、敵のみdata/monsters.csv。snapshot.jsonと本表を編集してもゲームには反映されません。
+呪文は2026-11-10の096反映後、モンスターは2026-11-04の072反映後、その他は2026-11-01の参照用スナップショット。編集正本は各dist/*.js、敵のみdata/monsters.csv。snapshot.jsonと本表を編集してもゲームには反映されません。
 
 ## classes（4件）
 
@@ -54,34 +54,44 @@
 |healingPotion|傷薬|medicine|dios|ディオス相当：味方1人のHPを1d8回復|[0,1,2,3]|8|70|
 |antidote|解毒剤|medicine|latumofis|ラツモフィス相当：味方1人の毒を解除|[0,1,2,3]|6|30|
 
-## spells（32件）
+## spells（42件）
 
 |id|name|job|level|mp|guaranteed|where|target|effect|value|description|
 |---|---|---|---|---|---|---|---|---|---|---|
+|flagview|旗視|1|5|5|false|field|party|flagcount|null|町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。|
+|reload|再抽選|1|4|4|false|field|party|restore|null|現在地のマス以外をすべて未探索状態にし、罠・階段・昇降機などのイベントマスの位置も全てランダマイズされる|
+|sweep|一掃|2|4|10|false|field|party|restore|null|罠に立ててある旗とその下にある罠がすべて解除され、探索済みになる。|
+|flagkill|生贄の旗|1|4|5|true|battle|enemy|damage|[2,5,2]|周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵1体に魔属性2d5+2。|
+|flagkill2|壊滅の旗|1|8|10|false|battle|group|damage|[5,8]|周囲8マスに旗が立ててある罠がある場合、全ての旗とその下にある罠を解除し、探索済みにする。選択した列の敵に魔属性5d8。|
+|flagdebuff|減退の旗|1|2|1|true|battle|group|debuff|1|周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵の列のAC+1。|
+|flagdebuff2|大減退の旗|1|7|5|false|battle|group|debuff|null|周囲8マスに旗が立ててある罠がある場合、全ての旗とその下にある罠を解除し、探索済みにする。選択した敵の列のACを解除した旗の数だけ上げる。|
+|tempt|誘惑|1|5|10|false|both|party|survey|null|そのマスで敵とエンカウントする。|
 |dumapic|判別|1|1|2|true|field|front|survey|null|前方の未探索マスを85%の精度で調査。解除・探索はしない。使用ごとにMP倍増、帰還でリセット|
-|floodfill|ミルワピック|2|5|4|true|field|party|floodfill|null|現在地から周囲に罠のないマスを連鎖的に探索済みにする（マインスイーパーの自動展開）。敵とは遭遇しない。使用ごとにMP倍増、帰還でリセット|
+|floodfill|開放|2|5|4|true|field|party|floodfill|null|現在地から周囲に罠のないマスを連鎖的に探索済みにする。使用ごとにMP倍増、帰還でリセット|
 |identifyfoe|識別|1|1|3|true|battle|all|identifyfoe|null|敵全列の正体を確率で見破る|
 |halito|火炎|1|1|2|true|battle|enemy|damage|[1,8]|敵1体に火炎1d8|
 |katino|誘睡|1|1|3|true|battle|group|sleep|null|選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止|
 |dilto|減退|1|3|3|true|battle|group|debuff|2|選択した列の敵のAC＋2。戦闘終了まで|
 |mahalito|大火炎|1|5|7|false|battle|group|damage|[4,6]|選択した列の敵に火炎4d6|
-|mamahalito|超火炎|1|6|10|false|battle|group|damage|[6,6]|選択した列の敵に火炎6d6|
+|mamahalito|超火炎|1|8|10|false|battle|group|damage|[6,6]|選択した列の敵に火炎6d6|
 |morlis|大減退|1|7|5|false|battle|group|debuff|3|選択した列の敵のAC＋3。戦闘終了まで|
 |dalto|吹雪|1|7|10|false|battle|group|damage|[6,6]|選択した列の敵に冷気6d6|
 |madalto|大吹雪|1|8|11|false|battle|group|damage|[7,8]|選択した列の敵に冷気7d8|
 |mamorlis|超減退|1|9|8|false|battle|all|debuff|3|敵全体のAC＋3。戦闘終了まで|
-|makanito|マカニト|1|9|12|true|battle|all|threshold-death|7|Lv7以下の敵全体を確実に即死させる。不死・構造体・守護者には無効|
-|lakanito|窒息|1|11|16|false|battle|group|death|null|選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死・構造体・悪魔には無効|
+|nofice|抵抗減少|1|9|8|false|battle|group|debuff|null|選択した列の敵の呪文抵抗を下げる|
+|makanito|窒息|1|9|12|true|battle|all|threshold-death|7|Lv7以下の敵全体を確実に即死させる。不死・構造体・守護者には無効|
+|lakanito|大窒息|1|11|16|false|battle|group|death|null|選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死・構造体・悪魔には無効|
 |malor|転移|1|13|20|false|field|floor|warp|null|訪問済み階の上り階段へ転移。未訪問階は選択不可|
+|mahaman|抵抗無効化|1|13|20|false|battle|group|debuff|null|選択した列の敵の呪文抵抗を無くす。代償として使用者のレベルが下がる。|
 |tiltowait|魔弾|1|13|30|false|battle|all|damage|[10,15]|敵全体に10d15|
 |dios|回復|2|1|2|true|both|ally|heal|[1,8]|生存する味方1人のHPを1d8回復|
 |kalki|防御|2|1|3|true|battle|party|buff|1|味方全員のAC−1。戦闘終了まで|
-|montino|モンティノ|2|3|4|true|battle|group|silence|null|選択した列の敵に沈黙判定。成功率は術者と敵のレベル差で変動、戦闘終了まで呪文を封じる。守護者には無効|
+|montino|沈黙|2|3|4|true|battle|group|silence|null|選択した列の敵に沈黙判定。戦闘終了まで呪文を封じる。守護者には無効|
 |matu|大防御|2|3|5|false|battle|party|buff|2|味方全員のAC−2。戦闘終了まで|
 |watchful|警戒結界|2|3|4|true|field|party|watchful|null|町へ戻るまで敵の奇襲を防ぐ。味方の先制率は変わらない|
 |milwa|透視|2|3|3|true|field|party|light|null|しばらくの間左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま|
 |calfo|仕掛解除|2|3|3|false|chest|chest|identify|null|宝箱の罠を95%の精度で識別。解除はしない|
-|lomilwa|大透視|2|6|5|false|field|party|light|null|町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま|
+|lomilwa|大透視|2|7|5|false|field|party|light|null|町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま|
 |dialko|強壮|2|5|4|false|both|ally|cure|null|生存する味方1人の麻痺・睡眠・沈黙・恐怖を治す|
 |teppeki|鉄壁|2|5|7|false|both|party|buff|null|町に戻るまで味方全員のAC-2。|
 |dial|大回復|2|7|5|true|both|ally|heal|[4,4]|生存する味方1人のHPを4d4回復|
