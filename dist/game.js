@@ -267,9 +267,9 @@ let shopTab='weapon';
 function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||w.shop===false||!Number.isFinite(w.price)||!canEquipJob(w,jobOf(i))||s.gold<w.price||s.inventory[i].length>=10)return;s.gold-=w.price;s.inventory[i].push(id);recordLibraryItem(id);render();renderShop();$('#shoppurchasemessage').textContent=`${NAMES[i]}が${w.name}を購入した。`;$('#shoppurchasedialog').showModal();setTimeout(()=>$('#shoppurchasedialog').close(),SHOP_PURCHASE_NOTICE_MS)}
 function equip(i,slot){if(!idle()||!s.inventory[i][slot]||(!canEquipJob(weapon(s.inventory[i][slot]),jobOf(i))&&!isEquipped(i,slot)))return;let w=weapon(s.inventory[i][slot]);if(w.kind==='medicine')return;if(w.part){if(s.armor[i][w.part]===slot)delete s.armor[i][w.part];else s.armor[i][w.part]=slot}else s.equipped[i]=slot;render();renderInventory()}
 function sell(i,slot){if(s.area!=='town'||!idle()||isEquipped(i,slot)||!s.inventory[i][slot])return;let w=weapon(s.inventory[i][slot]);s.gold+=w.sell;s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let p in s.armor[i])if(s.armor[i][p]>slot)s.armor[i][p]--;render();renderInventory();renderShop()}
-// 寺院の費用・成功率は本作の暫定式。成功率は百分率で返す。
+// 寺院の費用・成功率の上下限は本作の仕様。成功率は百分率で返す。
 function templeCost(m){return m.status==='dead'?Math.min(100*m.level,25*m.level*m.level):m.status==='ash'?Math.min(250*m.level,60*m.level*m.level):m.status==='stone'?Math.min(150*m.level,40*m.level*m.level):0}
-function templeChance(m){return m.status==='dead'?Math.max(50,Math.min(95,50+3*m.level)):m.status==='ash'?Math.max(40,Math.min(90,40+3*m.level)):m.status==='stone'?100:0}
+function templeChance(m){const vit=m.vit??10;return m.status==='dead'?Math.max(50,Math.min(95,50+3*vit)):m.status==='ash'?Math.max(40,Math.min(90,40+3*vit)):m.status==='stone'?100:0}
 function templeRaise(id){
  if(s.area!=='town'||!idle())return false;
  const r=trainingRoster().find(r=>r.members.id===id);
