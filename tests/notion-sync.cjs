@@ -58,7 +58,7 @@ const JOB={魔法使い:1,僧侶:2},WHERE={探索:'field',戦闘:'battle','戦�
 const TARGET={前方:'front',敵1体:'enemy',敵1列:'group',敵全体:'all',味方1人:'ally',味方全員:'party',階選択:'floor',宝箱:'chest'};
 const where=t=>{const places=JSON.parse(t);return places.includes('探索')&&places.includes('戦闘')?'both':WHERE[places[0]]};
 const value=t=>{t=unesc(t);if(!t)return null;const m=/^(\d+)d(\d+)(?:\+(\d+))?$/.exec(t);return m?(m[3]?[+m[1],+m[2],+m[3]]:[+m[1],+m[2]]):+t};
-assert.equal(ns.length,41,'Notion spell rows');assert.equal(MAGIC.length,41,'game spells');
+assert.equal(ns.length,42,'Notion spell rows');assert.equal(MAGIC.length,42,'game spells');
 for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x){diffs.push(`spell ${id} missing in game`);continue}
   const mp=unesc(r.MP);
   // flagdebuff has a blank numeric cell; its description and 083 specify AC +1.
@@ -67,4 +67,4 @@ for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x
   for(const k of Object.keys(b))eq(`spell ${id}.${k}`,x[k],b[k]);}
 for(const x of MAGIC)if(!ns.some(r=>r['userDefined:ID']===x.id))diffs.push(`spell ${x.id} not in Notion`);
 if(diffs.length){console.error(diffs.join('\n'));assert.fail(`${diffs.length} Notion/game differences`)}
-console.log('PASS notion-sync: 100 monsters and 41 spells match the Notion snapshot field by field');
+console.log('PASS notion-sync: 100 monsters and 42 spells match the Notion snapshot field by field');

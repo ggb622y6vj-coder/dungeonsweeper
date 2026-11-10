@@ -1,5 +1,6 @@
 // 呪文の正本。職業: 1=魔法使い、2=僧侶。MP・効果は本作用の調整。
 const MAGIC = [
+ ['flagview','旗視',1,5,5,false,'field','party','flagcount',null,'町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。'],
  ["reload","再抽選",1,4,4,false,"field","party","restore",null,"現在地のマス以外をすべて未探索状態にし、罠・階段・昇降機などのイベントマスの位置も全てランダマイズされる"],
  ["sweep","一掃",2,4,10,false,"field","party","restore",null,"罠に立ててある旗とその下にある罠がすべて解除され、探索済みになる。"],
  ["flagkill","生贄の旗",1,4,5,true,"battle","enemy","damage",[2,5,2],"周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵1体に魔属性2d5+2。"],
@@ -57,6 +58,7 @@ function activeSpellEffects(){
  const effects=[];
  if(s.milwaSteps>0||s.light)effects.push({name:'透視',description:'左右斜め前のマスを壁越しに表示する。未探索の数字は隠したまま',remaining:s.light?'町へ戻るまで':`あと${s.milwaSteps}歩`});
  if(s.watchful)effects.push({name:'警戒結界',description:'敵の奇襲を防ぐ',remaining:'町へ戻るまで'});
+ if(s.flagSight)effects.push({name:'旗視',description:'周囲8マスの旗の数を探索者マスの左下に表示する',remaining:'町へ戻るまで'});
  if(s.teppeki)effects.push({name:'鉄壁',description:'味方全員のAC-2',remaining:'町に戻るまで'});
  return effects;
 }
@@ -65,7 +67,7 @@ function renderActiveSpells(){
  $('#activespells').hidden=effects.length===0;
  $('#activespellbody').innerHTML=effects.map(effect=>`<div class="statcard"><b>${effect.name}</b><p>${effect.description}</p><p>${effect.remaining}</p></div>`).join('');
 }
-function spellReason(i,x){if(x.id==='mahaman'&&s.members[i].level<=1)return 'Lv.1では使用不可';if(s.ailments[i].silence>0)return '沈黙している';if(!s.members[i].known.includes(x.id))return s.members[i].level<x.level?`Lv.${x.level}で解禁`:'未習得';if(s.members[i].status==='stone')return '石化';if(!activeMember(i))return '死亡';if(s.ailments[i].paralysis>0)return '麻痺';if(s.area!=='dungeon'||s.done||s.pendingBoss||s.pendingStairs)return '今は使用不可';let ctx=magicContext();if(x.id==='tempt'&&ctx==='battle')return '探索専用';if(x.where!==ctx&&!(x.where==='both'&&(ctx==='battle'||ctx==='field')))return {battle:'戦闘専用',field:'探索専用',chest:'宝箱専用'}[x.where]||'今は使用不可';if(s.mp[i]<spellCost(x))return 'MP不足';if((['milwa','lomilwa'].includes(x.id)&&(s.milwaSteps>0||s.light))||(x.id==='watchful'&&s.watchful)||(x.id==='teppeki'&&s.teppeki))return '発動中';return ''}
+function spellReason(i,x){if(x.id==='mahaman'&&s.members[i].level<=1)return 'Lv.1では使用不可';if(s.ailments[i].silence>0)return '沈黙している';if(!s.members[i].known.includes(x.id))return s.members[i].level<x.level?`Lv.${x.level}で解禁`:'未習得';if(s.members[i].status==='stone')return '石化';if(!activeMember(i))return '死亡';if(s.ailments[i].paralysis>0)return '麻痺';if(s.area!=='dungeon'||s.done||s.pendingBoss||s.pendingStairs)return '今は使用不可';let ctx=magicContext();if(x.id==='tempt'&&ctx==='battle')return '探索専用';if(x.where!==ctx&&!(x.where==='both'&&(ctx==='battle'||ctx==='field')))return {battle:'戦闘専用',field:'探索専用',chest:'宝箱専用'}[x.where]||'今は使用不可';if(s.mp[i]<spellCost(x))return 'MP不足';if((['milwa','lomilwa'].includes(x.id)&&(s.milwaSteps>0||s.light))||(x.id==='watchful'&&s.watchful)||(x.id==='teppeki'&&s.teppeki)||(x.id==='flagview'&&s.flagSight))return '発動中';return ''}
 function validAllyTarget(t){return Number.isInteger(t)&&s.hp[t]>0&&['ok','stone'].includes(s.members[t]?.status)}
 function allyTargetCandidates(){return s.members.flatMap((_,i)=>validAllyTarget(i)?[i]:[])}
 function validMagicTarget(x,t){if(x.target==='ally')return validAllyTarget(t);if(x.target==='enemy'||x.target==='group')return !!s.enemy?.units.some(e=>e.uid===t&&e.hp>0);if(x.target==='floor')return Number.isInteger(t)&&(t===s.floor||!!s.floors[t]);return true}
@@ -101,6 +103,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicT
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺',pitfall:'落とし穴'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}
  else if(x.effect==='survey'){s.dumapicUses=(s.dumapicUses||0)+1;let j=target();if(j<0||s.cells[j].open)log('調査に失敗した。');else{let truth=!!s.cells[j].trap,correct=Math.random()<.85;log((correct?truth:!truth)?'前方は罠の可能性あり':'前方にはなにもない')}}
  else if(x.effect==='floodfill'){s.floodUses=(s.floodUses||0)+1;const start=s.pos,opened=new Set(),seen=new Set([start]),queue=[start];s.cells[start].open=true;if(num(start)>0)log('周囲に罠の気配がある。展開できなかった。');else{while(queue.length){const p=queue.shift();if(num(p)!==0)continue;for(const q of around(p)){const c=s.cells[q];if(seen.has(q)||c.flag||c.trap)continue;seen.add(q);if(!c.open){c.open=true;opened.add(q)}if(num(q)===0)queue.push(q)}}log(opened.size?`${opened.size}マスを探索済みにした。`:'新たに探索できるマスはなかった。')}}
+ else if(x.effect==='flagcount'){s.flagSight=true;log('周囲の旗が見えるようになった。')}
  else if(x.effect==='watchful'){s.watchful=true;log('警戒結界が一行を包んだ。')}
  else if(x.effect==='light'){if(x.id==='milwa')s.milwaSteps=30;else s.light=true;log('視界が広がった。')}
  else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{s.pos=s.start;s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}if(!s.enemy)autoReorderParty('spell');return true}
