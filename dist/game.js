@@ -331,7 +331,7 @@ function afflict(i,type){
  if(type==='poison')s.ailments[i].poison=true;else if(type==='paralysis')s.ailments[i].paralysis=4;
  if(type==='poison'||type==='paralysis')log(`${NAMES[i]}は${type==='poison'?'毒':'麻痺'}に侵された。`);
 }
-// Silence counts completed combat turns, independently of poison/paralysis at turn start.
+// Silence counts completed combat turns, independently of poison ticks at turn start.
 function tickBattleSilence(){
  if(!s.enemy)return;
  for(let i=0;i<s.members.length;i++)if(s.ailments[i].silence>0){
@@ -353,7 +353,6 @@ function tickAilments(logPoison=true){
  for(const id of s.members.map(m=>m.id)){
   const i=s.members.findIndex(m=>m.id===id),a=s.ailments[i];
   if(!activeMember(i))continue;
-  if(a.paralysis>0){a.paralysis--;if(a.paralysis===0)log(`${NAMES[i]}の麻痺が解けた。`)}
   if(a.poison){s.hp[i]=Math.max(0,s.hp[i]-2);markDeaths();if(logPoison)log(`${NAMES[i]}は毒で2ダメージ。`);if(s.hp[i]===0)log(`${NAMES[i]}は毒で倒れた。`)}
   if(!activeMembers().length){defeat();return}
  }
