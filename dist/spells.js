@@ -79,7 +79,7 @@ function lakanitoApplies(e){let d=enemyDefinition(e.id);return !d.boss&&!['不�
 function enemySpellResist(e,job){const d=enemyDefinition(e.id),base=job===1?d.mageResist:d.priestResist;if(e.spellResistNullified)return 0;return e.spellResistReduced?Math.floor(Math.round(base*100)/2)/100:base}
 function resistsEnemySpell(e,x){return Math.random()<enemySpellResist(e,x.job)}
 function disarmSpellFlags(indices){for(const j of indices)Object.assign(s.cells[j],{trap:false,disarmed:true,flag:false,open:true});checkElevatorUnlock()}
-function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'&&x.effect!=='restore'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
+function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
  // Count first; consume once before the first unresisted effect. All-resisted casts preserve flags.
  const flagSpell=['flagkill','flagkill2','flagdebuff','flagdebuff2'].includes(x.id);
  const flags=flagSpell?around(s.pos).filter(j=>s.cells[j].flag&&s.cells[j].trap).sort((a,b)=>a-b):[];
@@ -97,7 +97,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicT
   else log(known?`${d.name}のことは詳しくわからなかった。`:`${UNKNOWN_NAMES[e.id]||'正体不明'}の正体は見破れなかった。`);
  }}
  else if(x.effect==='buff'){if(x.id==='teppeki')s.teppeki=true;else s.enemy.partyAC=Math.max(s.enemy.partyAC||0,x.value);log('一行の守りが強まった。')}
- else if(x.effect==='heal'||x.effect==='restore'){let before=s.hp[t];s.hp[t]=x.effect==='restore'?maxHP(t):Math.min(maxHP(t),s.hp[t]+dice(...x.value).value);if(x.effect==='restore'){const petrified=s.members[t].status==='stone';s.members[t].status='ok';s.ailments[t]=freshAilments();if(petrified)log(`${NAMES[t]}の石化が解けた。`);}log(`${NAMES[t]}のHPが${s.hp[t]-before}回復した。`)}
+ else if(x.effect==='heal'||x.effect==='restore'){let before=s.hp[t];s.hp[t]=x.effect==='restore'?maxHP(t):Math.min(maxHP(t),s.hp[t]+dice(...x.value).value);if(x.effect==='restore')s.ailments[t]=freshAilments();log(`${NAMES[t]}のHPが${s.hp[t]-before}回復した。`)}
  else if(x.effect==='cure'){s.ailments[t].paralysis=0;s.ailments[t].sleep=0;s.ailments[t].silence=0;s.ailments[t].fear=0;log(`${NAMES[t]}の麻痺・睡眠・沈黙・恐怖が解けた。`)}
  else if(x.effect==='antidote'){s.ailments[t].poison=false;log(`${NAMES[t]}の毒が消えた。`)}
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺',pitfall:'落とし穴'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}
@@ -139,7 +139,7 @@ function commitMagicChoice(i,x,t){
 function pickFieldSpell(){
  const i=spellMember,x=magic(spellSelected);
  if(!x||spellBrowse||s.enemy||x.target!=='ally'||spellReason(i,x)||logBusy())return;
- beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||x.effect==='restore'),canWork:t=>s.members[t].status!=='stone'||x.effect==='restore',prompt:x.name,
+ beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),canWork:t=>s.members[t].status!=='stone',prompt:x.name,
   onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>{renderMagic();$('#magicdialog').showModal();$('#magicpick').focus()}});
 }
 function magicUI(){
