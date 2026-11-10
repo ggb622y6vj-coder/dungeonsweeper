@@ -150,15 +150,19 @@ for(const cause of ['enemy','poison','floor','chest','lastStone']){
 }
 console.log('PASS petrify: exploration/traps, thief/calfo exclusion, five wipe paths, corpse HP/state, pending-defeat reload and recovery');
 
-// Stone remains a living ally target; only Madi cures it. Failed cures spend nothing.
+// Stone remains a living ally target; no spell, including Madi, cures it. Failed cures spend nothing.
 for(const combat of [false,true]){
  const g=party();stone(g);if(combat)battle(g);
  g.run(`var caster=index('E'),t=index('B');s.members[caster].known.push('madi','dialko','latumofis');s.mp[caster]=100;
   s.inventory[caster].push('paralysisCure','antidote','healingPotion');`);
+ const hp=g.run('s.hp[t]'),ailments=json(g,'s.ailments[t]');
  assert.equal(g.run('validAllyTarget(t)&&allyTargetCandidates().includes(t)&&validMagicTarget(magic("madi"),t)'),true);
- for(const id of ['dialko','latumofis','dios']){
+ for(const id of ['dialko','latumofis','dios','madi']){
   assert.equal(g.run(`castMagic(caster,'${id}',t)`),false);
-  assert.match(g.run('logQueue.at(-1).text'),/ではBの石化を治せない。/);g.drain();
+  assert.match(g.run('logQueue.at(-1).text'),/ではBの石化を治せない。/);
+  assert.equal(g.run("logQueue.some(e=>e.text.includes('石化が解けた'))"),false);
+  assert.equal(g.run('displayVitals.members[t].status'),'stone','rejection does not present a cure');
+  g.drain();
  }
  for(const id of ['paralysisCure','antidote','healingPotion']){
   assert.equal(g.run(`useMedicine(caster,s.inventory[caster].indexOf('${id}'),t,${combat})`),false);
@@ -166,20 +170,32 @@ for(const combat of [false,true]){
   assert.equal(g.run(`s.inventory[caster].includes('${id}')`),true);
  }
  assert.equal(g.run('s.mp[caster]'),100);
- assert.equal(g.run('castMagic(caster,"madi",t)'),true);
- assert.equal(g.run('s.members[t].status'),'ok');assert.equal(g.run('s.hp[t]===s.members[t].maxHP'),true);
- assert.equal(g.run('s.mp[caster]'),85);
- assert.equal(g.run('displayVitals.members[t].status'),'stone','cure waits for its log');
- assert.equal(g.run("logQueue.some(e=>e.text==='Bの石化が解けた。')"),true);g.drain();
- assert.equal(g.run('order()'),'ACDBEF','cure does not restore the old formation');
- assert.equal(g.run('commandMembers().includes(t)'),true);
+ assert.equal(g.run('s.members[t].status'),'stone');
+ assert.equal(g.run('s.hp[t]'),hp);
+ assert.deepEqual(json(g,'s.ailments[t]'),ailments);
+ assert.equal(g.run('order()'),'ACDBEF','rejection does not restore the old formation');
+ assert.equal(g.run('commandMembers().includes(t)'),false);
 }
-// The active target picker dims and rejects only targets this action cannot affect.
-for(const [id,canWork] of [['dios',false],['dialko',false],['madi',true]]){
- const g=party();stone(g);g.run(`s.members[index('E')].known.push('${id}');s.mp[index('E')]=100;beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'||magic('${id}').effect==='restore'),canWork:t=>s.members[t].status!=='stone'||magic('${id}').effect==='restore',prompt:'test',onPick:()=>{},onCancel:()=>{}})`);
+// Madi still fully heals a living, non-stone ally and clears ailments without touching MP.
+{
+ const g=party();
+ g.run(`var caster=index('E'),t=index('A');s.members[caster].known.push('madi');s.mp[caster]=100;
+  s.hp[t]=3;s.ailments[t]={poison:true,paralysis:4,sleep:2,silence:3,fear:3};`);
+ assert.equal(g.run('castMagic(caster,"madi",t)'),true);
+ assert.equal(g.run('s.members[t].status'),'ok');
+ assert.equal(g.run('s.hp[t]===s.members[t].maxHP'),true);
+ assert.equal(g.run('s.mp[caster]'),85);
+ assert.deepEqual(json(g,'s.ailments[t]'),{poison:false,paralysis:0,sleep:0,silence:0,fear:0});
+ assert.equal(g.run("logQueue.some(e=>e.text.includes('石化が解けた'))"),false);
+}
+// The active target picker dims and rejects stone for every ally spell, including Madi.
+for(const id of ['dios','dialko','madi']){
+ const g=party();stone(g);g.run(`s.members[index('E')].known.push('${id}');s.mp[index('E')]=100;s.enemy=null;spellMember=index('E');spellBrowse=false;spellSelected='${id}';pickFieldSpell()`);
  assert.equal(g.run("allyTargetPick.candidates().includes(index('B'))"),true);
- assert.equal(g.run("allyTargetPick.canWork(index('B'))"),canWork);
- assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('B'))"),canWork);
+ assert.equal(g.run("allyTargetPick.canWork(index('B'))"),false);
+ assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('B'))"),false);
+ assert.equal(g.run("allyTargetPick.canWork(index('A'))"),true);
+ assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('A'))"),true);
 }
 for(const id of ['healingPotion','antidote','paralysisCure']){
  const g=party();stone(g);g.run(`s.inventory[index('E')].push('${id}');beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),canWork:t=>s.members[t].status!=='stone',prompt:'test',onPick:()=>{},onCancel:()=>{}})`);
@@ -187,14 +203,20 @@ for(const id of ['healingPotion','antidote','paralysisCure']){
  assert.equal(g.run("allyTargetPick.keyboardCandidates().includes(index('B'))"),false);
  assert.equal(g.run("allyTargetPick.canWork(index('A'))"),true);
 }
-// Simultaneously reserved Madi target follows the member through auto-retreat.
+// Simultaneously reserved Madi follows the member through auto-retreat, then is refused once they are stone.
 {
  const g=party();battle(g);g.run(`s.members[4].known.push('madi');s.mp[4]=100;s.commands[4]='spell';s.magicPlans[4]={id:'madi',target:1};
   var rolls=[.9,.2,.999,0,.9,0];Math.random=()=>rolls.shift()??.99;enemyTurn(s.commands)`);g.drain();
+ assert.equal(g.run("s.members[s.magicPlans[index('E')].target].name"),'B','reserved Madi follows B through retreat');
+ const hp=g.run("s.hp[index('B')]"),mp=g.run("s.mp[index('E')]");
  g.run('s.enemy.initiative="party";attack()');g.drain();
- assert.equal(g.run("s.members[index('B')].status"),'ok');assert.equal(g.run("s.hp[index('B')]===maxHP(index('B'))"),true);
+ assert.equal(g.run("s.members[index('B')].status"),'stone');
+ assert.equal(g.run("s.hp[index('B')]"),hp);
+ assert.equal(g.run("s.mp[index('E')]"),mp);
+ assert.equal(g.run("s.logs.some(t=>t==='真回復ではBの石化を治せない。')"),true);
+ assert.equal(g.run("s.logs.some(t=>t.includes('真回復を唱えた')||t.includes('石化が解けた'))"),false);
 }
-console.log('PASS petrify: field/battle Madi, stable reservation after retreat, ineffective spells/medicines with logs and no consumption');
+console.log('PASS petrify: field/battle Madi rejects stone, stable reservation after retreat, ineffective spells/medicines with logs and no consumption');
 
 // Town: preserve HP/MP/XP/level, carry to reserve, retain across both load paths.
 {
@@ -264,7 +286,16 @@ console.log('PASS petrify: town/load carry, XP/HP/MP preservation, blocked joini
  assert.equal(g.run('!!allyTargetPick'),true,'picker stays open');
  g.run('endAllyTargetPick();pendingSpell=null');
  g.run(`chooseBattleSpell(${e},magic('madi'))`);
- assert.equal(g.run(`allyTargetPick.canWork(${b})`),true);
+ assert.equal(g.run(`allyTargetPick.candidates().includes(${b})`),true);
+ assert.equal(g.run(`allyTargetPick.canWork(${b})`),false);
+ assert.equal(g.run(`allyTargetPick.keyboardCandidates().includes(${b})`),false);
+ const beforeMadi=g.run('JSON.stringify([s.logs.length,s.mp,s.commands,s.magicPlans])');
  g.run(`pickAllyTarget(${b})`);
- assert.equal(g.run(`s.magicPlans[${e}]?.target`),b,'Madi can target stone');
+ assert.equal(g.run('JSON.stringify([s.logs.length,s.mp,s.commands,s.magicPlans])'),beforeMadi,'Madi stone pick: no message, no MP, no plan');
+ assert.equal(g.run('!!allyTargetPick'),true,'picker stays open');
+ const a=g.run("index('A')");
+ assert.equal(g.run(`allyTargetPick.canWork(${a})`),true);
+ g.run(`pickAllyTarget(${a})`);
+ assert.equal(g.run(`s.magicPlans[${e}]?.id`),'madi');
+ assert.equal(g.run(`s.magicPlans[${e}]?.target`),a,'Madi can target a living ally');
 }
