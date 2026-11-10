@@ -50,24 +50,37 @@ for (const reserve of [false, true]) {
 }
 console.log('PASS temple: all four outcomes for party/reserve, fees, full HP/MP, XP preservation, save/reload and dungeon reentry');
 
-for (const [status, level, cost, chance] of [
-  ['dead', 1, 25, 53], ['dead', 2, 100, 56], ['dead', 3, 225, 59],
-  ['dead', 4, 400, 62], ['dead', 5, 500, 65], ['dead', 15, 1500, 95], ['dead', 30, 3000, 95],
-  ['ash', 1, 60, 43], ['ash', 2, 240, 46], ['ash', 3, 540, 49], ['ash', 4, 960, 52],
-  ['ash', 5, 1250, 55], ['ash', 17, 4250, 90], ['ash', 30, 7500, 90],
+for (const [status, level, cost] of [
+  ['dead', 1, 25], ['dead', 2, 100], ['dead', 3, 225],
+  ['dead', 4, 400], ['dead', 5, 500], ['dead', 15, 1500], ['dead', 30, 3000],
+  ['ash', 1, 60], ['ash', 2, 240], ['ash', 3, 540], ['ash', 4, 960],
+  ['ash', 5, 1250], ['ash', 17, 4250], ['ash', 30, 7500],
 ]) {
   const g = fixture(status, false, level);
   assert.equal(g.run('templeCost(s.members[0])'), cost);
-  assert.equal(g.run('templeChance(s.members[0])'), chance);
-  g.run(`s.gold=${cost};Math.random=()=>${chance}/100;var result=templeRaise(id)`);
-  assert.equal(g.run('result.success'), false, 'at threshold fails');
-  assert.equal(g.run('s.gold'), 0, 'exact balance is sufficient even on failure');
-  g.run(`s.members[0].status='${status}';s.gold=${cost};Math.random=()=>(${chance}-.001)/100`);
-  assert.equal(g.run('templeRaise(id).success'), true, 'below threshold succeeds');
+}
+for (const [vit, deadChance, ashChance] of [
+  [0, 50, 40], [3, 59, 49], [10, 80, 70], [13, 89, 79],
+  [15, 95, 85], [16, 95, 88], [17, 95, 90], [18, 95, 90],
+]) {
+  for (const [status, chance] of [['dead', deadChance], ['ash', ashChance]]) {
+    const g = fixture(status);
+    g.run(`s.members[0].vit=${vit};var cost=templeCost(s.members[0])`);
+    assert.equal(g.run('templeChance(s.members[0])'), chance);
+    for (const level of [1, 5, 30]) {
+      assert.equal(g.run(`templeChance({status:'${status}',vit:${vit},level:${level}})`), chance, 'level does not affect chance');
+    }
+    g.run(`s.gold=cost;Math.random=()=>${chance}/100;var result=templeRaise(id)`);
+    assert.equal(g.run('result.success'), false, 'at threshold fails');
+    assert.equal(g.run('s.gold'), 0, 'exact balance is sufficient even on failure');
+    g.run(`s.members[0].status='${status}';s.gold=cost;Math.random=()=>(${chance}-.001)/100`);
+    assert.equal(g.run('templeRaise(id).success'), true, 'below threshold succeeds');
+  }
 }
 for (const status of ['dead', 'ash']) {
   const g = fixture(status);
-  assert.equal(g.run(`templeChance({status:'${status}',level:0})`), status === 'dead' ? 50 : 40);
+  assert.equal(g.run(`templeChance({status:'${status}',level:5})`), status === 'dead' ? 80 : 70, 'missing VIT defaults to 10');
+  assert.equal(g.run(`templeChance({status:'${status}',level:5,vit:null})`), status === 'dead' ? 80 : 70, 'null VIT defaults to 10');
   g.run('s.gold=templeCost(s.members[0])-1;Math.random=()=>{throw Error("must not roll")};save()');
   const before = g.run('JSON.stringify(s)');
   assert.equal(g.run('templeRaise(id)'), false);
@@ -112,8 +125,8 @@ assert.equal(ui.run("$('#templedialog').open"), true);
 assert.equal(ui.run("$('#templemembers').children.length"), 2, 'only dead/ash are listed');
 assert.equal(ui.run("$('#templemembers').children[0].children[2].disabled"), true);
 assert.equal(ui.run("$('#templemembers').children[1].children[2].disabled"), false);
-assert.match(ui.run("$('#templemembers').children[0].children[0].children[1].textContent"), /パーティ.*死亡.*65%/);
-assert.match(ui.run("$('#templemembers').children[1].children[0].children[1].textContent"), /控え.*灰.*43%/);
+assert.match(ui.run("$('#templemembers').children[0].children[0].children[1].textContent"), /パーティ.*死亡.*86%/);
+assert.match(ui.run("$('#templemembers').children[1].children[0].children[1].textContent"), /控え.*灰.*76%/);
 assert.equal(ui.run("$('#templemembers').children[0].children[0].children[0].textContent"), '蘇生([対象');
 ui.run(`s.gold=1000;renderTemple();var raiseButton=$('#templemembers').children[0].children[2];
   changeRecruitParty(id,false);Math.random=()=>0;raiseButton.onclick();`);
