@@ -8,6 +8,7 @@ This folder holds the development record of the game: specs 001–072, implement
 | パス | 内容 |
 |---|---|
 | `TIMELINE.md` | 仕様番号ごとの一覧：日付、概要、main のコミット、仕様とレポートへのリンク |
+| `grok-build-notes.md` | Grok Build（grok CLI）への指示用メモ。096 での中断事例と、次に渡すときのチェックリスト |
 | `specs/` | 仕様書。末尾の **Amendment** はユーザーの回答を反映した最終版で、本文より優先されます |
 | `reports/NNN*.md` | 実装レポート（変更点、テスト結果、疑問点） |
 | `reports/NNN*-verify.md` | push 後のライブ検証レポート |
@@ -32,4 +33,5 @@ This folder holds the development record of the game: specs 001–072, implement
 ## 注記 / Notes
 
 - このフォルダは GitHub Pages に公開されません。Pages のワークフロー（`.github/workflows/pages.yml`）がアップロードするのは `dist/` だけです。
+- Grok Build で実装する場合は [grok-build-notes.md](grok-build-notes.md) を先に読む（096 でフルテスト待ちのまま中断し、未コミットのまま成果が残らなかった）。
 - 作業キューから持ってきていないもの：`HOLD`、Codex の実行ログ（`codex*.log`）、失敗した試行の diff、シミュレーターの出力（`sim*` と `*-sim-*.txt`）。
