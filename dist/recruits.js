@@ -120,7 +120,7 @@ function classChangePreview(record,toJob){
  if(!canChangeClass(record,toJob).ok)return null;
  const next=structuredClone(record),m=next.members,c=CLASSES[toJob];
  m.careerHistory=[...(m.careerHistory||[]),{from:m.job,fromLevel:m.level,to:toJob}];
- Object.assign(m,{job:toJob,level:1,xp:0,attack:c.attack,ac:c.ac,maxMP:Math.max(m.maxMP,c.mp),baseStr:m.str,baseAgi:m.agi});
+ Object.assign(m,{job:toJob,level:1,xp:0,attack:c.attack,ac:c.ac,maxMP:Math.max(m.maxMP-Math.floor(m.maxMP/10),c.mp),baseStr:m.str,baseAgi:m.agi});
  next.hp=m.maxHP;next.mp=m.maxMP;next.equipped=classWeaponSlot(record,toJob);
  for(const [part,slot] of Object.entries(next.armor))if(!canEquipJob(weapon(next.inventory[slot]),toJob))delete next.armor[part];
  return next;
