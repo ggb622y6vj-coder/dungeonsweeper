@@ -98,9 +98,12 @@ with sync_playwright() as p:
         bad_version['formatVersion'] = 2
         bad_data = copy.deepcopy(valid)
         bad_data['data']['gold'] = -1
+        bad_html_name = copy.deepcopy(valid)
+        bad_html_name['data']['roster'][0]['members']['name'] = '<b>読込不可</b>'
         for bad_payload, notice in [
             (b'not JSON', 'JSON'),
             (b'[]', '形式'),
+            (json.dumps(bad_html_name, ensure_ascii=False).encode(), '内容'),
             (json.dumps(bad_version).encode(), '未対応'),
             (json.dumps(bad_data).encode(), '内容'),
             (b' ' * (5 * 1024 * 1024 + 1), '5MiB'),
@@ -131,7 +134,17 @@ with sync_playwright() as p:
         assert page.evaluate('rosterSaveState().partyIds') == valid['data']['partyIds']
         assert page.evaluate('localStorage.getItem("ash-v1-backup")') == raw_before
         assert page.evaluate('localStorage.getItem("ash-keyhint")') == 'off'
+        imported_state = page.evaluate('JSON.parse(JSON.stringify(rosterSaveState()))')
+        page.reload(wait_until='load')
+        page.wait_for_function('s.gold===987654&&!!globalThis.KeyNav')
+        assert len(loads) == load_count + 2
+        assert page.evaluate('JSON.parse(JSON.stringify(rosterSaveState()))') == imported_state
+        assert page.evaluate('rosterSaveState().roster') == valid['data']['roster']
+        assert page.evaluate('rosterSaveState().partyIds') == valid['data']['partyIds']
+        assert json.loads(page.evaluate('localStorage.getItem("ash-v1")')) == imported_state
+        assert page.evaluate('localStorage.getItem("ash-v1-backup")') == raw_before
+        assert page.evaluate('localStorage.getItem("ash-keyhint")') == 'off'
         assert not errors, errors
         context.close()
-        print(f'PASS save transfer {width}px: download, local filename, roster round trip, rejection, cancel/Space/Esc, backup, settings, layout')
+        print(f'PASS save transfer {width}px: download, local filename, roster round trip, HTML name rejection without reload, second reload persistence, cancel/Space/Esc, backup, settings, layout')
     browser.close()
