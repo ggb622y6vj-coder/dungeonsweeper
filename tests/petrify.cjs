@@ -184,7 +184,7 @@ for(const combat of [false,true]){
  assert.equal(g.run('castMagic(caster,"madi",t)'),true);
  assert.equal(g.run('s.members[t].status'),'ok');
  assert.equal(g.run('s.hp[t]===s.members[t].maxHP'),true);
- assert.equal(g.run('s.mp[caster]'),85);
+ assert.equal(g.run('s.mp[caster]'),90);
  assert.deepEqual(json(g,'s.ailments[t]'),{poison:false,paralysis:0,sleep:0,silence:0,fear:0});
  assert.equal(g.run("logQueue.some(e=>e.text.includes('石化が解けた'))"),false);
 }

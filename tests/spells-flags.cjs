@@ -48,7 +48,7 @@ for(const id of ['flagkill','flagkill2','flagdebuff','flagdebuff2']){
  const g=setup();g.run("openMagic(0)");assert(!g.run("$('#magiclist').innerHTML.includes('data-spell=\"tempt\"')"));
  assert.equal(g.run("castMagic(0,'tempt',null)"),false);g.drain();
  g.run("s.enemy=null;encounterRate=()=>{throw Error('rate must not be used')};commitMagicChoice(0,magic('tempt'),null)");
- assert(g.run('!!s.enemy.units.length'));assert.equal(g.run('s.enemy.chestBattle'),false);assert.equal(g.run('s.mp[0]'),90);assert.equal(g.run('s.dumapicUses||0'),0);
+ assert(g.run('!!s.enemy.units.length'));assert.equal(g.run('s.enemy.chestBattle'),false);assert.equal(g.run('s.mp[0]'),99);assert.equal(g.run('s.dumapicUses||0'),0);
 }
 console.log('PASS spells flags, sweep and tempt');
 

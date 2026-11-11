@@ -22,14 +22,14 @@ function battle(ids = ['thief','ogre','skeleton','stone','guardian','goblin']) {
 {
   const g=battle();
   assert.deepEqual(json(g,"[magic('makanito').job,magic('makanito').level,magic('makanito').mp,magic('makanito').guaranteed,magic('makanito').where,magic('makanito').target,magic('makanito').effect,magic('makanito').value]"),
-    [1,9,12,true,'battle','all','threshold-death',7]);
+    [1,9,5,true,'battle','all','threshold-death',7]);
 }
 for (const random of [0, .999999]) {
   const g = battle();
   g.run(`Math.random=()=>${random}`);
   assert.equal(g.run("castMagic(0,'makanito',null)"), true);
   assert.deepEqual(json(g, 's.enemy.units.map(e=>e.hp)'), [0,99,99,99,99,0]);
-  assert.equal(g.run('s.mp[0]'), 48);
+  assert.equal(g.run('s.mp[0]'), 55);
   assert.equal(g.run('s.enemy.pendingXP'), g.run("enemyDefinition('thief').xp+enemyDefinition('goblin').xp"));
   assert.equal(g.run('s.enemy.pendingDrops'), 2);
   assert.equal(g.run('s.members[0].xp'), 0, 'XP stays pending until victory');
@@ -64,7 +64,7 @@ for (const random of [0, .999999]) {
 }
 for (const restriction of ['mp','unknown','silence']) {
   const g = battle(['goblin']);
-  if(restriction==='mp')g.run('s.mp[0]=11');
+  if(restriction==='mp')g.run('s.mp[0]=4');
   if(restriction==='unknown')g.run("s.members[0].known=s.members[0].known.filter(id=>id!=='makanito')");
   if(restriction==='silence')g.run('s.ailments[0].silence=3');
   const mp = g.run('s.mp[0]');
@@ -76,7 +76,7 @@ for (const restriction of ['mp','unknown','silence']) {
   const g = battle(['goblin','slime','wolf']);
   g.run("s.commands=['spell','guard','guard'];s.magicPlans[0]={id:'makanito',target:null};attack()");
   assert.equal(g.run('s.enemy'),null,'real turn ends in victory');
-  assert.equal(g.run('s.mp[0]'),48);
+  assert.equal(g.run('s.mp[0]'),55);
   assert.equal(g.run('s.members[0].xp'),g.run("Math.floor((enemyDefinition('goblin').xp+enemyDefinition('slime').xp+enemyDefinition('wolf').xp)/3)"));
   g.drain();
   assert.equal(g.run("s.library.monsters.goblin.count"),1);
@@ -116,7 +116,7 @@ for (const legacy of [false,true]) {
   g.run("s.members[0].known.push('lakanito');s.enemy.units[1].row=s.enemy.units[0].row;Math.random=()=>0;castMagic(0,'lakanito',100)");
   assert.deepEqual(json(g,'s.enemy.units.map(e=>e.hp)'),[0,0,99]);
   assert.equal(g.run('s.enemy.pendingXP'),g.run("2*enemyDefinition('ogre').xp"));
-  assert.equal(g.run('s.mp[0]'),44);
+  assert.equal(g.run('s.mp[0]'),50);
   g.drain();
   g.run("s.mp[0]=60;Math.random=()=>.999;castMagic(0,'lakanito',102)");
   assert.equal(g.run('s.enemy.units[2].hp'),99);
@@ -157,15 +157,15 @@ for (const roll of [0,.5,.999999]) {
 }
 // AI counts eligible living individuals across rows, including boss escorts.
 for(const [ids,mp,known,silence,fear,want] of [
-  [['thief','goblin','harpy'],12,true,0,0,true],
-  [['thief','goblin','harpy','guardian'],12,true,0,0,true],
-  [['thief','goblin'],12,true,0,0,false],
-  [['thief','goblin','ogre','skeleton','stone','guardian'],12,true,0,0,false],
-  [['thief','goblin','harpy'],11,true,0,0,false],
-  [['thief','goblin','harpy'],12,false,0,0,false],
-  [['thief','goblin','harpy'],12,true,3,0,false],
-  [['thief','goblin','harpy'],12,true,0,3,true],
-  [['troll','ninja','highmage'],12,true,0,3,false],
+  [['thief','goblin','harpy'],6,true,0,0,true],
+  [['thief','goblin','harpy','guardian'],6,true,0,0,true],
+  [['thief','goblin'],6,true,0,0,false],
+  [['thief','goblin','ogre','skeleton','stone','guardian'],6,true,0,0,false],
+  [['thief','goblin','harpy'],4,true,0,0,false],
+  [['thief','goblin','harpy'],6,false,0,0,false],
+  [['thief','goblin','harpy'],6,true,3,0,false],
+  [['thief','goblin','harpy'],6,true,0,3,true],
+  [['troll','ninja','highmage'],6,true,0,3,false],
 ]) {
   const g=battle(ids);
   if(ids.includes('guardian'))g.run('s.enemy.boss=true');
@@ -182,7 +182,7 @@ for(const [ids,mp,known,silence,fear,want] of [
 }
 {
   const g=battle(['thief','goblin','harpy']);
-  g.run("s.enemy.flagEffect={counts:{},curses:['magic'],bad:true};s.mp[0]=12");
+  g.run("s.enemy.flagEffect={counts:{},curses:['magic'],bad:true};s.mp[0]=7");
   planTurn(g);
   assert.equal(g.run("s.magicPlans[0]?.id==='makanito'"),false,'flag-adjusted MP cost is respected');
 }

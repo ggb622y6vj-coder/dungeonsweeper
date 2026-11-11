@@ -52,7 +52,7 @@ with sync_playwright() as p:
         page.wait_for_function('!logBusy()')
         assert page.evaluate('JSON.stringify(s.enemy.units.map(e=>[!!e.identified,!!e.identifiedBySpell]))') == \
             '[[true,true],[true,true],[true,true]]'
-        assert page.evaluate('s.mp[0]') == 17
+        assert page.evaluate('s.mp[0]') == 18
         log = page.locator('#log').inner_text()
         assert '素早い牙の正体を見破った。（→' in log, log
         listing = page.locator('.scene-enemies').inner_text()

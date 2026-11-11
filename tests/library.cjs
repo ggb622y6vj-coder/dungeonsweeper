@@ -8,11 +8,11 @@ function party(){
 }
 let g=game();
 assert.equal(g.run('ENEMIES.length'),100);
-assert.equal(g.run('WEAPONS.length'),67);
+assert.equal(g.run('WEAPONS.length'),76);
 assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/100 · アイテム 0/67');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/100 · アイテム 0/76');
 g.run("$('#libraryclose').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),false);
 g=party();
@@ -98,7 +98,7 @@ assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].text
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  var entries=libraryMonsterFloors().flatMap(f=>{renderLibrary('monsters',1,'weapon',f);return $('#librarybody').children.filter(e=>e.className==='library-entry')});`);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 100/100 · アイテム 67/67');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 100/100 · アイテム 76/76');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);

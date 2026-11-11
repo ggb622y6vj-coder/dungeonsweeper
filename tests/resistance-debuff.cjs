@@ -15,7 +15,7 @@ for(const boss of [false,true]){
  g.run("Math.random=()=>{throw Error('unexpected resistance roll')}");
  assert.equal(g.run("castMagic(1,'nofice',800)"),true);
  assert.deepEqual(read(g,'s.enemy.units.map(e=>[enemySpellResist(e,1),enemySpellResist(e,2)])'),[[.12,.47],[.12,.47],[.25,.95]]);
- assert.equal(g.run('s.mp[1]'),92);
+ assert.equal(g.run('s.mp[1]'),95);
  g.run("castMagic(1,'nofice',800)");
  assert.equal(g.run('enemySpellResist(s.enemy.units[0],1)'),.12,'does not stack');
  g.run('Math.random=()=>.2');
@@ -35,7 +35,7 @@ for(const boss of [false,true]){
  assert.equal(g.run('s.members[1].maxHP'),g.run('100-Math.round(memberClass(1).hpGrowth[0]*(memberClass(1).hpGrowth[1]+1)/2+memberClass(1).hpGrowth[2])'));
  assert.equal(g.run('s.members[1].maxMP'),g.run('100-Math.round(memberClass(1).mpGrowth[0]*(memberClass(1).mpGrowth[1]+1)/2)'));
  assert.equal(g.run('s.hp[1]'),g.run('s.members[1].maxHP'));
- assert.equal(g.run('s.mp[1]'),80,'MP consumed before clipping');
+ assert.equal(g.run('s.mp[1]'),90,'MP consumed before clipping');
  assert.deepEqual(read(g,'({stats:[s.members[1].str,s.members[1].agi,s.members[1].intelligence,s.members[1].piety,s.members[1].vit],known:s.members[1].known,inventory:s.inventory[1],equipped:s.equipped[1],armor:s.armor[1]})'),preserved);
  assert.equal(g.run('enemySpellResist(s.enemy.units[0],1)+enemySpellResist(s.enemy.units[0],2)'),0);
  g.run("castMagic(1,'nofice',800)");assert.equal(g.run('enemySpellResist(s.enemy.units[0],1)'),0);

@@ -84,8 +84,8 @@ console.log('PASS elite jobs: MP growth boundaries/inheritance, delayed dual-sch
 // All items use the same compatibility in basic/elite jobs, including medicines.
 g=setup();
 const items=read(g,'WEAPONS');
-const mapping=[[0],[1],[2],[3],[0],[0,2],[3],[1,2]];
-for(let job=0;job<8;job++)for(const w of items)assert.equal(g.run(`canEquipJob(weapon('${w.id}'),${job})`),mapping[job].some(j=>w.classes.includes(j)),`${job}: ${w.id}`);
+// 102: explicit snapshot classes include elite jobs and new item exceptions.
+for(let job=0;job<8;job++)for(const w of items)assert.equal(g.run(`canEquipJob(weapon('${w.id}'),${job})`),w.classes.includes(job),`${job}: ${w.id}`);
 assert.equal(g.run('canEquipJob(undefined,7)'),false);
 for(const [job,allowed,denied,starter] of [[4,'plate','dagger','sword'],[5,'wardrobe','staff','sword'],[6,'dagger','sword','dagger'],[7,'staff','sword','mace']]){
  g=setup();g.run(`elite(${job});s.inventory[0]=[];ensureProfile()`);
@@ -100,7 +100,7 @@ for(const [job,allowed,denied,starter] of [[4,'plate','dagger','sword'],[5,'ward
  g.run("s.inventory[1]=Array(10).fill('robe')");assert.equal(g.run(`lootRecipient(weapon('${allowed}'))`),0);
 }
 // Current compatible weapon wins; armor is filtered independently; no free items at conversion.
-for(const [from,to,equipped,armor] of [[2,5,2,{head:4,body:5,feet:7}],[1,7,1,{head:4,body:5,feet:7}],[0,4,0,{head:4,feet:7}],[0,6,3,{feet:7}]]){
+for(const [from,to,equipped,armor] of [[2,5,2,{head:4,body:5,feet:7}],[1,7,1,{body:5,feet:7}],[0,4,0,{head:4,feet:7}],[0,6,3,{feet:7}]]){
  g=setup();g.run(`var id=recruit(${from});prepare(id);var inventoryBefore=JSON.stringify(s.inventory[0]);change(id,${to})`);
  assert.equal(g.run('s.equipped[0]'),equipped);assert.deepEqual(read(g,'s.armor[0]'),armor);assert.equal(g.run('JSON.stringify(s.inventory[0])'),g.run('inventoryBefore'));
 }

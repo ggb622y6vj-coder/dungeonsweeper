@@ -411,7 +411,7 @@ with sync_playwright() as p:
                     tab_to(page, '[data-command-choice="guard"]'); press(page, 'Space')
                 ring(page, '#attack'); press(page, 'Space')
             assert page.evaluate('s.hp[s.members.findIndex(m=>m.id==="battle-keys-2")]===s.members.find(m=>m.id==="battle-keys-2").maxHP')
-            assert page.evaluate('s.mp[s.members.findIndex(m=>m.id==="battle-keys-0")]') == 85
+            assert page.evaluate('s.mp[s.members.findIndex(m=>m.id==="battle-keys-0")]') == 90
             assert page.evaluate('s.members.find(m=>m.id==="battle-keys-2").status==="ok" && !allyTargetPick')
             assert page.evaluate('JSON.stringify(s.members.map((m,i)=>({id:m.id,status:m.status,hp:s.hp[i],ailments:s.ailments[i]})).filter(m=>["battle-keys-1","battle-keys-4"].includes(m.id)))') == blocked
             assert page.locator('#party .ailment-stone').count() == (2 if blocked_status == 'stone' else 1)

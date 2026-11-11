@@ -39,7 +39,7 @@ with sync_playwright() as p:
         page.evaluate('''s.pendingStairs=false;s.pendingBoss=null;s.done=false;
           s.cells.forEach(c=>{c.flag=false;c.trap=false;c.type='';c.open=false;delete c.chest});
           s.pos=27;s.dir=1;s.cells[s.pos].open=true;
-          s.members[1].known=MAGIC.filter(m=>m.job===1).map(m=>m.id);s.mp[1]=5;render();''')
+          s.members[1].known=MAGIC.filter(m=>m.job===1).map(m=>m.id);s.mp[1]=2;render();''')
         # Inactive: no count element.
         assert page.locator('.flag-sight-count').count() == 0
         inactive_label = page.locator('#board .cell.here').get_attribute('aria-label')
@@ -56,7 +56,7 @@ with sync_playwright() as p:
         assert ids[ids.index('flagview') + 1] == 'mahalito', ids
         spell = page.locator('[data-spell="flagview"]')
         assert '旗視' in spell.inner_text()
-        assert '町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。' in spell.inner_text()
+        assert '町へ戻るまで、探索者の境界左下に周囲8マスの旗の数を表示する。' in spell.inner_text()
         spell.click()
         page.locator('#magiccast').click()
         page.wait_for_function('!logBusy()')

@@ -34,9 +34,9 @@ function hereLabel(g) {
 {
   const g = setup();
   assert.deepEqual(read(g, "magic('flagview')"), {
-    id: 'flagview', name: '旗視', job: 1, level: 5, mp: 5, guaranteed: false,
+    id: 'flagview', name: '旗視', job: 1, level: 5, mp: 2, guaranteed: false,
     where: 'field', target: 'party', effect: 'flagcount', value: null,
-    description: '町へ戻るまで、探索者マスの境界左下に周囲8マスの旗の数を表示する。',
+    description: '町へ戻るまで、探索者の境界左下に周囲8マスの旗の数を表示する。',
   });
   g.run("s.members[1].known=[];s.members[1].level=4;Math.random=()=>0;learnMagic(1,4);openMagic(1)");
   assert.equal(g.run("s.members[1].known.includes('flagview')"), false, 'Lv4 cannot learn even with a successful roll');
@@ -64,7 +64,7 @@ function hereLabel(g) {
 }
 {
   const g = setup();
-  g.run('s.mp[1]=5');
+  g.run('s.mp[1]=2');
   assert.equal(g.run("castMagic(1,'flagview',null)"), true);
   assert.equal(g.run('s.mp[1]'), 0);
   g.drain();
@@ -94,7 +94,7 @@ for (const [id, state] of [
   assert(!inactiveLabel.includes('旗'));
   assert.equal(g.run("castMagic(1,'flagview',null)"), true);
   assert.equal(g.run('s.flagSight'), true);
-  assert.equal(g.run('s.mp[1]'), 15);
+  assert.equal(g.run('s.mp[1]'), 18);
   assert.deepEqual(read(g, 'logQueue.map(e=>e.text)'), [
     g.run('NAMES[1]') + 'は旗視を唱えた。', '周囲の旗が見えるようになった。',
   ]);
@@ -103,7 +103,7 @@ for (const [id, state] of [
   assert.equal(hereLabel(g), inactiveLabel + '、周囲の旗0本');
   assert.equal(g.run("spellReason(1,magic('flagview'))"), '発動中');
   assert.equal(g.run("castMagic(1,'flagview',null)"), false);
-  assert.equal(g.run('s.mp[1]'), 15, 'recast does not consume MP');
+  assert.equal(g.run('s.mp[1]'), 18, 'recast does not consume MP');
   assert.deepEqual(read(g, 'activeSpellEffects()'), [{
     name: '旗視', description: '周囲8マスの旗の数を探索者マスの左下に表示する', remaining: '町へ戻るまで',
   }]);

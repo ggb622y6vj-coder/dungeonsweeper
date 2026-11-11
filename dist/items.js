@@ -1,10 +1,10 @@
 // 消耗品の正本。1個につきアイテム1枠。装備・MP・呪文習得は不要。
 const MEDICINES=[
- {id:'healingPotion',name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,1,2,3],sell:8,weight:70,minFloor:1},
- {id:'antidote',name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,1,2,3],sell:6,weight:30,minFloor:1},
- {id:'paralysisCure',name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,1,2,3],sell:15,weight:20,minFloor:3},
- {id:'greaterPotion',name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,1,2,3],sell:30,weight:35,minFloor:4},
- {id:'elixir',name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,1,2,3],sell:80,weight:20,minFloor:7}
+ {id:'healingPotion',name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,2,1,3,4,6,5,7],sell:8,weight:70,minFloor:1},
+ {id:'antidote',name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,2,1,3,6,4,5,7],sell:6,weight:30,minFloor:1},
+ {id:'paralysisCure',name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,2,1,3,4,6,5,7],sell:15,weight:20,minFloor:3},
+ {id:'greaterPotion',name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,2,1,3,4,6,5,7],sell:30,weight:35,minFloor:4},
+ {id:'elixir',name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,2,1,3,4,6,5,7],sell:80,weight:20,minFloor:7}
 ];
 let medicineMember=0;
 function lootRecipient(w){let i=s.members.findIndex((m,i)=>canEquipJob(w,jobOf(i))&&s.inventory[i].length<10);return i>=0?i:s.members.findIndex((m,i)=>s.inventory[i].length<10)}
@@ -65,4 +65,29 @@ function medicineUI(){
  $('#medicineitem').onchange=()=>{renderMedicineDescription();pickMedicineTarget()};
  $('#medicinepick').onclick=pickMedicineTarget;
  $('#medicinedialog').addEventListener('click',e=>{let d=e.currentTarget,r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
+}
+
+// 102: equipment effects use the equipped slot, never an inventory-only copy.
+function equippedArmor(i,part){return weapon(s.inventory[i]?.[s.armor[i]?.[part]])}
+function consumeArmor(i,part){
+ const slot=s.armor[i][part],w=weapon(s.inventory[i][slot]);
+ delete s.armor[i][part];removeInventorySlot(i,slot);
+ // A queued medicine slot can shift when armor disappears during the round.
+ const plan=s.itemPlans[i];if(plan){if(plan.slot===slot)s.itemPlans[i]=null;else if(plan.slot>slot)plan.slot--}
+ return w;
+}
+function sacrificeAfterDamage(i){
+ if(s.area!=='dungeon'||s.hp[i]<=0||s.hp[i]>maxHP(i)/3||equippedArmor(i,'body')?.effect?.kind!=='sacrificeHP')return false;
+ const w=consumeArmor(i,'body');s.hp[i]=Math.ceil(maxHP(i)/2);
+ log(`${NAMES[i]}の${w.name}が身代わりになり、HPを${s.hp[i]}まで回復して消滅した。`);return true;
+}
+function sacrificeBeforeAilment(i,type){
+ const already=type==='stone'?s.members[i].status==='stone':!!s.ailments[i][type];
+ if(already||!activeMember(i)||equippedArmor(i,'head')?.effect?.kind!=='sacrificeStatus')return false;
+ const w=consumeArmor(i,'head');log(`${NAMES[i]}の${w.name}が状態異常を防いで消滅した。`);return true;
+}
+function revealHeadlight(){
+ if(!s.members.some((m,i)=>activeMember(i)&&equippedArmor(i,'head')?.effect?.kind==='headlight'))return;
+ // Arrival has already settled. Only reveal cells; never visit or trigger them.
+ for(const j of around(s.pos))if(!s.cells[j].open&&!s.cells[j].trap)s.cells[j].open=true;
 }
