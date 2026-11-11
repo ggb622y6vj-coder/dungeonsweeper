@@ -55,9 +55,9 @@ with sync_playwright() as p:
   assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
   page.locator('#trainingtab-edit').focus();page.keyboard.press('Home')
   assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
-  page.locator('#recruitname').focus();page.keyboard.press('e')
+  page.locator('#recruitname').fill('wasd');page.locator('#recruitname').focus();page.keyboard.press('e')
   assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
-  assert page.locator('#recruitname').input_value()=='e'
+  assert page.locator('#recruitname').input_value()=='wasde'
   page.locator('#recruitname').fill('')
   page.locator('#trainingtab-edit').click()
   assert page.locator('#trainingreorder,#trainingorderdialog,#trainingorderlist').count()==0

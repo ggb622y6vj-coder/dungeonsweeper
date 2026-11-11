@@ -95,5 +95,5 @@ with sync_playwright() as p:
   page.reload();assert not dialog.is_visible()
   no_overflow(page)
   assert not errors,errors
-  print(f'PASS Chromium {width}px: no dialog on death-free return; dead/ash carry dialog (names, 死亡/灰, temple hint) → OK → level report; temple lists 控え; training shows status and disables join; reload keeps 4; dungeon entry allowed; unseen report re-shown after reload, Esc clears; no JS errors or overflow')
+  print(f'PASS Chromium {width}px: no dialog on death-free return; dead/ash carry dialog (names, 死亡/灰, temple hint) → OK → level report; temple lists 控え; training shows reserve status without a join button; reload keeps 4; dungeon entry allowed; unseen report re-shown after reload, Esc clears; no JS errors or overflow')
  browser.close()
