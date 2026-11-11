@@ -164,8 +164,9 @@ with sync_playwright() as p:
                     page.evaluate('Math.random=()=>0')
                     mp = page.evaluate('s.mp[0]')
                     page.locator('[data-command-choice="dispel"]').click()
-                    assert page.locator('[data-row-choice]').count() == 1
-                    page.locator('[data-row-choice="98"]').click()
+                    # 103: the only undead row is selected without a row prompt.
+                    assert page.locator('[data-row-choice]').count() == 0
+                    assert page.evaluate('choosingRow===false && s.commands[0]==="dispel" && String(s.dispelRows[0])==="98"')
                     page.locator('#attack').click()
                     settled(page)
                     assert page.evaluate('s.enemy.units.find(e=>e.uid===902).escaped')
