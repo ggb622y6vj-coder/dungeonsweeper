@@ -232,7 +232,9 @@ console.log('PASS petrify: field/battle Madi rejects stone, stable reservation a
  g.run(fs.readFileSync(path.join(__dirname,'../dist/training.js'),'utf8'));
  g.run('renderTraining()');
  assert.match(g.run("$('#recruitlist').children.at(-1).children[0].textContent"),/B（石化）/);
+ assert.deepEqual(JSON.parse(g.run("JSON.stringify($('#recruitlist').children.at(-1).children[3].children.map(b=>b.textContent))")),['転職','名前の変更','登録抹消']);
  assert.equal(g.run("$('#recruitlist').children.at(-1).children[3].children[0].disabled"),true);
+ assert.equal(g.run("$('#recruitlist').children.at(-1).children[3].children[1].disabled"),false);
  const loaded=game(g.run("save();localStorage.getItem('ash-v1')"));
  assert.equal(loaded.run("$('#templecarrydialog').open"),true);
  assert.equal(loaded.run('s.reserve[0].members.xp'),650);assert.equal(loaded.run('s.reserve[0].members.status'),'stone');

@@ -1,0 +1,104 @@
+// 104: training tabs, rename validation, no reorder UI, no 前職 line, job-name class buttons.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {game}=require('../scripts/sim/harness.cjs');
+const root=path.join(__dirname,'..');
+const html=fs.readFileSync(path.join(root,'dist/index.html'),'utf8');
+const trainingSrc=fs.readFileSync(path.join(root,'dist/training.js'),'utf8');
+const gameSrc=fs.readFileSync(path.join(root,'dist/game.js'),'utf8');
+for(const id of ['trainingtab-create','trainingtab-edit','trainingpanel-create','trainingpanel-edit','renamedialog','renamename','renameconfirm','renamecancel'])
+ assert(html.includes(`id="${id}"`),id);
+assert(html.includes('role="tablist"')&&html.includes('aria-controls="trainingpanel-edit"'));
+assert(html.includes('#classchangejobs button.job-ready'));
+for(const gone of ['id="trainingreorder"','id="trainingorderdialog"','id="trainingorderlist"','id="trainingordercancel"','登録・加入・外す・抹消'])
+ assert(!html.includes(gone),gone);
+assert(html.includes('id="partyreorder"'));
+assert(html.includes('>登録・転職・編集</button>'));
+assert(html.includes('訓練所で冒険者を作成し、酒場でパーティに加えてください。'));
+assert(!trainingSrc.includes('CLASS_FEATURES')&&!trainingSrc.includes('trainingreorder')&&!trainingSrc.includes('trainingOrder'));
+assert(!gameSrc.includes('前職：'));
+function setup(saved=null){
+ const g=game(saved,()=>.5);
+ g.run(`const originalCreate=document.createElement;document.createElement=(tag)=>Object.assign(originalCreate(tag),{dataset:{}});`);
+ g.run(trainingSrc);
+ return g;
+}
+const read=(g,code)=>JSON.parse(g.run(`JSON.stringify(${code})`));
+let g=setup();
+g.run(`$('#trainingopen').onclick()`);
+assert.equal(g.run(`$('#trainingtab-create').attributes['aria-selected']`),'true');
+assert.equal(g.run(`$('#trainingtab-edit').attributes['aria-selected']`),'false');
+assert.equal(g.run(`$('#trainingpanel-create').hidden`),false);
+assert.equal(g.run(`$('#trainingpanel-edit').hidden`),true);
+assert.equal(g.run(`$('#trainingtab-create').tabIndex`),0);
+assert.equal(g.run(`$('#trainingtab-edit').tabIndex`),-1);
+g.run(`showTrainingTab('edit')`);
+assert.equal(g.run(`$('#trainingtab-edit').attributes['aria-selected']`),'true');
+assert.equal(g.run(`$('#trainingpanel-create').hidden`),true);
+assert.equal(g.run(`$('#trainingpanel-edit').hidden`),false);
+g.run(`renderTraining()`);
+assert.equal(g.run(`$('#trainingtab-edit').attributes['aria-selected']`),'true');
+g.run(`$('#training').close();$('#trainingopen').onclick()`);
+assert.equal(g.run(`$('#trainingtab-create').attributes['aria-selected']`),'true');
+assert.equal(g.run(`$('#trainingpanel-edit').hidden`),true);
+g.run(`var rec=generateRecruit('元の名前',0);registerRecruit(rec);var id=rec.members.id;showTrainingTab('edit');renderTraining()`);
+assert.deepEqual(read(g,`$('#recruitlist').children.find(el=>el.dataset&&el.dataset.recruitId===id).children[3].children.map(b=>b.textContent)`),['転職','名前の変更','登録抹消']);
+const stored=()=>g.run('trainingRoster().find(r=>r.members.id===id).members.name');
+assert.equal(stored(),'元の名前');
+for(const bad of ['', '   ', 'あ'.repeat(21), '<tag>', 'a&b', 'a"b', "a'b", 'a>b', 'a\nb', 'a\u0000b', 12]){
+ const result=read(g,`renameRecruit(id,${JSON.stringify(bad)})`);
+ assert.equal(result.ok,false,JSON.stringify(bad));
+ assert.equal(stored(),'元の名前');
+}
+assert.equal(g.run(`renameRecruit('missing','名前').reason`),'冒険者が見つかりません。');
+assert.equal(g.run(`renameRecruit(id,'  新しい名前  ').ok`),true);
+assert.equal(stored(),'新しい名前');
+assert.equal(g.run('s.reserve[0].members.name'),'新しい名前');
+assert.equal(g.run(`renameRecruit(id,'あ').ok`),true);
+assert.equal(stored(),'あ');
+assert.equal(g.run(`renameRecruit(id,${JSON.stringify('あ'.repeat(20))}).ok`),true);
+assert.equal(g.run('trainingRoster().find(r=>r.members.id===id).members.name.length'),20);
+assert.equal(g.run(`renameRecruit(id,'名\u007f前').ok`),true);
+assert.equal(stored(),'名\u007f前');
+g.run(`changeRecruitParty(id,true);renameRecruit(id,'パーティ名')`);
+assert.equal(g.run('s.members[0].name'),'パーティ名');
+assert.equal(g.run('NAMES[0]'),'パーティ名');
+g.run(`s.members[0].careerHistory=[{from:1,fromLevel:10,to:0}];renderStats()`);
+assert.doesNotMatch(g.run(`$('#statsbody').innerHTML`),/前職/);
+assert.equal(g.run('s.members[0].careerHistory.length'),1);
+const id=g.run('id');
+const reloaded=setup(g.run(`localStorage.getItem('ash-v1')`));
+assert.equal(reloaded.run(`trainingRoster().find(r=>r.members.id===${JSON.stringify(id)}).members.name`),'パーティ名');
+g.run(`showTrainingTab('edit');renderTraining();$('#recruitlist').children.find(el=>el.dataset.recruitId===id).children[3].children[1].onclick()`);
+assert.equal(g.run(`$('#renamedialog').open`),true);
+assert.equal(g.run(`$('#renametarget').textContent.includes('パーティ名')`),true);
+assert.equal(g.run(`$('#renametarget').innerHTML`),undefined);
+g.run(`$('#renamename').value='<bad>';$('#renameconfirm').onclick()`);
+assert.match(g.run(`$('#renamenotice').textContent`),/使えない文字/);
+assert.equal(g.run(`$('#renamedialog').open`),true);
+assert.equal(g.run('s.members[0].name'),'パーティ名');
+g.run(`$('#renamename').value='  画面から  ';$('#renameconfirm').onclick()`);
+assert.equal(g.run('s.members[0].name'),'画面から');
+assert.equal(g.run(`$('#trainingnotice').textContent`),'名前を変更しました。');
+const row=read(g,`$('#recruitlist').children.find(el=>el.dataset.recruitId===id).children[0].textContent`);
+assert.match(row,/画面から/);
+assert.equal(g.run(`$('#recruitlist').children.find(el=>el.dataset.recruitId===id).children[0].innerHTML`),undefined);
+g.run(`s.area='dungeon'`);
+assert.equal(g.run(`renameRecruit(id,'別名').ok`),false);
+assert.equal(g.run('s.members[0].name'),'画面から');
+g.run(`s.area='town'`);
+g=setup();
+g.run(`var rec=generateRecruit('転職者',1);registerRecruit(rec);changeRecruitParty(rec.members.id,true);var id=rec.members.id;var r=trainingRoster()[0];r.members.level=10;r.inventory.push('sword','staff','mace','dagger');$('#trainingopen').onclick();openClassChange(id)`);
+const buttons=read(g,`$('#classchangejobs').children.map(b=>({text:b.textContent,disabled:!!b.disabled,title:b.title||'',className:b.className||'',job:+b.attributes['data-class-job'],pressed:b.attributes['aria-pressed']}))`);
+assert.equal(buttons.length,8);
+for(const b of buttons){
+ assert.equal(b.text,g.run(`CLASSES[${b.job}].name`));
+ assert.equal(b.pressed,'false');
+ const ok=g.run(`canChangeClass(trainingRoster()[0],${b.job}).ok`);
+ assert.equal(b.disabled,!ok);
+ assert.equal(b.className.includes('job-ready'),ok);
+ if(!ok)assert.equal(b.title,g.run(`canChangeClass(trainingRoster()[0],${b.job}).reason`));
+ else assert.equal(b.title,'');
+}
+console.log('PASS training menu: tabs, rename rejection/save, no reorder UI, no 前職 line, job-name buttons');

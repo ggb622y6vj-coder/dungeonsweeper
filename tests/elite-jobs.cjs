@@ -27,8 +27,7 @@ const eliteData=[
  ['bishop','司教',24,18,0,8,1,[1,4,2],1.6,[1,3,0],null,2],
 ];
 assert.deepEqual(read(g,'CLASSES.slice(4).map(c=>[c.id,c.name,c.hp,c.mp,c.attack,c.ac,c.hit,c.hpGrowth,c.xpFactor,c.mpGrowth,c.mpFromLevel??null,c.attackEvery])'),eliteData);
-const features=['武器による前衛戦闘が得意で、Lv4から魔法使い系の呪文を遅れて習得する。','武器による前衛戦闘が得意で、Lv4から僧侶系の呪文を遅れて習得し、呪いを解く。','床罠・宝箱の罠解除が得意。','魔法使い系と僧侶系の両方の呪文を習得する。習得は遅い。'];
-assert.deepEqual(read(g,'CLASS_FEATURES.slice(4)'),features);
+assert.equal(g.run('typeof CLASS_FEATURES'),'undefined');
 g.run('var id=recruit(0);var r=prepare(id)');
 const prerequisites={4:[0,1],5:[0,2],6:[0,3],7:[1,2]};
 for(let from=0;from<8;from++)for(let to=0;to<8;to++){
@@ -40,14 +39,16 @@ for(let from=0;from<8;from++)for(let to=0;to<8;to++){
  assert.equal(g.run('JSON.stringify(s)'),before,'eligibility is pure');
  if(!ok){assert(check.reason);if(from!==to&&to>=4)for(const j of prerequisites[to])assert(check.reason.includes(g.run(`CLASSES[${j}].name`)));}
  g.run(`$('#trainingopen').onclick();openClassChange(id)`);
- const buttons=read(g,"$('#classchangejobs').children.map(b=>({job:+b.attributes['data-class-job'],text:b.textContent,disabled:b.disabled}))");
+ const buttons=read(g,"$('#classchangejobs').children.map(b=>({job:+b.attributes['data-class-job'],text:b.textContent,disabled:b.disabled,title:b.title||'',className:b.className||''}))");
  assert.equal(buttons.length,8);assert.equal(buttons[to].disabled,!ok);
- if(!ok)assert(buttons[to].text.includes(check.reason));
+ assert.equal(buttons[to].text,g.run(`CLASSES[${to}].name`));
+ assert.equal(buttons[to].className.includes('job-ready'),ok);
+ if(!ok)assert.equal(buttons[to].title,check.reason);
 }
 for(const job of [4,5,6,7])assert.equal(g.run(`generateRecruit('新規不可',${job})`),null);
 for(const job of [-1,8,1.5,null])assert.equal(g.run(`canChangeClass(r,${JSON.stringify(job)}).ok`),false);
 assert.deepEqual(read(g,'[4,5,6,7].map(job=>[strengthFor(job,1),agilityFor(job,1)])'),[[13,10],[14,9],[12,14],[9,9]]);
-console.log('PASS elite jobs: exact class data/features, 64 career pairs, UI reasons, pure queries, recruit restrictions and fallback stats');
+console.log('PASS elite jobs: exact class data, 64 career pairs, job-name buttons, pure queries, recruit restrictions and fallback stats');
 
 // MP inheritance, delayed starts, effective levels, retrying missed spells with school-specific stats.
 for(const job of [0,1,2,3,4,5,6,7]){

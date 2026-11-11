@@ -1,5 +1,5 @@
 // UI uses textContent for player names and stable IDs for roster actions.
-let recruitDraft=null, previousRecruit=null, pendingDelete=null;
+let recruitDraft=null, previousRecruit=null, pendingDelete=null, pendingRename=null;
 function trainingNotice(text){$('#trainingnotice').textContent=text}
 function resetRecruitDraft(){recruitDraft=null;previousRecruit=null;$('#registerrecruit').disabled=true;$('#recruitpreview').replaceChildren()}
 function showRecruitPreview(){
@@ -13,14 +13,21 @@ function showRecruitPreview(){
  }
  $('#recruitpreview').append(grid);const note=document.createElement('p');note.textContent=`Lv.1 / 経験値 0 / NEXT ${m.xpTargets[2]}。括弧内は前回生成との差。`;$('#recruitpreview').append(note);
 }
+function showTrainingTab(which){
+ const create=which!=='edit';
+ $('#trainingtab-create').setAttribute('aria-selected',String(create));
+ $('#trainingtab-create').tabIndex=create?0:-1;
+ $('#trainingtab-edit').setAttribute('aria-selected',String(!create));
+ $('#trainingtab-edit').tabIndex=create?-1:0;
+ $('#trainingpanel-create').hidden=!create;
+ $('#trainingpanel-edit').hidden=create;
+}
 function renderTraining(){
  const list=$('#recruitlist');list.replaceChildren();const roster=trainingRoster();
- $('#trainingreorder').disabled=s.members.length<2;
- $('#trainingreorder').title=s.members.length<2?'入れ替えには2人以上のパーティーが必要です。':'';
  for(const corpse of s.corpses||[]){
   const p=document.createElement('p');p.textContent=`迷宮に残された遺体：地下${corpse.floor}階（${corpse.records.map(r=>r.members.name).join('、')}）`;list.append(p);
  }
- $('#trainingcount').textContent=`登録 ${roster.length}人 / パーティ ${s.members.length}/6人。先頭3人が前衛です。`;
+ $('#trainingcount').textContent=`登録 ${roster.length}人 / パーティ ${s.members.length}/6人。加入・離脱は酒場で行います。`;
  if(!roster.length){const p=document.createElement('p');p.textContent='名前と職業を選んで、最初の冒険者を作成してください。';list.append(p)}
  for(const r of roster){
   const m=r.members,index=s.members.findIndex(x=>x.id===m.id),row=document.createElement('section');row.dataset.recruitId=m.id;
@@ -29,25 +36,48 @@ function renderTraining(){
   const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AGI ${m.agi??10} / VIT ${m.vit} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
   row.append(title,status,stats);const actions=document.createElement('div');actions.className='recruit-actions';row.append(actions);
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b);return b};
-  button(index<0?'加入':'離脱',()=>{if(changeRecruitParty(m.id,index<0)){trainingNotice(index<0?'パーティに加入しました。':'控えに移しました。');renderTraining()}},index<0&&(s.members.length>=6||m.status!=='ok'));
-  if(index>=0)for(const [text,offset] of [['前へ',-1],['後ろへ',1]])button(text,()=>{const order=s.members.map((_,i)=>i);[order[index],order[index+offset]]=[order[index+offset],order[index]];reorderParty(order);renderTraining()},index+offset<0||index+offset>=s.members.length);
   const checks=[0,1,2,3,4,5,6,7].filter(job=>job!==m.job).map(job=>canChangeClass(r,job));
   const reason=checks.some(check=>check.ok)?'':checks[0].reason;
   const change=button('転職',()=>openClassChange(m.id),!!reason);change.setAttribute('data-class-change',m.id);change.title=reason;
   if(reason){const note=document.createElement('p');note.textContent=reason;row.append(note)}
+  button('名前の変更',()=>openRename(m.id));
   button('登録抹消',()=>{pendingDelete=m.id;$('#recruitdeletename').textContent=`${m.name}を登録抹消しますか？装備・所持品も削除され、元に戻せません。`;$('#recruitdeletedialog').showModal()});list.append(row);
  }
 }
-$('#trainingopen').onclick=()=>{if(s.area!=='town'||!idle())return;resetRecruitDraft();trainingNotice('');renderTraining();$('#training').showModal()};
+$('#trainingopen').onclick=()=>{if(s.area!=='town'||!idle())return;resetRecruitDraft();trainingNotice('');showTrainingTab('create');renderTraining();$('#training').showModal()};
 $('#trainingclose').onclick=()=>$('#training').close();
 $('#training').addEventListener('close',()=>{if(!$('#training').open)resetRecruitDraft()});
+$('#trainingtab-create').onclick=()=>showTrainingTab('create');
+$('#trainingtab-edit').onclick=()=>showTrainingTab('edit');
 $('#rollrecruit').onclick=()=>{const record=generateRecruit($('#recruitname').value,+$('#recruitjob').value);if(!record){trainingNotice('名前を入力してください。');return}previousRecruit=recruitDraft;recruitDraft=record;showRecruitPreview();$('#registerrecruit').disabled=false;trainingNotice('能力値を確認して登録してください。')};
 for(const id of ['recruitname','recruitjob'])$('#'+id).oninput=resetRecruitDraft;
-$('#registerrecruit').onclick=()=>{if(registerRecruit(recruitDraft)){resetRecruitDraft();renderTraining();trainingNotice('控えに登録しました。「加入」でパーティに加えてください。')}};
+$('#registerrecruit').onclick=()=>{if(registerRecruit(recruitDraft)){resetRecruitDraft();renderTraining();trainingNotice('控えに登録しました。酒場でパーティに加えてください。')}};
 $('#recruitdeletecancel').onclick=()=>$('#recruitdeletedialog').close();
 $('#recruitdeleteconfirm').onclick=()=>{if(deleteRecruit(pendingDelete)){renderTraining();trainingNotice('登録を抹消しました。')}$('#recruitdeletedialog').close()};
 // 'close' is dispatched asynchronously; a fast Space close→reopen must keep the new target.
 $('#recruitdeletedialog').addEventListener('close',()=>{if(!$('#recruitdeletedialog').open)pendingDelete=null});
+function openRename(id){
+ if(s.area!=='town'||!idle()||!$('#training').open)return;
+ const record=trainingRoster().find(r=>r.members.id===id);
+ if(!record)return;
+ pendingRename=id;
+ $('#renametarget').textContent=`${record.members.name}の名前を変更します。`;
+ $('#renamename').value=record.members.name;
+ $('#renamenotice').textContent='';
+ $('#renamedialog').showModal();
+}
+$('#renamecancel').onclick=()=>$('#renamedialog').close();
+$('#renameconfirm').onclick=()=>{
+ const result=renameRecruit(pendingRename,$('#renamename').value);
+ if(!result.ok){$('#renamenotice').textContent=result.reason;return}
+ renderTraining();trainingNotice('名前を変更しました。');$('#renamedialog').close();
+};
+$('#renamedialog').addEventListener('close',()=>{if(!$('#renamedialog').open)pendingRename=null});
+$('#renamename').addEventListener('keydown',e=>{
+ if(e.key!=='Enter'||e.ctrlKey||e.altKey||e.metaKey||e.isComposing||e.repeat)return;
+ e.preventDefault();
+ $('#renameconfirm').onclick();
+});
 
 // The tavern shares the existing registration UI; closing it returns one layer
 // and refreshes the roster so a later formation save cannot resurrect old data.
@@ -65,40 +95,7 @@ $('#recruitname').addEventListener('keydown',e=>{
  $('#registerrecruit').onclick();
 });
 
-let trainingOrderPicked=null;
-function cancelTrainingOrderPick(){trainingOrderPicked=null;renderTrainingOrder()}
-function renderTrainingOrder(){
- const list=$('#trainingorderlist');list.replaceChildren();
- $('#trainingorderhint').textContent=trainingOrderPicked
-  ?'選択中の冒険者と入れ替える相手を選んでください。Escで選択をやめます。'
-  :'冒険者を選び、次に入れ替える相手を選んでください。Spaceで決定します。';
- $('#trainingordercancel').hidden=!trainingOrderPicked;
- s.members.forEach((m,index)=>{
-  const button=document.createElement('button'),picked=m.id===trainingOrderPicked;
-  button.setAttribute('data-order-member',m.id);
-  button.setAttribute('aria-pressed',String(picked));
-  if(index===0)button.setAttribute('data-key-default','');
-  button.className=picked?'order-picked':'';
-  button.textContent=`${index+1}. ${m.name}${picked?'（選択中）':''}`;
-  button.onclick=()=>{
-   if(!trainingOrderPicked){trainingOrderPicked=m.id;renderTrainingOrder();return}
-   const from=s.members.findIndex(member=>member.id===trainingOrderPicked);
-   const to=s.members.findIndex(member=>member.id===m.id),order=s.members.map((_,i)=>i);
-   if(from>=0&&to>=0){[order[from],order[to]]=[order[to],order[from]];reorderParty(order)}
-   trainingOrderPicked=null;renderTrainingOrder();renderTraining();
-  };
-  list.append(button);
- });
-}
-$('#trainingreorder').onclick=()=>{
- trainingOrderPicked=null;renderTrainingOrder();$('#trainingorderdialog').showModal();
-};
-$('#trainingorderclose').onclick=()=>$('#trainingorderdialog').close();
-$('#trainingordercancel').onclick=cancelTrainingOrderPick;
-$('#trainingorderdialog').addEventListener('close',()=>{if(!$('#trainingorderdialog').open)trainingOrderPicked=null});
-
 let classChangeId=null,classChangeJob=null;
-const CLASS_FEATURES=['武器による前衛戦闘とHP成長が得意。','魔法使い系の呪文を習得する。','僧侶系の呪文を習得し、呪いを解く。','床罠・宝箱の罠解除が得意。','武器による前衛戦闘が得意で、Lv4から魔法使い系の呪文を遅れて習得する。','武器による前衛戦闘が得意で、Lv4から僧侶系の呪文を遅れて習得し、呪いを解く。','床罠・宝箱の罠解除が得意。','魔法使い系と僧侶系の両方の呪文を習得する。習得は遅い。'];
 function openClassChange(id){
  if(s.area!=='town'||!idle()||!$('#training').open)return;
  classChangeId=id;classChangeJob=null;renderClassChange();$('#classchangedialog').showModal();
@@ -110,8 +107,9 @@ function renderClassChange(){
  for(const job of [0,1,2,3,4,5,6,7]){
   const check=canChangeClass(record,job),b=document.createElement('button');
   b.setAttribute('data-class-job',String(job));b.setAttribute('aria-pressed',String(job===classChangeJob));
-  b.textContent=`${CLASSES[job].name}：${CLASS_FEATURES[job]} ${check.ok?'転職可能':check.reason}`;
-  b.disabled=!check.ok;b.title=check.reason;b.onclick=()=>{classChangeJob=job;renderClassChange()};list.append(b);
+  b.textContent=CLASSES[job].name;
+  b.disabled=!check.ok;b.title=check.reason;b.className=check.ok?'job-ready':'';
+  b.onclick=()=>{classChangeJob=job;renderClassChange()};list.append(b);
  }
  const preview=$('#classchangepreview');preview.replaceChildren();
  const check=canChangeClass(record,classChangeJob),next=classChangePreview(record,classChangeJob);

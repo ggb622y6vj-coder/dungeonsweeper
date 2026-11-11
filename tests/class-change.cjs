@@ -56,7 +56,7 @@ for(let n=0;n<3;n++){
  g.run('ensureProfile();render();save()');g=setup(g.run("localStorage.getItem('ash-v1')"));
  assert.deepEqual(json(g,'partyRecords()[0]'),changed);
 }
-g.run('renderStats();battle()');assert.match(g.run("$('#statsbody').innerHTML"),/前職：魔法使い Lv\.10/);
+g.run('renderStats();battle()');assert.doesNotMatch(g.run("$('#statsbody').innerHTML"),/前職/);assert.equal(g.run('s.members[0].careerHistory.length'),1);
 assert.match(g.run("$('#commandentry').innerHTML"),/data-command-choice="spell"/);
 g.run(`openMagic(0);chooseBattleSpell(0,magic('halito'));partyAction(0)`);g.drain();
 assert(g.run('s.enemy.units[0].hp')<999);assert.equal(g.run('s.mp[0]'),80-g.run("magic('halito').mp"));

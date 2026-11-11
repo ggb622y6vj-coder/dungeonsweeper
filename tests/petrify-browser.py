@@ -112,8 +112,11 @@ with sync_playwright() as p:
         no_overflow(page)
         page.locator('#tavernclose').click()
         page.locator('#trainingopen').click()
+        page.locator('#trainingtab-edit').click()
         recruit = page.locator('#recruitlist section').filter(has_text='B（石化）')
-        assert recruit.get_by_role('button', name='加入', exact=True).is_disabled()
+        assert recruit.get_by_role('button', name='加入', exact=True).count()==0
+        assert recruit.get_by_role('button', name='離脱', exact=True).count()==0
+        assert '控え' in recruit.inner_text() and '（石化）' in recruit.inner_text()
         no_overflow(page)
         page.locator('#trainingclose').click()
 
@@ -128,9 +131,11 @@ with sync_playwright() as p:
         assert 'Bの石化が解けた。' in page.locator('#templenotice').inner_text()
         assert page.evaluate("s.gold===960&&s.reserve[0].members.status==='ok'&&s.reserve[0].hp===s.reserve[0].members.maxHP&&s.reserve[0].mp===s.reserve[0].members.maxMP&&s.reserve[0].members.xp===650")
         page.locator('#templeclose').click()
-        page.locator('#trainingopen').click()
-        page.locator('#recruitlist section').filter(has=page.locator('h4', has_text='B ·')).get_by_role('button', name='加入', exact=True).click()
-        page.locator('#trainingclose').click()
+        page.locator('#tavernopen').click()
+        slot = page.evaluate('s.members.length')
+        select = page.locator('#tavernslots select').nth(slot)
+        select.select_option(label=select.locator('option').filter(has_text='B ·').inner_text())
+        page.locator('#tavernsave').click()
         page.reload()
         assert page.evaluate("s.members.length===6&&s.members.find(m=>m.name==='B').status==='ok'&&s.mp[s.members.findIndex(m=>m.name==='B')]===s.members.find(m=>m.name==='B').maxMP")
         page.locator('#entrance').click()

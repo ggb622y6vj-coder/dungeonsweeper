@@ -136,6 +136,9 @@ with sync_playwright() as p:
         page.keyboard.press('Space')
         tab_to(page, '#registerrecruit')
         page.keyboard.press('Enter')
+        assert page.evaluate('s.members.length===0 && s.reserve.length===1')
+        page.keyboard.press('e')
+        assert page.locator('#trainingtab-edit').get_attribute('aria-selected') == 'true'
         delete_button = '#recruitlist .recruit-actions button:last-child'
         tab_to(page, delete_button)
         page.keyboard.press('Space')
@@ -145,9 +148,7 @@ with sync_playwright() as p:
         assert not page.locator('#recruitdeletedialog').is_visible()
         assert page.locator('#training').is_visible()
         assert focused(page, delete_button)
-        tab_to(page, '#recruitlist .recruit-actions button:first-child')
-        page.keyboard.press('Enter')
-        assert page.evaluate('s.members.length') == 1
+        assert page.evaluate('s.reserve.length===1 && s.members.length===0')
         page.keyboard.press('Escape')
         assert focused(page, '#trainingopen')
 
@@ -173,6 +174,16 @@ with sync_playwright() as p:
         page.keyboard.press('Escape')
         assert page.locator('#keyhint').is_visible() == (width == 1280)
 
+        # Join the registered adventurer from the tavern before entering.
+        tab_to(page, '#tavernopen')
+        page.keyboard.press('Space')
+        assert page.locator('#taverndialog').is_visible()
+        tab_to(page, '#tavernslots select')
+        page.keyboard.press('ArrowDown')
+        tab_to(page, '#tavernsave')
+        page.keyboard.press('Space')
+        assert page.evaluate('s.members.length') == 1
+        assert not page.locator('#taverndialog').is_visible()
         # Exploration keys navigate controls once; decisions use the old click
         # route once. Turning is deterministic and cannot trigger an encounter.
         tab_to(page, '#entrance')
