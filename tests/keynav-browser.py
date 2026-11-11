@@ -178,7 +178,7 @@ with sync_playwright() as p:
         tab_to(page, '#tavernopen')
         page.keyboard.press('Space')
         assert page.locator('#taverndialog').is_visible()
-        tab_to(page, '#tavernslots select')
+        tab_to(page, '#tavernslots label:first-child select')
         page.keyboard.press('ArrowDown')
         tab_to(page, '#tavernsave')
         page.keyboard.press('Space')
