@@ -28,7 +28,7 @@ function rosterSaveState() {
  return snapshot;
 }
 function restoreRoster(state) {
- if(state)state.corpses??=[];
+ if(state){state.corpses??=[];state.itemBox??=[];}
  if(state?.rosterVersion!==1)return state;
  const records=new Map(state.roster.map(r=>[r.members.id,r]));
  const ids=[...new Set(state.partyIds)].filter(id=>records.has(id)).slice(0,6);

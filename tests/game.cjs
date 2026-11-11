@@ -350,5 +350,6 @@ require('./flag-sight.cjs');
 require('./stat-growth.cjs');
 
 require('./save-transfer.cjs');
+require('./item-box.cjs');
 
 require('./notion-equipment-effects.cjs');
