@@ -17,7 +17,7 @@ for(const floor of [1,2,10])for(const killed of [false,true])for(const location 
  assert.equal(g.run("castMagic(1,'reload',null)"),true); // Real spell guards, cost and effect.
  const after=read(g,'s');
  for(const key of Object.keys(before))if(!['cells','start','boss','corpses','mp'].includes(key))assert.deepEqual(after[key],before[key],`${floor}/${location}: ${key}`);
- assert.deepEqual(after.mp,before.mp.map((mp,i)=>mp-(i===1?4:0)));
+ assert.deepEqual(after.mp,before.mp.map((mp,i)=>mp-(i===1?2:0)));
  assert.deepEqual(after.cells[after.pos],current);
  assert(after.cells.every((c,i)=>i===after.pos||(!c.open&&!c.flag&&!c.chest&&!c.disarmed)));
  assert.equal(after.cells.filter(c=>c.trap).length,g.run('trapCount(s.floor,size())'));

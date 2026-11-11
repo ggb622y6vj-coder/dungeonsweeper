@@ -11,7 +11,7 @@ s.members[mage].known.push('dalto','halito','tiltowait');
 s.mp[mage]=1000;
 function cast(id){s.enemy.units[0].hp=1000;castMagic(mage,id,0);return 1000-s.enemy.units[0].hp}
 Math.random=()=>0;
-if(cast('dalto')!==3)throw Error('dalto must halve 6d6 minimum damage and round down');
+if(cast('dalto')!==4)throw Error('dalto must halve 6d6+2 minimum damage and round down');
 if(cast('halito')!==0)throw Error('halito fire resistance should halve rounded-down 1 damage to 0');
 Math.random=()=>.5;
 if(cast('halito')!==2)throw Error('halito fire resistance');
@@ -21,7 +21,7 @@ const firefly=enemyDefinition('firefly');
 ENEMIES.push({...firefly,id:'testfirefly',name:'炎耐性試験',resistance:'炎半減',mageResist:0,priestResist:0});
 Math.random=()=>0;
 s.enemy.units[0].id='testfirefly';
-if(cast('dalto')!==6)throw Error('fire-only monster must take full dalto damage');
+if(cast('dalto')!==8)throw Error('fire-only monster must take full dalto damage');
 s.enemy.units[0].id='kashadokuro';
 Math.random=()=>.5;
 if(cast('halito')!==2)throw Error('kashadokuro must halve fire damage');

@@ -64,14 +64,14 @@ with sync_playwright() as p:
         spell = page.locator('[data-spell="makanito"]')
         assert spell.is_enabled()
         assert '習得済み' in spell.inner_text()
-        assert 'MP 12' in spell.inner_text()
+        assert 'MP 5' in spell.inner_text()
         spell.click()
         assert page.evaluate("s.magicPlans[0].id==='makanito' && s.magicPlans[0].target===null")
         assert page.evaluate('s.mp[0]') == 40, 'planning spends no MP'
         page.locator('#attack').click()
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.enemy===null')
-        assert page.evaluate('s.mp[0]') == 28
+        assert page.evaluate('s.mp[0]') == 35
         assert page.evaluate('s.members[0].xp-xpBefore===expectedXP')
         assert page.locator('#scene [data-enemy-uid]').count() == 0
         log = page.locator('#log').inner_text()

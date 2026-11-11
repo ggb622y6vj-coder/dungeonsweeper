@@ -20,12 +20,12 @@ with sync_playwright() as p:
   assert page.locator('#entrance').is_disabled()
   # Empty library opens without any registered adventurers; both tabs scroll.
   page.locator('#libraryopen').click()
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 0/67'
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 0/76'
   monster_total=page.evaluate('ENEMIES.filter(d=>d.floors[0]===1).length')
   assert page.locator('#librarybody .library-entry').count()==monster_total
   assert page.locator('#librarybody h4').all_text_contents()==['？？？']*monster_total
   assert page.locator('#librarybody dl').count()==0
-  for tab,total in [('items',48),('monsters',monster_total)]:
+  for tab,total in [('items',54),('monsters',monster_total)]:
    page.locator('#librarytab-'+tab).click()
    assert page.locator('#librarytab-'+tab).get_attribute('aria-selected')=='true'
    assert page.locator('#librarybody h4').all_text_contents()==['？？？']*total
@@ -65,13 +65,13 @@ with sync_playwright() as p:
   page.evaluate('enterTown()');page.reload()
   page.locator('#libraryopen').click()
   # Counter counts spell-identified species, not kills.
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 2/67'
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 2/76'
   # 059: a kill without the 識別 spell shows only the unknown name and kill count.
   assert page.locator('#librarybody h4').first.inner_text()=='不定形'
   assert '1d6+3' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert '1体' in page.locator('#librarybody .library-entry').first.inner_text()
   page.evaluate("s.library.monsters.slime.identified=true;renderLibrary()")
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/100 · アイテム 2/67'
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/100 · アイテム 2/76'
   assert page.locator('#librarybody h4').first.inner_text()=='スライム'
   assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
   assert '初撃破階' not in page.locator('#librarybody .library-entry').first.inner_text()

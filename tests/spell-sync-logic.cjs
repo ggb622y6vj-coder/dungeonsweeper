@@ -40,7 +40,7 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  const g=party(),base=J(g,'s.members.map((_,i)=>effectiveAC(i))');
  assert.equal(g.run("castMagic(0,'teppeki',null)"),true);
  const protectedAC=base.map(n=>n-2);assert.deepEqual(J(g,'logQueue[0].ac'),base,'AC does not leak before the casting log');assert.deepEqual(J(g,'logQueue[1].ac'),protectedAC);assert.deepEqual(J(g,'snapshotVitals().ac'),protectedAC);
- assert.equal(g.run('s.mp[0]'),993);
+ assert.equal(g.run('s.mp[0]'),995);
  battle(g);g.run("castMagic(0,'teppeki',null);castMagic(0,'kalki',null)");
  assert.deepEqual(J(g,'s.members.map((_,i)=>effectiveAC(i))'),protectedAC,'recasting does not stack');
  g.run('s.enemy.units.forEach(e=>{e.hp=0;killReward(e)});finishMonsterBattle()');g.drain();
@@ -100,7 +100,7 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  assert.equal(g.run('rollCount'),3);
  assert.deepEqual(J(g,'s.enemy.units.map(e=>!!e.identifiedBySpell)'),[true,false,true,false]);
  assert.equal(g.run('s.library.monsters.slime.identified&&s.library.monsters.wolf.identified'),true);
- assert.equal(g.run('s.mp[1]'),997);
+ assert.equal(g.run('s.mp[1]'),998);
 }
 {
  const g=party();battle(g,['lesserdemon']);g.run("enemyDefinition('lesserdemon').mageResist=0;Math.random=()=>0");
