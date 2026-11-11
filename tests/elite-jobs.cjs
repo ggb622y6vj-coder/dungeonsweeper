@@ -54,7 +54,7 @@ console.log('PASS elite jobs: exact class data, 64 career pairs, job-name button
 for(const job of [0,1,2,3,4,5,6,7]){
  g=setup();g.run(`var id=recruit(${job===7?1:0});prepare(id);s.members[0].maxMP=50;s.members[0].known=['dumapic'];change(id,${job===0?1:job});`);
  if(job===0)g.run('s.members[0].level=10;change(id,0)');
- assert.equal(g.run('s.members[0].maxMP'),50);
+ assert.equal(g.run('s.members[0].maxMP'),job===0?41:45);
  assert.deepEqual(read(g,'s.members[0].known'),['dumapic']);
  assert.equal(g.run('s.members[0].classChanged'),true);
  // Zero RNG makes growth exact and learns every eligible spell.

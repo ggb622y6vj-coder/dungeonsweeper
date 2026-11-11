@@ -103,7 +103,7 @@ with sync_playwright() as p:
         page.keyboard.press('Enter')
         page.wait_for_function("!document.querySelector('#classchangedialog').open")
         assert page.evaluate('s.members[0].job===0&&s.members[0].level===1&&s.members[0].xp===0')
-        assert page.evaluate('s.hp[0]===s.members[0].maxHP&&s.mp[0]===100&&s.gold===789')
+        assert page.evaluate('s.hp[0]===s.members[0].maxHP&&s.mp[0]===90&&s.gold===789')
         assert page.evaluate("equippedWeapon(0).id==='sword'&&s.members[0].careerHistory.length===1")
         converted = page.evaluate('JSON.stringify(partyRecords()[0])')
         page.reload()

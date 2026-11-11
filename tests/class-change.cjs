@@ -40,13 +40,32 @@ g.run("r=at(id);r.members.status='ok';r.members.level=10;s.inventory[0]=['staff'
 const deleted=g.run('JSON.stringify(s)');g.run("$('#classchangeconfirm').onclick()");assert.equal(g.run('JSON.stringify(s)'),deleted);
 console.log('PASS class change: pure eligibility/preview, cancellation, invalid job, stale level/status/weapons/deleted ID');
 
+// MP reduction, floor rounding and target-class minimums share the party/reserve path.
+for(const join of [true,false]){
+ for(const [from,to,maxMP,expected] of [[1,0,33,30],[1,0,19,18],[1,0,9,9],[2,7,15,18],[0,1,0,20]]){
+  g=setup();g.run(`var id=recruit(${from},${join});prepare(id);at(id).members.maxMP=${maxMP};if(${join})s.mp[0]=0;else at(id).mp=0;`);
+  const before=g.run('JSON.stringify(s)'),preview=json(g,`classChangePreview(at(id),${to})`);
+  assert.equal(g.run('JSON.stringify(s)'),before,'MP preview must not change state');
+  assert.equal(preview.members.maxMP,expected);assert.equal(preview.mp,expected);
+  g.run(`change(id,${to})`);
+  const committed=json(g,'at(id)');
+  assert.equal(committed.members.maxMP,preview.members.maxMP,'committed MP cap must match preview');
+  assert.equal(committed.mp,preview.mp,'committed current MP must match preview');
+  assert.equal(g.run('s.members.some(m=>m.id===id)'),join);
+ }
+ g=setup();g.run(`var id=recruit(1,${join});prepare(id);at(id).members.maxMP=33;change(id,0);prepare(id);change(id,3)`);
+ assert.equal(g.run('at(id).members.maxMP'),27,'repeat conversion reduces the current cap (30), not the original cap');
+ assert.equal(g.run('at(id).mp'),27);
+}
+console.log('PASS class change: party/reserve MP reduction, rounding, class minimums, preview/commit agreement and repeated conversions');
+
 // Real confirmation -> roster save -> reload -> both combat and exploration casts.
 g=setup();g.run(`var id=recruit(1);prepare(id);s.gold=1234;s.members[0].known=['halito','dumapic','identifyfoe'];s.members[0].maxMP=80;s.hp[0]=1;s.mp[0]=0;s.members[0].str=16;s.members[0].agi=17;recordLibrarySpells();var original=structuredClone(at(id));var libraryBefore=JSON.stringify(s.library);change(id,0)`);
 const old=json(g,'original'),changed=json(g,'at(id)');
 assert.equal(changed.members.id,old.members.id);assert.equal(changed.members.name,old.members.name);
 assert.deepEqual(changed.inventory,old.inventory);assert.deepEqual(changed.members.known,old.members.known);
 assert.equal(changed.members.level,1);assert.equal(changed.members.xp,0);assert.equal(changed.members.maxHP,old.members.maxHP);
-assert.equal(changed.hp,old.members.maxHP);assert.equal(changed.mp,80);assert.equal(changed.members.baseStr,16);assert.equal(changed.members.baseAgi,17);
+assert.equal(changed.hp,old.members.maxHP);assert.equal(changed.mp,72);assert.equal(changed.members.baseStr,16);assert.equal(changed.members.baseAgi,17);
 assert.equal(changed.members.attack,g.run('CLASSES[0].attack'));assert.equal(changed.members.ac,g.run('CLASSES[0].ac'));
 assert.equal(g.run('s.gold'),1234);assert.equal(g.run('JSON.stringify(s.library)'),g.run('libraryBefore'));
 let targets=[0,0];for(let l=2;l<=30;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*.8);
@@ -59,12 +78,12 @@ for(let n=0;n<3;n++){
 g.run('renderStats();battle()');assert.doesNotMatch(g.run("$('#statsbody').innerHTML"),/前職/);assert.equal(g.run('s.members[0].careerHistory.length'),1);
 assert.match(g.run("$('#commandentry').innerHTML"),/data-command-choice="spell"/);
 g.run(`openMagic(0);chooseBattleSpell(0,magic('halito'));partyAction(0)`);g.drain();
-assert(g.run('s.enemy.units[0].hp')<999);assert.equal(g.run('s.mp[0]'),80-g.run("magic('halito').mp"));
+assert(g.run('s.enemy.units[0].hp')<999);assert.equal(g.run('s.mp[0]'),72-g.run("magic('halito').mp"));
 g.run(`s.enemy=null;displayCombat=undefined;resetCommandEntry();s.pos=27;s.dir=1;s.cells[target()].open=false;openMagic(0);spellSelected='dumapic';renderMagic();$('#magiccast').onclick()`);g.drain();
-assert.equal(g.run('s.dumapicUses'),1);assert(g.run('s.mp[0]')<80-g.run("magic('halito').mp"));
+assert.equal(g.run('s.dumapicUses'),1);assert(g.run('s.mp[0]')<72-g.run("magic('halito').mp"));
 const known=json(g,'s.members[0].known');g.run('s.members[0].xp=s.members[0].xpTargets[11];Math.random=()=>0;levelUp()');
 assert.deepEqual(json(g,'s.members[0].known'),known);assert.equal(g.run('s.members[0].str'),18);assert.equal(g.run('s.members[0].agi'),18);
-assert.equal(g.run('s.members[0].maxMP'),80);
+assert.equal(g.run('s.members[0].maxMP'),72);
 console.log('PASS class change: confirmation/save/repeated reload, XP/identity/library invariants, inherited real battle/field casts and growth');
 
 // Weapon-only fallback, current weapon precedence, independent armor slots, equip compatibility.
