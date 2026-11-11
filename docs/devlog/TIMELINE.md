@@ -140,3 +140,4 @@
 | 100 | 寺院の蘇生成功率をVIT依存にする（上限は維持） | docs/devlog/specs/100-temple-chance-by-vit.md |
 
 | 101 | セーブデータのJSON書き出し・読み込み | docs/devlog/specs/101-save-json-export-import.md |
+| 102 | 2026-11-11 | Notion DBの差分反映（装備職・呪文MP・新規アイテム9件） |  | [spec](specs/102-notion-db-sync.md) |  |
