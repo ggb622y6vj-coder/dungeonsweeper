@@ -263,20 +263,36 @@ function isSaveObject(value){
 }
 function validateSaveData(data){
  if(!isSaveObject(data)||data.rosterVersion!==1||!Array.isArray(data.roster))return false;
- const ids=new Set();
- for(const record of data.roster){
+ const strings=value=>Array.isArray(value)&&value.every(item=>typeof item==='string');
+ const cells=value=>Array.isArray(value)&&[64,100,144].includes(value.length)&&value.every(isSaveObject);
+ const validRecord=record=>{
   if(!isSaveObject(record)||!isSaveObject(record.members))return false;
   const m=record.members;
-  if(typeof m.id!=='string'||!m.id.length||ids.has(m.id)||typeof m.name!=='string'||!Number.isInteger(m.job)||m.job<0||m.job>7||!Number.isInteger(m.level)||m.level<1||m.level>30)return false;
-  if(!Number.isFinite(record.hp)||!Number.isFinite(record.mp)||!Array.isArray(record.inventory)||!Number.isInteger(record.equipped)||record.equipped<0||!isSaveObject(record.armor)||!isSaveObject(record.ailments))return false;
-  ids.add(m.id);
+  if(typeof m.id!=='string'||!m.id.length||typeof m.name!=='string'||m.name.length<1||m.name.length>20||/[<>&"'\u0000-\u001f]/.test(m.name)||!Number.isInteger(m.job)||m.job<0||m.job>7||!Number.isInteger(m.level)||m.level<1||m.level>30)return false;
+  if('status' in m&&!['ok','dead','ash','lost','stone'].includes(m.status))return false;
+  for(const key of ['str','agi','intelligence','piety','vit'])if(key in m&&!Number.isFinite(m[key]))return false;
+  if('xp' in m&&(!Number.isFinite(m.xp)||m.xp<0))return false;
+  if('xpTargets' in m&&(!Array.isArray(m.xpTargets)||!m.xpTargets.every(Number.isFinite)))return false;
+  if('known' in m&&!strings(m.known)||'careerHistory' in m&&!Array.isArray(m.careerHistory))return false;
+  if(!Number.isFinite(record.hp)||!Number.isFinite(record.mp)||!strings(record.inventory)||!isSaveObject(record.armor)||!isSaveObject(record.ailments))return false;
+  const slot=value=>Number.isInteger(value)&&value>=0&&(!record.inventory.length||value<record.inventory.length);
+  return slot(record.equipped)&&Object.values(record.armor).every(slot);
+ };
+ const ids=new Set();
+ for(const record of data.roster){
+  if(!validRecord(record)||ids.has(record.members.id))return false;
+  ids.add(record.members.id);
  }
  if(!Array.isArray(data.partyIds)||data.partyIds.length>6||new Set(data.partyIds).size!==data.partyIds.length||!data.partyIds.every(id=>typeof id==='string'&&ids.has(id)))return false;
- if(!Array.isArray(data.corpses)||!data.corpses.every(isSaveObject))return false;
- if(!Number.isInteger(data.floor)||data.floor<1||data.floor>10||!Number.isInteger(data.size)||!Array.isArray(data.cells)||data.cells.length!==data.size*data.size||![64,100,144].includes(data.cells.length)||!data.cells.every(isSaveObject))return false;
+ if(!Array.isArray(data.corpses)||!data.corpses.every(c=>isSaveObject(c)&&(!('records' in c)||(Array.isArray(c.records)&&c.records.every(validRecord)))))return false;
+ if(!Number.isInteger(data.floor)||data.floor<1||data.floor>10||!Number.isInteger(data.size)||!cells(data.cells)||data.cells.length!==data.size*data.size)return false;
  if(!Number.isFinite(data.gold)||data.gold<0)return false;
- for(const key of ['guardiansDefeated','elevatorFloors','logs'])if(key in data&&!Array.isArray(data[key]))return false;
- if('floors' in data&&(!isSaveObject(data.floors)||!Object.values(data.floors).every(f=>isSaveObject(f)&&(!('cells' in f)||(Array.isArray(f.cells)&&[64,100,144].includes(f.cells.length))))))return false;
+ for(const key of ['guardiansDefeated','elevatorFloors','templeReport'])if(key in data&&!Array.isArray(data[key]))return false;
+ if('logs' in data&&!strings(data.logs))return false;
+ if('floors' in data&&(!isSaveObject(data.floors)||!Object.values(data.floors).every(f=>isSaveObject(f)&&
+  (!('cells' in f)||cells(f.cells))&&(!('size' in f)||(Number.isInteger(f.size)&&(!('cells' in f)||f.size*f.size===f.cells.length)))&&
+  (!('floor' in f)||(Number.isInteger(f.floor)&&f.floor>=1&&f.floor<=10)))))return false;
+ if('enemy' in data&&data.enemy!==null&&(!isSaveObject(data.enemy)||('units' in data.enemy&&(!Array.isArray(data.enemy.units)||!data.enemy.units.every(isSaveObject)))))return false;
  return true;
 }
 function clearSaveImport(){pendingSaveImport=null;saveImportRequest++;$('#savefileinput').value=''}
