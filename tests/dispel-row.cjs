@@ -36,5 +36,33 @@ g.run(`s.dispelRows[${P}]=23;Math.random=()=>0;dispelUndead(${P})`);assert.deepE
 setup(MIX);g.run(`s.commands[${P}]='dispel';s.dispelRows[${P}]=39`);assert.equal(g.run(`commandSummary(${P})`),'呪いを解く → 3列');
 // MP is not spent.
 setup(MIX);const mp=g.run(`s.mp[${P}]`);g.run(`s.dispelRows[${P}]=7;Math.random=()=>0;dispelUndead(${P})`);assert.equal(g.run(`s.mp[${P}]`),mp);
+// 103: one living undead row confirms immediately; two or more still ask; none stays disabled.
+function chooseDispel(){
+ g.run('resetCommandEntry();render()');
+ const before=J('commandMembers()').indexOf(P);
+ assert.ok(before>=0,'priest can act');
+ for(let k=0;k<before;k++) g.run(`confirmCommand(commandMembers()[${k}])`);
+ assert.equal(g.run('commandMembers()[commandIndex]'),P);
+ g.run(`$('#commandentry').onclick({target:{closest:q=>q==='[data-command-choice]'?{dataset:{commandChoice:'dispel'}}:null}})`);
+}
+setup([u(1,'skeleton',7),u(3,'wolf',23)]);chooseDispel();
+assert.equal(g.run('choosingRow'),false);
+assert.equal(g.run(`s.commands[${P}]`),'dispel');
+assert.equal(g.run(`String(s.dispelRows[${P}])`),'7');
+assert.equal(g.run(`commandConfirmed[${P}]`),true);
+assert.equal(g.run("$('#commandentry').innerHTML.includes('data-row-choice')"),false);
+assert.equal(g.run(`commandSummary(${P})`),'呪いを解く → 1列');
+setup(MIX);chooseDispel();
+assert.equal(g.run('choosingRow'),'dispel');
+assert.equal(g.run(`s.commands[${P}]`),'guard');
+assert.equal(g.run(`!!commandConfirmed[${P}]`),false);
+assert.match(g.run("$('#commandentry').innerHTML"),/data-row-choice="7"/);
+assert.match(g.run("$('#commandentry').innerHTML"),/data-row-choice="39"/);
+assert.doesNotMatch(g.run("$('#commandentry').innerHTML"),/data-row-choice="23"/);
+setup([u(3,'wolf',23)]);chooseDispel();
+assert.equal(g.run('choosingRow'),false);
+assert.equal(g.run(`s.commands[${P}]`),'guard');
+assert.equal(g.run(`!!commandConfirmed[${P}]`),false);
+assert.equal(g.run("$('#commandentry').innerHTML.includes('data-row-choice')"),false);
 g.drain();
-console.log('PASS dispel row: undead-only choices, chosen row only, per-undead rolls, no XP, frontmost-undead fallback, no-undead no effect, summary, no MP');
+console.log('PASS dispel row: undead-only choices, chosen row only, per-undead rolls, no XP, frontmost-undead fallback, no-undead no effect, summary, no MP, single-row auto, multi-row prompt');

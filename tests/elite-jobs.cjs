@@ -125,7 +125,7 @@ for(const job of [4,5,6]){
  g.run('s.members[0].level=120');assert.equal(g.run('physicalAttack(0,s.enemy.units[0]).count'),10);
 }
 // Lord command click -> stable row selection -> party action; bishop never displays it.
-g=setup();g.run(`elite(5);battle();s.enemy.units=[{...makeEnemy('skeleton',901),row:73},{...makeEnemy('goblin',902),row:98}];render()`);
+g=setup();g.run(`elite(5);battle();s.enemy.units=[{...makeEnemy('skeleton',901),row:73},{...makeEnemy('goblin',902),row:98},{...makeEnemy('skeleton',903),row:50}];render()`);
 assert.match(g.run("$('#commandentry').innerHTML"),/data-command-choice="dispel"/);
 g.run(`$('#commandentry').onclick({target:{closest:q=>q==='[data-command-choice]'?{dataset:{commandChoice:'dispel'}}:null}})`);
 assert.equal(g.run('choosingRow'),'dispel');

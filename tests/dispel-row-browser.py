@@ -64,13 +64,12 @@ with sync_playwright() as p:
         page.screenshot(path=str(out / f'review-{width}.png'))
         press('#attack'); page.wait_for_function('!logBusy()')
         h = hp(page); assert h[0] == 20 and h[1] == 20 and h[2] > 0 and h[3] == 0, h
-        # Turn 2, keyboard: only row 1 is left with undead.
+        # Turn 2, keyboard: one undead row left, so 呪いを解く confirms it without a row prompt.
         page.wait_for_selector('[data-command-choice="guard"]')
         key_to('[data-command-choice="guard"]')
         key_to('[data-command-choice="dispel"]')
-        c2 = page.locator('[data-row-choice]').all_inner_texts()
-        assert len(c2) == 1 and c2[0].startswith('1列：') and c2[0].endswith('×2'), page.locator('#commandentry').inner_html()
-        key_to('[data-row-choice="7"]')
+        assert page.locator('[data-row-choice]').count() == 0, page.locator('#commandentry').inner_html()
+        assert page.evaluate('choosingRow===false && s.commands[1]==="dispel" && String(s.dispelRows[1])==="7"')
         for _ in range(4): key_to('[data-command-choice="guard"]')
         assert '呪いを解く → 1列' in page.locator('#commandreviewpopup').inner_text()
         key_to('#attack'); page.wait_for_function('!logBusy()')
@@ -83,6 +82,6 @@ with sync_playwright() as p:
         page.screenshot(path=str(out / f'disabled-{width}.png'))
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
-        print(f'PASS dispel-row Chromium {width}px: undead-only rows, {"tap" if touch else "mouse"} + keyboard choice, review n列, chosen row only, disabled without undead')
+        print(f'PASS dispel-row Chromium {width}px: multi-row choice, single-row auto, {"tap" if touch else "mouse"} + keyboard, review n列, chosen row only, disabled without undead')
         ctx.close()
     browser.close()
