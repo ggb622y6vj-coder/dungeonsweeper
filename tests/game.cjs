@@ -347,3 +347,5 @@ require('./elite-jobs.cjs');
 
 require('./flag-sight.cjs');
 require('./stat-growth.cjs');
+
+require('./save-transfer.cjs');

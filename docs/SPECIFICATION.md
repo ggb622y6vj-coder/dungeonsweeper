@@ -287,3 +287,20 @@ HPは従来の職業初期値±3、MPは魔法使い20±2・僧侶15±2・戦士
 旧セーブ向けの呪文自動補完（`ensureMagic`・`ensureMakanito`）は、`classChanged===true` または履歴1件以上なら適用しない。未転職の既存4職の補完結果（控えとパーティーの従来の差を含む）は維持する。転職で魔法使いになったメンバーの識別・判別はLv2へのレベルアップで習得する。上級職へ自動変換したり、読込のたびに呪文やXPを再抽選したりしない。
 
 `classChanged` はメンバー内の任意の真偽値項目で、`ash-v1`・`rosterVersion:1` は維持する。パーティー・控え・並べ替え・全滅時の遺体・回収を通して職業・履歴・classChanged・習得呪文・装備を保持し、繰り返し読込でも変化させない。
+
+## 14. セーブデータのJSON書き出し・読み込み（101）
+
+町の「設定」のキーヒント切替の下に、書き出し／読み込みボタンを置く。操作待ち（`idle()`）のときだけ実行し、結果は設定内の `#savenotice` に表示する。自動保存の `ash-v1`、`rosterVersion:1`、起動時の読み込み・移行処理は従来どおり。
+
+書き出しは `saveExportEnvelope()` で `{format:'dungeonsweeper-save', formatVersion:1, exportedAt:ISO日時, data:rosterSaveState()}` を生成し、インデント付きJSONをBlobと一時URLでダウンロードする。ファイル名は端末の現地時刻による `ds_YYYYMMDD_HHMMSS.json`。URLは使用後に解放する。冒険データ全体（控え・遺体・階層アーカイブ・図鑑を含む）が対象で、端末設定 `ash-keyhint` は含まない。通常のID補修を除きゲーム状態を変えず、localStorageへは書き込まない。
+
+読み込みは5MiB以下のファイルをJSONとして解析し、プレーンなエンベロープ・format・formatVersion（1のみ）・dataを検査する。`validateSaveData(data)` は入力を変更せず真偽値を返し、以下を検査する。
+
+- `rosterVersion===1`、ロスター配列と各レコード／membersのオブジェクト型、空でない一意の文字列ID、文字列name、整数job（0〜7）・level（1〜30）、有限数hp/mp、inventory配列、0以上の整数equipped、armor/ailmentsのオブジェクト型。
+- `partyIds` は重複なし・全IDがロスターに存在する文字列配列で最大6人。`corpses` はオブジェクトの配列。
+- 整数floor（1〜10）・size、cells配列の長さがsizeの二乗かつ64/100/144で、各セルはオブジェクト。goldは0以上の有限数。
+- 任意のguardiansDefeated/elevatorFloors/logsは存在すれば配列。floorsは存在すればオブジェクトで、各値もオブジェクト、各値にcellsがあれば配列で長さ64/100/144。その他の項目は前方互換のため通す。
+
+さらに `restoreRoster(structuredClone(data))` を試し、復元結果のcells長とmembers配列を確認する。確定前は `s` とlocalStorageを変更せず、候補はUI用一時変数だけに保持する。確認ダイアログには書き出し日時（現地時刻・欠落や無効値は「日時不明」）、登録人数、パーティ人数、地下N階、上書きの説明を表示する。動的文字列はtextContentのみで設定する。キャンセルを既定／戻る操作とし、キャンセル・閉じるでは候補とファイル入力を空にする。
+
+「上書きする」で現在の `ash-v1` の生テキストを `ash-v1-backup` に退避（元がnullなら省略）し、候補dataを `ash-v1` に保存する。退避失敗なら書き込みを中止。保存失敗は確認画面内の `#importnotice` に通知する。読み戻しでrosterVersionとロスター長を確認し、不一致・解析失敗なら元の生テキストへ戻す（元がnullならキーを削除）。復元失敗も通知する。成功後はページを再読み込みし、既存の起動処理で反映する。書き込むキーはこの2つだけで、`ash-keyhint` は読み込みでも変更しない。合併・複数スロット・クラウド同期・暗号化は扱わない。
