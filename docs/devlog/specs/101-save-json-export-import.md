@@ -99,3 +99,34 @@ Notion「セーブデータのJSON書き出し・読み込み（Muse向け試案
 - 実装は dist/game.js と dist/index.html を中心とし、新規ファイルは作らない（テストは除く）。対象範囲を厳密に守り、範囲外のリファクタリングや整形をしないこと。
 - テストが落ちたら、期待値を緩めたりテストを削除したりせず、原因を切り分けて報告書に書くこと。
 - 敵のHP・能力値をプレイ画面に出す変更、ダイスの内部計算のログ出力は禁止です。
+
+## Amendment 1（ChatGPT レビュー必須修正への対応、2026-11-11）
+
+ChatGPT レビュー（会話 6af3b86c）は条件付き統合可で、必須修正2件を挙げた。Muse が再現確認済み：HTML 特殊文字を含む冒険者名が検証を通過し（render は innerHTML を使用）、`logs:[null]`（immediateChestVersion なし）・`inventory:[null]`・保存済み階層の cells の null 要素も通過し、`logs:[null]` は ensureProfile で実際に TypeError を投げる。
+
+`validateSaveData` を次のとおり拡張する（未知フィールドを通す前方互換の方針は維持し、既存処理が解釈するフィールドの型を締める）。
+
+### レコード検証（ロスターと遺体の records の両方に適用）
+
+- `members.name`：文字列、1〜20文字、かつ `[<>&"'\u0000-\u001f]` を含まない（generateRecruit が除去する文字種。書き換えず拒否する）。
+- `members.status`：あれば `ok/dead/ash/lost/stone` のいずれか。
+- `members` の数値：`str/agi/intelligence/piety/vit` はあれば有限数。`xp` はあれば有限数かつ0以上。`xpTargets` はあれば有限数の配列。`known` はあれば文字列の配列。`careerHistory` はあれば配列。
+- `inventory`：文字列の配列。`equipped`：0以上の整数で、inventory が空でなければ `inventory.length` 未満。`armor`：プレーンなオブジェクトで、値は0以上の整数（inventory が空でなければ長さ未満）。
+
+### トップレベル追加検証
+
+- `logs`：あれば文字列の配列。
+- `cells`：各要素がプレーンなオブジェクトであること（現行実装の確認と固定）。
+- `floors`：各値はプレーンなオブジェクト。`cells` があれば長さ 64/100/144 のプレーンなオブジェクトの配列、`size` があれば整数で cells と整合（size*size===cells.length）、`floor` があれば 1〜10 の整数。
+- `corpses`：各要素はプレーンなオブジェクト。`records` があれば配列で、各要素にレコード検証を適用する。
+- `enemy`：あれば null かプレーンなオブジェクト。`units` があればプレーンなオブジェクトの配列。
+- `templeReport`：あれば配列。
+
+### テスト追加
+
+- tests/save-transfer.cjs：上記の拒否ケース（HTML 名・21文字名・引用符/アンパサンド名、logs の null/数値/オブジェクト要素、floors の cells の null 要素と size 不整合、inventory の非文字列要素、equipped/armor の範囲外、xpTargets/known の型崩れ、不正な status、遺体レコードの HTML 名）と、複雑な実状態（2F アーカイブ・控え・遺体・状態異常を含む）の受け入れ＋往復不変。
+- tests/save-transfer-browser.py：HTML 名を含むファイルが通知つきで拒否され再読込が起きないこと、インポート後の2回目の再読込でも状態が維持されること。
+
+### 問題C（記録のみ、101 では対応しない）
+
+再読込後の起動で例外が発生した場合の自動ロールバックはない（退避キー `ash-v1-backup` は存在するが、起動処理には触れない制約のため自動復元は入れない）。ChatGPT も「101 では検証の厳格化を優先し、C は分離可能」としている。元試案の安全要件を完全には満たしていない点として記録し、将来の別指示書の候補とする。
