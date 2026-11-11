@@ -239,6 +239,88 @@ function weapon(id){return WEAPONS.find(w=>w.id===id)||MEDICINES.find(w=>w.id===
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
 function diceLabel(w){if(w.kind==='medicine')return w.description;if(w.part)return `${{head:"頭",body:"胴体",feet:"足"}[w.part]} AC −${w.ac}`;return `${w.dice[0]}d${w.dice[1]}${w.dice[2]?'+'+w.dice[2]:''}`}
 function idle(){return !s.pendingElevator&&!allyTargetPick&&!currentChest()&&!logBusy()&&!s.enemy&&!s.pendingBoss&&!s.pendingStairs}
+// File transfer keeps pending data outside the saved game state.
+let pendingSaveImport=null,saveImportRequest=0;
+function saveExportEnvelope(){return {format:'dungeonsweeper-save',formatVersion:1,exportedAt:new Date().toISOString(),data:rosterSaveState()}}
+function exportSaveData(){
+ const notice=$('#savenotice');
+ if(!idle()){notice.textContent='操作が終わってから書き出してください。';return}
+ let url,link;
+ try{
+  const envelope=saveExportEnvelope(),now=new Date(envelope.exportedAt),pad=n=>String(n).padStart(2,'0');
+  url=URL.createObjectURL(new Blob([JSON.stringify(envelope,null,2)],{type:'application/json'}));
+  link=document.createElement('a');link.href=url;
+  link.download=`ds_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.json`;
+  document.body.append(link);link.click();
+  notice.textContent='セーブデータを書き出しました。';
+ }catch{notice.textContent='書き出しに失敗しました。'}
+ finally{if(link)link.remove();if(url)setTimeout(()=>URL.revokeObjectURL(url),0)}
+}
+function isSaveObject(value){
+ if(!value||Object.prototype.toString.call(value)!=='[object Object]')return false;
+ const proto=Object.getPrototypeOf(value);
+ return proto===null||Object.getPrototypeOf(proto)===null;
+}
+function validateSaveData(data){
+ if(!isSaveObject(data)||data.rosterVersion!==1||!Array.isArray(data.roster))return false;
+ const ids=new Set();
+ for(const record of data.roster){
+  if(!isSaveObject(record)||!isSaveObject(record.members))return false;
+  const m=record.members;
+  if(typeof m.id!=='string'||!m.id.length||ids.has(m.id)||typeof m.name!=='string'||!Number.isInteger(m.job)||m.job<0||m.job>7||!Number.isInteger(m.level)||m.level<1||m.level>30)return false;
+  if(!Number.isFinite(record.hp)||!Number.isFinite(record.mp)||!Array.isArray(record.inventory)||!Number.isInteger(record.equipped)||record.equipped<0||!isSaveObject(record.armor)||!isSaveObject(record.ailments))return false;
+  ids.add(m.id);
+ }
+ if(!Array.isArray(data.partyIds)||data.partyIds.length>6||new Set(data.partyIds).size!==data.partyIds.length||!data.partyIds.every(id=>typeof id==='string'&&ids.has(id)))return false;
+ if(!Array.isArray(data.corpses)||!data.corpses.every(isSaveObject))return false;
+ if(!Number.isInteger(data.floor)||data.floor<1||data.floor>10||!Number.isInteger(data.size)||!Array.isArray(data.cells)||data.cells.length!==data.size*data.size||![64,100,144].includes(data.cells.length)||!data.cells.every(isSaveObject))return false;
+ if(!Number.isFinite(data.gold)||data.gold<0)return false;
+ for(const key of ['guardiansDefeated','elevatorFloors','logs'])if(key in data&&!Array.isArray(data[key]))return false;
+ if('floors' in data&&(!isSaveObject(data.floors)||!Object.values(data.floors).every(f=>isSaveObject(f)&&(!('cells' in f)||(Array.isArray(f.cells)&&[64,100,144].includes(f.cells.length))))))return false;
+ return true;
+}
+function clearSaveImport(){pendingSaveImport=null;saveImportRequest++;$('#savefileinput').value=''}
+async function importSaveFile(file){
+ clearSaveImport();
+ const request=saveImportRequest,notice=$('#savenotice');notice.textContent='';
+ if(!file)return;
+ if(!idle()){notice.textContent='操作が終わってから読み込んでください。';return}
+ if(file.size>5*1024*1024){notice.textContent='ファイルが大きすぎます。上限は5MiBです。';return}
+ let envelope;
+ try{envelope=JSON.parse(await file.text())}catch{if(request===saveImportRequest)notice.textContent='JSONファイルを読み込めませんでした。';return}
+ if(request!==saveImportRequest)return;
+ if(!isSaveObject(envelope)||envelope.format!=='dungeonsweeper-save'){notice.textContent='セーブファイルの形式が正しくありません。';return}
+ if(envelope.formatVersion!==1){notice.textContent='未対応のセーブファイルバージョンです。';return}
+ if(!validateSaveData(envelope.data)){notice.textContent='セーブデータの内容が正しくありません。';return}
+ try{
+  const restored=restoreRoster(structuredClone(envelope.data));
+  if(!restored||!Array.isArray(restored.cells)||![64,100,144].includes(restored.cells.length)||!Array.isArray(restored.members))throw Error('restore');
+ }catch{notice.textContent='セーブデータを復元できませんでした。';return}
+ if(!idle()){notice.textContent='操作が終わってから読み込んでください。';return}
+ const date=typeof envelope.exportedAt==='string'?new Date(envelope.exportedAt):null;
+ $('#importsummary').textContent=`書き出し日時：${date&&Number.isFinite(date.getTime())?date.toLocaleString():'日時不明'}\n登録冒険者数：${envelope.data.roster.length}人\nパーティ人数：${envelope.data.partyIds.length}人\n現在階：地下${envelope.data.floor}階`;
+ $('#importnotice').textContent='';pendingSaveImport=envelope.data;
+ $('#importdialog').showModal();
+}
+function confirmSaveImport(){
+ if(!pendingSaveImport)return;
+ const data=pendingSaveImport,notice=$('#importnotice');
+ if(!idle()){notice.textContent='操作が終わってから読み込んでください。';return}
+ let raw;
+ try{raw=localStorage.getItem('ash-v1');if(raw!==null)localStorage.setItem('ash-v1-backup',raw)}
+ catch{notice.textContent='現在のデータの退避に失敗しました。読み込みを中止しました。';return}
+ try{localStorage.setItem('ash-v1',JSON.stringify(data))}
+ catch{notice.textContent='セーブデータの保存に失敗しました。';return}
+ try{
+  const saved=JSON.parse(localStorage.getItem('ash-v1'));
+  if(saved?.rosterVersion!==1||!Array.isArray(saved.roster)||saved.roster.length!==data.roster.length)throw Error('readback');
+ }catch{
+  try{if(raw===null)localStorage.removeItem('ash-v1');else localStorage.setItem('ash-v1',raw)}
+  catch{notice.textContent='保存の確認と元のデータの復元に失敗しました。';return}
+  notice.textContent='保存の確認に失敗したため、元のデータに戻しました。';return;
+ }
+ location.reload();
+}
 function canThiefDisarm(i){const k=target();return !!s.members[i]&&[3,6].includes(jobOf(i))&&!partyIncapacitated(i)&&idle()&&s.area==='dungeon'&&!s.members[i].disarmUsed&&k>=0&&k<s.cells.length&&!s.cells[k].open}
 function thiefDisarm(i){if(!canThiefDisarm(i))return;const t=target(),c=s.cells[t];s.members[i].disarmUsed=true;c.flag=false;if(c.trap){c.trap=false;c.disarmed=true;log(`${NAMES[i]}は目の前の罠を解除した。`)}else log(`${NAMES[i]}は目の前を調べた。罠はなかった。`);c.open=true;checkElevatorUnlock(t);render()}
 function enterTown(){if(!idle())return;const carried=s.defeatPending?[]:s.members.filter(m=>['dead','ash','lost','stone'].includes(m.status)).map(m=>({id:m.id,name:m.name||CLASSES[m.job??0].name,status:m.status}));s.area='town';const levels=s.members.map((m,i)=>m.status==='ok'?i:-1).filter(i=>i>=0);levelUp(levels);s.hp=s.members.map((m,i)=>m.status==='ok'?m.maxHP:s.hp[i]);s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);s.templeReport=carried.map(({name,status})=>({name,status}));s.ailments=s.ailments.map(()=>freshAilments());if(carried.length)removeFromParty(carried.map(x=>x.id));s.light=false;s.milwaSteps=0;s.teppeki=false;s.watchful=false;s.flagSight=false;s.dumapicUses=0;s.floodUses=0;for(const m of s.members)delete m.disarmUsed;for(const r of s.reserve||[])delete r.members.disarmUsed;s.ailments=s.ailments.map(()=>freshAilments());s.scan=5;s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.pendingElevator=false;resetDungeon();autoReorderParty('town');render();showTempleCarryReport()}
@@ -339,6 +421,13 @@ for(const id of ['mapdialog','statsdialog','leveldialog']){const d=$('#'+id);d.a
 
 function isEquipped(i,slot){return s.equipped[i]===slot||Object.values(s.armor[i]).includes(slot)}
 function effectiveAC(i){return memberClass(i).ac-Object.values(s.armor[i]).reduce((n,k)=>n+(weapon(s.inventory[i][k])?.ac||0),0)-Math.max(s.teppeki?2:0,s.enemy?.partyAC||0)}
+$('#saveexport').onclick=exportSaveData;
+$('#saveimport').onclick=()=>{if(idle()){clearSaveImport();$('#savefileinput').click()}else $('#savenotice').textContent='操作が終わってから読み込んでください。'};
+$('#savefileinput').onchange=()=>importSaveFile($('#savefileinput').files[0]);
+$('#importcancel').onclick=()=>{clearSaveImport();$('#importdialog').close()};
+$('#importdialog').addEventListener('close',()=>{if(!$('#importdialog').open)clearSaveImport()});
+$('#keysettingsdialog').addEventListener('close',()=>{if(!$('#keysettingsdialog').open)clearSaveImport()});
+$('#importconfirm').onclick=confirmSaveImport;
 $('#resetopen').onclick=()=>$('#resetdialog').showModal();$('#resetcancel').onclick=()=>$('#resetdialog').close();$('#resetconfirm').onclick=()=>{s=null;fresh();s.area='town';s.hp=s.members.map(m=>m.maxHP);s.mp=s.members.map(m=>m.maxMP);$('#resetdialog').close();render()};
 
 function visibleAilments(i){let a=(displayVitals?.ailments||s.ailments)[i]||{},hp=(displayVitals?.hp||s.hp)[i],status=shownMember(i).status,label={dead:'死亡',ash:'灰',lost:'ロスト',stone:'石化'}[status];return label?[[status,label]]:hp<=0?[['dead','死亡']]:[[a.poison,'poison','毒'],[a.paralysis>0,'paralysis','麻痺'],[a.sleep>0,'sleep','睡眠'],[a.silence>0,'silence','沈黙'],[a.fear>0,'fear','恐怖']].filter(([active])=>active).map(([,kind,label])=>[kind,label])}
