@@ -79,14 +79,12 @@ $('#renamename').addEventListener('keydown',e=>{
  $('#renameconfirm').onclick();
 });
 
-// The tavern shares the existing registration UI; closing it returns one layer
-// and refreshes the roster so a later formation save cannot resurrect old data.
+// The tavern shares the registration UI. Closing it returns one layer and
+// refreshes that roster by member id, so a later save cannot resurrect someone
+// who was removed and an unconfirmed formation is not replaced by the saved party.
 $('#tavernmanage').onclick=()=>$('#trainingopen').onclick();
 $('#training').addEventListener('close',()=>{
- if(!$('#training').open&&$('#taverndialog').open){
-  tavernRoster=trainingRoster();tavernOrder=Array.from({length:6},(_,i)=>i<s.members.length?i:-1);
-  renderTavern();
- }
+ if(!$('#training').open&&$('#taverndialog').open)refreshTavernRoster();
 });
 $('#recruitname').addEventListener('keydown',e=>{
  if(e.key!=='Enter'||e.ctrlKey||e.altKey||e.metaKey||e.isComposing||e.repeat)return;
