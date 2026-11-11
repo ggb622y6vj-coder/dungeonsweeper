@@ -66,17 +66,25 @@ with sync_playwright() as p:
               render();return m.id;
             }""", job)
             page.locator('#trainingopen').click()
+            page.locator('#trainingtab-edit').click()
             assert page.locator('#recruitjob option').count() == 4
             page.locator(f'[data-class-change="{candidate}"]').click()
             assert page.locator('[data-class-job]').count() == 8
-            for target, feature in enumerate(FEATURES, 4):
-                assert feature in page.locator(f'[data-class-job="{target}"]').inner_text()
+            for target, name in enumerate(['戦士','魔法使い','僧侶','盗賊','侍','君主','忍者','司教']):
+                button = page.locator(f'[data-class-job="{target}"]')
+                assert button.inner_text().strip() == name
+            for feature in FEATURES:
+                assert feature not in page.locator('#classchangejobs').inner_text()
             # All weapons are present, so rejection here proves the prior-job guard.
             denied = (5, 6) if job == 7 else (7,)
             for target in denied:
                 button = page.locator(f'[data-class-job="{target}"]')
                 assert button.is_disabled()
-                assert '前職が' in button.inner_text()
+                assert '前職が' in button.get_attribute('title')
+                assert 'job-ready' not in (button.get_attribute('class') or '')
+            ready = page.locator(f'[data-class-job="{job}"]')
+            assert 'job-ready' in ready.get_attribute('class')
+            assert ready.evaluate('e=>getComputedStyle(e).boxShadow') != 'none'
             before = page.evaluate('JSON.stringify(rosterSaveState())')
             page.locator(f'[data-class-job="{job}"]').click()
             no_overflow(page)

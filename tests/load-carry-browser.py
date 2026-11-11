@@ -25,8 +25,10 @@ with sync_playwright() as p:
   for i,job in enumerate([0,0,0,2,1,3]):
    page.locator('#recruitname').fill('旧冒険者'+str(i));page.locator('#recruitjob').select_option(str(job))
    page.locator('#rollrecruit').click();page.locator('#registerrecruit').click()
-   page.locator('#recruitlist section').last.get_by_role('button',name='加入',exact=True).click()
   page.locator('#trainingclose').click()
+  page.locator('#tavernopen').click()
+  for i in range(6):page.locator('#tavernslots select').nth(i).select_option(str(i))
+  page.locator('#tavernsave').click()
   dialog=page.locator('#templecarrydialog')
   # Healthy town reload: no dialog.
   page.reload()

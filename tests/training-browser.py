@@ -35,6 +35,8 @@ with sync_playwright() as p:
   page.locator('#libraryclose').click();assert not page.locator('#librarydialog').is_visible()
   page.locator('#libraryopen').click();page.keyboard.press('Escape');assert not page.locator('#librarydialog').is_visible()
   page.locator('#trainingopen').click()
+  assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
+  assert page.locator('#trainingpanel-edit').evaluate('e=>e.hidden')
   page.locator('#rollrecruit').click();assert page.locator('#registerrecruit').is_disabled()
   for i,job in enumerate([0,0,0,2,1,3,1]):
    page.locator('#recruitname').fill('冒険者'+str(i));page.locator('#recruitjob').select_option(str(job))
@@ -42,16 +44,48 @@ with sync_playwright() as p:
    if i==0:
     page.locator('#rollrecruit').click();assert '(' in page.locator('#recruitpreview').inner_text()
    page.locator('#registerrecruit').click();assert page.locator('#registerrecruit').is_disabled()
-   if i<6:page.locator('#recruitlist section').last.get_by_role('button',name='加入',exact=True).click()
-  assert page.locator('#recruitlist section').last.get_by_role('button',name='加入',exact=True).is_disabled()
-  page.locator('#recruitlist section').first.get_by_role('button',name='後ろへ',exact=True).click()
-  page.locator('#recruitlist section').first.get_by_role('button',name='離脱',exact=True).click()
-  page.locator('#recruitlist section').last.get_by_role('button',name='加入',exact=True).click()
+  page.locator('#trainingtab-edit').click()
+  assert page.locator('#trainingtab-edit').get_attribute('aria-selected')=='true'
+  assert page.locator('#trainingpanel-create').evaluate('e=>e.hidden')
+  page.locator('#trainingtab-edit').focus();page.keyboard.press('ArrowLeft')
+  assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
+  page.keyboard.press('e')
+  assert page.locator('#trainingtab-edit').get_attribute('aria-selected')=='true'
+  page.keyboard.press('q')
+  assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
+  page.locator('#trainingtab-edit').focus();page.keyboard.press('Home')
+  assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
+  page.locator('#recruitname').focus();page.keyboard.press('e')
+  assert page.locator('#trainingtab-create').get_attribute('aria-selected')=='true'
+  assert page.locator('#recruitname').input_value()=='e'
+  page.locator('#recruitname').fill('')
+  page.locator('#trainingtab-edit').click()
+  assert page.locator('#trainingreorder,#trainingorderdialog,#trainingorderlist').count()==0
+  assert page.locator('#recruitlist').get_by_role('button',name='加入').count()==0
+  assert page.locator('#recruitlist').get_by_role('button',name='離脱').count()==0
+  assert page.locator('#recruitlist').get_by_role('button',name='前へ').count()==0
+  assert page.locator('#recruitlist').get_by_role('button',name='後ろへ').count()==0
+  assert page.locator('#recruitlist section').count()==7
   page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click()
   page.locator('#recruitdeletecancel').click();assert page.locator('#recruitlist section').count()==7
+  page.locator('#recruitlist section').first.get_by_role('button',name='名前の変更',exact=True).click()
+  assert page.locator('#renamedialog').is_visible()
+  page.locator('#renamename').fill('<tag>');page.locator('#renameconfirm').click()
+  assert '使えない文字' in page.locator('#renamenotice').inner_text()
+  page.locator('#renamename').fill('');page.locator('#renameconfirm').click()
+  assert '1〜20' in page.locator('#renamenotice').inner_text()
+  page.locator('#renamename').fill('  新しい名前  ');page.locator('#renameconfirm').click()
+  assert not page.locator('#renamedialog').is_visible()
+  assert page.locator('#recruitlist h4').first.evaluate('e=>e.textContent').startswith('新しい名前')
+  assert page.evaluate("s.reserve[0].members.name")=='新しい名前'
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
   assert page.locator('#training').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
   page.screenshot(path=f'/tmp/training-{width}.png')
+  page.locator('#trainingclose').click()
+  page.locator('#tavernopen').click()
+  for i in range(6):page.locator('#tavernslots select').nth(i).select_option(str(i))
+  page.locator('#tavernsave').click()
+  assert page.evaluate('s.members.length===6 && s.reserve.length===1')
   before=page.evaluate('JSON.stringify(trainingRoster())');order=page.evaluate('s.members.map(m=>m.id)')
   page.reload();assert page.evaluate('JSON.stringify(trainingRoster())')==before;assert page.evaluate('s.members.map(m=>m.id)')==order
   # Purchase via the shop and win a deterministic 1F combat via the real turn path.
@@ -121,12 +155,13 @@ with sync_playwright() as p:
   assert page.evaluate(dead_ok,dead_id)
   assert not page.locator('#templecarrydialog').is_visible()
   page.locator('#trainingopen').click()
+  page.locator('#trainingtab-edit').click()
   while page.locator('#recruitlist section').count():
    page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click();page.locator('#recruitdeleteconfirm').click()
   page.locator('#trainingclose').click();assert page.locator('#entrance').is_disabled()
   page.reload();assert page.evaluate('trainingRoster().length')==0
   assert page.evaluate('s.library.monsters.slime.count===1 && s.library.items.helm && s.library.items.plate && s.library.items.healingPotion')
   assert not errors,errors
-  print(f'PASS Chromium {width}px: create/reroll/confirm, seven recruits, cap, reorder/bench/join, delete cancel/confirm, reload, combat, town return levels/heals ok members, carries dead to reserve with XP, carry dialog before level report, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
+  print(f'PASS Chromium {width}px: create/reroll/confirm, tabs, rename, seven recruits, tavern join, delete cancel/confirm, reload, combat, town return levels/heals ok members, carries dead to reserve with XP, carry dialog before level report, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
   ctx.close()
  browser.close()

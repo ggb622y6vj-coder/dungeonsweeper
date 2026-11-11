@@ -344,6 +344,7 @@ require('./action-order.cjs');
 
 require('./class-change.cjs');
 require('./elite-jobs.cjs');
+require('./training-menu.cjs');
 
 require('./flag-sight.cjs');
 require('./stat-growth.cjs');

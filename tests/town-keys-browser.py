@@ -111,12 +111,20 @@ with sync_playwright() as p:
         page.keyboard.down('Escape'); page.keyboard.down('Escape'); page.keyboard.up('Escape')
         assert focused(page, '#rollrecruit')
         assert page.locator('#training').is_visible()
-        join = '#recruitlist section:first-child .recruit-actions button:first-child'
-        delete = '#recruitlist section:first-child .recruit-actions button:last-child'
-        choose(page, join)
-        assert page.evaluate('s.members.length') == 1
-        choose(page, join)
+        page.keyboard.press('e')
+        assert page.locator('#trainingtab-edit').get_attribute('aria-selected') == 'true'
+        assert page.locator('#trainingreorder').count() == 0
+        assert page.locator('#recruitlist section:first-child .recruit-actions button').all_inner_texts() == ['転職', '名前の変更', '登録抹消']
         assert page.evaluate('s.members.length===0&&s.reserve.length===1')
+        rename = '#recruitlist section:first-child .recruit-actions button:nth-child(2)'
+        choose(page, rename)
+        assert focused(page, '#renamecancel')
+        assert page.locator('#renamedialog').is_visible()
+        page.keyboard.press('Escape')
+        assert not page.locator('#renamedialog').is_visible()
+        assert focused(page, rename)
+        assert page.evaluate("trainingRoster()[0].members.name") == 'wasd qe'
+        delete = '#recruitlist section:first-child .recruit-actions button:last-child'
         choose(page, delete)
         assert focused(page, '#recruitdeletecancel')
         assert page.locator('#recruitdeletecancel').inner_text() == 'キャンセル'
@@ -176,26 +184,21 @@ with sync_playwright() as p:
         assert page.locator('#templemembers button').count() == 0
         escape(page, '#templedialog', '#town')
 
-        # Two selections swap full records; focus follows the stable member ID.
-        choose(page, '#trainingopen'); choose(page, '#trainingreorder')
-        before = page.evaluate('partyRecords()')
-        assert [r['members']['name'] for r in before] == ['A', 'B']
-        first = '#trainingorderlist button:first-child'
-        page.keyboard.press('Space'); ring(page, first)
-        assert page.locator(first).get_attribute('aria-pressed') == 'true'
-        assert '選択中' in page.locator(first).inner_text()
-        page.keyboard.press('d'); ring(page, '#trainingorderlist button:last-child')
-        assert page.locator(first).get_attribute('class') == 'order-picked'
-        page.keyboard.press('Space')
-        assert page.evaluate('partyRecords()') == list(reversed(before))
-        assert page.locator('#trainingorderlist .order-picked').count() == 0
-        page.keyboard.press('Space')
-        page.keyboard.press('Escape')
-        assert page.locator('#trainingorderdialog').is_visible()
-        assert page.locator('#trainingorderlist .order-picked').count() == 0
-        assert page.evaluate('partyRecords()') == list(reversed(before))
-        escape(page, '#trainingorderdialog', '#training')
+        # Reorder stays on the status screen. Training has no reorder UI.
+        choose(page, '#statsopen')
+        assert page.locator('#partyreorder').is_enabled()
+        escape(page, '#statsdialog', '#town')
+        choose(page, '#trainingopen')
+        page.keyboard.press('e')
+        assert page.locator('#trainingtab-edit').get_attribute('aria-selected') == 'true'
+        assert page.locator('#trainingreorder').count() == 0
+        assert page.locator('#trainingorderdialog').count() == 0
+        assert page.locator('#trainingorderlist').count() == 0
+        assert page.locator('#training').get_by_role('button', name='前へ').count() == 0
+        assert page.locator('#training').get_by_role('button', name='加入').count() == 0
+        assert page.evaluate("partyRecords().map(r=>r.members.name)") == ['A', 'B']
         escape(page, '#training', '#town')
+        assert page.evaluate("partyRecords().map(r=>r.members.name)") == ['A', 'B']
 
         # Shop stock, buying twice, selling once, then transferring to A.
         choose(page, '#blacksmith')
@@ -286,5 +289,5 @@ with sync_playwright() as p:
         assert not errors, errors
         context.close()
         print(f'PASS town keys {width}px: tavern/registration, safe confirmations, temple/carry, '
-              'swap/cancel, shop/sell/transfer/stock, all catalogs/details/scroll, Esc layers, no JS errors')
+              'no training reorder, shop/sell/transfer/stock, all catalogs/details/scroll, Esc layers, no JS errors')
     browser.close()

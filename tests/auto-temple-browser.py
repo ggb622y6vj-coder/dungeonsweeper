@@ -29,8 +29,10 @@ with sync_playwright() as p:
   for i,job in enumerate([0,0,0,2,1,3]):
    page.locator('#recruitname').fill('冒険者'+str(i));page.locator('#recruitjob').select_option(str(job))
    page.locator('#rollrecruit').click();page.locator('#registerrecruit').click()
-   page.locator('#recruitlist section').last.get_by_role('button',name='加入',exact=True).click()
   page.locator('#trainingclose').click()
+  page.locator('#tavernopen').click()
+  for i in range(6):page.locator('#tavernslots select').nth(i).select_option(str(i))
+  page.locator('#tavernsave').click()
   # Death-free return: no carry dialog.
   page.locator('#entrance').click()
   stairs_home(page)
@@ -66,10 +68,12 @@ with sync_playwright() as p:
   page.locator('#templeclose').click()
   # Training: dead/ash shown with status, join disabled.
   page.locator('#trainingopen').click()
+  page.locator('#trainingtab-edit').click()
   for name,label in ((names[0],'死亡'),(names[1],'灰')):
    sec=page.locator('#recruitlist section').filter(has_text=name)
    assert '控え・'+label in sec.inner_text(),sec.inner_text()
-   assert sec.get_by_role('button',name='加入',exact=True).is_disabled()
+   assert sec.get_by_role('button',name='加入',exact=True).count()==0
+   assert sec.get_by_role('button',name='登録抹消',exact=True).is_enabled()
   no_overflow(page)
   page.locator('#trainingclose').click()
   # Reload keeps the 4-member party; dungeon entry is not refused.

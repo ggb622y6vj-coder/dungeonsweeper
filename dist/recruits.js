@@ -69,6 +69,24 @@ function deleteRecruit(id) {
  const ids=s.members.map(m=>m.id).filter(i=>i!==id);
  return setPartyFromRoster(roster,ids.map(i=>roster.findIndex(r=>r.members.id===i)));
 }
+// Reject, do not strip. The character class matches validateSaveData in game.js.
+function recruitNameError(name){
+ if(typeof name!=='string')return '名前を入力してください。';
+ const trimmed=name.trim();
+ if(trimmed.length<1||trimmed.length>20)return '名前は1〜20文字にしてください。';
+ if(/[<>&"'\u0000-\u001f]/.test(trimmed))return '名前に使えない文字が含まれています。';
+ return '';
+}
+function renameRecruit(id,name){
+ if(s.area!=='town'||!idle())return {ok:false,reason:'町で名前を変更してください。'};
+ const record=trainingRoster().find(r=>r.members.id===id);
+ if(!record)return {ok:false,reason:'冒険者が見つかりません。'};
+ const reason=recruitNameError(name);
+ if(reason)return {ok:false,reason};
+ record.members.name=name.trim();
+ refreshNames();render();save();
+ return {ok:true,reason:''};
+}
 function recruitAC(record){return record.members.ac-Object.values(record.armor).reduce((sum,slot)=>sum+(weapon(record.inventory[slot])?.ac||0),0)}
 
 function generateClassXP(job){

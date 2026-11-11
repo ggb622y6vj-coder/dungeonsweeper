@@ -197,9 +197,6 @@
  function back(){
   if(layer.id==='chest')return;
   if((layer.kind==='command'||layer.kind==='ally'||layer.kind==='confirm')&&logBusy())return;
-  if(layer.kind==='dialog'&&layer.id.id==='trainingorderdialog'&&trainingOrderPicked){
-   cancelTrainingOrderPick();sync();return;
-  }
   const button=layer.items.find(el=>el.hasAttribute('data-key-back')&&!disabled(el));
   if(button)activate(button);
   else if(layer.kind==='dialog')layer.id.close();
@@ -322,9 +319,6 @@
    sync();return;
   }
   if(tabNavigation(way,e.key)){sync();return;}
-  if(way&&selected?.hasAttribute('data-order-member')){
-   focus(nearest(selected,layer.items.filter(el=>el.hasAttribute('data-order-member')),way));return;
-  }
   const tabs=layer.items.filter(el=>el.getAttribute('role')==='tab');
   const target=tabEdge?(e.key==='Home'?tabs[0]:tabs[tabs.length-1]):navigate(way);
   focus(target);

@@ -47,6 +47,7 @@ with sync_playwright() as p:
         }""")
         candidate = page.evaluate('candidateId')
         page.locator('#trainingopen').click()
+        page.locator('#trainingtab-edit').click()
         change_button = page.locator(f'[data-class-change="{candidate}"]')
         assert change_button.is_enabled()
         for name, reason in [('見習い', 'Lv.10'), ('石化候補', '正常'), ('武器不足', '武器')]:
@@ -60,6 +61,14 @@ with sync_playwright() as p:
         assert page.locator('#classchangeconfirm').is_disabled()
         assert page.locator('[data-class-job="1"]').is_disabled()
         assert page.locator('[data-class-job="2"]').is_disabled()  # no mace
+        warrior = page.locator('[data-class-job="0"]')
+        assert warrior.inner_text().strip()=='戦士'
+        assert 'job-ready' in warrior.get_attribute('class')
+        assert warrior.evaluate('e=>getComputedStyle(e).boxShadow')!='none'
+        same = page.locator('[data-class-job="1"]')
+        assert same.inner_text().strip()=='魔法使い'
+        assert 'job-ready' not in (same.get_attribute('class') or '')
+        assert '同じ職業' in same.get_attribute('title')
         page.locator('[data-class-job="0"]').focus()
         page.keyboard.press('Space')
         assert page.locator('[data-class-job="0"]').get_attribute('aria-pressed') == 'true'
@@ -100,7 +109,8 @@ with sync_playwright() as p:
         page.reload()
         assert page.evaluate('JSON.stringify(partyRecords()[0])') == converted
         page.locator('#statsopen').click()
-        assert '前職：魔法使い Lv.10' in page.locator('#statsbody').inner_text()
+        assert '前職' not in page.locator('#statsbody').inner_text()
+        assert page.evaluate('s.members[0].careerHistory.length')==1
         assert page.locator('[data-stat-cast="0"]').is_visible()
         page.locator('#statsclose').click()
         page.locator('#entrance').click()
