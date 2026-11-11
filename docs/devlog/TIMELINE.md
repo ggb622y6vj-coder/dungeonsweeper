@@ -138,3 +138,5 @@
 - [grok-build-notes.md](grok-build-notes.md)（096 の Grok Build 中断と、次に指示するときの注意）
 
 | 100 | 寺院の蘇生成功率をVIT依存にする（上限は維持） | docs/devlog/specs/100-temple-chance-by-vit.md |
+
+| 101 | セーブデータのJSON書き出し・読み込み | docs/devlog/specs/101-save-json-export-import.md |
