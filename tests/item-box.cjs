@@ -123,7 +123,7 @@ console.log('PASS item box five categories, equipped rows, duplicate items and f
  for(const value of [[],['sword'],Array(100).fill('healingPotion'),Array(1000).fill('healingPotion')]){
   assert.equal(g.run(`{const data=structuredClone(snapshot);data.itemBox=${JSON.stringify(value)};const before=JSON.stringify(data);validateSaveData(data)&&JSON.stringify(data)===before}`),true);
  }
- for(const value of [Array(1001).fill('healingPotion'),[1],['sword',null],['sword',{}],['sword',false],null,{},'sword']){
+ for(const value of [Array(1001).fill('healingPotion'),Array(1000).fill('sword'),[...Array(100).fill('sword'),...Array(10).fill('healingPotion')],[1],['sword',null],['sword',{}],['sword',false],null,{},'sword']){
   assert.equal(g.run(`{const data=structuredClone(snapshot);data.itemBox=${JSON.stringify(value)};const before=JSON.stringify(data);!validateSaveData(data)&&JSON.stringify(data)===before}`),true);
  }
  g.run("$('#resetconfirm').onclick()");
