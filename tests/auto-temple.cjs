@@ -5,7 +5,7 @@ function boot(saved=null){
  let timers=[],els={};
  const el=()=>({style:{},dataset:{},children:[],classList:{toggle(){}},addEventListener(t,f){(this.events??={})[t]=f},append(...x){this.children.push(...x)},replaceChildren(...x){this.children=x},setAttribute(){},showModal(){this.open=true;this.shown=(this.shown||0)+1},close(){if(!this.open)return;this.open=false;this.events?.close?.()},textContent:'',innerHTML:'',value:'0'});
  const ctx={crypto:require('node:crypto').webcrypto,structuredClone,document:{querySelector:q=>els[q]??=el(),querySelectorAll:()=>[],createElement:el,addEventListener(){},style:{}},localStorage:{data:saved,getItem(){return this.data},setItem(k,v){this.data=v}},setTimeout:f=>(timers.push(f),timers.length),clearTimeout(){timers=[]},Math:Object.create(Math),confirm:()=>true};vm.createContext(ctx);
- for(const f of ['weapons.js','monster-data.js','balance.js','spells.js','items.js','flags.js','traps.js','combatui.js','party.js','monsters.js','recruits.js','library.js','game.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f),'utf8'),ctx);
+ for(const f of ['weapons.js','monster-data.js','balance.js','spells.js','items.js','loot.js','flags.js','traps.js','combatui.js','party.js','monsters.js','recruits.js','library.js','game.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f),'utf8'),ctx);
  const run=s=>vm.runInContext(s,ctx),drain=()=>{let n=0;while(timers.length){timers.shift()();if(++n>10000)throw Error('timer loop')}};
  return {run,drain,saved:()=>run("save();localStorage.getItem('ash-v1')")};
 }

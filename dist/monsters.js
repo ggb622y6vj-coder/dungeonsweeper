@@ -12,7 +12,12 @@ function finishMonsterBattle(){
  recordLibraryVictory(combat);
  if(defeated.length)victoryWeaponEffects(combat);
  awardVictory(combat);
- if(combat.chestBattle&&defeated.length){s.cells[s.pos].chest={gold:combat.lootGold,opened:false};fixChestTrap(s.cells[s.pos].chest);log('宝箱が現れた。開けるか、放棄するか。')}
+ if(combat.chestBattle&&defeated.length){
+  // A battle saved before 108 has no snapshot ID; its original first unit remains in units.
+  const monsterId=combat.lootMonsterId??combat.units[0].id,items=rollChestItems(monsterId,s.floor);
+  s.cells[s.pos].chest={gold:combat.lootGold,opened:false,rewardVersion:1,lootGroup:LOOT_TABLES.monsterGroups[monsterId],items};
+  fixChestTrap(s.cells[s.pos].chest);log('宝箱が現れた。開けるか、放棄するか。');
+ }
  s.enemy=null;
  if(combat.boss&&defeated.some(e=>enemyDefinition(e.id).boss)){
   s.relic=true;s.guardianKilledThisRun=true;

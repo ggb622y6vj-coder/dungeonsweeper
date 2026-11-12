@@ -18,7 +18,7 @@ function game(saved = null, random = Math.random) {
     Math: Object.assign(Object.create(Math), { random }),
   };
   vm.createContext(ctx);
-  for (const file of ['weapons', 'monster-data', 'balance', 'spells', 'items', 'flags', 'traps', 'combatui', 'party', 'monsters', 'recruits', 'library', 'game']) {
+  for (const file of ['weapons', 'monster-data', 'balance', 'spells', 'items', 'loot', 'flags', 'traps', 'combatui', 'party', 'monsters', 'recruits', 'library', 'game']) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../../dist', `${file}.js`), 'utf8'), ctx);
   }
   return {
