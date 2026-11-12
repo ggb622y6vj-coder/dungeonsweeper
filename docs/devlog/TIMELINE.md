@@ -145,3 +145,4 @@
 | 104 | 2026-11-11 | 訓練所メニューの整理（タブ化・名前の変更・前職表示の削除ほか） | 239dbfa | [spec](specs/104-training-menu-reorganization.md) | [実施](reports/104.md) |
 | 105 | 2026-11-11 | 転職時にMP上限が1割減少する | daefd1f | [spec](specs/105-class-change-mp-reduction.md) | [実施](reports/105.md) |
 | 106 | 2026-11-12 | アイテムボックスの導入 | a64da35 | [spec](specs/106-item-box.md) | [実施](reports/106.md) |
+| 107 | 2026-11-12 | 薬のスタック所持 | 7295cc9 | [spec](specs/107-item-stacking.md) | [実施](reports/107.md) |
