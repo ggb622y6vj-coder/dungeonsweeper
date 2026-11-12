@@ -4,7 +4,7 @@ function game(saved=null){
  const el=()=>({style:{},dataset:{},children:[],setAttribute(){},addEventListener(){},append(...items){this.children.push(...items)},replaceChildren(...items){this.children=items},classList:{toggle(){}},value:'0',showModal(){this.open=true},close(){this.open=false}});
  const ctx={crypto:require('node:crypto').webcrypto,structuredClone,document:{addEventListener(){},querySelector:k=>els[k]??=el(),querySelectorAll:()=>[],createElement:el},localStorage:{getItem:()=>storage,setItem:(k,v)=>{storage=v}},setTimeout:f=>(timers.push(f),timers.length),clearTimeout(){timers=[]},Math:Object.create(Math)};
  vm.createContext(ctx);
- for(const f of ['weapons','monster-data','balance','spells','items','flags','traps','combatui','party','monsters','recruits','library','game','training'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f+'.js'),'utf8'),ctx);
+ for(const f of ['weapons','monster-data','balance','spells','items','loot','flags','traps','combatui','party','monsters','recruits','library','game','training'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist',f+'.js'),'utf8'),ctx);
  return {run:code=>vm.runInContext(code,ctx),saved:()=>storage,drain:()=>{for(let n=0;timers.length;n++){if(n>300)throw Error('timer loop');timers.shift()()}}};
 }
 let g=game();

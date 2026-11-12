@@ -11,11 +11,11 @@ function loot(kind, id, inv) {
   return JSON.parse(g.run(`(()=>{${inv ? `s.inventory=${JSON.stringify(inv)};` : ''}let before=logQueue.length;
     let w=weapon('${id}');weightedLoot=()=>w;
     let rolls=${kind === 'chest' ? '[0,.99]' : '[0,.99]'};Math.random=()=>rolls.shift()??.99;
-    ${kind === 'chest' ? 'rewardChest({gold:0})' : 'dropWeapon()'};Math.random=realRandom;
+    ${kind === 'chest' ? `rewardChest({gold:0,rewardVersion:1,items:['${id}']})` : kind === 'legacy' ? 'rewardChest({gold:0})' : 'dropWeapon()'};Math.random=realRandom;
     return JSON.stringify({inv:s.inventory.map(a=>a.length),last:s.inventory.map(a=>a.at(-1)),logs:logQueue.slice(before).map(x=>x.text)})})()`));
 }
 const full = Array(10).fill('sword');
-for (const kind of ['chest', 'drop']) {
+for (const kind of ['chest', 'legacy', 'drop']) {
   const names = JSON.parse(g.run('JSON.stringify(NAMES)'));
   // Mage-only staff goes to the mage (index 2), not the front fighter.
   let r = loot(kind, 'staff', [['sword'], ['sword'], ['sword'], ['sword']]);

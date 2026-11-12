@@ -146,3 +146,4 @@
 | 105 | 2026-11-11 | 転職時にMP上限が1割減少する | daefd1f | [spec](specs/105-class-change-mp-reduction.md) | [実施](reports/105.md) |
 | 106 | 2026-11-12 | アイテムボックスの導入 | a64da35 | [spec](specs/106-item-box.md) | [実施](reports/106.md) |
 | 107 | 2026-11-12 | 薬のスタック所持 | 7295cc9 | [spec](specs/107-item-stacking.md) | [実施](reports/107.md) |
+| 108 | 2026-11-12 | 宝箱報酬を初代Wizardry #1型へ変更（敵別宝物テーブル・A/B/C 3枠抽選） | hold/108 | （統合時に記入） |

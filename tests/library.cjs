@@ -57,11 +57,11 @@ g.run("s.gold=1000;buy('helm',0);buy('helm',0)");
 assert.equal(g.run('Object.keys(s.library.items).length'),1);
 g.run("buy('staff',0);buy('holysword',0);s.gold=0;buy('longsword',0)");
 assert.equal(g.run('Object.keys(s.library.items).length'),1,'rejected purchases do not unlock entries');
-g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0})");g.drain();
+g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']})");g.drain();
 assert.equal(g.run('Object.keys(s.library.items).length'),1,'full inventory does not record unreceived loot');
 g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
 // Force the loot selection, while retaining the actual acquisition paths.
-g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();weightedLoot=()=>weapon('plate');rewardChest({gold:0});weightedLoot=actualLoot");g.drain();
+g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']});weightedLoot=actualLoot");g.drain();
 for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),true,id);
 g.run("var acquired=JSON.stringify(s.library);enterTown();sell(0,1)");
 assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'),'selling keeps the record');
