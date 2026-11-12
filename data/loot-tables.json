@@ -1,0 +1,374 @@
+{
+ "version": 1,
+ "monsterGroups": {
+  "slime": 1,
+  "gas": 3,
+  "skeleton": 1,
+  "wolf": 1,
+  "goblin": 1,
+  "bat": 2,
+  "rat": 1,
+  "spider": 2,
+  "scout": 2,
+  "apprentice": 2,
+  "guardian": 2,
+  "poisonslime": 2,
+  "ghostknight": 2,
+  "firefly": 2,
+  "orc": 2,
+  "bigspider": 3,
+  "mage": 3,
+  "bandit": 3,
+  "ghoul": 3,
+  "stone": 3,
+  "general": 3,
+  "acidslime": 3,
+  "archer": 3,
+  "blackwolf": 3,
+  "shaman": 3,
+  "venomspider": 4,
+  "thief": 4,
+  "dragon": 4,
+  "rabbit": 4,
+  "iron": 4,
+  "terror": 4,
+  "watcher": 4,
+  "ogre": 4,
+  "zombie": 4,
+  "harpy": 4,
+  "viper": 4,
+  "armorant": 4,
+  "darkpriest": 4,
+  "sorcerer": 5,
+  "gargoyle": 5,
+  "minogate": 6,
+  "wight": 5,
+  "troll": 5,
+  "werewolf": 5,
+  "scorpion": 5,
+  "ninja": 5,
+  "highmage": 5,
+  "salamander": 5,
+  "blob": 5,
+  "necromancer": 6,
+  "wraith": 6,
+  "stonegiant": 6,
+  "chimera": 6,
+  "darkknight": 6,
+  "fungus": 5,
+  "darkelf": 6,
+  "vampbat": 5,
+  "vampire": 7,
+  "gasdragon": 6,
+  "minotaur": 6,
+  "fleshgolem": 7,
+  "ninjachief": 6,
+  "deathmage": 6,
+  "hellhound": 6,
+  "crawler": 6,
+  "ettin": 8,
+  "lesserdemon": 7,
+  "bluedragon": 7,
+  "deathknight": 7,
+  "witch": 7,
+  "hydra": 7,
+  "assassin": 7,
+  "evileye": 7,
+  "demongeneral": 8,
+  "greaterdemon": 8,
+  "frostgiant": 8,
+  "vampirelord": 8,
+  "reddragon": 8,
+  "masterninja": 8,
+  "lich": 8,
+  "fiendhound": 7,
+  "ancientdragon": 9,
+  "royalguard": 8,
+  "fallenangel": 9,
+  "reaper": 9,
+  "chaosdragon": 9,
+  "chaosspawn": 8,
+  "archmage": 9,
+  "succubus": 6,
+  "daidaraboti": 5,
+  "kashadokuro": 10,
+  "labyrinthlord": 10,
+  "takenoko": 2,
+  "kinoko": 2,
+  "sirakaba": 2,
+  "insectivore": 4,
+  "dendenko": 2,
+  "dynamotuboro": 4,
+  "akumaikire": 4,
+  "poisongiant": 4
+ },
+ "groups": {
+  "1": {
+   "slots": [
+    {
+     "chance": 0.1,
+     "pool": "T1"
+    },
+    {
+     "chance": 0,
+     "pool": "T2"
+    },
+    {
+     "chance": 0,
+     "pool": "T3"
+    }
+   ]
+  },
+  "2": {
+   "slots": [
+    {
+     "chance": 0.2,
+     "pool": "T1"
+    },
+    {
+     "chance": 0.1,
+     "pool": "T2"
+    },
+    {
+     "chance": 0,
+     "pool": "T3"
+    }
+   ]
+  },
+  "3": {
+   "slots": [
+    {
+     "chance": 0.3,
+     "pool": "T2"
+    },
+    {
+     "chance": 0.15,
+     "pool": "T3"
+    },
+    {
+     "chance": 0,
+     "pool": "T4"
+    }
+   ]
+  },
+  "4": {
+   "slots": [
+    {
+     "chance": 0.4,
+     "pool": "T2"
+    },
+    {
+     "chance": 0.2,
+     "pool": "T3"
+    },
+    {
+     "chance": 0,
+     "pool": "T4"
+    }
+   ]
+  },
+  "5": {
+   "slots": [
+    {
+     "chance": 0.5,
+     "pool": "T3"
+    },
+    {
+     "chance": 0.3,
+     "pool": "T4"
+    },
+    {
+     "chance": 0.1,
+     "pool": "T5"
+    }
+   ]
+  },
+  "6": {
+   "slots": [
+    {
+     "chance": 1,
+     "pool": "T3"
+    },
+    {
+     "chance": 0.5,
+     "pool": "T4"
+    },
+    {
+     "chance": 0.2,
+     "pool": "T5"
+    }
+   ]
+  },
+  "7": {
+   "slots": [
+    {
+     "chance": 0.75,
+     "pool": "T4"
+    },
+    {
+     "chance": 0.25,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.1,
+     "pool": "T5"
+    }
+   ]
+  },
+  "8": {
+   "slots": [
+    {
+     "chance": 1,
+     "pool": "T4"
+    },
+    {
+     "chance": 0.5,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.15,
+     "pool": "T5"
+    }
+   ]
+  },
+  "9": {
+   "slots": [
+    {
+     "chance": 0.7,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.25,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.05,
+     "pool": "T5"
+    }
+   ]
+  },
+  "10": {
+   "slots": [
+    {
+     "chance": 1,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.5,
+     "pool": "T5"
+    },
+    {
+     "chance": 0.1,
+     "pool": "T5"
+    }
+   ]
+  }
+ },
+ "pools": {
+  "T1": [
+   "poisonsw",
+   "shortbow",
+   "longbow",
+   "compositebow",
+   "dagger",
+   "thiefblade",
+   "sword",
+   "staff",
+   "mace",
+   "longsword",
+   "battleaxe",
+   "greatsword",
+   "oakstaff",
+   "runestaff",
+   "starstaff",
+   "ironmace",
+   "warhammer",
+   "sacredmace",
+   "flagaxe",
+   "mumeinoken",
+   "flagsword",
+   "hatajirusinosentui",
+   "hatajirusinotanken",
+   "hatajirusinoyumi",
+   "headlight",
+   "cap",
+   "helm",
+   "robe",
+   "leather",
+   "chain",
+   "boots",
+   "greaves",
+   "wardrobe",
+   "healingPotion",
+   "antidote"
+  ],
+  "T2": [
+   "atkstaff",
+   "atkmace",
+   "bloodsac",
+   "knightsword",
+   "heavybow",
+   "keenblade",
+   "blessedhammer",
+   "magestaff",
+   "zerosword",
+   "chestsac",
+   "helmetsac",
+   "plate",
+   "steelhelm",
+   "hardleather",
+   "magecloak",
+   "steelgreaves",
+   "healingPotion",
+   "antidote",
+   "paralysisCure",
+   "greaterPotion"
+  ],
+  "T3": [
+   "poisonsw2",
+   "flamesword",
+   "magicbow",
+   "powerstaff",
+   "holyhammer",
+   "assassinknife",
+   "mitibikinoono",
+   "surveyorstaff",
+   "eighteyespear",
+   "deductiondagger",
+   "magichelm",
+   "ninjagarb",
+   "holyvestment",
+   "galeboots",
+   "healingPotion",
+   "antidote",
+   "paralysisCure",
+   "greaterPotion"
+  ],
+  "T4": [
+   "poisonsw3",
+   "ogreslayer",
+   "sagestaff",
+   "judgehammer",
+   "ninjato",
+   "dragonbow",
+   "reversalblade",
+   "sealinghammer",
+   "scoutingdagger",
+   "makyuu",
+   "knightplate",
+   "healingPotion",
+   "antidote",
+   "paralysisCure",
+   "greaterPotion",
+   "elixir"
+  ],
+  "T5": [
+   "holysword",
+   "dragonmail",
+   "antidote",
+   "paralysisCure",
+   "greaterPotion",
+   "elixir"
+  ]
+ }
+}
