@@ -1,14 +1,31 @@
-// 消耗品の正本。1個につきアイテム1枠。装備・MP・呪文習得は不要。
+// 消耗品の正本。同じ薬はstack個まで1枠。内部形式は1個ずつのID配列。装備・MP・呪文習得は不要。
 const MEDICINES=[
- {id:'healingPotion',name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,2,1,3,4,6,5,7],sell:8,weight:70,minFloor:1},
- {id:'antidote',name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,2,1,3,6,4,5,7],sell:6,weight:30,minFloor:1},
- {id:'paralysisCure',name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,2,1,3,4,6,5,7],sell:15,weight:20,minFloor:3},
- {id:'greaterPotion',name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,2,1,3,4,6,5,7],sell:30,weight:35,minFloor:4},
- {id:'elixir',name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,2,1,3,4,6,5,7],sell:80,weight:20,minFloor:7}
+ {id:'healingPotion',stack:10,name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,2,1,3,4,6,5,7],sell:8,weight:70,minFloor:1},
+ {id:'antidote',stack:10,name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,2,1,3,6,4,5,7],sell:6,weight:30,minFloor:1},
+ {id:'paralysisCure',stack:5,name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,2,1,3,4,6,5,7],sell:15,weight:20,minFloor:3},
+ {id:'greaterPotion',stack:5,name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,2,1,3,4,6,5,7],sell:30,weight:35,minFloor:4},
+ {id:'elixir',stack:3,name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,2,1,3,4,6,5,7],sell:80,weight:20,minFloor:7}
 ];
 let medicineMember=0;
-function lootRecipient(w){let i=s.members.findIndex((m,i)=>canEquipJob(w,jobOf(i))&&s.inventory[i].length<10);return i>=0?i:s.members.findIndex((m,i)=>s.inventory[i].length<10)}
-function medicineSlots(i){return s.inventory[i].flatMap((id,slot)=>MEDICINES.some(w=>w.id===id)?[{slot,item:weapon(id)}]:[])}
+function stackMaxOf(id){return MEDICINES.find(w=>w.id===id)?.stack||1}
+function usedSlots(ids){
+ const counts=new Map();for(const id of ids)counts.set(id,(counts.get(id)||0)+1);
+ let slots=0;for(const [id,count] of counts)slots+=Math.ceil(count/stackMaxOf(id));return slots;
+}
+function canAccept(ids,id,cap){return ids.filter(x=>x===id).length%stackMaxOf(id)!==0||usedSlots(ids)<cap}
+// Rows retain the first array index in each chunk; equipment always has its own row.
+function itemRows(ids){
+ const rows=[],last=new Map();
+ ids.forEach((id,slot)=>{
+  let row=last.get(id);
+  if(!row||row.count===stackMaxOf(id)){row={id,slot,item:weapon(id),count:0};rows.push(row);last.set(id,row)}
+  row.count++;
+ });
+ return rows;
+}
+function itemRowName(row){return (row.item?.name||row.id)+(row.count>1?' ×'+row.count:'')}
+function lootRecipient(w){let i=s.members.findIndex((m,i)=>canEquipJob(w,jobOf(i))&&canAccept(s.inventory[i],w.id,10));return i>=0?i:s.members.findIndex((m,i)=>canAccept(s.inventory[i],w.id,10))}
+function medicineSlots(i){return itemRows(s.inventory[i]).filter(x=>x.item?.kind==='medicine').map(({slot,item,count})=>({slot,item,count}))}
 function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&!partyIncapacitated(i)}
 function medicineAction(i){if(!s.enemy||!medicineSlots(i).length)return '';let plan=s.itemPlans[i],w=plan&&weapon(plan.id);return `<button data-medicine="${i}" ${!canChooseMedicine(i)?'disabled':''}>${s.commands[i]==='item'&&w?w.name+' → '+NAMES[plan.target]:'薬を使う'}</button>`}
 function dropMedicine(){
@@ -19,6 +36,7 @@ function dropMedicine(){
 }
 function removeInventorySlot(i,slot){s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let part in s.armor[i])if(s.armor[i][part]>slot)s.armor[i][part]--}
 function useMedicine(i,slot,target,inTurn=false,expectedId=null){
+ if(inTurn&&expectedId&&s.inventory[i]?.[slot]!==expectedId)slot=s.inventory[i]?.lastIndexOf(expectedId)??-1;
  let w=weapon(s.inventory[i]?.[slot]);
  if(!w||w.kind!=='medicine'||(expectedId&&w.id!==expectedId)||partyIncapacitated(i)||!validAllyTarget(target)||s.done||(!inTurn&&(!canChooseMedicine(i)||s.enemy)))return false;
  if(s.members[target].status==='stone'){log(`${w.name}では${NAMES[target]}の石化を治せない。`);return false}
@@ -34,9 +52,9 @@ function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  if(!inTurn)autoReorderParty('medicine');
  return true;
 }
-function openMedicine(i,slot){if(!canChooseMedicine(i)||!medicineSlots(i).length)return;medicineMember=i;$('#medicinetitle').textContent=NAMES[i]+'の薬';$('#medicineitem').innerHTML=medicineSlots(i).map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${x.item.name}（枠${x.slot+1}）</option>`).join('');// Decide visibility once per opening: toggling it on pointerdown would shift
+function openMedicine(i,slot){if(!canChooseMedicine(i)||!medicineSlots(i).length)return;medicineMember=i;$('#medicinetitle').textContent=NAMES[i]+'の薬';$('#medicineitem').innerHTML=medicineSlots(i).map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${itemRowName(x)}</option>`).join('');// Decide visibility once per opening: toggling it on pointerdown would shift
  // the dialog under a mouse/touch press.
- $('#medicinelist').hidden=!document.documentElement?.classList?.contains('keynav-keyboard');$('#medicinelist').innerHTML=medicineSlots(i).map((x,index)=>`<button data-medicine-choice="${x.slot}" ${index===0?'data-key-default':''}>${x.item.name}（枠${x.slot+1}）</button>`).join('');renderMedicineDescription();$('#medicinepick').hidden=s.area!=='dungeon';$('#medicinedialog').showModal();if(slot!==undefined&&s.area==='dungeon')pickMedicineTarget()}
+ $('#medicinelist').hidden=!document.documentElement?.classList?.contains('keynav-keyboard');$('#medicinelist').innerHTML=medicineSlots(i).map((x,index)=>`<button data-medicine-choice="${x.slot}" ${index===0?'data-key-default':''}>${itemRowName(x)}</button>`).join('');renderMedicineDescription();$('#medicinepick').hidden=s.area!=='dungeon';$('#medicinedialog').showModal();if(slot!==undefined&&s.area==='dungeon')pickMedicineTarget()}
 function renderMedicineDescription(){let w=weapon(s.inventory[medicineMember][+$('#medicineitem').value]);$('#medicinedescription').textContent=w?.description||''}
 function commitMedicineChoice(i,slot,target,id){
  const w=weapon(s.inventory[i]?.[slot]);

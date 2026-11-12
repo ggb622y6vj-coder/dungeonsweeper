@@ -351,5 +351,6 @@ require('./stat-growth.cjs');
 
 require('./save-transfer.cjs');
 require('./item-box.cjs');
+require('./item-stacking.cjs');
 
 require('./notion-equipment-effects.cjs');

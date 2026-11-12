@@ -13,6 +13,8 @@ assert.equal(new Set(rows.map(r=>r['userDefined:ID'])).size,rows.length);
 assert.equal(new Set(items.map(w=>w.id)).size,items.length);
 for(const r of rows){
  const id=r['userDefined:ID'],w=items.find(w=>w.id===id);if(!w){diffs.push(id+' missing in game');continue}
+ if(!Object.hasOwn(r,'スタック最大数'))diffs.push(id+' スナップショット未更新: スタック最大数がありません');
+ else eq(id+'.stack',w.kind==='medicine'?w.stack:1,r['スタック最大数']);
  const effectText=unesc(r['効果']),desc=effectText.split(/追加効果：|特殊効果[:：]/)[1];
  const b={name:r['名前'],sell:r['売却額'],classes:JSON.parse(r['装備職']).map(j=>{assert.ok(j in JOB);return JOB[j]}).sort()};
  if(r['種類']==='薬'){

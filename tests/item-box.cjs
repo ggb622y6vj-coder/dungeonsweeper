@@ -28,7 +28,7 @@ function refused(g,call){const before=state(g);assert.equal(g.run(call),false,ca
  assert.equal(g.run('withdrawItem(0,0)'),true);
  assert.deepEqual(J(g,'s.itemBox'),[]);
  assert.deepEqual(J(g,'s.inventory[0]'),['sword','helm','leather','boots','healingPotion','healingPotion']);
- assert.match(g.run("$('#inventorytitle').textContent"),/6\/10/);
+ assert.match(g.run("$('#inventorytitle').textContent"),/5\/10/);
  assert.deepEqual(J(g,"JSON.parse(localStorage.getItem('ash-v1')).itemBox"),[]);
  for(const slot of [0,1,2,3])refused(g,`depositItem(0,${slot})`);
  // Moving an earlier item must preserve every equipped item's identity.
@@ -46,12 +46,13 @@ console.log('PASS item box deposit/withdraw, equipment rejection, weapon/armor c
 
 {
  const g=setup();
- g.run("s.itemBox=Array(99).fill('healingPotion')");
+ g.run("s.itemBox=Array(99).fill('dagger')");
  assert.equal(g.run('depositItem(0,5)'),true);
  assert.equal(g.run('s.itemBox.length'),100);
- refused(g,'depositItem(0,1)');
+ g.run("s.inventory[0].push('dagger')");
+ refused(g,'depositItem(0,5)');
  assert.match(g.run("$('#itemboxnotice').textContent"),/ボックス.*いっぱい/);
- g.run("s.inventory[1]=['staff',...Array(8).fill('healingPotion')]");
+ g.run("s.inventory[1]=['staff',...Array(8).fill('dagger')]");
  assert.equal(g.run('withdrawItem(1,50)'),true);
  assert.equal(g.run('s.inventory[1].length'),10);
  refused(g,'withdrawItem(1,0)');
@@ -81,23 +82,23 @@ console.log('PASS item box capacity boundaries, invalid slots/members, town/idle
  g.run("s.itemBox=['healingPotion','helm','sword','leather','boots','healingPotion']");
  for(const [tab,ids,boxSlots,inventorySlots] of [
   ['weapon',['sword'],[2],[0]],['head',['helm'],[1],[2]],['body',['leather'],[3],[3]],
-  ['feet',['boots'],[4],[4]],['medicine',['healingPotion','healingPotion'],[0,5],[1,5]]
+  ['feet',['boots'],[4],[4]],['medicine',['healingPotion'],[0],[1]]
  ]){
   for(const id of ids)assert.equal(g.run(`itemBoxCategory(weapon('${id}'))`),tab);
   g.run(`$('#itemboxtab-${tab}').onclick()`);
   assert.equal(g.run(`$('#itemboxtab-${tab}').attributes['aria-selected']`),'true');
   assert.deepEqual(J(g,"$('#itemboxbody').children[0].children.slice(1).map(row=>+row.children[1].attributes['data-itembox-withdraw'])"),boxSlots);
   assert.deepEqual(J(g,"$('#itemboxbody').children[1].children.slice(1).map(row=>+row.children[1].attributes['data-itembox-deposit'])"),inventorySlots);
-  assert.deepEqual(J(g,"$('#itemboxbody').children[0].children.slice(1).map(row=>row.children[0].textContent)"),ids.map(id=>g.run(`weapon('${id}').name`)));
+  assert.deepEqual(J(g,"$('#itemboxbody').children[0].children.slice(1).map(row=>row.children[0].textContent)"),ids.map(id=>g.run(`weapon('${id}').name`)+(tab==='medicine'?' ×2':'')));
   assert.equal(g.run("$('#itemboxbody').children[1].children.slice(1).every(row=>row.children[1].disabled)"),tab!=='medicine');
   if(tab!=='medicine')assert.match(g.run("$('#itemboxbody').children[1].children[1].children[0].textContent"),/装備中/);
  }
- // Filtered buttons retain original slots, including duplicate IDs.
- assert.equal(g.run("$('#itemboxbody').children[0].children[2].children[1].onclick()"),true);
- assert.deepEqual(J(g,'s.itemBox'),['healingPotion','helm','sword','leather','boots']);
+ // A grouped medicine button consumes its first original slot, then rows rebuild.
+ assert.equal(g.run("$('#itemboxbody').children[0].children[1].children[1].onclick()"),true);
+ assert.deepEqual(J(g,'s.itemBox'),['helm','sword','leather','boots','healingPotion']);
  g.run("$('#itemboxtab-head').onclick()");
  assert.equal(g.run("$('#itemboxbody').children[0].children[1].children[1].onclick()"),true);
- assert.deepEqual(J(g,'s.itemBox'),['healingPotion','sword','leather','boots']);
+ assert.deepEqual(J(g,'s.itemBox'),['sword','leather','boots','healingPotion']);
  assert.equal(g.run('s.inventory[0].at(-1)'),'helm');
 }
 console.log('PASS item box five categories, equipped rows, duplicate items and filtered original-slot actions');
@@ -119,10 +120,10 @@ console.log('PASS item box five categories, equipped rows, duplicate items and f
  // The pre-roster save path gets the same optional-field default.
  const preRoster=g.run('JSON.stringify((({itemBox,...rest})=>rest)(s))');
  assert.deepEqual(J(game(preRoster,()=>.5),'s.itemBox'),[]);
- for(const value of [[],['sword'],Array(100).fill('healingPotion')]){
+ for(const value of [[],['sword'],Array(100).fill('healingPotion'),Array(1000).fill('healingPotion')]){
   assert.equal(g.run(`{const data=structuredClone(snapshot);data.itemBox=${JSON.stringify(value)};const before=JSON.stringify(data);validateSaveData(data)&&JSON.stringify(data)===before}`),true);
  }
- for(const value of [Array(101).fill('healingPotion'),[1],['sword',null],['sword',{}],['sword',false],null,{},'sword']){
+ for(const value of [Array(1001).fill('healingPotion'),[1],['sword',null],['sword',{}],['sword',false],null,{},'sword']){
   assert.equal(g.run(`{const data=structuredClone(snapshot);data.itemBox=${JSON.stringify(value)};const before=JSON.stringify(data);!validateSaveData(data)&&JSON.stringify(data)===before}`),true);
  }
  g.run("$('#resetconfirm').onclick()");
