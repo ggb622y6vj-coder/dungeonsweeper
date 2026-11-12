@@ -292,7 +292,7 @@ function validateSaveData(data){
  if(!Number.isFinite(data.gold)||data.gold<0)return false;
  for(const key of ['guardiansDefeated','elevatorFloors','templeReport'])if(key in data&&!Array.isArray(data[key]))return false;
  if('logs' in data&&!strings(data.logs))return false;
- if('itemBox' in data&&(!strings(data.itemBox)||data.itemBox.length>1000))return false;
+ if('itemBox' in data&&(!strings(data.itemBox)||data.itemBox.length>1000||usedSlots(data.itemBox)>100))return false;
  if('floors' in data&&(!isSaveObject(data.floors)||!Object.values(data.floors).every(f=>isSaveObject(f)&&
   (!('cells' in f)||cells(f.cells))&&(!('size' in f)||(Number.isInteger(f.size)&&(!('cells' in f)||f.size*f.size===f.cells.length)))&&
   (!('floor' in f)||(Number.isInteger(f.floor)&&f.floor>=1&&f.floor<=10)))))return false;
