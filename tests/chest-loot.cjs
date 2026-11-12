@@ -39,26 +39,36 @@ for (let bits = 0; bits < 8; bits++) {
   });
   assert.deepEqual(roll('sorcerer', 10, rolls), expected, `ABC pattern ${bits}`);
 }
-assert.deepEqual(roll('sorcerer', 0, [0,0,0]), [], 'empty eligible pools consume no item-selection roll');
+// Won slots with genuinely empty pools consume no item-selection roll.
+g.run('var savedPools=LOOT_TABLES.pools;LOOT_TABLES.pools={T3:[],T4:[],T5:[]}');
+assert.deepEqual(roll('sorcerer', 1, [0,0,0]), []);
+g.run('LOOT_TABLES.pools=savedPools');
 // An empty A slot must not prevent a later nonempty slot from drawing.
-g.run("var savedPool=LOOT_TABLES.pools.T3;LOOT_TABLES.pools.T3=['holysword']");
-assert.deepEqual(roll('sorcerer', 1, [0,0,0,0,0]), ['healingPotion','antidote']);
+g.run('var savedPool=LOOT_TABLES.pools.T3;LOOT_TABLES.pools.T3=[]');
+assert.deepEqual(roll('sorcerer', 1, [0,0,0,0,0]), [tables.pools.T4[0],tables.pools.T5[0]]);
 g.run('LOOT_TABLES.pools.T3=savedPool');
+// G6's C slot can draw a T5 item above its minFloor even on floor 1.
+const deepItemIndex = tables.pools.T5.findIndex(id => byId.get(id).minFloor > 1);
+assert.ok(deepItemIndex >= 0);
+const shallowRolls = [0,0,.5,0,(deepItemIndex+.5)/tables.pools.T5.length];
+const shallowExpected = [tables.pools.T3[0],tables.pools.T5[deepItemIndex]];
+assert.deepEqual(roll('minogate', 1, shallowRolls), shallowExpected);
+assert.deepEqual(roll('minogate', 10, shallowRolls), shallowExpected);
 // Walk every equal-sized selection interval, for every slot/group/floor.
-// This covers floor thresholds and medicines alongside weapons and all armor parts.
+// Every floor uses the full pool, including medicines, weapons and all armor parts.
 for (const [group, {slots}] of Object.entries(tables.groups)) {
   const monster = Object.keys(tables.monsterGroups).find(id => tables.monsterGroups[id] === +group);
   for (let floor = 1; floor <= 10; floor++) for (let chosen = 0; chosen < 3; chosen++) {
     if (!slots[chosen].chance) continue;
-    const eligible = tables.pools[slots[chosen].pool].filter(id => (byId.get(id).minFloor ?? 1) <= floor);
-    eligible.forEach((id, n) => {
+    const population = tables.pools[slots[chosen].pool];
+    population.forEach((id, n) => {
       const rolls = [], expected = [];
       slots.forEach((slot, i) => {
         const hit = i === chosen || slot.chance === 1;
         rolls.push(hit ? 0 : slot.chance);
         if (hit) {
-          const pool = tables.pools[slot.pool].filter(id => (byId.get(id).minFloor ?? 1) <= floor);
-          if (pool.length) { rolls.push(i === chosen ? (n + .5) / eligible.length : 0); expected.push(i === chosen ? id : pool[0]); }
+          const pool = tables.pools[slot.pool];
+          if (pool.length) { rolls.push(i === chosen ? (n + .5) / population.length : 0); expected.push(i === chosen ? id : pool[0]); }
         }
       });
       assert.deepEqual(roll(monster, floor, rolls), expected);
@@ -80,7 +90,7 @@ for (const [group, {slots}] of Object.entries(tables.groups)) {
 }
 g.run("slotMarkers.forEach((_,i)=>delete LOOT_TABLES.pools['test'+i])");
 assert.deepEqual(plain(g, 'LOOT_TABLES'), tables);
-console.log('PASS chest loot: data parity, all enemies/items, ABC 8 patterns, empty pools, uniform floor filtering, 100k/group slot rates');
+console.log('PASS chest loot: data parity, all enemies/items, ABC 8 patterns, empty pools, uniform full-pool selection, floor independence, 100k/group slot rates');
 
 function party(job=3) {
   const t = game(null, () => .5);
