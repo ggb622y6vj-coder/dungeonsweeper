@@ -266,181 +266,100 @@ const LOOT_TABLES = {
   }
  },
  "pools": {
-  "T1": [
-   "poisonsw",
-   "shortbow",
-   "longbow",
-   "compositebow",
-   "dagger",
-   "thiefblade",
-   "sword",
-   "staff",
-   "mace",
-   "longsword",
-   "battleaxe",
-   "greatsword",
-   "oakstaff",
-   "runestaff",
-   "starstaff",
-   "ironmace",
-   "warhammer",
-   "sacredmace",
-   "flagaxe",
-   "mumeinoken",
-   "flagsword",
-   "hatajirusinosentui",
-   "hatajirusinotanken",
-   "hatajirusinoyumi",
-   "headlight",
-   "cap",
-   "helm",
-   "robe",
-   "leather",
-   "chain",
-   "boots",
-   "greaves",
-   "wardrobe",
-   "healingPotion",
-   "antidote"
-  ],
-  "T2": [
-   "atkstaff",
-   "atkmace",
-   "bloodsac",
-   "knightsword",
-   "heavybow",
-   "keenblade",
-   "blessedhammer",
-   "magestaff",
-   "zerosword",
-   "chestsac",
-   "helmetsac",
-   "plate",
-   "steelhelm",
-   "hardleather",
-   "magecloak",
-   "steelgreaves",
-   "healingPotion",
-   "antidote",
-   "paralysisCure",
-   "greaterPotion",
-   "longsword",
-   "battleaxe",
-   "greatsword",
-   "warhammer",
-   "sacredmace",
-   "flagaxe",
-   "mumeinoken",
-   "flagsword",
-   "hatajirusinosentui",
-   "hatajirusinotanken",
-   "hatajirusinoyumi",
-   "headlight"
-  ],
-  "T3": [
-   "poisonsw2",
-   "flamesword",
-   "magicbow",
-   "powerstaff",
-   "holyhammer",
-   "assassinknife",
-   "mitibikinoono",
-   "surveyorstaff",
-   "eighteyespear",
-   "deductiondagger",
-   "magichelm",
-   "ninjagarb",
-   "holyvestment",
-   "galeboots",
-   "healingPotion",
-   "antidote",
-   "paralysisCure",
-   "greaterPotion",
-   "atkstaff",
-   "atkmace",
-   "bloodsac",
-   "knightsword",
-   "heavybow",
-   "keenblade",
-   "blessedhammer",
-   "magestaff",
-   "zerosword",
-   "chestsac",
-   "helmetsac",
-   "plate",
-   "steelhelm",
-   "hardleather",
-   "magecloak",
-   "steelgreaves",
-   "longsword",
-   "battleaxe",
-   "greatsword",
-   "oakstaff",
-   "runestaff",
-   "starstaff",
-   "ironmace",
-   "warhammer",
-   "sacredmace"
-  ],
-  "T4": [
-   "poisonsw3",
-   "ogreslayer",
-   "sagestaff",
-   "judgehammer",
-   "ninjato",
-   "dragonbow",
-   "reversalblade",
-   "sealinghammer",
-   "scoutingdagger",
-   "makyuu",
-   "knightplate",
-   "healingPotion",
-   "antidote",
-   "paralysisCure",
-   "greaterPotion",
-   "elixir",
-   "longsword",
-   "battleaxe",
-   "greatsword",
-   "oakstaff",
-   "runestaff",
-   "starstaff",
-   "ironmace",
-   "warhammer",
-   "sacredmace"
-  ],
-  "T5": [
-   "holysword",
-   "dragonmail",
-   "antidote",
-   "paralysisCure",
-   "greaterPotion",
-   "elixir",
-   "longsword",
-   "battleaxe",
-   "greatsword",
-   "oakstaff",
-   "runestaff",
-   "starstaff",
-   "ironmace",
-   "warhammer",
-   "sacredmace",
-   "poisonsw3",
-   "ogreslayer",
-   "sagestaff",
-   "judgehammer",
-   "ninjato",
-   "dragonbow",
-   "reversalblade",
-   "sealinghammer",
-   "scoutingdagger",
-   "makyuu",
-   "knightplate"
-  ]
+  "T1": {
+   "medicineShare": 0.05714285714285714,
+   "rankWeights": {
+    "1": 24,
+    "2": 8
+   },
+   "medicineIds": [
+    "healingPotion",
+    "antidote"
+   ]
+  },
+  "T2": {
+   "medicineShare": 0.125,
+   "rankWeights": {
+    "1": 4,
+    "2": 18,
+    "3": 6
+   },
+   "medicineIds": [
+    "healingPotion",
+    "antidote",
+    "paralysisCure",
+    "greaterPotion"
+   ]
+  },
+  "T3": {
+   "medicineShare": 0.09302325581395349,
+   "rankWeights": {
+    "1": 8,
+    "2": 12,
+    "3": 19
+   },
+   "medicineIds": [
+    "healingPotion",
+    "antidote",
+    "paralysisCure",
+    "greaterPotion"
+   ]
+  },
+  "T4": {
+   "medicineShare": 0.2,
+   "rankWeights": {
+    "1": 8,
+    "2": 1,
+    "4": 11
+   },
+   "medicineIds": [
+    "healingPotion",
+    "antidote",
+    "paralysisCure",
+    "greaterPotion",
+    "elixir"
+   ]
+  },
+  "T5": {
+   "medicineShare": 0.15384615384615385,
+   "rankWeights": {
+    "1": 8,
+    "2": 1,
+    "4": 11,
+    "5": 2
+   },
+   "medicineIds": [
+    "antidote",
+    "paralysisCure",
+    "greaterPotion",
+    "elixir"
+   ]
+  }
  }
 };
 
-// A/B/C are independent; every pool item in a slot has the same probability.
+// Validate settings once at load time, keeping the draw path deterministic.
+function validateLootTables(tables = LOOT_TABLES, equipment = WEAPONS, medicines = MEDICINES) {
+ for (const [tier, pool] of Object.entries(tables.pools)) {
+  if (!Number.isFinite(pool.medicineShare) || pool.medicineShare < 0 || pool.medicineShare >= 1)
+   throw new Error(`Invalid medicineShare: ${tier}`);
+  if (!Array.isArray(pool.medicineIds) || (pool.medicineShare > 0 && !pool.medicineIds.length))
+   throw new Error(`Missing medicine candidates: ${tier}`);
+  for (const id of pool.medicineIds) {
+   if (!medicines.some(item => item.id === id && item.kind === 'medicine'))
+    throw new Error(`Invalid medicine ID: ${tier}/${id}`);
+  }
+  for (const [rank, weight] of Object.entries(pool.rankWeights)) {
+   if (!/^[1-5]$/.test(rank) || !Number.isInteger(weight) || weight < 0)
+    throw new Error(`Invalid rank weight: ${tier}/${rank}`);
+   if (weight > 0 && !equipment.some(item => item.lootRank === +rank))
+    throw new Error(`Missing rank equipment: ${tier}/${rank}`);
+  }
+ }
+}
+validateLootTables();
+
+// A/B/C are independent. Floor does not restrict medicine or equipment candidates.
 function rollChestItems(monsterId, floor, rng = Math.random) {
  const group = Object.hasOwn(LOOT_TABLES.monsterGroups, monsterId) && LOOT_TABLES.monsterGroups[monsterId];
  if (!group) throw new Error(`Unknown chest monster ID: ${monsterId}`);
@@ -448,7 +367,22 @@ function rollChestItems(monsterId, floor, rng = Math.random) {
  for (const slot of LOOT_TABLES.groups[group].slots) {
   if (rng() < slot.chance) {
    const pool = LOOT_TABLES.pools[slot.pool];
-   if (pool.length) items.push(pool[Math.floor(rng() * pool.length)]);
+   const ranks = Object.entries(pool.rankWeights);
+   const total = ranks.reduce((sum, [, weight]) => sum + weight, 0);
+   if (!total && !pool.medicineShare) continue;
+   if (rng() < pool.medicineShare) {
+    items.push(pool.medicineIds[Math.floor(rng() * pool.medicineIds.length)]);
+   } else if (total) {
+    let roll = rng() * total;
+    for (const [rank, weight] of ranks) {
+     if (roll < weight) {
+      const candidates = WEAPONS.filter(item => item.lootRank === +rank);
+      items.push(candidates[Math.floor(rng() * candidates.length)].id);
+      break;
+     }
+     roll -= weight;
+    }
+   }
   }
  }
  return items;
