@@ -18,9 +18,12 @@ for(const r of rows){
  const effectText=unesc(r['効果']),desc=effectText.split(/追加効果：|特殊効果[:：]/)[1];
  const b={name:r['名前'],sell:r['売却額'],classes:JSON.parse(r['装備職']).map(j=>{assert.ok(j in JOB);return JOB[j]}).sort()};
  if(r['種類']==='薬'){
+  eq(id+'.ランク',r['ランク'],null);
+  eq(id+'.lootRank presence',Object.hasOwn(w,'lootRank'),false);
   const m=/宝箱 (\d+)F.*重み(\d+)/.exec(unesc(r['入手']));assert.ok(m,id+' medicine source');
   Object.assign(b,{kind:'medicine',minFloor:+m[1],weight:+m[2]});
  }else{
+  b.lootRank=r['ランク'];
   const m=/minFloor\s+(\d+)/.exec(unesc(r['備考']));assert.ok(m,id+' minFloor');b.minFloor=+m[1];
   b.part=PART[r['種類']];b.shop=!/店売りなし/.test(r['入手']);
   if(w.dice){b.range=r['種類']==='武器(遠距離)'?'ranged':'melee';b.dice=dice(effectText.match(/^\d+d\d+(?:\+\d+)?/)[0]);

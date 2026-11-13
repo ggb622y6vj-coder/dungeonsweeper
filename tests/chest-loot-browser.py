@@ -50,7 +50,7 @@ with sync_playwright() as p:
               rollChestItems=(id,floor)=>{
                 window.lootCalls++;
                 const slots=LOOT_TABLES.groups[LOOT_TABLES.monsterGroups[id]].slots;
-                const values=slots.flatMap((slot,i)=>i<count?[0,0]:[slot.chance]);
+                const values=slots.flatMap((slot,i)=>i<count?[0,0,0]:[slot.chance]);
                 const items=actualRoll(id,floor,()=>{
                   if(!values.length)throw Error('extra loot roll');return values.shift();
                 });
