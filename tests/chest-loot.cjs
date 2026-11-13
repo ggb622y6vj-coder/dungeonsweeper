@@ -92,15 +92,19 @@ for (const [monster, group] of Object.entries(tables.monsterGroups)) {
   }
   assert.deepEqual(roll(monster, 1, rolls), expected, monster);
 }
-// A zero-total, zero-medicine tier is valid and consumes only its slot's win draw.
-g.run(`var savedPools=structuredClone(LOOT_TABLES.pools);
- var emptyTier={medicineShare:0,rankWeights:{1:0,2:0,3:0,4:0,5:0},medicineIds:[]};
- for(const tier of ['T3','T4','T5'])LOOT_TABLES.pools[tier]=structuredClone(emptyTier);
- validateLootTables()`);
-assert.deepEqual(roll('sorcerer', 1, [0,0,0]), []);
-g.run('LOOT_TABLES.pools=structuredClone(savedPools);LOOT_TABLES.pools.T3=emptyTier');
-assert.deepEqual(roll('sorcerer', 1, [0,0,0,0,0,0,0]), [tables.pools.T4.medicineIds[0],tables.pools.T5.medicineIds[0]]);
-g.run('LOOT_TABLES.pools=structuredClone(savedPools)');
+// Every tier needs equipment, even when valid medicine candidates are available.
+for (const tier of Object.keys(tables.pools)) for (const pool of [
+  {medicineShare:0,rankWeights:{1:0,2:0,3:0,4:0,5:0},medicineIds:[]},
+  {medicineShare:.2,rankWeights:{1:0,2:0},medicineIds:['healingPotion']},
+]) {
+  const invalid = structuredClone(tables);
+  invalid.pools[tier] = pool;
+  const error = new RegExp(`Empty equipment pool: ${tier}`);
+  assert.throws(() => g.run(`validateLootTables(${JSON.stringify(invalid)})`), error);
+  const source = lootSource.replace(/const LOOT_TABLES = [\s\S]*?\n};/, `const LOOT_TABLES = ${JSON.stringify(invalid)};`);
+  assert.throws(() => vm.runInNewContext(source, {WEAPONS: equipment, MEDICINES: medicines}), error);
+}
+g.run('var savedPools=structuredClone(LOOT_TABLES.pools)');
 // Walk all medicines and every item of every positive rank in every active slot/group/floor.
 const t1Reached = new Set();
 for (const [group, {slots}] of Object.entries(tables.groups)) {
@@ -172,7 +176,7 @@ for (const [group, {slots}] of Object.entries(tables.groups)) {
 }
 g.run('LOOT_TABLES.pools=structuredClone(savedPools)');
 assert.deepEqual(plain(g, 'LOOT_TABLES'), tables);
-console.log('PASS chest loot: data validation/parity, 100 mappings, ABC 8 patterns, empty tiers, all rank/medicine candidates on every floor, T1 excludes R3, 100k/tier and group rates');
+console.log('PASS chest loot: data validation/parity, 100 mappings, ABC 8 patterns, empty equipment pools rejected, all rank/medicine candidates on every floor, T1 excludes R3, 100k/tier and group rates');
 
 function party(job=3) {
   const t = game(null, () => .5);
