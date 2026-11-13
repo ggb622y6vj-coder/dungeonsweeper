@@ -12,8 +12,9 @@ const row = id => list().match(new RegExp(`<button[^>]*data-spell="${id}"[^>]*>[
 assert.deepEqual([...list().matchAll(/data-spell="([^"]+)"/g)].map(m=>m[1]), ['reload','tempt','halito']);
 assert(!/未解禁|未習得/.test(list()));
 assert.match(row('halito'), / disabled/);
-assert.match(row('halito'), /習得済み · Lv\.1 · 確定習得 · 戦闘専用/);
-assert.match(row('reload'), /習得率50%/);
+assert.match(row('halito'), /<small>Lv\.1 · 戦闘専用<\/small>/);
+assert.match(row('reload'), /<small>Lv\.4<\/small>/);
+assert.doesNotMatch(list(), /習得済み|確定習得|習得率/);
 assert(!/ disabled/.test(row('reload')));
 const css = fs.readFileSync(require('node:path').join(__dirname, '../dist/index.html'), 'utf8');
 assert.match(css, /\.spellrow:disabled\{[^}]*opacity:\.4/,'disabled rows use existing dimming');

@@ -126,7 +126,7 @@ function renderMagic(){
  $('#magiclist').setAttribute('aria-labelledby',schools.length>1?'magictab-'+spellSchool:'magictitle');
  $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===spellSchool&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{
   let reason=spellReason(i,x),fieldBattleOnly=!s.enemy&&x.where==='battle';
-  return `<button ${index===0?'data-key-default':''} title="${reason}" class="spellrow learned" data-spell="${x.id}" ${fieldBattleOnly||(s.enemy&&!spellBrowse&&reason)?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>${spellCostLabel(x,i)}</span></b><small>習得済み · Lv.${x.level} · ${x.guaranteed?'確定習得':'習得率50%'}${reason?' · '+reason:''}</small><p>${x.description}</p></button>`
+  return `<button ${index===0?'data-key-default':''} title="${reason}" class="spellrow learned" data-spell="${x.id}" ${fieldBattleOnly||(s.enemy&&!spellBrowse&&reason)?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>${spellCostLabel(x,i)}</span></b><small>Lv.${x.level}${reason?' · '+reason:''}</small><p>${x.description}</p></button>`
  }).join('')||'<p>習得済みの呪文がありません</p>';
  renderMagicChoice();
 }

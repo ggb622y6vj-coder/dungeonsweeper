@@ -368,7 +368,63 @@ const SHOP_PURCHASE_NOTICE_MS=500;
 let shopTab='weapon';
 function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||w.shop===false||!Number.isFinite(w.price)||!canEquipJob(w,jobOf(i))||s.gold<w.price||usedSlots(s.inventory[i])>=10)return;s.gold-=w.price;s.inventory[i].push(id);recordLibraryItem(id);render();renderShop();$('#shoppurchasemessage').textContent=`${NAMES[i]}が${w.name}を購入した。`;$('#shoppurchasedialog').showModal();setTimeout(()=>$('#shoppurchasedialog').close(),SHOP_PURCHASE_NOTICE_MS)}
 function equip(i,slot){if(!idle()||!s.inventory[i][slot]||(!canEquipJob(weapon(s.inventory[i][slot]),jobOf(i))&&!isEquipped(i,slot)))return;let w=weapon(s.inventory[i][slot]);if(w.kind==='medicine')return;if(w.part){if(s.armor[i][w.part]===slot)delete s.armor[i][w.part];else s.armor[i][w.part]=slot}else s.equipped[i]=slot;render();renderInventory()}
-function sell(i,slot){if(s.area!=='town'||!idle()||isEquipped(i,slot)||!s.inventory[i][slot])return;let w=weapon(s.inventory[i][slot]);s.gold+=w.sell;s.inventory[i].splice(slot,1);if(s.equipped[i]>slot)s.equipped[i]--;for(let p in s.armor[i])if(s.armor[i][p]>slot)s.armor[i][p]--;render();renderInventory();renderShop()}
+// Remove only copies from this displayed chunk, preserving equipment references.
+function removeInventoryRow(i,slot,count){
+ const ids=s.inventory[i],row=ids&&itemRows(ids).find(row=>row.slot===slot);
+ if(!row?.item||!Number.isInteger(count)||count<1||count>row.count)return false;
+ const slots=[];
+ for(let n=slot;n<ids.length&&slots.length<count;n++)if(ids[n]===row.id)slots.push(n);
+ if(slots.some(n=>isEquipped(i,n)))return false;
+ for(const n of slots.reverse())removeInventorySlot(i,n);
+ return true;
+}
+function sell(i,slot,count=1){
+ if(s.area!=='town'||!idle())return false;
+ const w=weapon(s.inventory[i]?.[slot]);
+ if(!w||!removeInventoryRow(i,slot,count))return false;
+ s.gold+=w.sell*count;render();renderInventory();renderShop();return true;
+}
+function discard(i,slot,count=1){
+ if(s.area!=='dungeon'||!idle()||!removeInventoryRow(i,slot,count))return false;
+ render();renderInventory();return true;
+}
+let inventoryAction=null;
+function openInventoryAction(action,i,slot){
+ if(!['sell','discard'].includes(action)||s.area!==(action==='sell'?'town':'dungeon')||!idle()||!s.members[i])return false;
+ const row=itemRows(s.inventory[i]).find(row=>row.slot===slot);
+ if(!row?.item||isEquipped(i,slot))return false;
+ if(action==='sell'&&row.count===1)return sell(i,slot);
+ inventoryAction={action,i,slot,memberId:s.members[i].id,ids:[...s.inventory[i]],row};
+ $('#inventoryactiontitle').textContent=action==='sell'?'売却':'捨てる';
+ $('#inventoryactionname').textContent=action==='sell'?row.item.name:`${row.item.name}を捨てますか？`;
+ $('#inventoryquantitylabel').hidden=row.count===1;
+ $('#inventoryquantity').innerHTML=Array.from({length:row.count},(_,n)=>`<option value="${n+1}">${n+1}</option>`).join('');
+ $('#inventoryquantity').value='1';
+ $('#inventoryactionconfirm').textContent=action==='sell'?'売却する':'捨てる';
+ updateInventoryAction();$('#inventoryactiondialog').showModal();return true;
+}
+function updateInventoryAction(){
+ if(!inventoryAction)return;
+ const {action,row}=inventoryAction,count=Number($('#inventoryquantity').value);
+ const valid=Number.isInteger(count)&&count>=1&&count<=row.count;
+ $('#inventoryactionconfirm').disabled=!valid;
+ $('#inventoryactiontotal').hidden=action!=='sell';
+ $('#inventoryactiontotal').textContent=action==='sell'&&valid?`合計 ${row.item.sell*count} G（単価 ${row.item.sell} G × ${count}）`:'';
+}
+function closeInventoryAction(){inventoryAction=null;$('#inventoryactiondialog').close()}
+function confirmInventoryAction(){
+ const pending=inventoryAction;if(!pending)return;
+ const {action,i,slot,memberId,ids}=pending,count=Number($('#inventoryquantity').value);
+ // Recheck the owner and inventory as well as scene/equipment guards at confirmation.
+ if(s.members[i]?.id===memberId&&s.inventory[i]?.length===ids.length&&ids.every((id,n)=>s.inventory[i][n]===id)){
+  if(action==='sell')sell(i,slot,count);else discard(i,slot,count);
+ }
+ closeInventoryAction();
+}
+$('#inventoryquantity').onchange=updateInventoryAction;
+$('#inventoryactioncancel').onclick=closeInventoryAction;
+$('#inventoryactionconfirm').onclick=confirmInventoryAction;
+$('#inventoryactiondialog').addEventListener('close',()=>{if(!$('#inventoryactiondialog').open)inventoryAction=null});
 // 寺院の費用・成功率の上下限は本作の仕様。成功率は百分率で返す。
 function templeCost(m){return m.status==='dead'?Math.min(100*m.level,25*m.level*m.level):m.status==='ash'?Math.min(250*m.level,60*m.level*m.level):m.status==='stone'?Math.min(150*m.level,40*m.level*m.level):0}
 function templeChance(m){const vit=m.vit??10;return m.status==='dead'?Math.max(50,Math.min(95,50+3*vit)):m.status==='ash'?Math.max(40,Math.min(90,40+3*vit)):m.status==='stone'?100:0}
@@ -410,7 +466,7 @@ function renderTemple(result=null){
 $('#templeopen').onclick=()=>{if(s.area!=='town'||!idle())return;$('#templenotice').textContent='';renderTemple();$('#templedialog').showModal()};
 $('#templeclose').onclick=()=>$('#templedialog').close();
 function renderShop(){if(!s.members.length)return;for(const tab of ['weapon','head','body','feet']){const button=$('#shoptab-'+tab),active=tab===shopTab;button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1}$('#shopitems').setAttribute('aria-labelledby','shoptab-'+shopTab);let selected=+$('#shopmember').value||0;$('#shopmember').innerHTML=NAMES.map((name,i)=>`<option value="${i}">${name}</option>`).join('');$('#shopmember').value=String(selected);let i=+$('#shopmember').value||0;$('#shopgold').textContent=`金貨 ${s.gold} G`;$('#shopitems').innerHTML=WEAPONS.filter(w=>w.shop!==false&&(w.part||'weapon')===shopTab&&canEquipJob(w,jobOf(i))).map(w=>`<div class="shopitem"><div><b>${w.name}</b><small>${itemDescription(w)}</small></div><span>${w.price} G</span><button data-buy="${w.id}" ${s.gold<w.price||usedSlots(s.inventory[i])>=10?'disabled':''}>購入</button></div>`).join('')}
-function renderInventory(){let i=inventoryMember,rows=itemRows(s.inventory[i]);$('#itemboxopen').hidden=s.area!=='town';$('#itemboxopen').disabled=s.area!=='town'||!idle();$('#inventorytitle').textContent=`${NAMES[i]}のアイテム ${usedSlots(s.inventory[i])}/10`;renderEquipmentSummary(i);renderTransfer(i);$('#inventoryslots').innerHTML=Array.from({length:10},(_,index)=>{let row=rows[index],slot=row?.slot,w=row?.item;return `<div class="slot"><small>${index+1}</small>${w?`<b>${itemRowName(row)}</b><span>${itemDescription(w)}</span>${w.kind==='medicine'?`<button data-use-medicine="${slot}" ${!canChooseMedicine(i)?'disabled':''}>使う</button>`:canEquipJob(w,jobOf(i))||isEquipped(i,slot)?`<button data-equip="${slot}" ${isEquipped(i,slot)&&!w.part?'disabled':''}>${isEquipped(i,slot)?w.part?'外す':'装備中':'装備'}</button>`:''}${s.area==='town'?`<button data-sell="${slot}" ${isEquipped(i,slot)?'disabled':''}>売却 ${w.sell} G</button>`:''}`:'<span>—</span>'}</div>`}).join('')}
+function renderInventory(){let i=inventoryMember,rows=itemRows(s.inventory[i]);$('#itemboxopen').hidden=s.area!=='town';$('#itemboxopen').disabled=s.area!=='town'||!idle();$('#inventorytitle').textContent=`${NAMES[i]}のアイテム ${usedSlots(s.inventory[i])}/10`;renderEquipmentSummary(i);renderTransfer(i);$('#inventoryslots').innerHTML=Array.from({length:10},(_,index)=>{let row=rows[index],slot=row?.slot,w=row?.item;return `<div class="slot"><small>${index+1}</small>${w?`<div class="slotmain"><b>${itemRowName(row)}</b><p>${itemDescription(w)}</p></div>${w.kind==='medicine'?`<button data-use-medicine="${slot}" ${!canChooseMedicine(i)?'disabled':''}>使う</button>`:canEquipJob(w,jobOf(i))||isEquipped(i,slot)?`<button data-equip="${slot}" ${isEquipped(i,slot)&&!w.part?'disabled':''}>${isEquipped(i,slot)?w.part?'外す':'装備中':'装備'}</button>`:''}${s.area==='town'?`<button data-sell="${slot}" ${!idle()||isEquipped(i,slot)?'disabled':''}>売却 ${w.sell} G</button>`:s.area==='dungeon'?`<button data-discard="${slot}" ${!idle()||isEquipped(i,slot)?'disabled':''}>捨てる</button>`:''}`:'<span>—</span>'}</div>`}).join('')}
 function openInventory(i){if(!idle())return;inventoryMember=i;renderInventory();$('#inventorydialog').showModal()}
 // The box is shared by the party; slots always refer to the unfiltered arrays.
 let itemBoxTab='weapon';
@@ -493,7 +549,7 @@ $('#activespellclose').onclick=()=>$('#activespelldialog').close();
 $('#statsopen').onclick=e=>{if(allyTargetPick){if(e)partyTargetEvent(e);return}renderStats();$('#statsdialog').showModal()};$('#party').onclick=$('#statsopen').onclick;$('#party').onkeydown=e=>{if(globalThis.KeyNav||e.ctrlKey||e.altKey||e.metaKey)return;if(partyTargetEvent(e))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#statsopen').onclick()}};$('#statsclose').onclick=()=>$('#statsdialog').close();$('#statsbody').onclick=e=>{let disarm=e.target.closest('[data-stat-disarm]');if(disarm){$('#statsdialog').close();thiefDisarm(+disarm.dataset.statDisarm);return}let b=e.target.closest('[data-stat-inventory]');if(b)openInventory(+b.dataset.statInventory);let cast=e.target.closest('[data-stat-cast]');if(cast){$('#statsdialog').close();openMagic(+cast.dataset.statCast)}};$('#catalogclose').onclick=()=>$('#catalogdialog').close();$('#maptoggle').onclick=()=>{if(visibleCombat()||escapeMapHold)return;$('#mapdialogbody').append($('#mappanel'));$('#mapdialog').showModal()};$('#mapclose').onclick=()=>$('#mapdialog').close();$('#mapdialog').addEventListener('close',()=>$('#mapdock').append($('#mappanel')));
 $('#bossyes').onclick=()=>s.pendingStairs?answerStairs(true):answerBoss(true);$('#bossno').onclick=()=>s.pendingStairs?answerStairs(false):answerBoss(false);$('#board').onclick=e=>{let b=e.target.closest('[data-i]');if(b)flag(+b.dataset.i)};document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>move(b.dataset.action));$('#frontflag').onclick=()=>flag(target());
 $('#party').onchange=e=>{if(e.target.matches('[data-attack-row]')&&!logBusy()&&s.enemy){s.attackRows[+e.target.dataset.attackRow]=e.target.value;render();return}if(!e.target.matches('input[data-person]')||logBusy()||!s.enemy)return;s.commands[+e.target.dataset.person]=e.target.value;render()};
-$('#cleartown').onclick=enterTown;$('#backtown').onclick=enterTown;$('#entrance').onclick=enterDungeon;$('#blacksmith').onclick=()=>{if(!s.members.length)return;shopTab='weapon';renderShop();$('#shopdialog').showModal()};$('#shopclose').onclick=()=>$('#shopdialog').close();$('#inventoryclose').onclick=()=>$('#inventorydialog').close();$('#shopmember').onchange=()=>renderShop();$('#shopitems').onclick=e=>{let b=e.target.closest('[data-buy]');if(b)buy(b.dataset.buy,+$('#shopmember').value)};$('#shopinventory').onclick=()=>openInventory(+$('#shopmember').value);$('#inventoryslots').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.useMedicine!==undefined)openMedicine(inventoryMember,+b.dataset.useMedicine);if(b.dataset.equip!==undefined)equip(inventoryMember,+b.dataset.equip);if(b.dataset.sell!==undefined)sell(inventoryMember,+b.dataset.sell)};
+$('#cleartown').onclick=enterTown;$('#backtown').onclick=enterTown;$('#entrance').onclick=enterDungeon;$('#blacksmith').onclick=()=>{if(!s.members.length)return;shopTab='weapon';renderShop();$('#shopdialog').showModal()};$('#shopclose').onclick=()=>$('#shopdialog').close();$('#inventoryclose').onclick=()=>$('#inventorydialog').close();$('#shopmember').onchange=()=>renderShop();$('#shopitems').onclick=e=>{let b=e.target.closest('[data-buy]');if(b)buy(b.dataset.buy,+$('#shopmember').value)};$('#shopinventory').onclick=()=>openInventory(+$('#shopmember').value);$('#inventoryslots').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.useMedicine!==undefined)openMedicine(inventoryMember,+b.dataset.useMedicine);if(b.dataset.equip!==undefined)equip(inventoryMember,+b.dataset.equip);if(b.dataset.sell!==undefined)openInventoryAction('sell',inventoryMember,+b.dataset.sell);if(b.dataset.discard!==undefined)openInventoryAction('discard',inventoryMember,+b.dataset.discard)};
 try{s=restoreRoster(JSON.parse(localStorage.getItem('ash-v1')))}catch{}if(!s||!s.cells||![64,100,144].includes(s.cells.length)){fresh();s.area='town';s.logs=[];render()}else{ensureProfile();s.guardiansDefeated??=[];s.guardiansDefeated=[...new Set(s.guardiansDefeated)].sort((a,b)=>a-b);migrateMonsterBattle();s.start??=0;if(s.relic&&s.done){s.done=false;s.cells[s.boss].type=s.floor<MAX_FLOOR?'down':''}s.guardianKilledThisRun??=!!s.relic;if(s.floor<MAX_FLOOR&&(s.guardiansDefeated||[]).includes(s.floor)&&s.cells[s.boss].type==='boss'){s.cells[s.boss].type='down';s.relic=true}if(s.cells[s.start].type!=='boss'&&s.cells[s.start].type!=='down')s.cells[s.start].type='stairs';for(let c of s.cells){if(c.open&&c.trap){c.trap=false;c.spent=true}if(c.type==='enemy')c.type=''}if(s.area==='town'&&!s.defeatPending){const carried=s.members.filter(m=>m.status!=='ok').map(m=>({id:m.id,name:m.name||CLASSES[m.job??0].name,status:m.status}));if(carried.length){s.templeReport=carried.map(({name,status})=>({name,status}));removeFromParty(carried.map(x=>x.id));s.levelReport=[];s.templeReportFromLoad=true;save()}autoReorderParty('load')}render();if(s.area==='town'&&s.templeReport?.length)showTempleCarryReport()}
 if(s.defeatPending)finishDefeat();
 
