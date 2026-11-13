@@ -355,6 +355,8 @@ function validateLootTables(tables = LOOT_TABLES, equipment = WEAPONS, medicines
    if (weight > 0 && !equipment.some(item => item.lootRank === +rank))
     throw new Error(`Missing rank equipment: ${tier}/${rank}`);
   }
+  if (Object.values(pool.rankWeights).reduce((sum, weight) => sum + weight, 0) <= 0)
+   throw new Error(`Empty equipment pool: ${tier}`);
  }
 }
 validateLootTables();
