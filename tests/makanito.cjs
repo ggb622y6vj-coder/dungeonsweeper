@@ -108,7 +108,8 @@ for (const legacy of [false,true]) {
   const again = game(loaded.run("localStorage.getItem('ash-v1')"));
   assert.equal(again.run("s.members[0].known.filter(id=>id==='makanito').length"),1);
   again.run('openMagic(0,true)');
-  assert.match(again.run("$('#magiclist').innerHTML"), /data-spell="makanito"[^]*?習得済み/);
+  assert.match(again.run("$('#magiclist').innerHTML"), /data-spell="makanito"[^]*?<small>Lv\.9 · 今は使用不可<\/small>/);
+  assert.doesNotMatch(again.run("$('#magiclist').innerHTML"), /習得済み|確定習得|習得率/);
 }
 // Shared death helper preserves Lakanito's probability, group scope and rewards.
 {

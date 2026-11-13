@@ -63,7 +63,8 @@ with sync_playwright() as p:
         page.locator('[data-command-choice="spell"]').click()
         spell = page.locator('[data-spell="makanito"]')
         assert spell.is_enabled()
-        assert '習得済み' in spell.inner_text()
+        assert spell.locator('small').inner_text() == 'Lv.9'
+        assert not any(text in spell.inner_text() for text in ('習得済み', '確定習得', '習得率'))
         assert 'MP 5' in spell.inner_text()
         spell.click()
         assert page.evaluate("s.magicPlans[0].id==='makanito' && s.magicPlans[0].target===null")
