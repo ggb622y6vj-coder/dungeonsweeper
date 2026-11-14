@@ -11,6 +11,8 @@ const CLASSES = [
 ];
 const SPELLS={blast:{name:'呪文',cost:4,dice:[3,6,0]},heal:{name:'回復',cost:3,dice:[2,6,4]}};
 const LEVEL_CAP=30;
+// 112: L は増分で到達するレベル（2..30）。生成・転職・旧セーブ移行で共用。
+function xpCurveScale(L){return L<=8?1:Math.min(6,Math.pow(1.2,L-8))}
 // 099: maximum-HP candidate; hpGrowth remains the level-drain approximation.
 function vitBonus(vit){return vit===3?-2:vit<=5?-1:vit<=15?0:vit-15}
 function hpCandidate(job,level,vit){
@@ -26,22 +28,26 @@ function trapPower(floor){return 1+0.25*(Math.min(floor,MAX_FLOOR)-1)}
 function trapCount(floor,size){return Math.min(Math.floor(size*size*0.22),Math.round(size*size*(0.14+0.01*(floor-1))))}
 // 各レベルの増分を個別に抽選し保存。描画や再読み込みで再抽選しない。
 function ensureProgression(){
- s.members.forEach((m,i)=>{
+ function ensureMember(m,job){
   if(m.xpTargets){
-   if(m.xpCurveVersion!==2){
+   if(m.xpCurveVersion!==3){
     let old=m.xpTargets.slice();
-    for(let level=m.level+1;level<=LEVEL_CAP;level++)m.xpTargets[level]=m.xpTargets[level-1]+Math.round((old[level]-old[level-1])*1.15);
-    m.xpCurveVersion=2;
+    for(let level=m.level+1;level<=LEVEL_CAP;level++)m.xpTargets[level]=m.xpTargets[level-1]+Math.round((old[level]-old[level-1])*xpCurveScale(level));
+    m.xpCurveVersion=3;
    }
    return;
   }
   m.xpTargets=[0,0];
   for(let level=2;level<=LEVEL_CAP;level++){
    m.xpTargets[level]=level<=m.level?50*level*(level-1):
-    m.xpTargets[level-1]+Math.round(115*(level-1)*memberClass(i).xpFactor*(.9+Math.random()*.2));
+    m.xpTargets[level-1]+Math.round(115*(level-1)*CLASSES[job].xpFactor*(.9+Math.random()*.2)*xpCurveScale(level));
   }
-  m.xpCurveVersion=2;
- });
+  m.xpCurveVersion=3;
+ }
+ s.members.forEach((m,i)=>ensureMember(m,jobOf(i)));
+ for(const r of [...(s.reserve||[]),...(s.corpses||[]).flatMap(c=>c.records||[])]){
+  if(r.members)ensureMember(r.members,r.members.job??0);
+ }
 }
 const requiredXP=(level,i)=>s.members[i].xpTargets[level];
 

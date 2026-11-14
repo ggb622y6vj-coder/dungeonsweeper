@@ -11,7 +11,7 @@ function generateRecruit(name, job) {
   stats[choices[Math.floor(Math.random()*choices.length)]]++;
  }
  const hp=c.hp-3+Math.floor(Math.random()*7), mp=c.mp?c.mp-2+Math.floor(Math.random()*5):0;
- const m={id:crypto.randomUUID(),name,job,level:1,xp:0,maxHP:hp,maxMP:mp,attack:c.attack,ac:c.ac,str:stats[0],baseStr:stats[0],intelligence:stats[1],piety:stats[2],agi:stats[3],baseAgi:stats[3],creationBonus:bonus,xpTargets:[0,0],xpCurveVersion:2,
+ const m={id:crypto.randomUUID(),name,job,level:1,xp:0,maxHP:hp,maxMP:mp,attack:c.attack,ac:c.ac,str:stats[0],baseStr:stats[0],intelligence:stats[1],piety:stats[2],agi:stats[3],baseAgi:stats[3],creationBonus:bonus,xpTargets:[0,0],xpCurveVersion:3,
   careerHistory:[],known:MAGIC.filter(x=>x.job===job&&x.level===1&&x.guaranteed).map(x=>x.id)};
  m.xpTargets=generateClassXP(job);
  m.vit=10+Math.floor(Math.random()*4);
@@ -91,7 +91,7 @@ function recruitAC(record){return record.members.ac-Object.values(record.armor).
 
 function generateClassXP(job){
  const targets=[0,0];
- for(let l=2;l<=LEVEL_CAP;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*CLASSES[job].xpFactor*(.9+Math.random()*.2));
+ for(let l=2;l<=LEVEL_CAP;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*CLASSES[job].xpFactor*(.9+Math.random()*.2)*xpCurveScale(l));
  return targets;
 }
 function ensureCareerHistory(m){
@@ -132,7 +132,7 @@ function changeClass(id,toJob){
  if(!check.ok)return check;
  const next=classChangePreview(record,toJob);
  next.members.classChanged=true;
- next.members.xpTargets=generateClassXP(toJob);next.members.xpCurveVersion=2;
+ next.members.xpTargets=generateClassXP(toJob);next.members.xpCurveVersion=3;
  if(index>=0){for(const key of PARTY_FIELDS)s[key][index]=next[key]}
  else s.reserve[reserveIndex]=next;
  displayVitals=null;refreshNames();render();

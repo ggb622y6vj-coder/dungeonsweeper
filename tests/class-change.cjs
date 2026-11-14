@@ -68,8 +68,8 @@ assert.equal(changed.members.level,1);assert.equal(changed.members.xp,0);assert.
 assert.equal(changed.hp,old.members.maxHP);assert.equal(changed.mp,72);assert.equal(changed.members.baseStr,16);assert.equal(changed.members.baseAgi,17);
 assert.equal(changed.members.attack,g.run('CLASSES[0].attack'));assert.equal(changed.members.ac,g.run('CLASSES[0].ac'));
 assert.equal(g.run('s.gold'),1234);assert.equal(g.run('JSON.stringify(s.library)'),g.run('libraryBefore'));
-let targets=[0,0];for(let l=2;l<=30;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*.8);
-assert.deepEqual(changed.members.xpTargets,targets);assert.equal(changed.members.xpCurveVersion,2);
+let targets=[0,0];for(let l=2;l<=30;l++)targets[l]=targets[l-1]+Math.round(115*(l-1)*.8*(l<=8?1:Math.min(6,Math.pow(1.2,l-8))));
+assert.deepEqual(changed.members.xpTargets,targets);assert.equal(changed.members.xpCurveVersion,3);
 assert.deepEqual(changed.members.careerHistory,[{from:1,fromLevel:10,to:0}]);
 for(let n=0;n<3;n++){
  g.run('ensureProfile();render();save()');g=setup(g.run("localStorage.getItem('ash-v1')"));

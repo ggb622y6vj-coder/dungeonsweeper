@@ -36,12 +36,12 @@ for(let job=0;job<4;job++)for(const [index,roll] of [0,.5,.999999].entries()){
   assert.equal(m.baseStr,m.str);assert.equal(m.baseAgi,m.agi);
   assert.equal(r.hp,m.maxHP);assert.equal(r.mp,m.maxMP);
   const expectedXP=[0,0];
-  for(let level=2;level<=30;level++)expectedXP[level]=expectedXP[level-1]+Math.round(115*(level-1)*[.8,1.2,1,.85][job]*(.9+roll*.2));
+  for(let level=2;level<=30;level++)expectedXP[level]=expectedXP[level-1]+Math.round(115*(level-1)*[.8,1.2,1,.85][job]*(.9+roll*.2)*(level<=8?1:Math.min(6,Math.pow(1.2,level-8))));
   assert.deepEqual(m.xpTargets,expectedXP);
   assert.deepEqual(m.known,[[],['dumapic','identifyfoe','halito','katino'],['dios','kalki'],[]][job]);
  }
 }
-console.log('PASS 099 recruit: VIT 10–13 boundaries; existing stats, bonus, HP/MP, XP and spells unchanged');
+console.log('PASS 099 recruit: VIT 10–13 boundaries; existing stats, bonus, HP/MP and spells unchanged; XP follows curve v3');
 
 // Missing and already-set VIT in every record location, both save formats.
 g=setup();g.run(`recruit(1);recruit(2,false);recruit(0,false);

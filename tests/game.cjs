@@ -112,9 +112,9 @@ s.cells[2].open=true;s.cells[3].flag='power';rememberFloor();var oldFloor2=JSON.
 `);drain();run(`
 var inventoryBefore=JSON.stringify(s.inventory),goldBefore=s.gold,xpBefore=s.members.map(m=>m.xp).join();enterTown();if(s.area!=='town'||s.floor!==1||Object.keys(s.floors).length||s.cells.some(c=>c.open||c.flag||c.spent||c.disarmed)||s.cells[s.boss].type!==((s.guardiansDefeated||[]).includes(s.floor)?'down':'boss'))throw Error('town reset all floors');if(JSON.stringify(s.inventory)!==inventoryBefore||s.gold!==goldBefore||s.members.map(m=>m.xp).join()!==xpBefore)throw Error('town reset profile');enterDungeon();if(s.cells.filter(c=>c.open).length!==1||!s.cells[s.start].open)throw Error('new expedition');
 `);drain();run(`
-var oldMembers=s.members;s.members=[{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))},{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))},{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))}];Math.random=()=>{throw Error('migration must not reroll')};ensureProgression();if(s.members.some(m=>m.level!==2||m.xp!==105||m.xpTargets[2]!==100||m.xpTargets[3]!==330))throw Error('15 percent XP migration');var targets=JSON.stringify(s.members);ensureProgression();if(JSON.stringify(s.members)!==targets)throw Error('double XP inflation');s.members=oldMembers;
+var oldMembers=s.members;s.members=[{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))},{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))},{level:2,xp:105,xpTargets:Array.from({length:31},(_,l)=>50*l*(l-1))}];Math.random=()=>{throw Error('migration must not reroll')};ensureProgression();if(s.members.some(m=>m.level!==2||m.xp!==105||m.xpTargets[2]!==100||m.xpTargets[3]!==300))throw Error('v3 XP migration below Lv9');var targets=JSON.stringify(s.members);ensureProgression();if(JSON.stringify(s.members)!==targets)throw Error('double XP inflation');s.members=oldMembers;
 s.enemy={units:[{id:'wolf',uid:0,row:0,hp:0},{id:'wolf',uid:1,row:0,hp:10},{id:'wolf',uid:2,row:0,hp:20},{id:'slime',uid:3,row:1,hp:10}],target:2};s.attackRows=[0,1,0];if(selectedEnemy(0).uid!==1||selectedEnemy(1).uid!==3)throw Error('first living per row');s.enemy.units[1].hp=0;if(selectedEnemy(0).uid!==2)throw Error('advance within row');s.enemy.units[2].hp=0;if(selectedEnemy(0)!==undefined)throw Error('selectedEnemy preserves reserved row ID');
-`);console.log('PASS guardian gates / same-tile stairs, floor round trips and town reset, profile retention, XP +15% migration once, first living target and empty-row action');
+`);console.log('PASS guardian gates / same-tile stairs, floor round trips and town reset, profile retention, XP curve v3 migration once, first living target and empty-row action');
 drain();run(`
 s.enemy=null;s.cells.forEach(c=>c.flag=false);var ts=s.cells.filter(c=>c.trap);ts[0].flag='power';ts[1].flag='guard';ts[2].flag='magic';var ef=flagEffect();if(ef.counts.power!==1||ef.counts.guard!==1||ef.counts.magic!==1)throw Error('typed flags');s.flagKind='guard';if(placedFlag(ts[0])!=='power')throw Error('recolor');Math.random=()=>0;s.enemy={units:[{id:'slime',uid:0,hp:10}],flagEffect:ef};if(flagDamage(20)!==30||flagDamage(20,true)!==10)throw Error('mixed procs');s.mp[1]=10;flagConsumeMP(1,3);if(s.mp[1]!==8)throw Error('half MP combat');s.enemy=null;flagConsumeMP(1,3);if(s.mp[1]!==6)throw Error('half MP field');s.cells.find(c=>!c.trap).flag='guard';s.enemy={units:[{id:'slime',uid:0,hp:10}],flagEffect:flagEffect()};if(flagDamage(20)!==20||flagDamage(20,true)!==30||escapeChance()!==0)throw Error('mixed curse');s.enemy=null;
 `);console.log('PASS typed flags, independent procs, no recoloring, half MP in combat and field, exclusive curses');
@@ -342,6 +342,7 @@ require('./pitfall.cjs');
 require('./travel-characterization.cjs');
 require('./action-order.cjs');
 
+require('./xp-curve.cjs');
 require('./class-change.cjs');
 require('./elite-jobs.cjs');
 require('./training-menu.cjs');
