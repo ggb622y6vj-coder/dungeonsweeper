@@ -147,3 +147,4 @@
 | 106 | 2026-11-12 | アイテムボックスの導入 | a64da35 | [spec](specs/106-item-box.md) | [実施](reports/106.md) |
 | 107 | 2026-11-12 | 薬のスタック所持 | 7295cc9 | [spec](specs/107-item-stacking.md) | [実施](reports/107.md) |
 | 108 | 2026-11-12 | 宝箱報酬を初代Wizardry #1型へ変更（敵別宝物テーブル・A/B/C 3枠抽選） | hold/108 | be9bf67 |
+| 112 | 2026-11-14 | 必要経験値カーブの引き上げ（Lv9から1.2倍ずつ・最大6倍） | 1bc18b4 | [spec](specs/112-xp-curve.md) | [実施](reports/112.md) |
