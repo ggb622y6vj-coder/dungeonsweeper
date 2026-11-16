@@ -38,7 +38,7 @@ sが状態本体。localStorageのキー`ash-v1`にJSON保存。別端末・別�
 - light,watchful,dumapicUses：帰還までの魔法状態。
 - pendingBoss,pendingStairs,done,area：画面・イベント遷移のガード。
 
-ensureProfile→ensureLibrary/ensureCareerHistory/ensureMagic/ensureProgression等が旧セーブを補完する（renderのたびに呼ばれ、新規状態の既定値埋めも兼ねる）。GitHub公開前の形式専用の移行（3人→6人パーティー変換、members導入前の状態、旧敵ID、スコア削除、真偽値の旗、healコマンド）は2026-11-16に削除した。対応する最古の形式は訓練所導入後（rosterVersion:1）で、それ以前のmembers配列を持つセーブは変換せずそのまま読む。membersのないセーブは新規開始、unitsのない戦闘は破棄する。初期状態生成と移行は同じではない。
+ensureProfile→ensureLibrary/ensureCareerHistory/ensureMagic/ensureProgression等が旧セーブを補完する（renderのたびに呼ばれ、新規状態の既定値埋めも兼ねる）。GitHub公開前の形式専用の移行（3人→6人パーティー変換、members導入前の状態、旧敵ID、スコア削除、真偽値の旗、healコマンド）は2026-11-16に削除した。対応する最古の形式は最初のGitHub Pages公開版（88b675f、2026-11-01）で、訓練所導入前の並列配列形式（partyVersion:1）である。公開版が書き出したセーブは保存時点で正規化済みのため変換は不要で、members配列を持つセーブはそのまま読む。公開前の形式は対象外とし、membersまたは並行配列（hp/mp/inventory/equipped/armor/ailments）を欠くセーブは起動時に安全に新規開始へ倒す。unitsのない戦闘は破棄する。初期状態生成と移行は同じではない。
 
 ## ログ同期
 
