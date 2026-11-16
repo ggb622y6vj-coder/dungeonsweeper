@@ -309,6 +309,8 @@ Node新規テストは64通りの前職／転職先、特徴文、生成拒否�
 
 ## 公開前形式の移行削除と死にコード整理（2026-11-16）
 
+113：開く導線のない敵データ一覧ダイアログと専用CSS・閉じるハンドラ、パーティーonchangeの未使用 `[data-attack-row]` 分岐を削除。game.cjsのPASS名2箇所を言い換え、検証内容・現行の行選択・セーブ処理は変更なし。
+
 呼び出し元のない `attackRowUI`／`medicineAction`／`renderCatalog`／`spellStats` を削除。オーナー承認のうえ、GitHub公開前の形式専用の移行（`ensureStats`、`ensureSixParty` の3人→6人変換、`migrateMonsterBattle`、スコア／履歴削除、`flag===true`、`heal` コマンド、`type==='enemy'`、3人用の既定値）を削除した。最初のGitHub Pages公開版（88b675f、2026-11-01）以降のセーブと、11/2以降に追加した移行（図書館・遺体・昇降機・VIT・AGI・転職履歴・経験値カーブv3・アイテムボックス等）は変更なし。
 
 削除後の旧形式の扱い：members配列と並行配列（hp/mp/inventory/equipped/armor/ailments）を持つ旧セーブは変換せずそのまま読む（3人なら3人のまま）。membersまたは並行配列を欠くセーブは新規開始、unitsのない進行中戦闘は破棄。`tests/legacy-save.cjs`（game.cjsから実行）で固定。game.cjsの戦闘用fixtureは、削除した移行に頼らずテスト内の `fixtureThreeMembers`／`fixtureSixParty` で組み立てる。
