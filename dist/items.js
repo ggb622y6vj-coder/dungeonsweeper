@@ -27,7 +27,6 @@ function itemRowName(row){return (row.item?.name||row.id)+(row.count>1?' ×'+row
 function lootRecipient(w){let i=s.members.findIndex((m,i)=>canEquipJob(w,jobOf(i))&&canAccept(s.inventory[i],w.id,10));return i>=0?i:s.members.findIndex((m,i)=>canAccept(s.inventory[i],w.id,10))}
 function medicineSlots(i){return itemRows(s.inventory[i]).filter(x=>x.item?.kind==='medicine').map(({slot,item,count})=>({slot,item,count}))}
 function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&!partyIncapacitated(i)}
-function medicineAction(i){if(!s.enemy||!medicineSlots(i).length)return '';let plan=s.itemPlans[i],w=plan&&weapon(plan.id);return `<button data-medicine="${i}" ${!canChooseMedicine(i)?'disabled':''}>${s.commands[i]==='item'&&w?w.name+' → '+NAMES[plan.target]:'薬を使う'}</button>`}
 function dropMedicine(){
  if(Math.random()>=.30)return;
  const pool=MEDICINES.filter(w=>(w.minFloor||1)<=(s.floor||1)),total=pool.reduce((n,w)=>n+w.weight,0);let roll=Math.random()*total,w=pool[0];for(let item of pool){roll-=item.weight;if(roll<0){w=item;break}}
