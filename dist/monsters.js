@@ -30,12 +30,6 @@ function finishMonsterBattle(){
  else if(!defeated.length)log('敵はいなくなった。');
  autoReorderParty('battle-end');
 }
-function migrateMonsterBattle(){
- if(!s.enemy||s.enemy.dataVersion===1)return;
- const mapping=s.floor>=3?{slime:'acidslime',skeleton:'archer',wolf:'blackwolf',goblin:'shaman',guardian:'watcher'}:s.floor===2?{slime:'poisonslime',skeleton:'ghostknight',wolf:'wolf',goblin:'orc',guardian:'general'}:{};
- for(const e of s.enemy.units){e.row??=e.id;e.id=mapping[e.id]||e.id;if(!ENEMIES.some(d=>d.id===e.id))e.id='slime';const d=enemyDefinition(e.id);e.hp=Math.min(e.hp,d.hp[0]*d.hp[1]+d.hp[2]);}
- s.enemy.dataVersion=1;
-}
 function monsterResists(e,effect){return effect==='poison'&&enemyDefinition(e.id).resistance.includes('毒無効')}
 function afflictMonster(e,effect){if(monsterResists(e,effect))return false;e[effect]=true;return true}
 

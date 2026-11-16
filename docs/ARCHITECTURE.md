@@ -9,7 +9,7 @@
 | dist/combatui.js | 順番コマンド、対象選択、行動確認 |
 | dist/recruits.js | キャラクター生成、登録・編成・抹消、登録簿の保存復元 |
 | dist/training.js | 訓練所のUIと確認ダイアログ |
-| dist/party.js | 職業識別、6人移行、酒場、並べ替え、譲渡、装備概要、盗賊開封 |
+| dist/party.js | 職業識別、酒場、並べ替え、譲渡、装備概要、盗賊開封 |
 | dist/balance.js | 職業、経験値曲線と移行 |
 | dist/weapons.js | 武器17・防具9。防具もWEAPONS配列に追加 |
 | dist/items.js | 薬2・消費・対象選択・スロット削除 |
@@ -19,7 +19,7 @@
 | data/monsters.csv | 敵31種類の編集正本 |
 | scripts/compile-monsters.py | CSV検証・JS生成。固定IDは確定名に紐付く |
 | dist/monster-data.js | 生成されたENEMIES。直接編集しない |
-| dist/monsters.js | 敵特殊行動、戦闘終了、旧敵移行、解呪 |
+| dist/monsters.js | 敵特殊行動、戦闘終了、解呪 |
 | tests/game.cjs | Node vm＋簡易DOM＋タイマーによる回帰テスト |
 
 ビルド不要、classic scriptのグローバル共有。index.htmlのscript順を維持。外部画像・フォント・CDN依存・バックエンドAPIなし。図形はSVGと文字。単独でdistフォルダを配信すれば動作する。
@@ -38,7 +38,7 @@ sが状態本体。localStorageのキー`ash-v1`にJSON保存。別端末・別�
 - light,watchful,dumapicUses：帰還までの魔法状態。
 - pendingBoss,pendingStairs,done,area：画面・イベント遷移のガード。
 
-ensureProfile→ensureStats/ensureSixParty/ensureMagic/ensureProgression等が旧セーブを補完。migrateMonsterBattleは読込時の旧敵IDを移行する。初期状態生成と移行は同じではない。
+ensureProfile→ensureLibrary/ensureCareerHistory/ensureMagic/ensureProgression等が旧セーブを補完する（renderのたびに呼ばれ、新規状態の既定値埋めも兼ねる）。GitHub公開前の形式専用の移行（3人→6人パーティー変換、members導入前の状態、旧敵ID、スコア削除、真偽値の旗、healコマンド）は2026-11-16に削除した。対応する最古の形式は訓練所導入後（rosterVersion:1）で、それ以前のmembers配列を持つセーブは変換せずそのまま読む。membersのないセーブは新規開始、unitsのない戦闘は破棄する。初期状態生成と移行は同じではない。
 
 ## ログ同期
 
