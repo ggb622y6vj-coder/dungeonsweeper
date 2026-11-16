@@ -320,3 +320,11 @@ Node新規テストは64通りの前職／転職先、特徴文、生成拒否�
 Amendment（2026-11-16、ChatGPTレビュー必須修正への対応をオーナーが承認し Muse が直接実施）：F-01＝互換性の基準を「訓練所導入後」から最初のGitHub Pages公開版（88b675f、2026-11-01、訓練所導入前の並列配列形式）に訂正し、そのビルドで実際に生成したセーブを `tests/fixtures/first-public-save.json` として固定、読込・再保存の回帰テストを `tests/legacy-save.cjs` に追加。F-02＝membersはあるが並行配列（hp/mp/inventory/equipped/armor/ailments）のいずれかを欠くセーブが起動時に例外で落ちる問題に、起動時の構造チェック（欠けた場合は安全に新規開始）を追加し、同テストで固定。Muse側検証：node tests/game.cjs 214 PASS、ブラウザテスト47/47、compile-monsters、sim selftest、Notion同期テスト、MANIFEST不一致0。
 
 統合（2026-11-16、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` を main へ fast-forward 統合（dbaf707）。Pages デプロイ成功（run 43809653935）。ライブ検証：配信17ファイルすべて HTTP 200、配信 game.js に構造チェックがあり削除した移行関数（ensureStats／ensureSixParty／migrateMonsterBattle）がないことを確認。
+
+## デザイン評価と可読性・タッチ領域の改修（2026-11-16）
+
+`dist/index.html` のスタイル末尾に改修ブロックを追加（既存の画面別ルールより後で上書きする）。9〜10pxだった文字（Lv、前衛／後衛、状態異常タグ、敵一覧、ステータス詳細）を11pxへ。ステータスdialogのボタンと順番変更、dialog内select、地図の旗ボタンの高さを40〜44pxへ。図書館モンスターの階タブは700px以下で5列×2段（390pxで幅26px→約60px）。鍛冶屋のツールバーとタブの間に余白。インラインSVGのfaviconとtheme-colorを追加（favicon不在の404がコンソールエラーになり、ブラウザテスト3本が失敗していた）。開く経路のなかった敵データ一覧dialog（`#catalogdialog`）とそのCSS・閉じるハンドラーを削除。先の記録の「`renderCatalog` は存在しない要素を参照」は誤りで、要素はあったが開く経路がなかった。
+
+クイック攻撃ボタンの拡大（24px→36px）は、071の「コマンド欄を070より10px以上低く」という既存テスト（`quick-attack-browser.py`）に反したため取りやめ、24pxのまま。配色（202色）とCSSの上書きの積み重ねは未整理。
+
+検証：Node全57本PASS。Python版Playwrightを一時環境に入れ、`tests/*-browser.py` 全47本を1280/390pxで実行。改修前は44本PASS・3本FAIL（favicon 404）、改修後は全47本PASS（quick-attackは上記取りやめ後に再実行）。
