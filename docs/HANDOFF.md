@@ -316,3 +316,5 @@ Node新規テストは64通りの前職／転職先、特徴文、生成拒否�
 検証：Node全57本、敵CSV整合、sim/selftest PASS。削除前のビルドで作った32通りのセーブを新旧ビルドで読み、再保存結果が完全一致。Chromium 1280/390pxで新規登録→入場→移動→再読込と旧形式2種の起動をスモーク確認（JSエラー0）。既存 `tests/*-browser.py` 47本はPython版Playwrightがなく未実行。
 
 Amendment（2026-11-16、ChatGPTレビュー必須修正への対応をオーナーが承認し Muse が直接実施）：F-01＝互換性の基準を「訓練所導入後」から最初のGitHub Pages公開版（88b675f、2026-11-01、訓練所導入前の並列配列形式）に訂正し、そのビルドで実際に生成したセーブを `tests/fixtures/first-public-save.json` として固定、読込・再保存の回帰テストを `tests/legacy-save.cjs` に追加。F-02＝membersはあるが並行配列（hp/mp/inventory/equipped/armor/ailments）のいずれかを欠くセーブが起動時に例外で落ちる問題に、起動時の構造チェック（欠けた場合は安全に新規開始）を追加し、同テストで固定。Muse側検証：node tests/game.cjs 214 PASS、ブラウザテスト47/47、compile-monsters、sim selftest、Notion同期テスト、MANIFEST不一致0。
+
+統合（2026-11-16、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` を main へ fast-forward 統合（dbaf707）。Pages デプロイ成功（run 43809653935）。ライブ検証：配信17ファイルすべて HTTP 200、配信 game.js に構造チェックがあり削除した移行関数（ensureStats／ensureSixParty／migrateMonsterBattle）がないことを確認。
