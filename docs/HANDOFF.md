@@ -306,3 +306,11 @@ Node新規テストは64通りの前職／転職先、特徴文、生成拒否�
 既存ブラウザテストの仕様衝突（静的確認）：`tests/class-change-browser.py:44` の「武器不足」はメイスだけを持つ僧侶Lv10で、同ファイル51〜54行は転職ボタン無効を期待する。095ではメイスを装備できる君主・司教への前職条件を満たすため、ボタン有効が正しい。この旧期待値は依頼に従い変更していない。ブラウザ全件合格には、このケースのfixture／期待値の扱いを依頼側で調整する必要がある。新仕様を満たす実装で旧期待値まで満たすことはできない。
 
 検証済み：`node tests/game.cjs`（elite-jobs登録済み）と、同テストから呼ばれない既存18本を合わせたNode全46本、`python3 scripts/compile-monsters.py --check`（100種）、`node scripts/sim/selftest.cjs` はPASS。新規ブラウザテストのPython構文と静的なJavaScript39箇所もPASS。MANIFEST.sha256は照合のみで再生成せず、変更対象の既存12ファイルが不一致、新規テスト2本は未登録。コミット・push・公開は行っていない。
+
+## 公開前形式の移行削除と死にコード整理（2026-11-16）
+
+呼び出し元のない `attackRowUI`／`medicineAction`／`renderCatalog`／`spellStats` を削除。オーナー承認のうえ、GitHub公開前の形式専用の移行（`ensureStats`、`ensureSixParty` の3人→6人変換、`migrateMonsterBattle`、スコア／履歴削除、`flag===true`、`heal` コマンド、`type==='enemy'`、3人用の既定値）を削除した。訓練所導入後（`rosterVersion:1`）のセーブと、11/2以降に追加した移行（図書館・遺体・昇降機・VIT・AGI・転職履歴・経験値カーブv3・アイテムボックス等）は変更なし。
+
+削除後の旧形式の扱い：members配列を持つ旧セーブは変換せずそのまま読む（3人なら3人のまま）。membersのないセーブは新規開始、unitsのない進行中戦闘は破棄。`tests/legacy-save.cjs`（game.cjsから実行）で固定。game.cjsの戦闘用fixtureは、削除した移行に頼らずテスト内の `fixtureThreeMembers`／`fixtureSixParty` で組み立てる。
+
+検証：Node全57本、敵CSV整合、sim/selftest PASS。削除前のビルドで作った32通りのセーブを新旧ビルドで読み、再保存結果が完全一致。Chromium 1280/390pxで新規登録→入場→移動→再読込と旧形式2種の起動をスモーク確認（JSエラー0）。既存 `tests/*-browser.py` 47本はPython版Playwrightがなく未実行。

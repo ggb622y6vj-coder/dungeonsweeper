@@ -152,20 +152,16 @@ for(const [name,action,count] of [
 console.log('PASS end-to-end wipes from movement/battle poison, floor traps, chest trap and enemy attack');
 
 const legacySource=corpseParty();
-for(const format of ['roster','parallel','three-member']){
+for(const format of ['roster','parallel']){
  const legacy=JSON.parse(legacySource.run(format==='roster'?'JSON.stringify(rosterSaveState())':'JSON.stringify(s)'));
  delete legacy.corpses;
- if(format==='three-member'){
-  delete legacy.partyVersion;
-  for(const key of ['members','hp','mp','inventory','equipped','armor','ailments'])legacy[key]=legacy[key].slice(0,3);
- }
  const g=game(JSON.stringify(legacy));
  assert.equal(g.run('s.corpses.length'),0,format);
  assert.equal(g.run('s.members.length'),6,format);
  g.run('renderTraining();save();');assert.equal(game(g.saved()).run('s.corpses.length'),0,format);
 }
 assert.equal(game().run('s.corpses.length'),0);
-console.log('PASS missing corpses defaults to [] for new and old roster/parallel/three-member saves');
+console.log('PASS missing corpses defaults to [] for new and old roster/parallel saves');
 
 // 031: regenerate each floor from the same seed with corpses on stairs, boss and traps.
 g=game();
