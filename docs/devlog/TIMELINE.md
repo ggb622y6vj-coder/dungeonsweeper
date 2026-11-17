@@ -149,3 +149,4 @@
 | 108 | 2026-11-12 | 宝箱報酬を初代Wizardry #1型へ変更（敵別宝物テーブル・A/B/C 3枠抽選） | hold/108 | be9bf67 |
 | 112 | 2026-11-14 | 必要経験値カーブの引き上げ（Lv9から1.2倍ずつ・最大6倍） | 1bc18b4 | [spec](specs/112-xp-curve.md) | [実施](reports/112.md) |
 | 113 | 2026-11-16 | 開く導線のない敵データ一覧ダイアログと残存ハンドラの整理 | cf2d24a | [spec](specs/113-dead-code-catalog.md) | [実施](reports/113.md) |
+| 114 | 2026-11-17 | MPバーの背景に青系トークンを戻す（CSS整理の任意改善C-02） | 61f43fb | [spec](specs/114-mpbar-background.md) | [実施](reports/114.md) |
