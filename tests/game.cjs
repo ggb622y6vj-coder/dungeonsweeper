@@ -359,3 +359,4 @@ require('./notion-equipment-effects.cjs');
 require('./chest-loot.cjs');
 require('./loot-recipient.cjs');
 require('./legacy-save.cjs');
+require('./css-structure.cjs');
