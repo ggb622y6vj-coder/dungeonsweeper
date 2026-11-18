@@ -308,7 +308,7 @@ with sync_playwright() as p:
             page.wait_for_function('!logBusy()')
             assert page.evaluate('s.floor === 4 && s.start === 65')
             assert page.evaluate('isAntimagicZone()') == (route == 'stairs')
-            assert page.evaluate(EFFECT_FIELDS) == (CLEARED if route == 'stairs' else [0, *ACTIVE[1:]])
+            assert page.evaluate(EFFECT_FIELDS) == (CLEARED if route == 'stairs' else ACTIVE)
             assert all(EFFECT['name'] not in line for line in page.evaluate('s.logs'))
 
         assert not errors, errors

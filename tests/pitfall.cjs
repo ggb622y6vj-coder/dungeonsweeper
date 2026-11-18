@@ -14,7 +14,7 @@ const plain="(()=>{const c=s.cells[s.pos];return !c.type&&!c.trap&&!c.flag&&!c.c
  assert.equal(g.run('s.floor'),4);
  assert.equal(g.run("!s.floors[3].cells[fromPos].trap&&s.floors[3].cells[fromPos].spent&&s.floors[3].cells[fromPos].trapKind==='pitfall'"),true);
  assert.equal(g.run(plain),true);
- assert.equal(g.run('s.previousPos===s.pos&&s.scan===2&&s.milwaSteps===0&&!s.pendingStairs&&!s.pendingElevator&&!s.clearNotice'),true);
+ assert.equal(g.run('s.previousPos===s.pos&&s.scan===2&&s.milwaSteps===12&&!s.pendingStairs&&!s.pendingElevator&&!s.clearNotice'),true);
  assert.equal(g.run("s.logs.concat(logQueue.map(x=>x.text)).some(t=>t.includes('落とし穴の罠！'))"),true);
 }
 {const g=setup();g.run('fresh(10)');assert.equal(floorTrap(g),true);

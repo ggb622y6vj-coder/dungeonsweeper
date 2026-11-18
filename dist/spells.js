@@ -127,7 +127,7 @@ function renderMagic(){
  $('#magictabs').hidden=schools.length<2;
  for(const job of [1,2]){const b=$('#magictab-'+job);b.setAttribute('aria-selected',String(spellSchool===job));b.tabIndex=spellSchool===job?0:-1}
  $('#magiclist').setAttribute('aria-labelledby',schools.length>1?'magictab-'+spellSchool:'magictitle');
- $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===spellSchool&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).map((x,index)=>{
+ $('#magiclist').innerHTML=MAGIC.filter(x=>x.job===spellSchool&&m.known.includes(x.id)&&!(s.enemy&&!spellBrowse&&x.id==='tempt')).sort((a,b)=>a.level-b.level).map((x,index)=>{
   let reason=spellReason(i,x),fieldBattleOnly=!s.enemy&&x.where==='battle';
   return `<button ${index===0?'data-key-default':''} title="${reason}" class="spellrow learned" data-spell="${x.id}" ${fieldBattleOnly||(s.enemy&&!spellBrowse&&reason)?'disabled':''} aria-pressed="${spellSelected===x.id}"><b>${x.name} <span>${spellCostLabel(x,i)}</span></b><small>Lv.${x.level}${reason?' · '+reason:''}</small><p>${x.description}</p></button>`
  }).join('')||'<p>習得済みの呪文がありません</p>';
