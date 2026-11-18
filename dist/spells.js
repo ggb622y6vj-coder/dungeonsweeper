@@ -58,6 +58,7 @@ function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.len
 function magicContext(){return s.enemy?'battle':currentChest()?'chest':'field'}
 function activeSpellEffects(){
  const effects=[];
+ if(isAntimagicZone())effects.push({name:'反呪文の結界',description:'この範囲では呪文が打ち消され、発動中の魔法も解除される',remaining:'このマスにいる間'});
  if(s.milwaSteps>0||s.light)effects.push({name:'透視',description:'左右斜め前のマスを壁越しに表示する。未探索の数字は隠したまま',remaining:s.light?'町へ戻るまで':`あと${s.milwaSteps}歩`});
  if(s.watchful)effects.push({name:'警戒結界',description:'敵の奇襲を防ぐ',remaining:'町へ戻るまで'});
  if(s.flagSight)effects.push({name:'旗視',description:'周囲8マスの旗の数を探索者マスの左下に表示する',remaining:'町へ戻るまで'});
@@ -81,7 +82,10 @@ function lakanitoApplies(e){let d=enemyDefinition(e.id);return !d.boss&&!['不�
 function enemySpellResist(e,job){const d=enemyDefinition(e.id),base=job===1?d.mageResist:d.priestResist;if(e.spellResistNullified)return 0;return e.spellResistReduced?Math.floor(Math.round(base*100)/2)/100:base}
 function resistsEnemySpell(e,x){return Math.random()<enemySpellResist(e,x.job)}
 function disarmSpellFlags(indices){for(const j of indices)Object.assign(s.cells[j],{trap:false,disarmed:true,flag:false,open:true});checkElevatorUnlock()}
-function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);if(hasBloodSacrifice(i)){cost=spellCost(x,i);s.mp[i]-=cost;s.hp[i]-=cost}else flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
+function castMagic(i,id,t){
+ let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}
+ if(isAntimagicZone()){log('反呪文の結界に打ち消された！');return false}
+ const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);if(hasBloodSacrifice(i)){cost=spellCost(x,i);s.mp[i]-=cost;s.hp[i]-=cost}else flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
  // Count first; consume once before the first unresisted effect. All-resisted casts preserve flags.
  const flagSpell=['flagkill','flagkill2','flagdebuff','flagdebuff2'].includes(x.id);
  const flags=flagSpell?around(s.pos).filter(j=>s.cells[j].flag&&s.cells[j].trap).sort((a,b)=>a-b):[];
@@ -108,7 +112,7 @@ function castMagic(i,id,t){let x=magic(id);if(!x||spellReason(i,x)||!validMagicT
  else if(x.effect==='flagcount'){s.flagSight=true;log('周囲の旗が見えるようになった。')}
  else if(x.effect==='watchful'){s.watchful=true;log('警戒結界が一行を包んだ。')}
  else if(x.effect==='light'){if(x.id==='milwa')s.milwaSteps=30;else s.light=true;log('視界が広がった。')}
- else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{s.pos=s.start;s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}if(!s.enemy)autoReorderParty('spell');return true}
+ else if(x.effect==='warp'){if(t!==s.floor)travelFloor(t,true);else{setPlayerPosition(s.start);s.pendingStairs=false}log(`地下${t}階の上り階段へ転移した。`)}if(!s.enemy)autoReorderParty('spell');return true}
 function fixChestTrap(c){if(c.trap!==undefined)return;let r=Math.random();c.trap=r>=.4?'none':r<.18?'needle':r<.29?'poison':r<.36?'paralysis':'pitfall'}
 function magicActions(i){if(!hasSpells(i))return ''; let plan=s.magicPlans[i],x=magic(plan?.id);return `<button data-magic="${i}" ${logBusy()||s.done?'disabled':''}>${s.enemy&&s.commands[i]==='spell'&&x?x.name+' · 変更':'呪文を選ぶ'}</button>${s.enemy&&s.commands[i]==='spell'&&x?`<small class="spellplan">${spellCostLabel(x,i)} · ${spellTargetLabel(x,plan.target)}</small>`:''}`}
 function spellTargetLabel(x,t){if(x.target==='ally')return NAMES[t];if(x.target==='group'||x.target==='enemy'){let e=s.enemy.units.find(e=>e.uid===t),g=e&&enemyGroups().find(g=>g.key===rowKey(e));return g?`${g.index+1}列：${enemyDisplay(g.units[0])}`:'対象なし'}if(x.target==='enemy')return enemyDefinition(s.enemy.units.find(e=>e.uid===t)?.id||s.enemy.units[0].id).name+(x.target==='group'?'の組':'');return {party:'味方全員',all:'敵全体',chest:'宝箱',floor:`地下${t}階`}[x.target]}
