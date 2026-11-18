@@ -152,3 +152,4 @@
 | 114 | 2026-11-17 | MPバーの背景に青系トークンを戻す（CSS整理の任意改善C-02） | 61f43fb | [spec](specs/114-mpbar-background.md) | [実施](reports/114.md) |
 | 115 | 2026-11-18 | 3F中心部の「地図が見えない」ゾーン（半径3マス・32マス） | 0df6435 | [spec](specs/115-dark-zone-3f.md) | [実施](reports/115.md) |
 | 116 | 2026-11-18 | 地図ブラインド時の「地図が反応しない！」通知と透視中のゾーン枠表示 | a04ccdd | [spec](specs/116-map-blind-notice-frame.md) | [実施](reports/116.md) |
+| 117 | 2026-11-18 | 4F の反呪文ゾーン（呪文の解除・打ち消し、透視で赤破線の枠） | 673d6cc | [spec](specs/117-antimagic-zone-4f.md) | [実施](reports/117.md) |
