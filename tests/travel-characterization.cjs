@@ -43,14 +43,14 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const ret=g.run('travelFloor(2)');
  assert.equal(ret,undefined,'travelFloor returns undefined on success');
  const {queue,renders,...rest}=J(g,SNAP);
- assert.deepEqual(rest,{floor:2,posKind:'start',startOpen:true,bossOpen:false,bossType:'boss',milwa:0,pBoss:false,pStairs:false,pElev:false,notice:false,relic:false,scan:5});
+ assert.deepEqual(rest,{floor:2,posKind:'start',startOpen:true,bossOpen:false,bossType:'boss',milwa:7,pBoss:false,pStairs:false,pElev:false,notice:false,relic:false,scan:5});
  assert.equal(renders,2,'fresh() render + travelFloor render');
  assert.ok(!queue.some(t=>t.includes('到着した')),'no saved-floor arrival log on a fresh floor');
  g.drain();
  assert.deepEqual(J(g,'s.logs'),[ARRIVAL],'fresh() reset the log history');}
 
 // travelFloor up to a SAVED floor whose guardian is defeated: arrival is the boss cell,
-// the arrival log is queued, milwaSteps resets (floor changed), render runs once.
+// the arrival log is queued, milwaSteps is preserved across the floor change (118), render runs once.
 // OBSERVED, spec undecided: pendingElevator is NOT cleared on this path, unlike the
 // elevator and pitfall routes. This asymmetry is recorded, not endorsed; whether it
 // is reachable in real play is unverified, and an intentional fix may change it.
@@ -61,7 +61,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const ret=g.run('travelFloor(1)');
  assert.equal(ret,undefined);
  const {queue,renders,...rest}=J(g,SNAP);
- assert.deepEqual(rest,{floor:1,posKind:'boss',startOpen:true,bossOpen:false,bossType:'down',milwa:0,pBoss:false,pStairs:false,pElev:true,notice:false,relic:true,scan:5});
+ assert.deepEqual(rest,{floor:1,posKind:'boss',startOpen:true,bossOpen:false,bossType:'down',milwa:5,pBoss:false,pStairs:false,pElev:true,notice:false,relic:true,scan:5});
  assert.deepEqual(queue,['地下1階に到着した。']);
  assert.equal(renders,1,'saved path renders once');
  g.drain();
@@ -70,7 +70,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
 // travelFloor DOWN to a SAVED floor (the saved-floor stairs case also needs the
 // descending direction). Arrival is the start cell, a start cell left closed in
 // the save is opened by the arrival (076 Amendment 1), the arrival log is queued,
-// milwaSteps resets, and the render count is the saved-path one.
+// milwaSteps is preserved (118), and the render count is the saved-path one.
 {const g=setup(108);
  g.run("s.guardiansDefeated=[1];s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");g.drain();
  g.run('travelFloor(1)');g.drain(); // back up; arrival is the 1F boss cell (relic)
@@ -82,14 +82,13 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const {queue,renders,...rest}=J(g,SNAP);
  assert.equal(rest.floor,2);assert.equal(rest.posKind,'start','descending arrival is the start cell');
  assert.equal(rest.startOpen,true,'stair arrival opens the saved start cell');
- assert.equal(rest.milwa,0);assert.equal(renders,1,'saved path renders once');
+ assert.equal(rest.milwa,3);assert.equal(renders,1,'saved path renders once');
  assert.deepEqual(queue,['地下2階に到着した。']);
  g.drain();}
 
 // travelFloor with fromTown=true to the SAME floor: travelFloor saves the current
 // floor first (rememberFloor), so the same floor is then restored from that snapshot.
-// No arrival log. OBSERVED: milwaSteps is preserved because the current code resets
-// it only when the floor changes; recorded as current behavior, not a spec promise.
+// No arrival log. Same-floor travel also preserves milwaSteps.
 {const g=setup(103);
  wrap(g);
  g.run('s.milwaSteps=9;var boardBefore=JSON.stringify(s.cells)');
@@ -122,7 +121,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  const ret=g.run('travelElevator(2)');
  assert.equal(ret,true);
  const {queue,renders,...rest}=J(g,SNAP);
- assert.deepEqual(rest,{floor:2,posKind:'elevator',startOpen:false,bossOpen:false,bossType:'boss',milwa:0,pBoss:false,pStairs:false,pElev:false,notice:false,relic:false,scan:5});
+ assert.deepEqual(rest,{floor:2,posKind:'elevator',startOpen:false,bossOpen:false,bossType:'boss',milwa:6,pBoss:false,pStairs:false,pElev:false,notice:false,relic:false,scan:5});
  assert.equal(renders,2,'fresh() render + travelElevator render');
  g.drain();
  assert.deepEqual(J(g,'s.logs'),[ARRIVAL]);}
@@ -155,7 +154,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  assert.equal(trig,true);
  assert.equal(g.run('s.floors[3].cells[origin].trapKind'), 'pitfall','the pinned roll really drew the pitfall');
  const snap=J(g,SNAP);
- assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,0);assert.equal(snap.scan,2,'scan is carried over');
+ assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,12);assert.equal(snap.scan,2,'scan is carried over');
  assert.equal(snap.pElev,false);assert.equal(snap.notice,false);
  assert.deepEqual(snap.queue.slice(0,4),['先行ログ','罠だ！','落とし穴の罠！ 一行は下の階へ落ちた。','地下4階に到着した。']);
  assert.match(snap.queue[4],/^警告：周囲に罠が\d+個。$/);
@@ -176,7 +175,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
  assert.equal(trig,true);
  assert.equal(g.run('s.floors[3].cells[origin].trapKind'), 'pitfall','the pinned roll really drew the pitfall');
  const snap=J(g,SNAP);
- assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,0);assert.equal(snap.scan,2);
+ assert.equal(snap.floor,4);assert.equal(snap.posKind,'plain');assert.equal(snap.milwa,12);assert.equal(snap.scan,2);
  assert.deepEqual(snap.queue.slice(0,3),['先行ログ','罠だ！','落とし穴の罠！ 一行は下の階へ落ちた。']);
  assert.match(snap.queue[3],/^警告：周囲に罠が\d+個。$/);
  assert.ok(!snap.queue.some(t=>t.includes('到着した')),'no arrival log on a fresh floor');

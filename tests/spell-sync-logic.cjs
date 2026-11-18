@@ -68,27 +68,28 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
  assert.equal(g.run('s.milwaSteps'),1,'remaining steps survive reload');
  g.run("move('back')");g.drain();assert.equal(g.run('s.milwaSteps'),0);assert.deepEqual(J(g,'diagonalSight()'),[]);
  g.run("castMagic(0,'milwa',null)");g.drain();g.run("s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");
- assert.equal(g.run('s.floor'),2);assert.equal(g.run('s.milwaSteps'),0);assert.deepEqual(J(g,'diagonalSight()'),[]);
- g.run("s.mp[0]=100;castMagic(0,'milwa',null)");g.drain();g.run('travelFloor(1)');
- assert.equal(g.run('s.milwaSteps'),0,'revisiting a saved floor also expires milwa');
- g.run("s.pendingStairs=false;castMagic(0,'lomilwa',null);castMagic(0,'milwa',null)");g.drain();
+ assert.equal(g.run('s.floor'),2);assert.equal(g.run('s.milwaSteps'),30);assert.equal(g.run('diagonalSight().length'),2);
+ g.drain();g.run('travelFloor(1)');
+ assert.equal(g.run('s.milwaSteps'),30,'revisiting a saved floor also preserves milwa');
+ g.run('s.pendingStairs=false;s.milwaSteps=0');
+ assert.equal(g.run("castMagic(0,'lomilwa',null)"),true);g.drain();
  g.run('s.milwaSteps=1;s.cells.forEach(c=>{c.open=true;c.type=\'\';c.trap=false});s.pos=27;s.dir=1;Math.random=()=>.99;move(\'forward\')');g.drain();
  assert.equal(g.run('s.milwaSteps'),0);assert.equal(g.run('diagonalSight().length'),2,'long light survives milwa expiry');
  g.run("castMagic(0,'milwa',null)");g.drain();g.run('enterTown()');g.drain();
  assert.equal(g.run('s.milwaSteps'),0);assert.deepEqual(J(g,'diagonalSight()'),[]);
 }
-// All floor-change routes expire short light; failed travel and same-floor warp preserve it.
+// Floor changes, failed travel and same-floor warp preserve short light.
 {
  const g=party();g.run("castMagic(0,'milwa',null)");g.drain();
  g.run('travelFloor(2)');g.drain();assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.milwaSteps'),30);
  g.run("castMagic(1,'malor',1)");g.drain();assert.equal(g.run('s.milwaSteps'),30,'same floor is not a floor change');
  g.run("s.relic=true;s.cells[s.boss].type='down';s.pos=s.boss;travelFloor(2)");
- assert.equal(g.run('s.floor'),2);assert.equal(g.run('s.milwaSteps'),0);
- g.run("castMagic(0,'milwa',null)");g.drain();g.run("castMagic(1,'malor',1)");g.drain();
- assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.milwaSteps'),0,'warp expires light');
- g.run("s.elevatorFloors=[1,2];s.cells[s.pos].type='elevator';castMagic(0,'milwa',null)");g.drain();
- assert.equal(g.run('travelElevator(2)'),true);assert.equal(g.run('s.milwaSteps'),0,'elevator expires light');
- assert.deepEqual(J(g,'diagonalSight()'),[]);
+ assert.equal(g.run('s.floor'),2);assert.equal(g.run('s.milwaSteps'),30);
+ g.drain();g.run("castMagic(1,'malor',1)");g.drain();
+ assert.equal(g.run('s.floor'),1);assert.equal(g.run('s.milwaSteps'),30,'warp preserves light');
+ g.run("s.elevatorFloors=[1,2];s.cells[s.pos].type='elevator'");
+ assert.equal(g.run('travelElevator(2)'),true);assert.equal(g.run('s.milwaSteps'),30,'elevator preserves light');
+ assert.equal(g.run('diagonalSight().length'),2);
 }
 // Mixed rolls in the same row and a later row prove that each living enemy gets its own roll.
 {

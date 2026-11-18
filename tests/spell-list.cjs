@@ -9,7 +9,7 @@ g.run(`s.area='dungeon';s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.
  openMagic(0)`);
 const list = () => g.run("$('#magiclist').innerHTML");
 const row = id => list().match(new RegExp(`<button[^>]*data-spell="${id}"[^>]*>[^]*?</button>`))?.[0];
-assert.deepEqual([...list().matchAll(/data-spell="([^"]+)"/g)].map(m=>m[1]), ['reload','tempt','halito']);
+assert.deepEqual([...list().matchAll(/data-spell="([^"]+)"/g)].map(m=>m[1]), ['halito','reload','tempt']);
 assert(!/未解禁|未習得/.test(list()));
 assert.match(row('halito'), / disabled/);
 assert.match(row('halito'), /<small>Lv\.1 · 戦闘専用<\/small>/);
