@@ -60,7 +60,12 @@ with sync_playwright() as p:
         else: page.keyboard.press('Enter')
         page.wait_for_function('s.floor===3')
         assert page.evaluate("s.cells[s.pos].type==='elevator'&&s.cells[s.pos].open&&!s.pendingElevator&&!s.enemy")
-        assert '昇降機' in page.locator(f'#board [data-i="{page.evaluate("s.pos")}"]').get_attribute('aria-label')
+        arrival = page.evaluate('s.pos')
+        arrival_label = page.locator(f'#board [data-i="{arrival}"]').get_attribute('aria-label')
+        if (arrival % 12 - 5.5)**2 + (arrival // 12 - 5.5)**2 <= 9:
+            assert arrival_label == '地図のマス'
+        else:
+            assert '昇降機' in arrival_label
         assert page.evaluate("!(s.guardiansDefeated||[]).includes(3)")
         page.screenshot(path=str(out / f'arrived-{width}.png'))
         # Ride back with the other input method (mouse click at 1280, keyboard at 390).

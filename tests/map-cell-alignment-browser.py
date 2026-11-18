@@ -32,6 +32,7 @@ with sync_playwright() as p:
             # No movement or encounters are needed for this layout regression.
             page.evaluate('''floor => {
                 fresh(floor);
+                if (floor === 3) s.pos = 0; // Keep the number layout fixture outside the dark zone.
                 s.corpses = [];
                 s.cells.forEach((c, i) => {
                     c.open = true;
