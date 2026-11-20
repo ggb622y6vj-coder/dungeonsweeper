@@ -36,7 +36,13 @@ function libraryDice(values){
  const [n,d,add=0]=values;
  return `${n}d${d}${add>0?'+':''}${add||''}`;
 }
+function libraryGroupDice([min,max]){
+ if(min===max)return String(min);
+ return `1d${max-min+1}${min>=2?`+${min-1}`:''}`;
+}
 function libraryMonsterDetails(d,record){
+ const groupDice=libraryGroupDice(d.groupSize);
+ const resistText=`${Math.round(d.mageResist*100)}/${Math.round(d.priestResist*100)}`;
  const abilities=[];
  if(d.breath)abilities.push(`${d.breath.element}のブレス${(d.breath.statuses||[]).map(a=>`（${({poison:'毒',paralysis:'麻痺'})[a.type]}）`).join('')}`);
  for(const a of d.statuses)if(a.chance>0)abilities.push({kind:a.type,label:({poison:'毒',paralysis:'麻痺',stone:'石化',fear:'恐怖',sleep:'睡眠',silence:'沈黙'})[a.type]||a.type});
@@ -45,7 +51,7 @@ function libraryMonsterDetails(d,record){
  const attacks=document.createElement('dd');
  if(abilities.length){for(const ability of abilities){const tag=libraryElement('span',typeof ability==='string'?ability:ability.label);tag.className=`ailment-tag ${typeof ability==='string'?'ailment-other':`ailment-${ability.kind}`}`;attacks.append(tag)}}else attacks.textContent='なし';
  return [
-  ['種族',d.race],['出現階',d.floors.map(f=>`${f}F`).join('・')],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],
+  ['種族',d.race],['出現階',d.floors.map(f=>`${f}F`).join('・')],['集団数',groupDice],['HP',libraryDice(d.hp)],['物理ダメージ',libraryDice(d.attack)],['攻撃回数',`${d.swings}回`],['呪文抵抗（魔／僧）',resistText],
   ['特殊能力',abilities.length?attacks:'なし'],['使用呪文',d.spell>0?(d.spellInfo?.effect==='silence'?`${d.spellInfo.name}（${d.spellInfo.name==='沈黙'?'':'沈黙・'}全体）`:(d.spellInfo?.name||'不明')):'なし'],
   ['経験値',String(Number.isInteger(d.xp)?d.xp:Math.round(d.xp))],['撃破数',`${record.count}体`]
  ];

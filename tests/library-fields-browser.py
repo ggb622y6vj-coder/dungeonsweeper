@@ -13,7 +13,8 @@ chrome_path = os.environ.get('CHROME_PATH') or next((p for p in (
 ) if Path(p).exists()), None)
 output = Path(os.environ.get('LIBRARY_FIELDS_SCREENSHOT_DIR', '/tmp/library-fields-browser'))
 output.mkdir(parents=True, exist_ok=True)
-ORDER = ['種族', '出現階', 'HP', '物理ダメージ', '攻撃回数', '特殊能力', '使用呪文', '経験値', '撃破数']
+ORDER = ['種族', '出現階', '集団数', 'HP', '物理ダメージ', '攻撃回数', '呪文抵抗（魔／僧）',
+         '特殊能力', '使用呪文', '経験値', '撃破数']
 # Spot checks straight from data/monsters.csv (HP, 物理ダメージ, 経験値, 出現階, 種族).
 CSV = {'rat': ('獣', '1F', '1d6+2', '1d5', '15'), 'evileye': ('魔獣', '8F', '6d8', '1d10', '3000'),
        'daidaraboti': ('人型', '9F・10F', '15d10', '5d9', '4500')}
@@ -49,9 +50,9 @@ with sync_playwright() as p:
             assert e.locator('h4').inner_text().startswith(page.evaluate(f"enemyDefinition('{key}').name"))
             assert e.locator('.library-subtext').inner_text() == page.evaluate(f"enemyDefinition('{key}').unknown")
             assert e.locator('dt').all_inner_texts() == ORDER, e.locator('dt').all_inner_texts()
-            dd = e.locator('dd').all_inner_texts()
-            assert dd[0] == race and dd[1] == floor and dd[2] == hp and dd[3] == dmg and dd[7] == xp, dd
-            assert dd[8] == {'rat': '3体', 'evileye': '1体', 'daidaraboti': '2体'}[key]
+            fields = dict(zip(ORDER, e.locator('dd').all_inner_texts()))
+            assert tuple(fields[label] for label in ('種族', '出現階', 'HP', '物理ダメージ', '経験値')) == (race, floor, hp, dmg, xp), fields
+            assert fields['撃破数'] == {'rat': '3体', 'evileye': '1体', 'daidaraboti': '2体'}[key]
             box = e.bounding_box()
             assert box['x'] >= 0 and box['x'] + box['width'] <= width
             page.screenshot(path=str(output / f'{key}-{width}.png'))
