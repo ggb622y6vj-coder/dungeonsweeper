@@ -155,3 +155,4 @@
 | 117 | 2026-11-18 | 4F の反呪文ゾーン（呪文の解除・打ち消し、透視で赤破線の枠） | 673d6cc | [spec](specs/117-antimagic-zone-4f.md) | [実施](reports/117.md) |
 | 118 | 2026-11-19 | 透視の階またぎ持続、宝箱ボタンの表記を「仕掛解除」に統一、呪文リストをレベル昇順に | ff50854 | [spec](specs/118-milwa-persistence-and-spell-list.md) | [実施](reports/118.md) |
 | 119 | 2026-11-19 | 3F の回転床（1d4個、歩いて入ると向きがランダムに変わる、目印なし） | 922bc3e | [spec](specs/119-spinner-3f.md) | [実施](reports/119.md) |
+| 120 | 2026-11-21 | 図書館のモンスター情報に集団数（ダイス表記）と呪文抵抗（魔／僧）を追加、詳細を2列化、進捗表示を見出し行へ移動 | c10118c | [spec](specs/120-library-monster-display.md) | [実施](reports/120.md) |
