@@ -8,11 +8,11 @@ function party(){
 }
 let g=game();
 assert.equal(g.run('ENEMIES.length'),100);
-assert.equal(g.run('WEAPONS.length'),76);
+assert.equal(g.run('WEAPONS.length'),80);
 assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/100 · アイテム 0/76');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/100 · アイテム 0/80');
 g.run("$('#libraryclose').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),false);
 g=party();
@@ -54,16 +54,18 @@ console.log('PASS library: multi-row victory counts, first floor, reload, flee/d
 
 g=party();
 g.run("s.gold=1000;buy('helm',0);buy('helm',0)");
-assert.equal(g.run('Object.keys(s.library.items).length'),1);
+assert.equal(g.run('Object.keys(s.library.items).length'),0);
 g.run("buy('staff',0);buy('holysword',0);s.gold=0;buy('longsword',0)");
-assert.equal(g.run('Object.keys(s.library.items).length'),1,'rejected purchases do not unlock entries');
+assert.equal(g.run('Object.keys(s.library.items).length'),0,'rejected purchases do not unlock entries');
 g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']})");g.drain();
-assert.equal(g.run('Object.keys(s.library.items).length'),1,'full inventory does not record unreceived loot');
+assert.equal(g.run('Object.keys(s.library.items).length'),0,'full inventory does not record unreceived loot');
 g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
 // Force the loot selection, while retaining the actual acquisition paths.
 g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']});weightedLoot=actualLoot");g.drain();
-for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),true,id);
-g.run("var acquired=JSON.stringify(s.library);enterTown();sell(0,1)");
+for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),undefined,id);
+g.run("enterTown();performItemService('identify',itemTarget(0,1));performItemService('identify',itemTarget(0,2))");
+for(const id of ['longsword','plate'])assert.equal(g.run(`s.library.items.${id}`),true,id);
+g.run("var acquired=JSON.stringify(s.library);sell(0,1)");
 assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'),'selling keeps the record');
 g=reload(g);
 g.run("var acquired=JSON.stringify(s.library);trainingRoster().map(r=>r.members.id).forEach(deleteRecruit)");
@@ -73,7 +75,7 @@ g=reload(g);
 assert.equal(g.run('s.library.items.plate'),true);
 g.run("const second=generateRecruit('冒険者',0);registerRecruit(second);changeRecruitParty(second.members.id,true);enterDungeon()");g.drain();
 g.run('hurt(999)');g.drain();g=reload(g);
-assert.equal(g.run('s.library.items.healingPotion'),true);
+assert.equal(g.run('s.library.items.longsword'),true);
 g.run("$('#resetconfirm').onclick()");
 assert.equal(g.run('Object.keys(s.library.items).length'),0,'explicit full reset clears the library');
 console.log('PASS library: purchases, drops/chests/medicine, capacity, sale, deletion, wipe, reload and explicit reset');
@@ -98,7 +100,7 @@ assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].text
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  var entries=libraryMonsterFloors().flatMap(f=>{renderLibrary('monsters',1,'weapon',f);return $('#librarybody').children.filter(e=>e.className==='library-entry')});`);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 100/100 · アイテム 76/76');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 100/100 · アイテム 80/80');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);

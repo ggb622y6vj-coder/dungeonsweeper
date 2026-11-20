@@ -18,10 +18,10 @@ function setup(weapon='sword',armor=null){
 }
 function attack(g,rolls){if(rolls)g.run(`var rolls=${JSON.stringify(rolls)};Math.random=()=>rolls.shift()??.99`);g.run('partyAction(0)')}
 const ids=['poisonsw','poisonsw2','poisonsw3','atkstaff','atkmace','bloodsac','chestsac','helmetsac','headlight'];
-test('81 canonical item classes; nine definitions and descriptions in library/inventory',()=>{
+test('85 canonical item classes; nine definitions and descriptions in library/inventory',()=>{
  const g=setup();const rows=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../data/notion-items.json')));
  const jobs={'戦士':0,'魔法使い':1,'僧侶':2,'盗賊':3,'侍':4,'君主':5,'忍者':6,'司教':7};
- assert.equal(g.run('WEAPONS.length+MEDICINES.length'),81);
+ assert.equal(g.run('WEAPONS.length+MEDICINES.length'),85);
  for(const r of rows){const id=r['userDefined:ID'],w=read(g,`weapon('${id}')`),classes=JSON.parse(r['装備職']).map(j=>jobs[j]);
   assert.deepEqual([...w.classes].sort(),classes.sort(),id);
   for(let job=0;job<8;job++)assert.equal(g.run(`canEquipJob(weapon('${id}'),${job})`),classes.includes(job),id+' job '+job);

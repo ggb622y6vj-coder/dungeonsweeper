@@ -11,7 +11,7 @@ assert.deepEqual(plain(g, 'LOOT_TABLES'), tables);
 const enemies = plain(g, 'ENEMIES');
 const equipment = plain(g, 'WEAPONS'), medicines = plain(g, 'MEDICINES');
 const byId = new Map([...equipment, ...medicines].map(w => [w.id, w]));
-assert.equal(equipment.length, 76);
+assert.equal(equipment.length, 80);
 for (const w of equipment) assert.ok(Number.isInteger(w.lootRank) && w.lootRank >= 1 && w.lootRank <= 5, w.id);
 for (const w of medicines) assert.equal(Object.hasOwn(w, 'lootRank'), false, w.id);
 assert.equal(tables.version, 1);
@@ -218,11 +218,11 @@ for (const opener of ['openChest','thiefOpenChest']) {
   u.run(`var calls=0;Math.random=()=>{calls++;${opener==='thiefOpenChest' ? "if(calls===1)return 0;" : ''}throw Error('opening rerolled contents')};${opener}()`);
   u.drain();
   const after = plain(u,'s.inventory');
-  assert.deepEqual(after[0],before[0].concat(wanted.slice(1)));
-  assert.deepEqual(after[1],before[1].concat(wanted[0]));
+  assert.deepEqual(after[0],before[0].concat('unid:powerstaff',wanted.slice(1)));
+  assert.deepEqual(after[1],before[1]);
   assert.deepEqual(after[2],before[2]);
   assert.equal(u.run('s.gold'),gold+expectedGold*3);
-  for(const id of wanted) assert.equal(u.run(`s.library.items['${id}']`),true);
+  for(const id of wanted) assert.equal(u.run(`s.library.items['${id}']`),undefined);
   assert.equal(u.run('currentChest()'),null);
   u.run(`${opener}();openChest();thiefOpenChest();rewardChest(s.cells[s.pos].chest)`);u.drain();
   assert.deepEqual(plain(u,'s.inventory'),after);
@@ -240,8 +240,8 @@ assert.deepEqual(plain(t,'s.inventory'),before);
 assert.equal(t.run('s.gold'),21);
 fixedChest(t,['unknown','healingPotion','not-an-item','staff']);
 t.run('openChest()');t.drain();
-assert.equal(t.run('s.inventory[0].at(-1)'),'healingPotion');
-assert.equal(t.run('s.inventory[1].at(-1)'),'staff');
+assert.equal(t.run('s.inventory[0].at(-2)'),'healingPotion');
+assert.equal(t.run('s.inventory[0].at(-1)'),'unid:staff');
 assert.equal(t.run("Object.hasOwn(s.library.items,'unknown')"),false);
 // Ordered distribution: a partial stack accepts its last item at 10 slots, then fallback,
 // and full inventories never register an unreceived item in the library.
@@ -251,7 +251,7 @@ fixedChest(t,['healingPotion','healingPotion','elixir']);
 t.run('openChest()');t.drain();
 assert.equal(t.run("s.inventory[0].filter(id=>id==='healingPotion').length"),10);
 assert.equal(t.run('s.inventory[2].at(-1)'),'healingPotion');
-assert.equal(t.run('s.library.items.healingPotion'),true);
+assert.equal(t.run('s.library.items.healingPotion'),undefined);
 assert.equal(t.run('s.library.items.elixir'),undefined);
 assert.equal(t.run("s.logs.filter(l=>l==='霊薬を見つけたが、アイテムがいっぱいだ。').length"),1);
 // Same ID in multiple slots remains multiple rewards, respecting stack capacity.
@@ -262,7 +262,8 @@ for(const [job,action,random,success] of [[6,'thiefOpenChest',.749,true],[6,'thi
   t = party(job);fixedChest(t,['antidote']);
   t.run(`Math.random=()=>${random};${action}()`);t.drain();
   assert.equal(t.run('s.gold'),success?21:0);
-  assert.equal(t.run('s.library.items.antidote')===true,success);
+  assert.equal(t.run("s.inventory.flat().includes('antidote')"),success);
+  assert.equal(t.run('s.library.items.antidote'),undefined);
   assert.equal(t.run('currentChest()'),null);
 }
 // Old unfinished battles (pre-108) can still finish using their first original unit.
@@ -274,8 +275,9 @@ t=party();
 t.run("s.cells[s.pos].chest={gold:7,opened:false,trap:'none'};var legacyItem=chestItemPool(1)[0].item.id;var rolls=[0,0,0,0];Math.random=()=>{if(!rolls.length)throw Error('extra legacy roll');return rolls.shift()};openChest()");t.drain();
 assert.equal(t.run('rolls.length'),0);
 assert.equal(t.run('s.gold'),21);
-assert.equal(t.run('s.inventory.flat().filter(id=>id===legacyItem).length'),t.run("['sword','staff','dagger'].includes(legacyItem)?2:1"));
-assert.equal(t.run('s.library.items.healingPotion'),true);
+assert.equal(t.run("s.inventory[0].filter(id=>id==='unid:'+legacyItem).length"),1);
+assert.equal(t.run("s.inventory[0].filter(id=>id==='healingPotion').length"),1);
+assert.equal(t.run('s.library.items.healingPotion'),undefined);
 const legacyInv=plain(t,'s.inventory');t.run('openChest();thiefOpenChest();rewardChest(s.cells[s.pos].chest)');t.drain();
 assert.deepEqual(plain(t,'s.inventory'),legacyInv);
 assert.equal(t.run('s.gold'),21);
