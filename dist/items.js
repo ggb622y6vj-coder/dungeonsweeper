@@ -62,10 +62,13 @@ function dropMedicine(){
  receiveLoot(w);
 }
 function receiveLoot(w){
- const token=w.kind==='medicine'?w.id:equipmentToken(w.id,true,false);
+ const medicine=w.kind==='medicine';
+ const token=medicine?w.id:equipmentToken(w.id,true,false);
  const i=lootRecipient(w,token),name=itemName(token);
  if(i<0){log(name+'を見つけたが、アイテムがいっぱいだ。');return}
- s.inventory[i].push(token);log(name+'を入手。'+NAMES[i]+'が受け取った。');
+ s.inventory[i].push(token);
+ if(medicine)recordLibraryItem(w.id);
+ log(name+'を入手。'+NAMES[i]+'が受け取った。');
 }
 // A removal can slide an indistinguishable copy into an open dialog's slot.
 const inventoryRevisions=new WeakMap();

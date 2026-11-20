@@ -96,6 +96,7 @@ with sync_playwright() as p:
   page.wait_for_function('!logBusy()')
   page.evaluate("rollChestItems=actualChestRoll;s.cells[s.pos].chest.trap='none';Math.random=()=>0")
   page.locator('#chestopen').click();page.wait_for_function('!logBusy()')
+  assert page.evaluate('s.library.items.helm && s.library.items.healingPotion && !s.library.items.plate')
   page.evaluate('enterTown()')
   page.locator('#blacksmith').click()
   page.locator('#shopidentify').click()
@@ -104,23 +105,23 @@ with sync_playwright() as p:
   page.reload()
   page.locator('#libraryopen').click()
   # Counter counts spell-identified species, not kills.
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 1/80'
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 0/100 · アイテム 2/80'
   # 059: a kill without the 識別 spell shows only the unknown name and kill count.
   assert page.locator('#librarybody h4').first.inner_text()=='不定形'
   assert '1d6+3' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert '1体' in page.locator('#librarybody .library-entry').first.inner_text()
   page.evaluate("s.library.monsters.slime.identified=true;renderLibrary()")
-  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/100 · アイテム 1/80'
+  assert page.locator('#libraryprogress').inner_text()=='モンスター 1/100 · アイテム 2/80'
   assert page.locator('#librarybody h4').first.inner_text()=='スライム'
   assert '1d6+3' in page.locator('#librarybody .library-entry').first.inner_text()
   assert '初撃破階' not in page.locator('#librarybody .library-entry').first.inner_text()
   assert page.locator('#librarybody dl').count()==1
   page.screenshot(path=f'/tmp/library-monsters-{width}.png')
   page.locator('#librarytab-items').click()
-  for kind, name, known in [('head','鉄兜',False),('body','板金鎧',True),('medicine','傷薬',False)]:
+  for kind, name in [('head','鉄兜'),('body','板金鎧'),('medicine','傷薬')]:
     page.locator('#libraryitemtab-'+kind).click()
-    assert (name in page.locator('#librarybody h4').all_text_contents()) == known
-    assert page.locator('#librarybody dl').count()==int(known)
+    assert name in page.locator('#librarybody h4').all_text_contents()
+    assert page.locator('#librarybody dl').count()==1
   page.screenshot(path=f'/tmp/library-items-{width}.png')
   assert page.locator('#librarydialog').evaluate('(e)=>e.scrollWidth<=e.clientWidth')
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
@@ -165,7 +166,7 @@ with sync_playwright() as p:
    page.locator('#recruitlist section').first.get_by_role('button',name='登録抹消',exact=True).click();page.locator('#recruitdeleteconfirm').click()
   page.locator('#trainingclose').click();assert page.locator('#entrance').is_disabled()
   page.reload();assert page.evaluate('trainingRoster().length')==0
-  assert page.evaluate('s.library.monsters.slime.count===1 && !s.library.items.helm && s.library.items.plate && !s.library.items.healingPotion')
+  assert page.evaluate('s.library.monsters.slime.count===1 && s.library.items.helm && s.library.items.plate && s.library.items.healingPotion')
   assert not errors,errors
   print(f'PASS Chromium {width}px: create/reroll/confirm, tabs, rename, seven recruits, tavern join, delete cancel/confirm, reload, combat, town return levels/heals ok members, carries dead to reserve with XP, carry dialog before level report, no inn, empty party; library empty/populated tabs, purchase/chest/victory records, reload/deletion retention, keyboard, scroll/open/close; no JS errors or overflow')
   ctx.close()

@@ -54,15 +54,16 @@ console.log('PASS library: multi-row victory counts, first floor, reload, flee/d
 
 g=party();
 g.run("s.gold=1000;buy('helm',0);buy('helm',0)");
-assert.equal(g.run('Object.keys(s.library.items).length'),0);
+assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'purchase immediately registers equipment once');
 g.run("buy('staff',0);buy('holysword',0);s.gold=0;buy('longsword',0)");
-assert.equal(g.run('Object.keys(s.library.items).length'),0,'rejected purchases do not unlock entries');
+assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'rejected purchases do not unlock entries');
 g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']})");g.drain();
-assert.equal(g.run('Object.keys(s.library.items).length'),0,'full inventory does not record unreceived loot');
+assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'full inventory does not record unreceived loot');
 g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
 // Force the loot selection, while retaining the actual acquisition paths.
 g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']});weightedLoot=actualLoot");g.drain();
-for(const id of ['helm','longsword','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),undefined,id);
+assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.inventory[0])')),['sword','unid:longsword','unid:plate','healingPotion']);
+assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true,healingPotion:true},'medicine registers on receipt and dungeon equipment awaits identification');
 g.run("enterTown();performItemService('identify',itemTarget(0,1));performItemService('identify',itemTarget(0,2))");
 for(const id of ['longsword','plate'])assert.equal(g.run(`s.library.items.${id}`),true,id);
 g.run("var acquired=JSON.stringify(s.library);sell(0,1)");
@@ -72,7 +73,7 @@ g.run("var acquired=JSON.stringify(s.library);trainingRoster().map(r=>r.members.
 assert.equal(g.run('s.members.length'),0);
 assert.equal(g.run('JSON.stringify(s.library)'),g.run('acquired'));
 g=reload(g);
-assert.equal(g.run('s.library.items.plate'),true);
+for(const id of ['helm','plate','healingPotion'])assert.equal(g.run(`s.library.items.${id}`),true,id);
 g.run("const second=generateRecruit('冒険者',0);registerRecruit(second);changeRecruitParty(second.members.id,true);enterDungeon()");g.drain();
 g.run('hurt(999)');g.drain();g=reload(g);
 assert.equal(g.run('s.library.items.longsword'),true);

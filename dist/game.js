@@ -375,7 +375,7 @@ function weightedLoot(pool){let total=pool.reduce((n,x)=>n+x.weight,0),roll=Math
 function dropWeapon(){if(Math.random()>=.05)return;let pool=chestItemPool(s.floor).filter(x=>x.item.drop&&!x.item.chestOnly);if(!pool.length)return;receiveLoot(weightedLoot(pool))}
 const SHOP_PURCHASE_NOTICE_MS=500;
 let shopTab='weapon';
-function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||id!==w.id||w.shop===false||!Number.isFinite(w.price)||!canEquipJob(w,jobOf(i))||s.gold<w.price||usedSlots(s.inventory[i])>=10)return;s.gold-=w.price;s.inventory[i].push(id);render();renderShop();$('#shoppurchasemessage').textContent=`${NAMES[i]}が${w.name}を購入した。`;$('#shoppurchasedialog').showModal();setTimeout(()=>$('#shoppurchasedialog').close(),SHOP_PURCHASE_NOTICE_MS)}
+function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||id!==w.id||w.shop===false||!Number.isFinite(w.price)||!canEquipJob(w,jobOf(i))||s.gold<w.price||usedSlots(s.inventory[i])>=10)return;s.gold-=w.price;s.inventory[i].push(id);recordLibraryItem(id);render();renderShop();$('#shoppurchasemessage').textContent=`${NAMES[i]}が${w.name}を購入した。`;$('#shoppurchasedialog').showModal();setTimeout(()=>$('#shoppurchasedialog').close(),SHOP_PURCHASE_NOTICE_MS)}
 function equip(i,slot){
  const token=s.inventory[i]?.[slot],w=weapon(token);
  if(!idle()||!w||w.kind==='medicine')return;
