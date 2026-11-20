@@ -156,3 +156,4 @@
 | 118 | 2026-11-19 | 透視の階またぎ持続、宝箱ボタンの表記を「仕掛解除」に統一、呪文リストをレベル昇順に | ff50854 | [spec](specs/118-milwa-persistence-and-spell-list.md) | [実施](reports/118.md) |
 | 119 | 2026-11-19 | 3F の回転床（1d4個、歩いて入ると向きがランダムに変わる、目印なし） | 922bc3e | [spec](specs/119-spinner-3f.md) | [実施](reports/119.md) |
 | 120 | 2026-11-21 | 図書館のモンスター情報に集団数（ダイス表記）と呪文抵抗（魔／僧）を追加、詳細を2列化、進捗表示を見出し行へ移動 | c10118c | [spec](specs/120-library-monster-display.md) | [実施](reports/120.md) |
+| 121 | 2026-11-21 | アイテム鑑定と呪いの装備を導入（未鑑定入手、司教鑑定、鍛冶屋の鑑定・呪い解除、呪い付き装備4品） | 9487b11 | [spec](specs/121-item-identification-curse.md) | [実施](reports/121.md) |
