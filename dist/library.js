@@ -29,7 +29,7 @@ function recordLibraryVictory(combat){
  combat.libraryRecorded=true;
 }
 function recordLibraryItem(id){
- if(!weapon(id))return;
+ if(weapon(id)?.id!==id||!id)return;
  ensureLibrary();s.library.items[id]=true;
 }
 function libraryDice(values){
@@ -117,7 +117,7 @@ function renderLibrary(tab='monsters',spellJob=1,itemKind='weapon',monsterFloor=
  }else if(tab==='items'){
   for(const w of [...WEAPONS,...MEDICINES].filter(w=>(w.kind==='medicine'?'medicine':w.part||'weapon')===itemKind)){
    const known=!!s.library.items[w.id];
-   const entry=libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,'item-'+w.id);
+   const entry=libraryEntry(known?w.name:'？？？',known?libraryItemDetails(w):null,known?'item-'+w.id:null);
    if(known&&itemKind==='weapon'){
     const tag=libraryElement('span',w.range==='ranged'?'遠距離':'近距離');tag.className='ailment-tag ailment-other';entry.children[0].append(tag);
    }

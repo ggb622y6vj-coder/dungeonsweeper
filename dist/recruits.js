@@ -102,26 +102,26 @@ function ensureCareerHistory(m){
  if(m.careerHistory.length)m.classChanged=true;
 }
 // Pure queries over a complete roster record, shared by preview and commit.
-function classWeaponSlot(record,toJob){
- const usable=slot=>{const w=weapon(record.inventory[slot]);return !!w&&!w.part&&w.kind!=='medicine'&&canEquipJob(w,toJob)};
+function classWeaponSlot(record,toJob,preview=false){
+ const usable=slot=>{const token=record.inventory[slot],w=weapon(token);return !!w?.dice&&((preview&&unidentified(token))||canEquipJob(w,toJob))};
  return usable(record.equipped)?record.equipped:record.inventory.findIndex((_,slot)=>usable(slot));
 }
-function canChangeClass(record,toJob){
+function canChangeClass(record,toJob,preview=false){
  const m=record?.members,previousJobs=({4:[0,1],5:[0,2],6:[0,3],7:[1,2]})[toJob];
- const reason=!m?'冒険者が見つかりません。':m.status!=='ok'?'正常な冒険者だけ転職できます。':
+ const reason=!m?'冒険者が見つかりません。':record.inventory.some(boundItem)?CURSE_LOCK:m.status!=='ok'?'正常な冒険者だけ転職できます。':
   m.level<10?'転職にはLv.10以上が必要です。':
   !Number.isInteger(toJob)||toJob<0||toJob>7?'転職先を選んでください。':
   m.job===toJob?'現在と同じ職業には転職できません。':
   previousJobs&&!previousJobs.includes(m.job)?`前職が${previousJobs.map(job=>CLASSES[job].name).join('または')}である必要があります。`:
-  classWeaponSlot(record,toJob)<0?'転職先で装備できる武器を所持していません。':'';
+  classWeaponSlot(record,toJob,preview)<0?'転職先で装備できる武器を所持していません。':'';
  return {ok:!reason,reason};
 }
-function classChangePreview(record,toJob){
- if(!canChangeClass(record,toJob).ok)return null;
+function classChangePreview(record,toJob,preview=false){
+ if(!canChangeClass(record,toJob,preview).ok)return null;
  const next=structuredClone(record),m=next.members,c=CLASSES[toJob];
  m.careerHistory=[...(m.careerHistory||[]),{from:m.job,fromLevel:m.level,to:toJob}];
  Object.assign(m,{job:toJob,level:1,xp:0,attack:c.attack,ac:c.ac,maxMP:Math.max(m.maxMP-Math.floor(m.maxMP/10),c.mp),baseStr:m.str,baseAgi:m.agi});
- next.hp=m.maxHP;next.mp=m.maxMP;next.equipped=classWeaponSlot(record,toJob);
+ next.hp=m.maxHP;next.mp=m.maxMP;next.equipped=classWeaponSlot(record,toJob,preview);
  for(const [part,slot] of Object.entries(next.armor))if(!canEquipJob(weapon(next.inventory[slot]),toJob))delete next.armor[part];
  return next;
 }

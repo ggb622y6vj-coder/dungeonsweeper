@@ -76,9 +76,9 @@ function partyUI(){ $('#tavernopen').onclick=()=>{if(s.area!=='town'||!idle())re
 function thiefMember(){return s.members.findIndex((m,i)=>[3,6].includes(jobOf(i))&&!partyIncapacitated(i))}
 function thiefOpenChest(){let c=currentChest(),i=thiefMember();if(!c||i<0||logBusy()||s.enemy||s.done)return;fixChestTrap(c);if(Math.random()<(jobOf(i)===6?.75:.85)){log(NAMES[i]+'が宝箱の罠を解除した。');rewardChest(c)}else{c.opened=true;log(NAMES[i]+'は宝箱の解除に失敗した！');let fromFloor=s.floor,fromPos=s.pos;triggerChestTrap(c);if(s.floor===fromFloor)delete s.cells[fromPos].chest;log('宝箱は失われた。')}render()}
 
-function renderEquipmentSummary(i){$('#equipmentsummary').innerHTML=[['武器',s.equipped[i]],['頭',s.armor[i].head],['胴体',s.armor[i].body],['足',s.armor[i].feet]].map(([label,slot])=>`<div><small>${label}</small><b>${weapon(s.inventory[i][slot])?.name||'−'}</b></div>`).join('')}
+function renderEquipmentSummary(i){$('#equipmentsummary').innerHTML=[['武器',s.equipped[i]],['頭',s.armor[i].head],['胴体',s.armor[i].body],['足',s.armor[i].feet]].map(([label,slot])=>`<div><small>${label}</small><b>${itemName(s.inventory[i][slot])}</b></div>`).join('')}
 function renderTransfer(i){
- const rows=itemRows(s.inventory[i]).map((row,index)=>({...row,index})).filter(x=>!isEquipped(i,x.slot)),selected=+$('#transferitem').value;
+ const rows=itemRows(s.inventory[i]).map((row,index)=>({...row,index})).filter(x=>!isEquipped(i,x.slot)&&!boundItem(x.id)),selected=+$('#transferitem').value;
  const slot=rows.some(x=>x.slot===selected)?selected:rows[0]?.slot;
  $('#transferitem').innerHTML=rows.map(x=>`<option value="${x.slot}" ${x.slot===slot?'selected':''}>${x.index+1}. ${itemRowName(x)}</option>`).join('');
  const id=s.inventory[i][slot],previous=+$('#transfermember').value;
@@ -86,9 +86,9 @@ function renderTransfer(i){
  const to=recipients.includes(previous)?previous:recipients[0];
  $('#transfermember').innerHTML=NAMES.map((name,j)=>j===i?'':`<option value="${j}" ${recipients.includes(j)?'':'disabled'} ${j===to?'selected':''}>${name} (${usedSlots(s.inventory[j])}/10)</option>`).join('');
  $('#transfergive').disabled=!idle()||!rows.length||!recipients.length;
- $('#transfernotice').textContent=rows.length?'':'装備中のアイテムは渡せません。';
+ $('#transfernotice').textContent=rows.length?'':s.inventory[i].some(boundItem)?CURSE_LOCK:'装備中のアイテムは渡せません。';
 }
-function transferItem(from,slot,to){if(!idle()||s.done||![from,slot,to].every(Number.isInteger)||from===to||!s.inventory[from]?.[slot]||!s.inventory[to]||!canAccept(s.inventory[to],s.inventory[from][slot],10)||isEquipped(from,slot))return false;let id=s.inventory[from][slot];removeInventorySlot(from,slot);s.inventory[to].push(id);render();renderInventory();$('#transfernotice').textContent=`${NAMES[to]}に${weapon(id).name}を渡した。`;return true}
+function transferItem(from,slot,to){if(!idle()||s.done||![from,slot,to].every(Number.isInteger)||from===to||!s.inventory[from]?.[slot]||!s.inventory[to]||!canAccept(s.inventory[to],s.inventory[from][slot],10)||boundItem(s.inventory[from][slot])||isEquipped(from,slot))return false;let id=s.inventory[from][slot];removeInventorySlot(from,slot);s.inventory[to].push(id);render();renderInventory();$('#transfernotice').textContent=`${NAMES[to]}に${itemName(id)}を渡した。`;return true}
 let partyOrderDraft=[];
 function renderPartyOrder(){ $('#partyorder').innerHTML=partyOrderDraft.map((id,slot)=>`<label>${slot<3?'前衛':'後衛'} ${slot%3+1}<select data-party-position="${slot}">${NAMES.map((name,i)=>`<option value="${i}" ${id===i?'selected':''}>${name}</option>`).join('')}</select></label>`).join('')+'<button id="partyordersave">この順番にする</button> <button id="partyordercancel">キャンセル</button>';$('#partyordersave').onclick=()=>{if(applyPartyOrder(partyOrderDraft))$('#partyorder').hidden=true};$('#partyordercancel').onclick=()=>$('#partyorder').hidden=true}
 function applyPartyOrder(order){if(!idle()||s.done||order.length!==s.members.length||new Set(order).size!==order.length||order.some(i=>!Number.isInteger(i)||i<0||i>=s.members.length))return false;for(let key of PARTY_FIELDS)s[key]=order.map(i=>s[key][i]);displayVitals=null;resetPartyCommands();refreshNames();render();renderStats();return true}

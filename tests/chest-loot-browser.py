@@ -50,7 +50,7 @@ with sync_playwright() as p:
               rollChestItems=(id,floor)=>{
                 window.lootCalls++;
                 const slots=LOOT_TABLES.groups[LOOT_TABLES.monsterGroups[id]].slots;
-                const values=slots.flatMap((slot,i)=>i<count?[0,0,0]:[slot.chance]);
+                const values=slots.flatMap((slot,i)=>i<count?(i===0?[0,.99,0,0]:[0,0,0]):[slot.chance]);
                 const items=actualRoll(id,floor,()=>{
                   if(!values.length)throw Error('extra loot roll');return values.shift();
                 });
@@ -85,7 +85,8 @@ with sync_playwright() as p:
             page.wait_for_function('!logBusy() && !!currentChest()')
             assert page.evaluate('structuredClone(currentChest())') == chest
             before = page.evaluate('({gold:s.gold,items:s.inventory.flat()})')
-            names = page.evaluate('currentChest().items.map(id=>weapon(id).name)')
+            tokens = page.evaluate("currentChest().items.map(id=>weapon(id).kind==='medicine'?id:'unid:'+id)")
+            names = page.evaluate('tokens=>tokens.map(itemName)', tokens)
             # Direct opening consumes no RNG. Thief/ninja opening uses exactly one success roll.
             selector = '#chestopen' if count % 2 == 0 else '#chestthief'
             page.evaluate('''thief => {
@@ -98,8 +99,8 @@ with sync_playwright() as p:
             assert page.evaluate('s.gold') == before['gold'] + chest['gold'] * 3
             after = page.evaluate('s.inventory.flat()')
             assert len(after) == len(before['items']) + count
-            for item in set(chest['items']):
-                assert after.count(item) - before['items'].count(item) == chest['items'].count(item)
+            for item in set(tokens):
+                assert after.count(item) - before['items'].count(item) == tokens.count(item)
             log = page.locator('#log').inner_text()
             assert f"宝箱を開けた。金貨{chest['gold']*3}枚を獲得。" in log, log
             assert log.count('を入手。') == count, log

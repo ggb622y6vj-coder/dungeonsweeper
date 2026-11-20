@@ -36,7 +36,7 @@ function renderTraining(){
   const stats=document.createElement('p');stats.textContent=`STR ${m.str} / IQ ${m.intelligence??10} / PIE ${m.piety??10} / AGI ${m.agi??10} / VIT ${m.vit} / AC ${recruitAC(r)} / HP ${r.hp}/${m.maxHP} / MP ${r.mp}/${m.maxMP} / 経験値 ${m.xp}`;
   row.append(title,status,stats);const actions=document.createElement('div');actions.className='recruit-actions';row.append(actions);
   const button=(text,action,disabled=false)=>{const b=document.createElement('button');b.textContent=text;b.disabled=disabled;b.onclick=action;actions.append(b);return b};
-  const checks=[0,1,2,3,4,5,6,7].filter(job=>job!==m.job).map(job=>canChangeClass(r,job));
+  const checks=[0,1,2,3,4,5,6,7].filter(job=>job!==m.job).map(job=>canChangeClass(r,job,true));
   const reason=checks.some(check=>check.ok)?'':checks[0].reason;
   const change=button('転職',()=>openClassChange(m.id),!!reason);change.setAttribute('data-class-change',m.id);change.title=reason;
   if(reason){const note=document.createElement('p');note.textContent=reason;row.append(note)}
@@ -103,14 +103,14 @@ function renderClassChange(){
  $('#classchangename').textContent=record?`${record.members.name}の転職（無料）`:'';
  const list=$('#classchangejobs');list.replaceChildren();
  for(const job of [0,1,2,3,4,5,6,7]){
-  const check=canChangeClass(record,job),b=document.createElement('button');
+  const check=canChangeClass(record,job,true),b=document.createElement('button');
   b.setAttribute('data-class-job',String(job));b.setAttribute('aria-pressed',String(job===classChangeJob));
   b.textContent=CLASSES[job].name;
   b.disabled=!check.ok;b.title=check.reason;b.className=check.ok?'job-ready':'';
   b.onclick=()=>{classChangeJob=job;renderClassChange()};list.append(b);
  }
  const preview=$('#classchangepreview');preview.replaceChildren();
- const check=canChangeClass(record,classChangeJob),next=classChangePreview(record,classChangeJob);
+ const check=canChangeClass(record,classChangeJob,true),next=classChangePreview(record,classChangeJob,true);
  $('#classchangeconfirm').disabled=!check.ok;
  $('#classchangenotice').textContent=classChangeJob===null?'転職先を選んでください。':check.reason;
  if(!next)return;
@@ -118,13 +118,14 @@ function renderClassChange(){
  const table=document.createElement('table');table.className='class-change-comparison';
  const head=document.createElement('tr');
  for(const text of ['項目','転職前','転職後']){const th=document.createElement('th');th.textContent=text;head.append(th)}table.append(head);
- for(const [label,before,after] of [['Lv',m.level,n.level],['XP',m.xp,n.xp],['HP',`${record.hp}/${m.maxHP}`,`${next.hp}/${n.maxHP}`],['MP',`${record.mp}/${m.maxMP}`,`${next.mp}/${n.maxMP}`],['AC',recruitAC(record),recruitAC(next)]]){
+ for(const [label,before,after] of [['Lv',m.level,n.level],['XP',m.xp,n.xp],['HP',`${record.hp}/${m.maxHP}`,`${next.hp}/${n.maxHP}`],['MP',`${record.mp}/${m.maxMP}`,`${next.mp}/${n.maxMP}`],['AC',recruitAC(record),Object.values(record.armor).some(slot=>unidentified(record.inventory[slot]))?'？':recruitAC(next)]]){
   const row=document.createElement('tr');for(const text of [label,before,after]){const td=document.createElement('td');td.textContent=String(text);row.append(td)}table.append(row);
  }
  preview.append(table);
- const removed=[record.equipped,...Object.values(record.armor)].filter(slot=>!canEquipJob(weapon(record.inventory[slot]),classChangeJob));
- const equipment=document.createElement('p');equipment.textContent=`使えなくなる装備：${removed.map(slot=>weapon(record.inventory[slot]).name).join('、')||'なし'}。所持品として残ります。転職後の武器：${weapon(next.inventory[next.equipped]).name}。`;
+ const removed=[record.equipped,...Object.values(record.armor)].filter(slot=>!unidentified(record.inventory[slot])&&!canEquipJob(weapon(record.inventory[slot]),classChangeJob));
+ const equipment=document.createElement('p');equipment.textContent=`使えなくなる装備：${removed.map(slot=>itemName(record.inventory[slot])).join('、')||'なし'}。所持品として残ります。転職後の武器：${unidentified(next.inventory[next.equipped])?'確定時に判定':itemName(next.inventory[next.equipped])}。`;
  const warning=document.createElement('p');warning.textContent='Lv と XP がリセットされます。習得済み呪文はすべて引き継ぎます。新職の呪文はレベルアップ時に習得します。';
+ if(record.inventory.some(unidentified))warning.textContent+=' 未鑑定品の装備可否は確定時に判定します。';
  preview.append(equipment,warning);
 }
 $('#classchangecancel').onclick=()=>$('#classchangedialog').close();

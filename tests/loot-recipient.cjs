@@ -1,5 +1,5 @@
-// 048: chest and enemy-drop loot go to the first member who can use the item and has room,
-// else the first member with room; all full logs 「{name}を見つけたが、アイテムがいっぱいだ。」 (048a).
+// 121: unidentified loot goes to the first member with room,
+// regardless of profession; all full logs 「{name}を見つけたが、アイテムがいっぱいだ。」 (048a).
 const assert = require('node:assert/strict');
 const { game } = require('../scripts/sim/harness.cjs');
 const { createParty } = require('../scripts/sim/combat.cjs');
@@ -17,22 +17,22 @@ function loot(kind, id, inv) {
 const full = Array(10).fill('sword');
 for (const kind of ['chest', 'legacy', 'drop']) {
   const names = JSON.parse(g.run('JSON.stringify(NAMES)'));
-  // Mage-only staff goes to the mage (index 2), not the front fighter.
+  // A mage-only weapon goes to the front fighter while unidentified.
   let r = loot(kind, 'staff', [['sword'], ['sword'], ['sword'], ['sword']]);
-  assert.deepEqual(r.inv, [1, 1, 2, 1], kind);
-  assert.equal(r.last[2], 'staff');
-  assert.ok(r.logs.includes(`杖を入手。${names[2]}が受け取った。`), kind + JSON.stringify(r.logs));
+  assert.deepEqual(r.inv, [2, 1, 1, 1], kind);
+  assert.equal(r.last[0], 'unid:staff');
+  assert.ok(r.logs.includes(`正体不明の武器を入手。${names[0]}が受け取った。`), kind + JSON.stringify(r.logs));
   // Mage full -> first member with room receives (drop is not discarded).
   r = loot(kind, 'staff', [full, ['sword'], full, ['sword']]);
   assert.deepEqual(r.inv, [10, 2, 10, 1], kind);
-  assert.ok(r.logs.includes(`杖を入手。${names[1]}が受け取った。`), kind);
-  // Usable-class priority uses party order among capable members (two fighters).
+  assert.ok(r.logs.includes(`正体不明の武器を入手。${names[1]}が受け取った。`), kind);
+  // The first vacancy also wins when the recipient happens to be able to equip it.
   r = loot(kind, 'longsword', [full, ['sword'], ['sword'], ['sword']]);
   assert.deepEqual(r.inv, [10, 2, 1, 1], kind);
   // All full -> full log, nothing added.
   r = loot(kind, 'staff', [full, full, full, full]);
   assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
-  assert.ok(r.logs.includes('杖を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes('正体不明の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
   assert.ok(!r.logs.some(l => l.includes('持ち帰れなかった') || l.includes('置いていった')), kind + JSON.stringify(r.logs));
   // 048a: all full with no capable class uses the same item-name message (staff for a fighter-only party is still "full").
   g.run('var savedJobs=s.members.map(m=>m.job);s.members.forEach(m=>m.job=0)');
@@ -40,11 +40,11 @@ for (const kind of ['chest', 'legacy', 'drop']) {
   r = loot(kind, 'staff', [full, full, full, full]);
   g.run('s.members.forEach((m,i)=>m.job=savedJobs[i])');
   assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
-  assert.ok(r.logs.includes('杖を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes('正体不明の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
 }
 // Medicine (all classes) still goes to the front member with room.
 {
   const r = JSON.parse(g.run(`(()=>{s.inventory=[['sword'],['sword'],['sword'],['sword']];let rolls=[0,0];Math.random=()=>rolls.shift()??0;dropMedicine();Math.random=realRandom;return JSON.stringify(s.inventory.map(a=>a.length))})()`));
   assert.deepEqual(r, [2, 1, 1, 1]);
 }
-console.log('PASS loot recipient: class priority, fallback to any member with room (chest and drop), all-full log, medicine front-first');
+console.log('PASS loot recipient: first vacancy, fallback to any member with room (chest and drop), all-full log, medicine front-first');

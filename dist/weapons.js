@@ -2,6 +2,8 @@
 // 価格・売却額・ドロップ対象もここだけで管理します。
 // lootRank：宝箱の装備ランク（1〜5）。minFloor：旧宝箱・直接ドロップ等の最浅階（省略時1）。shop:false は鍛冶屋に並ばない迷宮産の品（売却は可）。
 const WEAPONS = [
+ {id:'cursedDagger',lootRank:1,name:'呪われた短剣',dice:[1,4,0],classes:[3,6],price:20,sell:10,drop:true,chestOnly:true,shop:false,minFloor:1,cursed:true},
+ {id:'cursedStaff',lootRank:1,name:'呪われた杖',dice:[1,2,0],classes:[1,7],price:16,sell:8,drop:true,chestOnly:true,shop:false,minFloor:1,cursed:true},
  // 102: 宝箱専用の特殊装備。
  {"id":"poisonsw","lootRank":2,"name":"塗毒の小刀","range":"melee","dice":[2,4,0],"classes":[0,3,6],"price":400,"sell":200,"drop":true,"chestOnly":true,"minFloor":2,"shop":false,"desc":"攻撃時10%で対象を毒状態にする","effect":{"kind":"poison","chance":0.1}},
  {"id":"poisonsw2","lootRank":3,"name":"塗毒の隠し刀","range":"melee","dice":[2,6,0],"classes":[0,3,6],"price":800,"sell":400,"drop":true,"chestOnly":true,"minFloor":5,"shop":false,"desc":"攻撃時15%で対象を毒状態にする","effect":{"kind":"poison","chance":0.15}},
@@ -64,6 +66,8 @@ const WEAPONS = [
 ] .map(w=>({range:'melee',hitBonus:0,minAttacks:1,minFloor:1,...w}));
 
 const ARMOR=[
+ {id:'cursedArmor',lootRank:2,name:'呪われた胴鎧',part:'body',ac:0,classes:[0,2,3,4,6,5],price:200,sell:100,drop:true,chestOnly:true,shop:false,minFloor:3,cursed:true},
+ {id:'cursedHelm',lootRank:2,name:'呪われた兜',part:'head',ac:0,classes:[0,2,4,5],price:240,sell:120,drop:true,chestOnly:true,shop:false,minFloor:4,cursed:true},
  {"id":"chestsac","lootRank":3,"name":"代わり身の胸当て","part":"body","ac":4,"classes":[0,4,5],"price":800,"sell":400,"drop":true,"chestOnly":true,"minFloor":3,"shop":false,"desc":"装備するとHPが1/3以下になった時にHPを1/2回復し、このアイテムは消滅する。","effect":{"kind":"sacrificeHP"}},
  {"id":"helmetsac","lootRank":3,"name":"代わり身の兜","part":"head","ac":2,"classes":[0,4,5],"price":800,"sell":400,"drop":true,"chestOnly":true,"minFloor":3,"shop":false,"desc":"装備すると状態異常になった時に状態異常を回復し、このアイテムは消滅する。","effect":{"kind":"sacrificeStatus"}},
  {"id":"headlight","lootRank":3,"name":"ヘッドライト","part":"head","ac":1,"classes":[0,2,3,1,4,6,5,7],"price":1000,"sell":500,"drop":true,"chestOnly":true,"minFloor":2,"shop":false,"desc":"階を移動した時、移動先のマスの周囲8マスのうち未探索で罠のないマスを全て解放済みにする。この効果は重複しない。","effect":{"kind":"headlight"}},
