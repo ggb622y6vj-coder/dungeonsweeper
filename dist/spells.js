@@ -58,7 +58,7 @@ function ensureMagic(){s.magicPlans??=[];while(s.magicPlans.length<s.members.len
 function magicContext(){return s.enemy?'battle':currentChest()?'chest':'field'}
 function activeSpellEffects(){
  const effects=[];
- if(isAntimagicZone())effects.push({name:'反呪文の結界',description:'この範囲では呪文が打ち消され、発動中の魔法も解除される',remaining:'このマスにいる間'});
+ if(isAntimagicZone())effects.push({name:'反呪文の結界',description:'全ての呪文が打ち消された！',remaining:''});
  if(s.milwaSteps>0||s.light)effects.push({name:'透視',description:'左右斜め前のマスを壁越しに表示する。未探索の数字は隠したまま',remaining:s.light?'町へ戻るまで':`あと${s.milwaSteps}歩`});
  if(s.watchful)effects.push({name:'警戒結界',description:'敵の奇襲を防ぐ',remaining:'町へ戻るまで'});
  if(s.flagSight)effects.push({name:'旗視',description:'周囲8マスの旗の数を探索者マスの左下に表示する',remaining:'町へ戻るまで'});

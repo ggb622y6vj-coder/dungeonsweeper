@@ -1,6 +1,23 @@
 // Shared by enemy drain and 抵抗無効化; equipment and learned spells are retained.
 function lowerMemberLevel(i){if(s.members[i].level<=1)return false;let m=s.members[i];m.level--;m.xp=requiredXP(m.level,i);m.maxHP=Math.max(1,m.maxHP-Math.round(memberClass(i).hpGrowth[0]*(memberClass(i).hpGrowth[1]+1)/2+memberClass(i).hpGrowth[2]));m.maxMP=Math.max(0,m.maxMP-Math.round(memberClass(i).mpGrowth[0]*(memberClass(i).mpGrowth[1]+1)/2));s.hp[i]=Math.min(s.hp[i],m.maxHP);s.mp[i]=Math.min(s.mp[i],m.maxMP);return true}
-function monsterFormation(boss){let floor=Math.min(Math.max(...ENEMIES.flatMap(d=>d.floors)),s.floor||1),pool=ENEMIES.filter(d=>d.floors.includes(floor)&&!d.boss);if(boss){let guardian=ENEMIES.find(d=>d.floors.includes(floor)&&d.boss);return [guardian.id,pool[Math.random()*pool.length|0].id,...(Math.random()<.5?[pool[Math.random()*pool.length|0].id]:[]) ]}return Array.from({length:1+(Math.random()*3|0)},()=>pool[Math.random()*pool.length|0].id)}
+function monsterFormation(boss){
+ const floor=Math.min(Math.max(...ENEMIES.flatMap(d=>d.floors)),s.floor||1);
+ const pool=ENEMIES.filter(d=>d.floors.includes(floor)&&!d.boss);
+ if(boss){
+  const guardian=ENEMIES.find(d=>d.floors.includes(floor)&&d.boss);
+  return [guardian.id,pool[Math.random()*pool.length|0].id,...(Math.random()<.5?[pool[Math.random()*pool.length|0].id]:[])];
+ }
+ const guardian=(s.guardiansDefeated||[]).includes(s.floor)?ENEMIES.find(d=>d.floors.includes(floor)&&d.boss):null;
+ const encounterPool=guardian?[...pool,guardian]:pool;
+ const formation=Array.from({length:1+(Math.random()*3|0)},()=>encounterPool[Math.random()*encounterPool.length|0].id);
+ if(guardian){
+  const first=formation.indexOf(guardian.id);
+  for(let row=first+1;row<formation.length;row++){
+   if(formation[row]===guardian.id)formation[row]=pool[Math.random()*pool.length|0].id;
+  }
+ }
+ return formation;
+}
 function monsterHurt(i,n,cmds,name){n=flagDamage(cmds[i]==='guard'?Math.ceil(n/2):n,true);s.hp[i]=Math.max(0,s.hp[i]-n);markDeaths();log(`${name}は${NAMES[i]}に${n}ダメージ。`);if(n>0)sacrificeAfterDamage(i)}
 function monsterAction(e,cmds){let d=enemyDefinition(e.id),r=Math.random(),name=enemyDisplay(e);if((r-=d.flee)<0&&!d.boss){e.hp=0;e.rewarded=true;e.escaped=true;log(`${name}は逃げ出した。`);return true}if((r-=d.summon)<0){let group=s.enemy.units.filter(x=>rowKey(x)===rowKey(e)&&x.hp>0),summoned=s.enemy.summoned||0;if(summoned<4&&group.length<d.summonCap){let uid=Math.max(...s.enemy.units.map(x=>x.uid))+1;s.enemy.units.push({...makeEnemy(e.id,uid),row:e.row,identified:e.identified});s.enemy.summoned=summoned+1;log(`${name}は仲間を呼んだ。`)}else log(`${name}は仲間を呼んだが、現れなかった。`);return true}if(d.breath&&(r-=d.breath.chance)<0){log(`${name}は${d.breath.element}のブレスを吐いた。`);for(let i=0;i<s.hp.length;i++)if(activeMember(i)){monsterHurt(i,dice(...d.breath.dice).value,cmds,name);for(const a of d.breath.statuses||[])if(activeMember(i)&&Math.random()<a.chance)afflict(i,a.type)}return true}if((r-=d.spell)<0){
  if(e.silence)return false;
@@ -24,7 +41,7 @@ function finishMonsterBattle(){
  s.enemy=null;
  if(combat.boss&&defeated.some(e=>enemyDefinition(e.id).boss)){
   s.relic=true;s.guardianKilledThisRun=true;
-  if(s.floor<MAX_FLOOR){s.guardiansDefeated=[...new Set([...(s.guardiansDefeated||[]),s.floor])].sort((a,b)=>a-b)}
+  s.guardiansDefeated=[...new Set([...(s.guardiansDefeated||[]),s.floor])].sort((a,b)=>a-b);
   if(s.floor===MAX_FLOOR&&defeated.some(e=>e.id==='labyrinthlord')){
    s.cells[s.boss].type='';s.pendingStairs=false;s.cleared=true;s.clearNotice=true;
    log('迷宮の主は倒れた。迷宮に静寂が戻った……');

@@ -17,8 +17,8 @@ chrome = os.environ.get('CHROME_PATH') or next((p for p in (
 NEGATED = '反呪文の結界に打ち消された！'
 EFFECT = {
     'name': '反呪文の結界',
-    'description': 'この範囲では呪文が打ち消され、発動中の魔法も解除される',
-    'remaining': 'このマスにいる間',
+    'description': '全ての呪文が打ち消された！',
+    'remaining': '',
 }
 EFFECT_FIELDS = '[s.milwaSteps, s.light, s.watchful, s.flagSight, s.teppeki]'
 SET_EFFECTS = 'Object.assign(s, {milwaSteps: 10, light: true, watchful: true, flagSight: true, teppeki: true})'
@@ -156,9 +156,11 @@ with sync_playwright() as p:
         assert board.locator('.cell.here .cell-number').count() == 1
         page.locator('#party').click()
         page.locator('#activespells').click()
-        assert page.locator('#activespellbody .statcard').count() == 1
-        for label in EFFECT.values():
-            assert page.locator('#activespelldialog').get_by_text(label, exact=True).is_visible()
+        effect_card = page.locator('#activespellbody .statcard')
+        assert effect_card.count() == 1
+        assert effect_card.get_by_text(EFFECT['name'], exact=True).is_visible()
+        assert effect_card.get_by_text(EFFECT['description'], exact=True).is_visible()
+        assert effect_card.locator('p').all_text_contents() == [EFFECT['description'], EFFECT['remaining']]
         page.locator('#activespellclose').click()
         page.locator('#statsclose').click()
 
