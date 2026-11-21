@@ -26,4 +26,27 @@
 - アイテム欄にボタン（文言「謎のアイテムを集める」）を追加する。表示中のメンバーが司教（job 7）のときだけ表示する。
 - 有効条件：`canBishopIdentify(i)` と同じ条件を満たし、かつ集められる品が1つ以上あること。それ以外は disabled にする。
 - 集める対象：司教以外の
-...[truncated 2706 chars]
+...[truncated 2706 chars]パーティーメンバー全員の所持品のうち、未鑑定（`unid:`）で、拘束されておらず（`bound` でない）、そのメンバーが装備していない品。アイテムボックス内の品は対象外。司教本人の所持品は対象外（既に手元にある）。
+- 移動：メンバー順→所持順に、司教の所持枠（上限10枠。`usedSlots`／`canAccept` の既存判定を使う）に空きがある間だけ移す。移動には既存の `removeInventorySlot()` を使い、元の持ち主の装備インデックスを壊さない。入りきらなかった品は元の持ち主のまま残る。
+- 結果は `#inventorynotice` に表示する：集めた個数を出し、枠不足で残った場合はその個数も併記する（例：「謎のアイテムを3個集めた。」／「謎のアイテムを2個集めた。枠が足りず1個は残った。」）。0個のときはボタンが無効なので実行されない。
+- 移動後は `renderInventory()` と `render()` を更新し、既存の保存経路でセーブされる状態にする。
+
+## 5. 鍛冶屋に「売買」「鑑定」タブ
+
+- `#shopdialog` に訓練所と同じ方式のタブ（`.library-tabs`、role=tablist）を追加する：タブ「売買」「鑑定」。開いたときは「売買」を選択状態にする。
+- 売買タブ：従来の内容すべて（`#shopinventory`「アイテム・売却」ボタン、種類タブ（武器/頭/胴体/足）、`#shopitems` の購入リスト）。`#shopmember` は売買タブ側に置く。
+- 鑑定タブ：鑑定と呪い解除の対象リストをその場に表示する。行の内容（持ち主・表示名・料金）・料金（どちらも売却額100%＝`serviceFee`）・金貨不足時の無効化・確認ダイアログ（`#itemchoicedialog`）・実行時の再検証（`performItemService`／`currentItemTarget`）は従来のサービス画面と同じ。鑑定リストと呪い解除リストは見出しで区切って両方表示する。実行後はタブ内リストと所持金を再描画する。
+- 所持金 `#shopgold` は両タブで見える位置（ツールバー）に残す。
+- ツールバーの `#shopidentify`／`#shopuncurse` ボタンは廃止する。
+- 使われなくなる `#itemservicedialog` と `openItemService`／`renderItemService` は、他に参照がなければ削除する（デッドコードを残さない）。`#itemchoicedialog` は残す。
+
+## 不変条件
+
+- 121の鑑定・拘束・料金・確率・トークン方式・セーブ形式（ash-v1、`rosterVersion: 1`）は一切変えない。変更は表示名・導線・画面構成のみ。
+- 敵のHP・能力値をプレイ画面に出さない。ダイスの内部計算や鑑定の確率をログ・画面に出さない。
+
+## テスト追従
+
+- tests/item-identification.cjs、tests/item-identification-browser.py、tests/game.cjs、tests/loot-recipient.cjs、tests/training-browser.py 等にある旧表示名（正体不明の○○）・旧導線（ステータスの鑑定ボタン、`#shopidentify`、`#itemservicedialog`）への参照を新仕様へ追従させる。検証の強さは落とさない。
+- 新規検証を追加する：(a) アイテム欄を開いた直後の通知行が空（拘束品・未鑑定品があっても）、(b) 未鑑定名が「謎の武器」／「謎の防具」、(c) 司教のアイテム欄の行ボタンから鑑定できる（確認→実行→結果表示）、(d) 「謎のアイテムを集める」で他メンバーの未鑑定品が司教へ移り、装備中・拘束品は残り、10枠で止まる、(e) 鍛冶屋の鑑定タブで鑑定と呪い解除ができる、(f) ステータス画面に鑑定ボタンがない。
+- 標準検証：`node tests/game.cjs` 全件、`tests/*-browser.py` 全件（実行は呼び出し元）、`python3 scripts/compile-monsters.py --check`、sim selftest、Notion同期テスト、MANIFEST。
