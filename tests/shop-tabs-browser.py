@@ -21,6 +21,13 @@ with sync_playwright() as p:
           s.gold=10000;render();
         }""")
         page.locator('#blacksmith').click()
+        assert page.locator('#shoptab-trade').get_attribute('aria-selected') == 'true'
+        assert page.locator('#shoppanel-trade').is_visible()
+        assert not page.locator('#shoppanel-identify').is_visible()
+        assert page.locator('#shopdialog > .shoptoolbar #shopgold').inner_text() == '金貨 10000 G'
+        assert page.locator('#shoppanel-trade #shopmember').is_visible()
+        assert page.locator('#shoppanel-trade #shopinventory').is_visible()
+        assert page.locator('#shopidentify, #shopuncurse, #itemservicedialog').count() == 0
         geometry = []
         for tab in ('weapon','head','body','feet'):
             page.locator('#shoptab-'+tab).click()
@@ -35,7 +42,16 @@ with sync_playwright() as p:
         assert page.evaluate('shopTab') == 'feet'
         page.locator('#shopclose').click(); page.locator('#blacksmith').click()
         assert page.evaluate('shopTab') == 'weapon'
-        page.locator('#shoptab-weapon').focus(); page.keyboard.press('e')
+        page.locator('#shoptab-trade').focus(); page.keyboard.press('e')
+        assert page.locator('#shoptab-identify').get_attribute('aria-selected') == 'true'
+        assert page.locator('#shopidentifylist').is_visible() and page.locator('#shopuncurselist').is_visible()
+        assert not page.locator('#shoppanel-trade').is_visible()
+        assert page.locator('#shopgold').is_visible()
+        assert page.locator('#shopidentifytitle').inner_text() == '鑑定'
+        assert page.locator('#shopuncursetitle').inner_text() == '呪い解除'
+        page.keyboard.press('q')
+        assert page.locator('#shoptab-trade').get_attribute('aria-selected') == 'true'
+        page.locator('#shoptab-weapon').focus(); page.keyboard.press('ArrowRight')
         assert page.evaluate('shopTab') == 'head'
         page.locator('#shopmember').select_option('0')
         page.clock.install()
@@ -60,6 +76,11 @@ with sync_playwright() as p:
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         assert not errors, errors
         page.locator('#shopdialog').screenshot(path=str(out / f'shop-tabs-{width}.png'))
+        page.locator('#shoptab-identify').click()
+        page.locator('#shopclose').click()
+        page.locator('#blacksmith').click()
+        assert page.locator('#shoptab-trade').get_attribute('aria-selected') == 'true'
+        assert page.locator('#shopitems').is_visible()
         print(f'PASS shop tabs Chromium {width}px: classification, keyboard, modal blocking, 500ms, resume')
         ctx.close()
     browser.close()

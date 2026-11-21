@@ -21,18 +21,18 @@ for (const kind of ['chest', 'legacy', 'drop']) {
   let r = loot(kind, 'staff', [['sword'], ['sword'], ['sword'], ['sword']]);
   assert.deepEqual(r.inv, [2, 1, 1, 1], kind);
   assert.equal(r.last[0], 'unid:staff');
-  assert.ok(r.logs.includes(`正体不明の武器を入手。${names[0]}が受け取った。`), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes(`謎の武器を入手。${names[0]}が受け取った。`), kind + JSON.stringify(r.logs));
   // Mage full -> first member with room receives (drop is not discarded).
   r = loot(kind, 'staff', [full, ['sword'], full, ['sword']]);
   assert.deepEqual(r.inv, [10, 2, 10, 1], kind);
-  assert.ok(r.logs.includes(`正体不明の武器を入手。${names[1]}が受け取った。`), kind);
+  assert.ok(r.logs.includes(`謎の武器を入手。${names[1]}が受け取った。`), kind);
   // The first vacancy also wins when the recipient happens to be able to equip it.
   r = loot(kind, 'longsword', [full, ['sword'], ['sword'], ['sword']]);
   assert.deepEqual(r.inv, [10, 2, 1, 1], kind);
   // All full -> full log, nothing added.
   r = loot(kind, 'staff', [full, full, full, full]);
   assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
-  assert.ok(r.logs.includes('正体不明の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes('謎の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
   assert.ok(!r.logs.some(l => l.includes('持ち帰れなかった') || l.includes('置いていった')), kind + JSON.stringify(r.logs));
   // 048a: all full with no capable class uses the same item-name message (staff for a fighter-only party is still "full").
   g.run('var savedJobs=s.members.map(m=>m.job);s.members.forEach(m=>m.job=0)');
@@ -40,7 +40,7 @@ for (const kind of ['chest', 'legacy', 'drop']) {
   r = loot(kind, 'staff', [full, full, full, full]);
   g.run('s.members.forEach((m,i)=>m.job=savedJobs[i])');
   assert.deepEqual(r.inv, [10, 10, 10, 10], kind);
-  assert.ok(r.logs.includes('正体不明の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
+  assert.ok(r.logs.includes('謎の武器を見つけたが、アイテムがいっぱいだ。'), kind + JSON.stringify(r.logs));
 }
 // Medicine (all classes) still goes to the front member with room.
 {

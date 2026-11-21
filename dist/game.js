@@ -237,7 +237,7 @@ function levelUp(indices=s.members.map((_,i)=>i)){
  });
  s.levelReport=reports;
 }
-function renderStats(){ renderActiveSpells(); $('#partyreorder').disabled=!idle()||s.done; $('#statsbody').innerHTML=s.members.map((_,i)=>{let m=shownMember(i);let values=[['HP',`${(displayVitals?.hp||s.hp)[i]}/${m.maxHP}`],['MP',`${(displayVitals?.mp||s.mp)[i]}/${m.maxMP}`],['STR',m.str],['AGI',m.agi??agilityFor(jobOf(i),m.level)],['AC',displayVitals?.ac?.[i]??effectiveAC(i)],['IQ',m.intelligence],['PIE',m.piety],['VIT',m.vit],['経験値',m.xp],['NEXT',m.level>=LEVEL_CAP?'上限':Math.max(0,m.xpTargets[m.level+1]-m.xp)]];return `<article class="statcard" tabindex="0" data-stat-member="${i}"><h3>${m.name||CLASSES[m.job??i].name} <small>Lv.${m.level} · ${i<3?'前衛':'後衛'}</small>${ailmentTags(i)}</h3><dl class="stat-metrics">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="stat-actions"><button data-stat-inventory="${i}" ${!idle()?'disabled':''}>アイテム</button>${readyBishop(i,displayVitals||s)?`<button data-stat-identify="${i}" ${canBishopIdentify(i)?'':'disabled'}>鑑定</button>`:''}${[3,6].includes(jobOf(i))?`<button data-stat-disarm="${i}" ${canThiefDisarm(i)?'':'disabled'}>罠解除</button>`:''}${m.known?.length?`<button data-stat-cast="${i}" ${s.enemy||logBusy()?'disabled':''}>呪文</button>`:''}</div></article>`}).join('')}
+function renderStats(){ renderActiveSpells(); $('#partyreorder').disabled=!idle()||s.done; $('#statsbody').innerHTML=s.members.map((_,i)=>{let m=shownMember(i);let values=[['HP',`${(displayVitals?.hp||s.hp)[i]}/${m.maxHP}`],['MP',`${(displayVitals?.mp||s.mp)[i]}/${m.maxMP}`],['STR',m.str],['AGI',m.agi??agilityFor(jobOf(i),m.level)],['AC',displayVitals?.ac?.[i]??effectiveAC(i)],['IQ',m.intelligence],['PIE',m.piety],['VIT',m.vit],['経験値',m.xp],['NEXT',m.level>=LEVEL_CAP?'上限':Math.max(0,m.xpTargets[m.level+1]-m.xp)]];return `<article class="statcard" tabindex="0" data-stat-member="${i}"><h3>${m.name||CLASSES[m.job??i].name} <small>Lv.${m.level} · ${i<3?'前衛':'後衛'}</small>${ailmentTags(i)}</h3><dl class="stat-metrics">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl><div class="stat-actions"><button data-stat-inventory="${i}" ${!idle()?'disabled':''}>アイテム</button>${[3,6].includes(jobOf(i))?`<button data-stat-disarm="${i}" ${canThiefDisarm(i)?'':'disabled'}>罠解除</button>`:''}${m.known?.length?`<button data-stat-cast="${i}" ${s.enemy||logBusy()?'disabled':''}>呪文</button>`:''}</div></article>`}).join('')}
 function showLevelReport(){if(!s.levelReport?.length)return;$('#levelreport').textContent=s.levelReport.join('\n');if(!$('#leveldialog').open)$('#leveldialog').showModal()}
 function showTempleCarryReport(){if(!s.templeReport?.length){showLevelReport();return}const lines=[],normal=s.templeReport.filter(r=>r.status==='dead'||r.status==='ash'),lost=s.templeReport.filter(r=>r.status==='lost'),stone=s.templeReport.filter(r=>r.status==='stone');if(normal.length)lines.push(`${normal.map(r=>`${r.name}（${r.status==='dead'?'死亡':'灰'}）`).join('、')}を寺院に運んだ。寺院で蘇生できます。`);if(stone.length)lines.push(`${stone.map(r=>`${r.name}（石化）`).join('、')}を寺院に運んだ。寺院で石化を解除できます。`);for(const r of lost)lines.push(`${r.name}（ロスト）はパーティーから外れた。ロストは蘇生できません。`);$('#templecarrylist').textContent=lines.join('\n');$('#templecarrydialog').showModal()}
 function canWeaponAttack(i){return !(s.ailments[i].fear>0)&&(i<3||equippedWeapon(i)?.range==='ranged')}
@@ -374,7 +374,18 @@ function finishDefeat(){
 function weightedLoot(pool){let total=pool.reduce((n,x)=>n+x.weight,0),roll=Math.random()*total;for(let entry of pool){roll-=entry.weight;if(roll<0)return entry.item}return pool.at(-1).item}
 function dropWeapon(){if(Math.random()>=.05)return;let pool=chestItemPool(s.floor).filter(x=>x.item.drop&&!x.item.chestOnly);if(!pool.length)return;receiveLoot(weightedLoot(pool))}
 const SHOP_PURCHASE_NOTICE_MS=500;
-let shopTab='weapon';
+let shopTab='weapon',shopPanel='trade';
+function showShopPanel(panel){
+ shopPanel=panel;
+ for(const name of ['trade','identify']){
+  const active=name===panel,button=$('#shoptab-'+name);
+  button.setAttribute('aria-selected',String(active));
+  button.tabIndex=active?0:-1;
+  $('#shoppanel-'+name).hidden=!active;
+ }
+ $('#shopservicenotice').textContent='';
+ renderShop();
+}
 function buy(id,i){if(!s.members[i])return;let w=weapon(id);if(s.area!=='town'||!idle()||!w||id!==w.id||w.shop===false||!Number.isFinite(w.price)||!canEquipJob(w,jobOf(i))||s.gold<w.price||usedSlots(s.inventory[i])>=10)return;s.gold-=w.price;s.inventory[i].push(id);recordLibraryItem(id);render();renderShop();$('#shoppurchasemessage').textContent=`${NAMES[i]}が${w.name}を購入した。`;$('#shoppurchasedialog').showModal();setTimeout(()=>$('#shoppurchasedialog').close(),SHOP_PURCHASE_NOTICE_MS)}
 function equip(i,slot){
  const token=s.inventory[i]?.[slot],w=weapon(token);
@@ -450,10 +461,6 @@ function confirmInventoryAction(){
  }
  closeInventoryAction();
 }
-$('#shopidentify').onclick=()=>openItemService('identify');
-$('#shopuncurse').onclick=()=>openItemService('uncurse');
-$('#itemserviceclose').onclick=()=>$('#itemservicedialog').close();
-$('#itemservicedialog').addEventListener('close',()=>{if(!$('#itemservicedialog').open)itemService=null});
 $('#itemchoicecancel').onclick=()=>{pendingItemChoice=null;$('#itemchoicedialog').close()};
 $('#itemchoicedialog').addEventListener('close',()=>{if(!$('#itemchoicedialog').open)pendingItemChoice=null});
 $('#itemchoiceconfirm').onclick=confirmItemChoice;
@@ -501,12 +508,58 @@ function renderTemple(result=null){
 }
 $('#templeopen').onclick=()=>{if(s.area!=='town'||!idle())return;$('#templenotice').textContent='';renderTemple();$('#templedialog').showModal()};
 $('#templeclose').onclick=()=>$('#templedialog').close();
-function renderShop(){if(!s.members.length)return;for(const tab of ['weapon','head','body','feet']){const button=$('#shoptab-'+tab),active=tab===shopTab;button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1}$('#shopitems').setAttribute('aria-labelledby','shoptab-'+shopTab);let selected=+$('#shopmember').value||0;$('#shopmember').innerHTML=NAMES.map((name,i)=>`<option value="${i}">${name}</option>`).join('');$('#shopmember').value=String(selected);let i=+$('#shopmember').value||0;$('#shopgold').textContent=`金貨 ${s.gold} G`;$('#shopitems').innerHTML=WEAPONS.filter(w=>w.shop!==false&&(w.part||'weapon')===shopTab&&canEquipJob(w,jobOf(i))).map(w=>`<div class="shopitem"><div><b>${w.name}</b><small>${itemDescription(w)}</small></div><span>${w.price} G</span><button data-buy="${w.id}" ${s.gold<w.price||usedSlots(s.inventory[i])>=10?'disabled':''}>購入</button></div>`).join('')}
+function renderShop(){
+ $('#shopgold').textContent=`金貨 ${s.gold} G`;
+ if(shopPanel==='identify'){
+  renderShopServiceList('identify',$('#shopidentifylist'));
+  renderShopServiceList('uncurse',$('#shopuncurselist'));
+  return;
+ }
+ if(!s.members.length)return;
+ for(const tab of ['weapon','head','body','feet']){const button=$('#shoptab-'+tab),active=tab===shopTab;button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1}$('#shopitems').setAttribute('aria-labelledby','shoptab-'+shopTab);let selected=+$('#shopmember').value||0;$('#shopmember').innerHTML=NAMES.map((name,i)=>`<option value="${i}">${name}</option>`).join('');$('#shopmember').value=String(selected);let i=+$('#shopmember').value||0;$('#shopitems').innerHTML=WEAPONS.filter(w=>w.shop!==false&&(w.part||'weapon')===shopTab&&canEquipJob(w,jobOf(i))).map(w=>`<div class="shopitem"><div><b>${w.name}</b><small>${itemDescription(w)}</small></div><span>${w.price} G</span><button data-buy="${w.id}" ${s.gold<w.price||usedSlots(s.inventory[i])>=10?'disabled':''}>購入</button></div>`).join('')}
+function collectibleUnknownItems(recipient){
+ const items=[];
+ for(const member of s.members.keys()){
+  if(member===recipient)continue;
+  s.inventory[member].forEach((token,slot)=>{
+   if(unidentified(token)&&!boundItem(token)&&!isEquipped(member,slot)){
+    items.push({member,slot,token});
+   }
+  });
+ }
+ return items;
+}
+function collectUnknownItems(){
+ const i=inventoryMember;
+ if(!$('#inventorydialog').open||!canBishopIdentify(i))return;
+ const inventory=s.inventory[i],items=collectibleUnknownItems(i);
+ const removedByMember=Array(s.members.length).fill(0);
+ let collected=0;
+ for(const {member,slot,token} of items){
+  if(!canAccept(inventory,token,10))break;
+  removeInventorySlot(member,slot-removedByMember[member]);
+  removedByMember[member]++;
+  inventory.push(token);
+  collected++;
+ }
+ if(!collected)return;
+ const remaining=items.length-collected;
+ render();
+ renderInventory();
+ if($('#shopdialog').open)renderShop();
+ let message=`謎のアイテムを${collected}個集めた。`;
+ if(remaining)message+=`枠が足りず${remaining}個は残った。`;
+ $('#inventorynotice').textContent=message;
+}
+$('#inventorycollect').onclick=collectUnknownItems;
 function renderInventory(){
- const i=inventoryMember,rows=itemRows(s.inventory[i]);
+ const i=inventoryMember,inventory=s.inventory[i],rows=itemRows(inventory),canIdentify=canBishopIdentify(i);
+ const slots=usedSlots(inventory),collect=$('#inventorycollect');
  $('#itemboxopen').hidden=s.area!=='town';$('#itemboxopen').disabled=s.area!=='town'||!idle();
- $('#inventorytitle').textContent=`${NAMES[i]}のアイテム ${usedSlots(s.inventory[i])}/10`;
- $('#inventorynotice').textContent=s.inventory[i].some(boundItem)?CURSE_LOCK:s.inventory[i].some(unidentified)?'未鑑定品は、呪いがあると装備後に外せなくなります。':'';
+ collect.hidden=jobOf(i)!==7;
+ collect.disabled=!canIdentify||slots>=10||!collectibleUnknownItems(i).length;
+ $('#inventorytitle').textContent=`${NAMES[i]}のアイテム ${slots}/10`;
+ $('#inventorynotice').textContent='';
  renderEquipmentSummary(i);renderTransfer(i);
  $('#inventoryslots').innerHTML=Array.from({length:10},(_,index)=>{
   const row=rows[index],slot=row?.slot,w=row?.item;
@@ -521,7 +574,8 @@ function renderInventory(){
    const guard=bound?'disabled title="'+CURSE_LOCK+'"':!idle()||equipped?'disabled':'';
    const remove=s.area==='town'?`<button data-sell="${slot}" ${guard}>${bound?'売却不可':'売却 '+w.sell+' G'}</button>`:
     `<button data-discard="${slot}" ${guard}>捨てる</button>`;
-   content=`<div class="slotmain"><b>${itemRowName(row)}</b><p>${itemDescription(w)}</p></div>${use}${remove}`;
+   const identify=canIdentify&&w.unknown?`<button data-inventory-identify="${slot}">鑑定</button>`:'';
+   content=`<div class="slotmain"><b>${itemRowName(row)}</b><p>${itemDescription(w)}</p></div>${use}${identify}${remove}`;
   }
   return `<div class="slot"><small>${index+1}</small>${content}</div>`;
  }).join('');
@@ -654,10 +708,10 @@ function render({settledPosition=true}={}){
  $('#log').replaceChildren(...s.logs.map(t=>{let d=document.createElement('div');d.innerHTML=coloredLog(t);return d}));$('#bosschoice').hidden=!s.pendingBoss&&!s.pendingStairs;$('#bossyes').textContent=s.pendingBoss?'戦う':'はい';$('#bossno').textContent=s.pendingBoss?'戻る':'いいえ';$('#bossyes').disabled=logBusy();$('#bossno').disabled=logBusy();let combat=visibleCombat();$('.controls').hidden=!!combat||!!s.enemy;$('#battle').hidden=!combat;$('#commandreviewpopup').hidden=true;if(combat){$('#battle').innerHTML=`<div id="commandentry"></div>`;renderCommandEntry()}$('#frontflag').disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss||target()<0;document.querySelectorAll('[data-action]').forEach(b=>b.disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss);$('#chestactions').hidden=!currentChest()||!!s.enemy||!!visibleCombat()||logBusy()||s.done;const chestOpener=thiefMember();$('#chestthief').hidden=chestOpener<0;if(chestOpener>=0)$('#chestthief').textContent=memberClass(chestOpener).name+'が調べて開ける';$('#chestthief').disabled=logBusy();$('#chestcalfo').hidden=calfoCaster()<0;$('#chestcalfo').disabled=logBusy();$('#chestopen').disabled=logBusy();$('#chestabandon').disabled=logBusy();$('#statsopen').disabled=!!allyTargetPick;$('#maptoggle').disabled=!!allyTargetPick;renderAllyTargetPick(focusedAllyTarget);scene()}
 $('#activespells').onclick=()=>{renderActiveSpells();$('#activespelldialog').showModal()};
 $('#activespellclose').onclick=()=>$('#activespelldialog').close();
-$('#statsopen').onclick=e=>{if(allyTargetPick){if(e)partyTargetEvent(e);return}renderStats();$('#statsdialog').showModal()};$('#party').onclick=$('#statsopen').onclick;$('#party').onkeydown=e=>{if(globalThis.KeyNav||e.ctrlKey||e.altKey||e.metaKey)return;if(partyTargetEvent(e))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#statsopen').onclick()}};$('#statsclose').onclick=()=>$('#statsdialog').close();$('#statsbody').onclick=e=>{let bishop=e.target.closest('[data-stat-identify]');if(bishop){openItemService('bishop',+bishop.dataset.statIdentify);return}let disarm=e.target.closest('[data-stat-disarm]');if(disarm){$('#statsdialog').close();thiefDisarm(+disarm.dataset.statDisarm);return}let b=e.target.closest('[data-stat-inventory]');if(b)openInventory(+b.dataset.statInventory);let cast=e.target.closest('[data-stat-cast]');if(cast){$('#statsdialog').close();openMagic(+cast.dataset.statCast)}};$('#maptoggle').onclick=()=>{if(visibleCombat()||escapeMapHold)return;$('#mapdialogbody').append($('#mappanel'));$('#mapdialog').showModal();syncMapBlindNotice()};$('#mapclose').onclick=()=>$('#mapdialog').close();$('#mapdialog').addEventListener('close',()=>{syncMapBlindNotice();$('#mapdock').append($('#mappanel'))});
+$('#statsopen').onclick=e=>{if(allyTargetPick){if(e)partyTargetEvent(e);return}renderStats();$('#statsdialog').showModal()};$('#party').onclick=$('#statsopen').onclick;$('#party').onkeydown=e=>{if(globalThis.KeyNav||e.ctrlKey||e.altKey||e.metaKey)return;if(partyTargetEvent(e))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#statsopen').onclick()}};$('#statsclose').onclick=()=>$('#statsdialog').close();$('#statsbody').onclick=e=>{let disarm=e.target.closest('[data-stat-disarm]');if(disarm){$('#statsdialog').close();thiefDisarm(+disarm.dataset.statDisarm);return}let b=e.target.closest('[data-stat-inventory]');if(b)openInventory(+b.dataset.statInventory);let cast=e.target.closest('[data-stat-cast]');if(cast){$('#statsdialog').close();openMagic(+cast.dataset.statCast)}};$('#maptoggle').onclick=()=>{if(visibleCombat()||escapeMapHold)return;$('#mapdialogbody').append($('#mappanel'));$('#mapdialog').showModal();syncMapBlindNotice()};$('#mapclose').onclick=()=>$('#mapdialog').close();$('#mapdialog').addEventListener('close',()=>{syncMapBlindNotice();$('#mapdock').append($('#mappanel'))});
 $('#bossyes').onclick=()=>s.pendingStairs?answerStairs(true):answerBoss(true);$('#bossno').onclick=()=>s.pendingStairs?answerStairs(false):answerBoss(false);$('#board').onclick=e=>{let b=e.target.closest('[data-i]');if(b)flag(+b.dataset.i)};document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>move(b.dataset.action));$('#frontflag').onclick=()=>flag(target());
 $('#party').onchange=e=>{if(!e.target.matches('input[data-person]')||logBusy()||!s.enemy)return;s.commands[+e.target.dataset.person]=e.target.value;render()};
-$('#cleartown').onclick=enterTown;$('#backtown').onclick=enterTown;$('#entrance').onclick=enterDungeon;$('#blacksmith').onclick=()=>{if(!s.members.length)return;shopTab='weapon';renderShop();$('#shopdialog').showModal()};$('#shopclose').onclick=()=>$('#shopdialog').close();$('#inventoryclose').onclick=()=>$('#inventorydialog').close();$('#shopmember').onchange=()=>renderShop();$('#shopitems').onclick=e=>{let b=e.target.closest('[data-buy]');if(b)buy(b.dataset.buy,+$('#shopmember').value)};$('#shopinventory').onclick=()=>openInventory(+$('#shopmember').value);$('#inventoryslots').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.useMedicine!==undefined)openMedicine(inventoryMember,+b.dataset.useMedicine);if(b.dataset.equip!==undefined)equip(inventoryMember,+b.dataset.equip);if(b.dataset.sell!==undefined)openInventoryAction('sell',inventoryMember,+b.dataset.sell);if(b.dataset.discard!==undefined)openInventoryAction('discard',inventoryMember,+b.dataset.discard)};
+$('#cleartown').onclick=enterTown;$('#backtown').onclick=enterTown;$('#entrance').onclick=enterDungeon;$('#blacksmith').onclick=()=>{if(!s.members.length)return;shopTab='weapon';showShopPanel('trade');$('#shopdialog').showModal()};$('#shopclose').onclick=()=>$('#shopdialog').close();$('#inventoryclose').onclick=()=>$('#inventorydialog').close();$('#shopmember').onchange=()=>renderShop();$('#shopitems').onclick=e=>{let b=e.target.closest('[data-buy]');if(b)buy(b.dataset.buy,+$('#shopmember').value)};$('#shopinventory').onclick=()=>openInventory(+$('#shopmember').value);$('#inventoryslots').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.useMedicine!==undefined)openMedicine(inventoryMember,+b.dataset.useMedicine);if(b.dataset.equip!==undefined)equip(inventoryMember,+b.dataset.equip);if(b.dataset.inventoryIdentify!==undefined)openItemChoice('bishop',itemTarget(inventoryMember,+b.dataset.inventoryIdentify));if(b.dataset.sell!==undefined)openInventoryAction('sell',inventoryMember,+b.dataset.sell);if(b.dataset.discard!==undefined)openInventoryAction('discard',inventoryMember,+b.dataset.discard)};
 try{s=restoreRoster(JSON.parse(localStorage.getItem('ash-v1')))}catch{}if(s&&(!Array.isArray(s.members)||['hp','mp','inventory','equipped','armor','ailments'].some(k=>!Array.isArray(s[k]))))s=null;if(!s||!s.cells||![64,100,144].includes(s.cells.length)){fresh();s.area='town';s.logs=[];render()}else{if(s.enemy&&!Array.isArray(s.enemy.units))s.enemy=null;ensureProfile();s.guardiansDefeated??=[];s.guardiansDefeated=[...new Set(s.guardiansDefeated)].sort((a,b)=>a-b);if(s.relic&&s.done){s.done=false;s.cells[s.boss].type=s.floor<MAX_FLOOR?'down':''}s.guardianKilledThisRun??=!!s.relic;if(s.floor<MAX_FLOOR&&(s.guardiansDefeated||[]).includes(s.floor)&&s.cells[s.boss].type==='boss'){s.cells[s.boss].type='down';s.relic=true}if(s.cells[s.start].type!=='boss'&&s.cells[s.start].type!=='down')s.cells[s.start].type='stairs';for(let c of s.cells){if(c.open&&c.trap){c.trap=false;c.spent=true}}if(s.area==='town'&&!s.defeatPending){const carried=s.members.filter(m=>m.status!=='ok').map(m=>({id:m.id,name:m.name||CLASSES[m.job??0].name,status:m.status}));if(carried.length){s.templeReport=carried.map(({name,status})=>({name,status}));removeFromParty(carried.map(x=>x.id));s.levelReport=[];s.templeReportFromLoad=true;save()}autoReorderParty('load')}render();if(s.area==='town'&&s.templeReport?.length)showTempleCarryReport()}
 if(s.defeatPending)finishDefeat();
 
@@ -847,5 +901,6 @@ function renderElevatorDialogs(){if(s.area!=='dungeon'){s.pendingElevator=false;
 function renderElevatorPick(){const root=$('#elevatorchoices');root.replaceChildren();for(const n of s.elevatorFloors.filter(n=>n!==s.floor)){const b=document.createElement('button');b.textContent=`地下${n}階`;b.setAttribute('data-elevator-floor',n);if(!root.children.length)b.setAttribute('data-key-default','');b.onclick=()=>{ $('#elevatorpick').close();travelElevator(n)};root.append(b)}if(!root.children.length){const p=document.createElement('p');p.textContent='移動できる階はありません。';root.append(p)} }
 $('#elevatorok').onclick=()=>$('#elevatordialog').close();$('#elevatorcancel').onclick=()=>$('#elevatorpick').close();$('#elevatorpick').addEventListener('click',e=>{if(e.target===$('#elevatorpick'))$('#elevatorpick').close()});$('#elevatorpick').addEventListener('close',()=>{if(s.pendingElevator){s.pendingElevator=false;render()}});
 
+for(const panel of ['trade','identify'])$('#shoptab-'+panel).onclick=()=>showShopPanel(panel);
 for(const tab of ['weapon','head','body','feet'])$('#shoptab-'+tab).onclick=()=>{shopTab=tab;renderShop()};
 $('#shoppurchasedialog').addEventListener('cancel',e=>e.preventDefault());
