@@ -33,6 +33,8 @@ g.run(`fresh(10);s.enemy={boss:false,chestBattle:false,units:[{id:'goblin',uid:0
 g.drain();
 assert.equal(g.run('s.cleared'), false, 'ordinary 10F encounters do not clear the game');
 startBoss(10);defeatBoss();
+assert.deepEqual(Array.from(g.run('s.guardiansDefeated')), [10]);
+assert.ok(g.run("monsterFormation(false).includes('labyrinthlord')"));
 assert.equal(g.run('s.cleared'), true);
 assert.equal(g.run("s.cells[s.boss].type"), '');
 assert.equal(g.run('s.pendingStairs'), false);
@@ -46,8 +48,10 @@ assert.equal(g.run('s.area'), 'dungeon', 'return waits for battle logs');
 
 // Reload the actual ash-v1 payload, including roster migration and startup code.
 const saved = g.run("save();localStorage.getItem('ash-v1')");
-const restored = game(saved);
+const restored = game(saved, () => .999);
 assert.equal(restored.run('s.cleared'), true);
+assert.deepEqual(Array.from(restored.run('s.guardiansDefeated')), [10]);
+assert.ok(restored.run("monsterFormation(false).includes('labyrinthlord')"));
 assert.equal(restored.run("s.cells[s.boss].type"), '');
 assert.equal(restored.run("$('#clearresult').hidden"), false);
 g.drain();
@@ -70,6 +74,7 @@ assert.equal(g.run('s.area'), 'dungeon');
 assert.equal(g.run('s.cleared'), true);
 
 startBoss(9);defeatBoss();g.drain();
+assert.deepEqual(Array.from(g.run('s.guardiansDefeated')), [9, 10]);
 assert.equal(g.run("s.cells[s.boss].type"), 'down');
 assert.equal(g.run('s.pendingStairs'), 'down');
 assert.equal(g.run('s.clearNotice'), false);
@@ -77,15 +82,25 @@ g.run('answerStairs(true);');
 assert.equal(g.run('s.floor'), 10);
 assert.equal(g.run('s.cleared'), true, 'new floor preserves global clear flag');
 startBoss(10);defeatBoss();g.drain();
+assert.deepEqual(Array.from(g.run('s.guardiansDefeated')), [9, 10], 'a repeat boss victory keeps one record per floor');
 assert.equal(g.run('s.clearNotice'), true);
 assert.equal(g.run("s.cells[s.boss].type"), '');
 g.run('travelFloor(9);');
 assert.equal(g.run('s.clearNotice'), false);
 assert.equal(g.run('s.cleared'), true, 'cached floor preserves global clear flag');
+assert.deepEqual(Array.from(g.run('s.guardiansDefeated')), [9, 10]);
+
+const regenerated = game(saved, () => .999);
+regenerated.run('fresh(10)');
+assert.equal(regenerated.run('s.cells[s.boss].type'), 'boss', 'a new 10F still has its boss tile');
+assert.equal(regenerated.run('s.relic'), false, 'the defeat record alone does not grant the relic on 10F');
+assert.equal(regenerated.run('s.guardianKilledThisRun'), false);
+assert.ok(regenerated.run("monsterFormation(false).includes('labyrinthlord')"));
 
 // Old saves may already contain a down stair or cached floors beyond 10F.
 const legacy = JSON.parse(saved);
 delete legacy.cleared;delete legacy.clearNotice;
+legacy.guardiansDefeated=legacy.guardiansDefeated.filter(floor=>floor<10);
 legacy.cells[legacy.boss].type='down';legacy.pendingStairs='down';
 legacy.floors[10]={floor:10,cells:structuredClone(legacy.cells)};
 legacy.floors[11]={floor:11,cells:structuredClone(legacy.cells)};
