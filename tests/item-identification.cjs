@@ -15,8 +15,15 @@ function party(){
 function rolls(g,values){
  g.run(`var draws=${JSON.stringify(values)};Math.random=()=>{if(!draws.length)throw Error('unexpected random draw');return draws.shift()}`);
 }
+function clickIdentify(g,slot){
+ g.run(`$('#inventoryslots').onclick({target:{closest:()=>({dataset:{inventoryIdentify:'${slot}'}})}})`);
+}
 function bishop(g,slot=1){
- g.run(`openItemService('bishop',0);openItemChoice('bishop',itemTarget(0,${slot}));confirmItemChoice();confirmItemChoice()`);
+ g.run("if(!$('#inventorydialog').open)openInventory(0)");
+ clickIdentify(g,slot);
+ assert.equal(g.run("$('#itemchoicedialog').open"),true);
+ g.run("$('#itemchoiceconfirm').onclick();$('#itemchoiceconfirm').onclick()");
+ assert.equal(g.run("$('#inventorynotice').textContent"),g.run('s.logs[0]'));
  assert.equal(g.run('draws.length'),0);
 }
 for(const [level,p,q] of [[1,.15,.32],[11,.65,.02],[12,.7,0],[17,.95,0],[18,1,0],[30,1,0]]){
@@ -51,20 +58,142 @@ for(const [level,p,q] of [[1,.15,.32],[11,.65,.02],[12,.7,0],[17,.95,0],[18,1,0]
  assert.equal(g.run("canChangeClass(partyRecords()[0],1).reason"),g.run('CURSE_LOCK'));
 }
 {
- const g=party();g.run("s.members[1].job=7;s.inventory.forEach(ids=>ids.push('unid:cursedStaff'));openItemService('bishop',0)");
- assert.equal(g.run("$('#itemservicelist').children.length"),1);
+ const g=party();g.run("s.members[1].job=7;s.inventory.forEach(ids=>ids.push('unid:cursedStaff'));openInventory(0)");
+ const rows=g.run("$('#inventoryslots').innerHTML");
+ assert.deepEqual(Array.from(rows.matchAll(/data-inventory-identify="(\d+)"/g),m=>+m[1]),[1]);
  g.run("openItemChoice('bishop',itemTarget(1,1));confirmItemChoice()");
+ assert.notEqual(g.run("$('#itemchoicedialog').open"),true);
  assert.equal(g.run('s.inventory[1][1]'),'unid:cursedStaff');
  for(const mutation of ["s.enemy={units:[]}","s.cells[s.pos].chest={opened:false}","s.pendingBoss=true",
   "s.pendingStairs='up'","s.pendingElevator=true","s.done=true","logQueue.push({})",
   "s.ailments[0].paralysis=1","s.ailments[0].sleep=1","s.members[0].status='stone'","s.hp[0]=0",
   "s.members[0].job=1","changeRecruitParty(s.members[0].id,false)"]){
-  const g=party();g.run("s.inventory[0].push('unid:cursedStaff');openItemService('bishop',0);openItemChoice('bishop',itemTarget(0,1))");
+  const g=party();g.run("s.inventory[0].push('unid:cursedStaff');openInventory(0)");
+  clickIdentify(g,1);
+  assert.equal(g.run("$('#itemchoicedialog').open"),true);
   g.run(mutation);rolls(g,[]);const before=g.run('JSON.stringify(s)');g.run('confirmItemChoice()');
   assert.equal(g.run('JSON.stringify(s)'),before,mutation);
  }
 }
 console.log('PASS 121 bishop levels, exact boundaries/RNG order, all four outcomes, repeat contact, ownership, incapacity, silence/zero MP, stale scene and immediate save');
+
+{
+ const g=party();
+ g.run("s.inventory[0].push('unid-bound:cursedStaff','unid:cursedHelm');s.inventory[1].push('unid:cursedHelm');renderStats();openInventory(0)");
+ assert.doesNotMatch(g.run("$('#statsbody').innerHTML"),/data-stat-identify/);
+ assert.equal(g.run("$('#inventorynotice').textContent"),'');
+ assert.match(g.run("$('#inventoryslots').innerHTML"),/data-inventory-identify="1">鑑定/);
+ clickIdentify(g,1);
+ assert.equal(g.run("$('#itemchoiceprompt').textContent"),'冒険者0の謎の武器を鑑定しますか？ 呪いに触れることがあります。');
+ const before=g.run('JSON.stringify(s)');
+ rolls(g,[]);
+ g.run("$('#itemchoicecancel').onclick();$('#itemchoiceconfirm').onclick()");
+ assert.equal(g.run('JSON.stringify(s)'),before);
+ assert.equal(g.run("$('#inventorynotice').textContent"),'');
+ rolls(g,[0]);bishop(g);
+ assert.doesNotMatch(g.run("$('#inventoryslots').innerHTML"),/data-inventory-identify="1"/);
+ g.run("$('#inventoryclose').onclick();openInventory(0)");
+ assert.equal(g.run("$('#inventorynotice').textContent"),'');
+ g.run("s.ailments[0].sleep=1;renderInventory()");
+ assert.doesNotMatch(g.run("$('#inventoryslots').innerHTML"),/data-inventory-identify/);
+ g.run("$('#inventoryclose').onclick();openInventory(1)");
+ assert.equal(g.run("$('#inventorynotice').textContent"),'');
+ assert.doesNotMatch(g.run("$('#inventoryslots').innerHTML"),/data-inventory-identify/);
+}
+console.log('PASS 122 inventory notices, bishop-only row actions, cancellation, refresh and reopen');
+
+{
+ const g=party();
+ g.run(`s.inventory[0]=['staff','unid:robe',...Array(4).fill('cap'),...Array(10).fill('healingPotion')];
+  s.inventory[1]=['unid:cap','unid:sword','unid-bound:cursedHelm','unid:plate','unid:boots','helm','chain'];
+  s.inventory[2]=['dagger','unid:oakstaff','unid:dragonbow'];
+  s.equipped[1]=1;s.armor[1]={feet:4,head:5,body:6};s.itemBox=['unid:galeboots'];openInventory(1)`);
+ const button="$('#inventorycollect')";
+ assert.equal(g.run(button+'.hidden'),true);
+ g.run("$('#inventoryclose').onclick();openInventory(0)");
+ assert.equal(g.run(button+'.hidden'),false);
+ assert.equal(g.run(button+'.disabled'),false);
+ assert.equal(g.run('usedSlots(s.inventory[0])'),7);
+ for(const [block,unblock] of [
+  ['s.ailments[0].sleep=1','s.ailments[0].sleep=0'],
+  ['s.pendingStairs="up"','s.pendingStairs=null']
+ ]){
+  g.run(block+';renderInventory()');
+  assert.equal(g.run(button+'.hidden'),false);
+  assert.equal(g.run(button+'.disabled'),true);
+  const before=g.run('JSON.stringify(s.inventory)');
+  g.run(button+'.onclick()');
+  assert.equal(g.run('JSON.stringify(s.inventory)'),before);
+  g.run(unblock+';renderInventory()');
+ }
+ rolls(g,[]);
+ g.run(button+'.onclick()');
+ assert.equal(g.run('usedSlots(s.inventory[0])'),10);
+ assert.equal(g.run("$('#inventorytitle').textContent"),'冒険者0のアイテム 10/10');
+ assert.deepEqual(read(g,'s.inventory[0].slice(0,2)'),['staff','unid:robe']);
+ assert.deepEqual(read(g,'s.inventory[0].slice(-3)'),['unid:cap','unid:plate','unid:oakstaff']);
+ assert.deepEqual(read(g,'s.inventory[1]'),['unid:sword','unid-bound:cursedHelm','unid:boots','helm','chain']);
+ assert.deepEqual(read(g,'s.inventory[2]'),['dagger','unid:dragonbow']);
+ assert.deepEqual(read(g,'s.equipped'),[0,0,0]);
+ assert.deepEqual(read(g,'s.armor[1]'),{feet:2,head:3,body:4});
+ assert.deepEqual(read(g,'s.itemBox'),['unid:galeboots']);
+ assert.deepEqual(read(g,'s.library.items'),{});
+ assert.equal(g.run("$('#inventorynotice').textContent"),'謎のアイテムを3個集めた。枠が足りず1個は残った。');
+ assert.equal(g.run(button+'.disabled'),true);
+ const full=g.run('JSON.stringify(s.inventory)');
+ g.run(button+'.onclick()');
+ assert.equal(g.run('JSON.stringify(s.inventory)'),full);
+ const reloaded=game(saved(g),()=>.5);
+ for(const expr of ['s.inventory','s.equipped','s.armor','s.itemBox'])assert.deepEqual(read(reloaded,expr),read(g,expr));
+ g.run('removeInventorySlot(0,2);renderInventory()');
+ assert.equal(g.run(button+'.disabled'),false);
+ g.run(button+'.onclick()');
+ assert.equal(g.run("$('#inventorynotice').textContent"),'謎のアイテムを1個集めた。');
+ assert.equal(g.run('s.inventory[0].at(-1)'),'unid:dragonbow');
+ g.run('removeInventorySlot(0,2);renderInventory()');
+ assert.equal(g.run(button+'.disabled'),true);
+ assert.equal(g.run("$('#inventorynotice').textContent"),'');
+}
+console.log('PASS 122 collect unknown items in party and inventory order, skip equipped/bound/box, preserve indices, enforce ten slots with stacks and save');
+
+{
+ const g=party();
+ g.run("s.inventory[0].push('unid:cursedStaff');s.inventory[1].push('unid-bound:cursedHelm');s.gold=8;$('#blacksmith').onclick()");
+ assert.equal(g.run("$('#shoptab-trade').attributes['aria-selected']"),'true');
+ assert.equal(g.run("$('#shoppanel-identify').hidden"),true);
+ g.run("$('#shoptab-identify').onclick()");
+ assert.equal(g.run("$('#shoptab-identify').attributes['aria-selected']"),'true');
+ assert.equal(g.run("$('#shoptab-identify').tabIndex"),0);
+ assert.equal(g.run("$('#shoppanel-identify').hidden"),false);
+ assert.equal(g.run("$('#shoppanel-trade').hidden"),true);
+ assert.deepEqual(read(g,"$('#shopidentifylist').children.map(b=>[b.textContent,b.disabled])"),[
+  ['冒険者0 · 謎の武器 · 8 G',false],['冒険者1 · 謎の防具 · 120 G',true]
+ ]);
+ assert.deepEqual(read(g,"$('#shopuncurselist').children.map(b=>[b.textContent,b.disabled])"),[
+  ['冒険者1 · 謎の防具（呪い） · 120 G',true]
+ ]);
+ g.run("$('#shopidentifylist').children[0].onclick()");
+ assert.equal(g.run("$('#itemchoicedialog').open"),true);
+ assert.equal(g.run("$('#itemchoiceprompt').textContent"),'冒険者0の謎の武器を8 Gで鑑定しますか？');
+ g.run("$('#itemchoiceconfirm').onclick()");
+ assert.equal(g.run("$('#shopdialog').open"),true);
+ assert.equal(g.run("$('#shopservicenotice').textContent"),'謎の武器は呪われた杖だった！');
+ assert.equal(g.run("$('#shopgold').textContent"),'金貨 0 G');
+ assert.equal(g.run("$('#shopidentifylist').children.length"),1);
+ assert.equal(g.run("$('#shopuncurselist').children.length"),1);
+ g.run("s.gold=120;renderShop();$('#shopuncurselist').children[0].onclick()");
+ assert.match(g.run("$('#itemchoiceprompt').textContent"),/謎の防具を120 Gで呪い解除しますか？ 品は消滅します。/);
+ g.run("$('#itemchoiceconfirm').onclick()");
+ for(const id of ['shopidentifylist','shopuncurselist']){
+  assert.equal(g.run(`$('#${id}').children[0].textContent`),'対象の品がありません。');
+ }
+ assert.equal(g.run("$('#shopservicenotice').textContent"),'謎の防具の呪いを解除した。品は消滅した。');
+ assert.equal(g.run("s.library.items.cursedHelm"),undefined);
+ g.run("$('#shopclose').onclick();$('#blacksmith').onclick()");
+ assert.equal(g.run("$('#shoptab-trade').attributes['aria-selected']"),'true');
+ assert.equal(g.run("$('#shopservicenotice').textContent"),'');
+}
+console.log('PASS 122 inline smith lists, tab state, quotes, affordability, refresh and notices');
 
 {
  const g=party();g.run("s.inventory[1]=['sword','helm','unid:cursedHelm','cursedArmor','chain','cap','boots'];s.armor[1]={head:1,body:4,feet:6};inventoryMember=1");
@@ -93,7 +222,7 @@ console.log('PASS 121 bishop levels, exact boundaries/RNG order, all four outcom
  const thief=g.run("ENEMIES.find(d=>d.steal>0&&!d.statuses.length&&!d.death&&!d.drain).id");
  g.run(`Math.random=()=>0;monsterOnHit({id:'${thief}'},0);monsterOnHit({id:'${thief}'},0)`);
  assert.deepEqual(read(g,'s.inventory[0]'),['staff','unid-bound:cursedDagger']);
- assert.ok(g.run("logQueue.some(x=>x.text.includes('正体不明の武器を奪われた'))"));
+ assert.ok(g.run("logQueue.some(x=>x.text.includes('謎の武器を奪われた'))"));
  assert.equal(g.run('canChangeClass(partyRecords()[0],1).ok'),false);
  g.drain();g.run("s.area='town';s.gold=10");
  for(const expr of ['sell(0,1)','depositItem(0,1)','transferItem(0,1,1)',"openInventoryAction('sell',0,1)"]){
@@ -108,7 +237,7 @@ console.log('PASS 121 bishop levels, exact boundaries/RNG order, all four outcom
  assert.equal(g.run("physicalAttack(0,{id:'slime',hp:10}).damage"),2);
  assert.equal(g.run("equippedWeapon(0).dice[1]"),2);
  g.run("s.inventory[1]=['sword','unid:chestsac'];s.armor[1]={body:1};s.hp[1]=1;s.area='dungeon';sacrificeAfterDamage(1)");
- assert.match(g.run('logQueue.at(-1).text'),/正体不明の胴防具/);
+ assert.match(g.run('logQueue.at(-1).text'),/謎の防具/);
  assert.doesNotMatch(g.run('logQueue.at(-1).text'),/代わり身の胸当て|chestsac/);
 }
 console.log('PASS 121 voluntary binding, battle damage, AC snapshots, hidden sacrifice/theft logs, equipped and unequipped locks, armor index compaction');
@@ -116,10 +245,10 @@ console.log('PASS 121 voluntary binding, battle damage, AC snapshots, hidden sac
 {
  const g=party();g.run("s.inventory[0]=['staff','cursedStaff','unid:cursedStaff','bound:cursedStaff','unid-bound:cursedStaff','unid:cursedStaff'];s.gold=8");
  for(const action of ['identify','uncurse']){
-  g.run(`openItemService('${action}');openItemChoice('${action}',itemTarget(0,4));$('#itemchoicecancel').onclick();confirmItemChoice()`);
+  g.run(`$('#blacksmith').onclick();$('#shoptab-identify').onclick();openItemChoice('${action}',itemTarget(0,4));$('#itemchoicecancel').onclick();confirmItemChoice()`);
   assert.equal(g.run('s.gold'),8);assert.equal(g.run('s.inventory[0][4]'),'unid-bound:cursedStaff');
  }
- rolls(g,[]);g.run("openItemService('identify');openItemChoice('identify',itemTarget(0,4));s.gold=7;confirmItemChoice()");
+ rolls(g,[]);g.run("$('#blacksmith').onclick();$('#shoptab-identify').onclick();openItemChoice('identify',itemTarget(0,4));s.gold=7;confirmItemChoice()");
  assert.equal(g.run('s.gold'),7);assert.deepEqual(read(g,'s.library.items'),{});
  g.run("s.gold=8;openItemChoice('identify',itemTarget(0,4));confirmItemChoice();confirmItemChoice()");
  assert.equal(g.run('s.gold'),0);assert.deepEqual(read(g,'s.library.items'),{cursedStaff:true});
@@ -127,13 +256,13 @@ console.log('PASS 121 voluntary binding, battle damage, AC snapshots, hidden sac
  assert.equal(g.run('s.equipped[0]'),0);
  for(const action of ['identify','uncurse'])for(const mutation of ["removeInventorySlot(0,1)","s.inventory[0][1]='cursedStaff'","reorderParty([1,0,2])"]){
   const h=party(),token=action==='identify'?'unid:cursedStaff':'unid-bound:cursedStaff';
-  h.run(`s.inventory[0].push('${token}','${token}');openItemService('${action}');openItemChoice('${action}',itemTarget(0,1));${mutation}`);
+  h.run(`s.inventory[0].push('${token}','${token}');$('#blacksmith').onclick();$('#shoptab-identify').onclick();openItemChoice('${action}',itemTarget(0,1));${mutation}`);
   const before=h.run('JSON.stringify(s)');h.run('confirmItemChoice()');assert.equal(h.run('JSON.stringify(s)'),before,mutation);
  }
  for(const [job,id,starter] of [[1,'cursedStaff','staff'],[7,'cursedStaff','staff'],[3,'cursedDagger','dagger'],[6,'cursedDagger','dagger']]){
   for(const hasSpare of [true,false]){
    const h=party();h.run(`s.members[0].job=${job};s.inventory[0]=['unid:staff','bound:${id}','cap',${hasSpare?"'"+starter+"'":"'unid:oakstaff'"},...Array(6).fill('robe')];s.equipped[0]=1;s.armor[0]={head:2};s.gold=weapon('${id}').sell`);
-   h.run("openItemService('uncurse');openItemChoice('uncurse',itemTarget(0,1));confirmItemChoice();confirmItemChoice()");
+   h.run("$('#blacksmith').onclick();$('#shoptab-identify').onclick();openItemChoice('uncurse',itemTarget(0,1));confirmItemChoice();confirmItemChoice()");
    assert.equal(h.run('s.gold'),0);assert.equal(h.run('s.inventory[0].length'),hasSpare?9:10);
    assert.equal(h.run('s.equipped[0]'),hasSpare?2:9);assert.equal(h.run('equippedWeapon(0).id'),starter);
    assert.equal(h.run('s.armor[0].head'),1);assert.equal(h.run(`weapon('${starter}').sell<serviceFee('${id}')`),true);
@@ -143,14 +272,14 @@ console.log('PASS 121 voluntary binding, battle damage, AC snapshots, hidden sac
 }
 {
  const g=party();g.run("s.inventory[0].push('unid:cursedDagger','unid:plate','unid:dragonbow');s.gold=0");
- assert.equal(g.run('transferItem(0,1,1)'),true);assert.match(g.run("$('#transfernotice').textContent"),/正体不明の武器/);
+ assert.equal(g.run('transferItem(0,1,1)'),true);assert.match(g.run("$('#transfernotice').textContent"),/謎の武器/);
  assert.equal(g.run('sell(1,1)'),true);assert.equal(g.run('s.gold'),1);
  g.run("s.itemBox=Array(99).fill('robe');s.inventory[0].push(...Array(10).fill('healingPotion'));depositItem(0,1)");
  assert.equal(g.run('usedSlots(s.itemBox)'),100);assert.equal(g.run('depositItem(0,1)'),false);
  assert.equal(g.run('withdrawItem(0,99)'),true);assert.equal(g.run('s.inventory[0].at(-1)'),'unid:plate');
  assert.equal(g.run('usedSlots(s.inventory[0])'),4);
  g.run("s.area='dungeon';openInventoryAction('discard',0,1)");
- assert.match(g.run("$('#inventoryactionname').textContent"),/正体不明の武器/);
+ assert.match(g.run("$('#inventoryactionname').textContent"),/謎の武器/);
  g.run('confirmInventoryAction()');assert.equal(g.run("s.inventory[0].includes('unid:dragonbow')"),false);
  assert.deepEqual(read(g,'s.library.items'),{});
 }
@@ -213,7 +342,10 @@ console.log('PASS 121 all states survive JSON, ash-v1, reserve, stairs, death tr
 {
  const g=party();
  g.run("s.inventory[0]=['staff','unid:dragonbow','unid:cursedHelm','unid:cursedArmor','unid:galeboots'];s.members[0].job=1;s.members[0].level=10;renderInventory();renderEquipmentSummary(0);renderTransfer(0)");
- for(const name of ['武器','兜','胴防具','足防具'])assert.match(g.run("$('#inventoryslots').innerHTML"),new RegExp('正体不明の'+name));
+ assert.deepEqual(read(g,'s.inventory[0].slice(1).map(itemName)'),['謎の武器','謎の防具','謎の防具','謎の防具']);
+ const slots=g.run("$('#inventoryslots').innerHTML");
+ assert.equal((slots.match(/<b>謎の武器<\/b>/g)||[]).length,1);
+ assert.equal((slots.match(/<b>謎の防具<\/b>/g)||[]).length,3);
  for(const id of ['dragonbow','cursedHelm','cursedArmor','galeboots']){
   const w=read(g,`weapon('${id}')`),html=g.run("$('#inventoryslots').innerHTML+$('#transferitem').innerHTML");
   for(const secret of [id,w.name,w.sell+' G'])assert.ok(!html.includes(secret),secret);
@@ -248,7 +380,7 @@ console.log('PASS 121 all four chest candidates, direct pools on every floor, co
  assert.equal(g.run('useMedicine(0,2,0)'),true);g.drain();
  g.run("s.hp[0]=1;castMagic(0,'dios',0)");g.drain();assert.ok(g.run('s.hp[0]>1'));
  assert.deepEqual(read(g,'s.inventory[0]'),['unid-bound:cursedStaff','bound:cursedDagger']);
- g.run("s.area='town';s.gold=10;openItemService('uncurse');openItemChoice('uncurse',itemTarget(0,1));s.gold=9;confirmItemChoice()");
+ g.run("s.area='town';s.gold=10;$('#blacksmith').onclick();$('#shoptab-identify').onclick();openItemChoice('uncurse',itemTarget(0,1));s.gold=9;confirmItemChoice()");
  assert.equal(g.run('s.gold'),9);assert.deepEqual(read(g,'s.inventory[0]'),['unid-bound:cursedStaff','bound:cursedDagger']);
  assert.equal(g.run("performItemService('uncurse',itemTarget(1,0))"),false);
 }

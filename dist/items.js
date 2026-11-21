@@ -24,7 +24,7 @@ function equipmentToken(id,unknown,bound){
 function visibleItem(token){
  const w=weapon(token);
  if(!w||!unidentified(token))return w;
- return {unknown:true,part:w.part,sell:1,name:'正体不明の'+({head:'兜',body:'胴防具',feet:'足防具'}[w.part]||'武器')};
+ return {unknown:true,part:w.part,sell:1,name:w.part?'謎の防具':'謎の武器'};
 }
 function itemName(token){return visibleItem(token)?.name||'−'}
 const CURSE_LOCK='呪いで拘束されています。鍛冶屋で呪いを解除してください。';
@@ -234,36 +234,31 @@ function performItemService(action,target){
  return message;
 }
 
-let itemService=null,pendingItemChoice=null;
-function openItemService(action,i){
- if(action==='bishop'?!canBishopIdentify(i):s.area!=='town'||!idle()||s.done)return;
- itemService={action,owner:action==='bishop'?s.members[i].id:null};
- $('#itemservicetitle').textContent=action==='uncurse'?'呪い解除':'鑑定';
- renderItemService();$('#itemservicedialog').showModal();
-}
-function renderItemService(notice=''){
- const {action,owner}=itemService,list=$('#itemservicelist');
+let pendingItemChoice=null;
+function renderShopServiceList(action,list){
  list.replaceChildren();
- for(const [i,m] of s.members.entries()){
-  if(owner!==null&&m.id!==owner)continue;
+ for(const i of s.members.keys()){
   s.inventory[i].forEach((token,slot)=>{
    if(!serviceAvailable(action,i,slot))return;
    const target=itemTarget(i,slot),button=document.createElement('button');
-   const fee=action==='bishop'?'':' · '+serviceFee(token)+' G';
-   button.textContent=NAMES[i]+' · '+itemName(token)+(action==='uncurse'?'（呪い）':'')+fee;
-   button.disabled=action!=='bishop'&&s.gold<serviceFee(token);
+   const fee=serviceFee(token);
+   button.textContent=NAMES[i]+' · '+itemName(token)+(action==='uncurse'?'（呪い）':'')+' · '+fee+' G';
+   button.disabled=s.gold<fee;
    if(button.disabled)button.title='金貨が足りません。';
    button.onclick=()=>openItemChoice(action,target);
    list.append(button);
   });
  }
- $('#itemservicenotice').textContent=notice||(!list.children.length?'対象の品がありません。':'');
+ if(!list.children.length){
+  const empty=document.createElement('p');
+  empty.textContent='対象の品がありません。';
+  list.append(empty);
+ }
 }
 function openItemChoice(action,target){
  if(!currentItemTarget(target))return;
  const {i,slot,token}=target;
- if(action!=='equip'&&(!itemService||itemService.action!==action||!serviceAvailable(action,i,slot)))return;
- if(action==='bishop'&&itemService.owner!==target.owner)return;
+ if(action!=='equip'&&(!itemServiceInView(action,target)||!serviceAvailable(action,i,slot)))return;
  const name=itemName(token),owner=NAMES[i];
  const prompt=action==='equip'?name+'を装備しますか？ 呪いがあれば外せなくなります。':
   action==='bishop'?name+'を鑑定しますか？ 呪いに触れることがあります。':
@@ -272,6 +267,10 @@ function openItemChoice(action,target){
  $('#itemchoiceprompt').textContent=owner+'の'+prompt;
  $('#itemchoiceconfirm').disabled=action!=='bishop'&&action!=='equip'&&s.gold<serviceFee(token);
  $('#itemchoicedialog').showModal();
+}
+function itemServiceInView(action,target){
+ if(action==='bishop')return $('#inventorydialog').open&&inventoryMember===target.i;
+ return $('#shopdialog').open&&shopPanel==='identify';
 }
 function confirmItemChoice(){
  const choice=pendingItemChoice;
@@ -282,8 +281,13 @@ function confirmItemChoice(){
   if(currentItemTarget(target))applyEquip(target.i,target.slot,true);
   return;
  }
- if(!itemService||itemService.action!==action||(action==='bishop'&&itemService.owner!==target.owner))return;
- const message=performItemService(action,target);
- if(action!=='bishop')renderShop();
- renderItemService(message||'所持品・所持金・状態を確認してください。');
+ if(!itemServiceInView(action,target))return;
+ const message=performItemService(action,target)||'所持品・所持金・状態を確認してください。';
+ if(action==='bishop'){
+  if(s.members[inventoryMember])renderInventory();
+  $('#inventorynotice').textContent=message;
+ }else{
+  renderShop();
+  $('#shopservicenotice').textContent=message;
+ }
 }
