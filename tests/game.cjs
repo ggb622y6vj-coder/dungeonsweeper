@@ -341,6 +341,7 @@ require('./spell-list.cjs');
 require('./pitfall.cjs');
 require('./travel-characterization.cjs');
 require('./action-order.cjs');
+require('./hide-ambush.cjs');
 
 require('./xp-curve.cjs');
 require('./class-change.cjs');

@@ -23,6 +23,7 @@ function rosterSaveState() {
  const records=s.defeatPending?(s.reserve||[]):trainingRoster(), seen=new Set();
  for(const r of records){if(!r.members.id||seen.has(r.members.id))r.members.id=crypto.randomUUID();seen.add(r.members.id)}
  const snapshot={...s,rosterVersion:1,roster:records,partyIds:s.defeatPending?[]:s.members.map(m=>m.id),corpses:structuredClone(s.corpses||[])};
+ if(s.enemy)snapshot.enemy={...s.enemy,commandIndex};
  for(const key of PARTY_FIELDS)delete snapshot[key];
  delete snapshot.reserve;
  return snapshot;
