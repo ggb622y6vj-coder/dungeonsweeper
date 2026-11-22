@@ -164,3 +164,4 @@
 | 126 | 2026-11-22 | Notion更新を反映。モンスター8種追加・3種改名、呪文抵抗と宝物グループの更新、植物に特効を持つ伐採の鎌を追加 | 4667ac1 | [spec](specs/126-notion-data-update.md) | [実施](reports/126.md) |
 | 127 | 2026-11-22 | 術者22種に系統・習得Lv別の詠唱を導入。戦闘中は敵グループで魔力低下を共有 | e528b82 | [spec](specs/127-enemy-spellcasting.md) | [実施](reports/127.md) |
 | 128 | 2026-11-22 | ログ文8件を訂正し、悪魔・竜・魔獣に対する種族特効武器を6種追加 | 47fac1b | [spec](specs/128-log-text-and-new-weapons.md) | [実施](reports/128.md) |
+| 129 | 2026-11-23 | 床罠「浮上穴」を追加。1つ上の階へ転移し、1Fでは不発 |  | [spec](specs/129-upward-teleport-trap.md) | [実施](reports/129.md) |

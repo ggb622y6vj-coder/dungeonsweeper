@@ -124,7 +124,7 @@ drain();run(`
 s.enemy=null;s.done=false;s.pendingBoss=null;s.pendingStairs=false;fresh(1);s.cells.forEach(c=>{c.trap=false;c.flag=false;c.chest=undefined});
 if(flagChance({counts:{power:0}},'power')!==0||flagChance({counts:{power:1}},'power')!==.04||flagChance({counts:{power:5}},'power')!==.2||flagChance({counts:{power:10}},'power')!==.4||flagChance({counts:{power:100}},'power')!==.4)throw Error('4-40 percent linear');
 `);
-for (const [r,kind] of [[.1,'needle'],[.3,'blast'],[.6,'poison'],[.8,'paralysis'],[.95,'teleport']]){drain();run(`s.hp=s.members.map(m=>m.maxHP);s.ailments.forEach(a=>{a.poison=false;a.paralysis=0});s.done=false;var orig=s.pos,c=s.cells[orig];c.trap=true;Math.random=()=>${r};triggerFloorTrap(c);if(c.trap||!c.spent||c.trapKind!=='${kind}')throw Error('trap consume');if('${kind}'==='needle'&&s.hp.filter((h,i)=>h<maxHP(i)).length!==1)throw Error('single damage');if('${kind}'==='blast'&&s.hp.some((h,i)=>h>=maxHP(i)))throw Error('party damage');if('${kind}'==='poison'&&s.ailments.some(a=>!a.poison))throw Error('poison gas');if('${kind}'==='paralysis'&&!s.ailments.some(a=>a.paralysis>0))throw Error('paralysis');if('${kind}'==='teleport'&&(s.pos===orig||s.cells[s.pos].type||s.cells[s.pos].trap||!s.cells[s.pos].open||s.enemy||s.pendingStairs))throw Error('safe teleport');`)}
+for (const [r,kind] of [[.1,'needle'],[.3,'blast'],[.6,'poison'],[.8,'paralysis'],[.92,'teleport']]){drain();run(`s.hp=s.members.map(m=>m.maxHP);s.ailments.forEach(a=>{a.poison=false;a.paralysis=0});s.done=false;var orig=s.pos,c=s.cells[orig];c.trap=true;Math.random=()=>${r};triggerFloorTrap(c);if(c.trap||!c.spent||c.trapKind!=='${kind}')throw Error('trap consume');if('${kind}'==='needle'&&s.hp.filter((h,i)=>h<maxHP(i)).length!==1)throw Error('single damage');if('${kind}'==='blast'&&s.hp.some((h,i)=>h>=maxHP(i)))throw Error('party damage');if('${kind}'==='poison'&&s.ailments.some(a=>!a.poison))throw Error('poison gas');if('${kind}'==='paralysis'&&!s.ailments.some(a=>a.paralysis>0))throw Error('paralysis');if('${kind}'==='teleport'&&(s.pos===orig||s.cells[s.pos].type||s.cells[s.pos].trap||!s.cells[s.pos].open||s.enemy||s.pendingStairs))throw Error('safe teleport');`)}
 drain();run(`
 s.hp=s.members.map(m=>m.maxHP);s.ailments.forEach(a=>{a.poison=false;a.paralysis=0});s.enemy={units:[{id:'slime',uid:0,row:0,hp:99}],target:0};resetCommandEntry();render();if(!$('#commandentry').innerHTML.includes('戦士：行動')||!$('#attack').hidden)throw Error('first prompt');s.commands[0]='guard';confirmCommand(0);if(!$('#commandentry').innerHTML.includes('魔法使い：行動'))throw Error('second prompt');confirmCommand(1);if(!$('#commandentry').innerHTML.includes('僧侶：行動'))throw Error('third prompt');confirmCommand(2);if($('#attack').hidden||!$('#commandreviewpopup').innerHTML.includes('<td>守る</td>'))throw Error('review');resetCommandEntry();s.hp[0]=0;s.ailments[1].paralysis=3;render();if(!$('#commandentry').innerHTML.includes('僧侶：行動'))throw Error('skip incapacitated');
 `);console.log('PASS linear 4-40% flags, five floor traps, safe teleport and sequential command entry/review');
@@ -342,6 +342,7 @@ require('./reload.cjs');
 
 require('./spell-list.cjs');
 require('./pitfall.cjs');
+require('./rise-trap.cjs');
 require('./travel-characterization.cjs');
 require('./action-order.cjs');
 require('./hide-ambush.cjs');
