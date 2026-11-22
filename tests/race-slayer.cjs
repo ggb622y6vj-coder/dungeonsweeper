@@ -28,3 +28,8 @@ assert.equal(damage('sickle', 'takenoko', { ambush: true, roll: 0 }), 0);
 // The cursed power flag rounds 8 × .65 down to 5 before both multipliers.
 assert.equal(damage('sickle', 'takenoko', { ambush: true, cursedFlag: true }), 20);
 console.log('PASS race slayer: plant and non-plant hits, ordinary weapon, ambush, miss and flag rounding');
+
+// At .99 the spear rolls 8 + 8 + 4 before the race multiplier.
+assert.equal(damage('dragonslayerspear', 'dragon'), 40);
+assert.equal(damage('dragonslayerspear', 'slime'), 20);
+console.log('PASS race slayer: dragon-slaying spear doubles damage only against dragons');

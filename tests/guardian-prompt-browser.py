@@ -14,7 +14,7 @@ src = Path(__file__).with_name('battle-keys-browser.py').read_text()
 bk = {}
 exec(src.split('\nwith sync_playwright()')[0], bk)  # reuse fixture/selected/ring without running that suite
 fixture, ring, chrome = bk['fixture'], bk['ring'], bk['chrome']
-TEXT = '階段の上に長い手足の男が覆いかぶさっている。'
+TEXT = '階段の上に誰かが覆いかぶさっている。'
 
 def labels(page):
     return page.evaluate('[$("#bossyes").textContent,$("#bossno").textContent]')
@@ -55,7 +55,7 @@ with sync_playwright() as p:
         # Escape = 戻る: back one cell, existing log, no battle; re-entry prompts again.
         page.keyboard.press('Escape'); page.wait_for_function('!logBusy()')
         assert page.evaluate('s.pos===27 && !s.pendingBoss && !s.enemy && s.cells[28].open')
-        assert page.evaluate('s.logs[0]') == '戦闘を避け、一歩前のマスへ戻った。'
+        assert page.evaluate('s.logs[0]') == '戦闘を避け、一つ前の部屋へ戻った。'
         step_in(page)
         page.locator('#bossno').click(); page.wait_for_function('!logBusy()')
         assert page.evaluate('s.pos===27 && !s.enemy')

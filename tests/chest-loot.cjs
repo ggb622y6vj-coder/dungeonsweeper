@@ -11,7 +11,7 @@ assert.deepEqual(plain(g, 'LOOT_TABLES'), tables);
 const enemies = plain(g, 'ENEMIES');
 const equipment = plain(g, 'WEAPONS'), medicines = plain(g, 'MEDICINES');
 const byId = new Map([...equipment, ...medicines].map(w => [w.id, w]));
-assert.equal(equipment.length, 81);
+assert.equal(equipment.length, 87);
 for (const w of equipment) assert.ok(Number.isInteger(w.lootRank) && w.lootRank >= 1 && w.lootRank <= 5, w.id);
 for (const w of medicines) assert.equal(Object.hasOwn(w, 'lootRank'), false, w.id);
 assert.equal(tables.version, 1);

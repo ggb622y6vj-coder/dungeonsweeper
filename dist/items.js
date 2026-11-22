@@ -86,12 +86,12 @@ function useMedicine(i,slot,target,inTurn=false,expectedId=null){
  if(s.members[target].status==='stone'){log(`${w.name}では${NAMES[target]}の石化を治せない。`);return false}
  const heal=['dios','dial','dialma'].includes(w.spell);
  if(heal&&s.hp[target]>=maxHP(target)){log(NAMES[target]+'のHPは満タンだ。');return false}
- if(w.spell==='dialko'&&!['paralysis','sleep','silence','fear'].some(key=>s.ailments[target][key]>0)){log(NAMES[target]+'は麻痺・睡眠・沈黙・恐怖していない。');return false}
+ if(w.spell==='dialko'&&!['paralysis','sleep','silence','fear'].some(key=>s.ailments[target][key]>0)){log(NAMES[target]+'は元気そうだ。');return false}
  if(w.spell==='latumofis'&&!s.ailments[target].poison){log(NAMES[target]+'は毒に侵されていない。');return false}
  if(!displayVitals)displayVitals=snapshotVitals();
  removeInventorySlot(i,slot);log(NAMES[i]+'は'+w.name+'を使った。');
  if(heal){let before=s.hp[target];s.hp[target]=Math.min(maxHP(target),before+dice(...magic(w.spell).value).value);log(NAMES[target]+'のHPが'+(s.hp[target]-before)+'回復した。')}
- else if(w.spell==='dialko'){s.ailments[target].paralysis=0;s.ailments[target].sleep=0;s.ailments[target].silence=0;s.ailments[target].fear=0;log(NAMES[target]+'の麻痺・睡眠・沈黙・恐怖が解けた。')}
+ else if(w.spell==='dialko'){s.ailments[target].paralysis=0;s.ailments[target].sleep=0;s.ailments[target].silence=0;s.ailments[target].fear=0;log(NAMES[target]+'の状態異常が解けた。')}
  else{s.ailments[target].poison=false;log(NAMES[target]+'の毒が消えた。')}
  if(!inTurn)autoReorderParty('medicine');
  return true;

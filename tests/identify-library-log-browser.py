@@ -42,9 +42,9 @@ with sync_playwright() as p:
         page.wait_for_function('!logBusy()')
         combat_log = page.locator('#log').inner_text()
         assert '不定形の正体を見破った。（→スライム）' in combat_log, combat_log
-        assert 'スライムの情報を図書館に記録した。' in combat_log, combat_log
+        assert 'スライムの情報を記録した。' in combat_log, combat_log
         wolf_name = page.evaluate("enemyDefinition('wolf').name")
-        assert f'{wolf_name}の情報を図書館に記録した。' in combat_log, combat_log
+        assert f'{wolf_name}の情報を記録した。' in combat_log, combat_log
         assert 'すでに正体は判明している。' not in combat_log, combat_log
         page.screenshot(path=str(output / f'combat-{width}.png'))
         page.evaluate('s.enemy=null;enterTown();save()')

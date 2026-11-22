@@ -79,11 +79,11 @@ with sync_playwright() as p:
         assert opened == want, (opened, want)
         v = page.evaluate("({enemy:s.enemy,boss:s.pendingBoss,stairs:s.pendingStairs,pos:s.pos,mp:s.mp[1],log:s.logs[0]})")
         assert v['enemy'] is None and not v['boss'] and not v['stairs'] and v['pos'] == POS and v['mp'] == mp0 - 4, v
-        assert v['log'] == f'{len(want)-1}マスを探索済みにした。', v
+        assert v['log'] == f'{len(want)-1}部屋を探索済みにした。', v
         assert page.locator('#log').inner_text().count('開放を唱えた。') == 1
         # 2nd cast (nothing new) costs 8, then reload: next cost is 16 and cells stay explored.
         assert 'MP 8' in cast(page)
-        assert page.evaluate('s.logs[0]') == '新たに探索できるマスはなかった。'
+        assert page.evaluate('s.logs[0]') == '新たに探索できる部屋はなかった。'
         page.reload(); page.wait_for_function('!!globalThis.KeyNav && !logBusy()')
         assert page.evaluate('s.cells.map((c,i)=>c.open?i:-1).filter(i=>i>=0)') == want
         assert page.evaluate("s.floodUses===2 && spellCost(magic('floodfill'))===16 && spellCost(magic('dumapic'))===2")

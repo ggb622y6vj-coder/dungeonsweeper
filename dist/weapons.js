@@ -63,7 +63,13 @@ const WEAPONS = [
  {"id":"hatajirusinoyumi","lootRank":2,"name":"旗印の弓","range":"ranged","dice":[2,3,0],"classes":[3,6,0],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+10%。","effect":{"kind":"flagMatchFirstHit","pct":10}},
  {"id":"deductiondagger","lootRank":3,"name":"不意打ちの弓","range":"ranged","dice":[2,4,0],"classes":[3,6,0],"price":1400,"sell":700,"drop":true,"minFloor":5,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+15%。","effect":{"kind":"flagMatchFirstHit","pct":15}},
  {"id":"makyuu","lootRank":4,"name":"魔弓","range":"ranged","dice":[2,4,3],"classes":[3,6,0],"price":4000,"sell":2000,"drop":true,"minFloor":8,"shop":false,"desc":"周囲8マスに未探索のマスがあるなら、戦闘で最初に命中した通常攻撃のダメージ+25%。","effect":{"kind":"firstHitUnexplored","pct":25}},
- {"id":"sickle","lootRank":1,"name":"伐採の鎌","range":"melee","dice":[1,6,2],"classes":[0,3,4,6],"price":200,"sell":100,"drop":true,"minFloor":1,"shop":false,"desc":"植物に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"植物","mult":2}}
+ {"id":"sickle","lootRank":1,"name":"伐採の鎌","range":"melee","dice":[1,6,2],"classes":[0,3,4,6],"price":200,"sell":100,"drop":true,"minFloor":1,"shop":false,"desc":"植物に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"植物","mult":2}},
+ {"id":"banishinghammer","lootRank":3,"name":"退魔の槌","range":"melee","dice":[2,6,2],"hitBonus":1,"classes":[2,5],"price":1000,"sell":500,"drop":true,"minFloor":3,"shop":false,"desc":"悪魔に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"悪魔","mult":2}},
+ {"id":"dragonhunterspear","lootRank":3,"name":"竜狩りの槍","range":"melee","dice":[2,6,3],"hitBonus":1,"classes":[0,4,6],"price":1100,"sell":550,"drop":true,"minFloor":3,"shop":false,"desc":"竜に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"竜","mult":2}},
+ {"id":"beastslayerbow","lootRank":3,"name":"魔獣狩りの弓","range":"ranged","dice":[2,4,2],"hitBonus":1,"classes":[0,3,6],"price":900,"sell":450,"drop":true,"minFloor":3,"shop":false,"desc":"魔獣に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"魔獣","mult":2}},
+ {"id":"dragonslayerspear","lootRank":4,"name":"竜殺しの槍","range":"melee","dice":[2,8,4],"hitBonus":2,"classes":[0,4,6],"price":2600,"sell":1300,"drop":true,"minFloor":5,"shop":false,"desc":"竜に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"竜","mult":2}},
+ {"id":"demonslayerhammer","lootRank":4,"name":"滅魔の戦槌","range":"melee","dice":[2,8,3],"hitBonus":2,"classes":[2,5],"price":2400,"sell":1200,"drop":true,"minFloor":5,"shop":false,"desc":"悪魔に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"悪魔","mult":2}},
+ {"id":"greatbeastslayerbow","lootRank":4,"name":"魔獣滅ぼしの剛弓","range":"ranged","dice":[2,6,3],"hitBonus":2,"classes":[0,3,6],"price":2200,"sell":1100,"drop":true,"minFloor":5,"shop":false,"desc":"魔獣に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"魔獣","mult":2}}
 ] .map(w=>({range:'melee',hitBonus:0,minAttacks:1,minFloor:1,...w}));
 
 const ARMOR=[

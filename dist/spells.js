@@ -99,7 +99,7 @@ function castMagic(i,id,t){
   const d=enemyDefinition(e.id),libraryKnown=!!s.library?.monsters?.[e.id]?.identified,known=!!e.identified;
   if(known&&libraryKnown){log('すでに正体は判明している。');continue}
   const chance=Math.max(5,Math.min(95,49+5*(s.members[i].level-monsterLevel(e))));
-  if(Math.random()*100<chance){e.identified=true;e.identifiedBySpell=true;recordLibraryIdentification({units:[e]});if(!known)log(`${UNKNOWN_NAMES[e.id]||'正体不明'}の正体を見破った。（→${d.name}）`);if(!libraryKnown)log(`${d.name}の情報を図書館に記録した。`)}
+  if(Math.random()*100<chance){e.identified=true;e.identifiedBySpell=true;recordLibraryIdentification({units:[e]});if(!known)log(`${UNKNOWN_NAMES[e.id]||'正体不明'}の正体を見破った。（→${d.name}）`);if(!libraryKnown)log(`${d.name}の情報を記録した。`)}
   else log(known?`${d.name}のことは詳しくわからなかった。`:`${UNKNOWN_NAMES[e.id]||'正体不明'}の正体は見破れなかった。`);
  }}
  else if(x.effect==='buff'){if(x.id==='teppeki')s.teppeki=true;else s.enemy.partyAC=Math.max(s.enemy.partyAC||0,x.value);log('一行の守りが強まった。')}
@@ -108,7 +108,7 @@ function castMagic(i,id,t){
  else if(x.effect==='antidote'){s.ailments[t].poison=false;log(`${NAMES[t]}の毒が消えた。`)}
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺',pitfall:'落とし穴'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}
  else if(x.effect==='survey'){s.dumapicUses=(s.dumapicUses||0)+1;let j=target();if(j<0||s.cells[j].open)log('調査に失敗した。');else{let truth=!!s.cells[j].trap,correct=Math.random()<.85;log((correct?truth:!truth)?'前方は罠の可能性あり':'前方にはなにもない')}}
- else if(x.effect==='floodfill'){s.floodUses=(s.floodUses||0)+1;const start=s.pos,opened=new Set(),seen=new Set([start]),queue=[start];s.cells[start].open=true;if(num(start)>0)log('周囲に罠の気配がある。展開できなかった。');else{while(queue.length){const p=queue.shift();if(num(p)!==0)continue;for(const q of around(p)){const c=s.cells[q];if(seen.has(q)||c.flag||c.trap)continue;seen.add(q);if(!c.open){c.open=true;opened.add(q)}if(num(q)===0)queue.push(q)}}log(opened.size?`${opened.size}マスを探索済みにした。`:'新たに探索できるマスはなかった。')}}
+ else if(x.effect==='floodfill'){s.floodUses=(s.floodUses||0)+1;const start=s.pos,opened=new Set(),seen=new Set([start]),queue=[start];s.cells[start].open=true;if(num(start)>0)log('周囲に罠の気配がある。展開できなかった。');else{while(queue.length){const p=queue.shift();if(num(p)!==0)continue;for(const q of around(p)){const c=s.cells[q];if(seen.has(q)||c.flag||c.trap)continue;seen.add(q);if(!c.open){c.open=true;opened.add(q)}if(num(q)===0)queue.push(q)}}log(opened.size?`${opened.size}部屋を探索済みにした。`:'新たに探索できる部屋はなかった。')}}
  else if(x.effect==='flagcount'){s.flagSight=true;log('周囲の旗が見えるようになった。')}
  else if(x.effect==='watchful'){s.watchful=true;log('警戒結界が一行を包んだ。')}
  else if(x.effect==='light'){if(x.id==='milwa')s.milwaSteps=30;else s.light=true;log('視界が広がった。')}

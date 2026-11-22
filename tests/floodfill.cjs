@@ -26,7 +26,7 @@ assert.equal(g.run("s.cells[16].open"),true,'stairs revealed only');
 assert.equal(g.run("s.pendingStairs"),false);
 assert.equal(g.run("s.cells[18].open"),true,'guardian room revealed');
 assert.equal(g.run('s.pendingBoss'),null);
-assert.match(g.run('s.logs[0]'),/マスを探索済みにした/);
+assert.match(g.run('s.logs[0]'),/部屋を探索済みにした/);
 assert.equal(g.run('s.mp[0]'),96);
 assert.equal(g.run('spellCost(magic(\'floodfill\'))'),8);
 assert.equal(g.run('spellCost(magic(\'dumapic\'))'),2);
@@ -60,5 +60,5 @@ assert.equal(names.length,h.run('MAGIC.filter(x=>x.job===2).length'));assert.ok(
 h.run("castMagic(0,'floodfill',null)");h.drain();
 assert.equal(h.run('s.cells.filter(c=>!c.open).length'),1,'only the trap stays closed');
 assert.equal(h.run('s.cells[4].open'),false);
-assert.match(h.run('s.logs[0]'),/^2マスを探索済みにした/);
+assert.match(h.run('s.logs[0]'),/^2部屋を探索済みにした/);
 console.log('PASS floodfill: expands through explored quiet cells; library ？？？ before learning');}
