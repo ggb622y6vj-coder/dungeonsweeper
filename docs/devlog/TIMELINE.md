@@ -161,4 +161,4 @@
 | 123 | 2026-11-21 | 反呪文の結界の説明、探索済みマスの遭遇率、撃破後の守護者の通常遭遇 | e54b9c4 | [spec](specs/123-encounter-adjustments.md) | [実施](reports/123.md) |
 | 124 | 2026-11-21 | 盗賊・忍者に「隠れる／奇襲」を追加。防御はターン開始時に潜伏解除 | fbbd7a4 | [spec](specs/124-hide-ambush.md) | [実施](reports/124.md) |
 | 125 | 2026-11-22 | 狭い画面で図書館のモンスター階タブを1行化し、高さを縮小 | 3041de3 | [spec](specs/125-library-floor-tabs.md) | [実施](reports/125.md) |
-| 126 | 2026-11-22 | Notion更新を反映。モンスター8種追加・3種改名、呪文抵抗と宝物グループの更新、植物に特効を持つ伐採の鎌を追加 | — | [spec](specs/126-notion-data-update.md) | [実施](reports/126.md) |
+| 126 | 2026-11-22 | Notion更新を反映。モンスター8種追加・3種改名、呪文抵抗と宝物グループの更新、植物に特効を持つ伐採の鎌を追加 | ccaac45 | [spec](specs/126-notion-data-update.md) | [実施](reports/126.md) |
