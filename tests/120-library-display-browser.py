@@ -61,8 +61,27 @@ with sync_playwright() as p:
         assert progress_box['y'] < close_box['y'] + close_box['height']
         assert close_box['y'] < progress_box['y'] + progress_box['height']
 
+        floor_tabs = page.locator('#library-monster-tabs')
+        if width == 390:
+            buttons = floor_tabs.locator('button').evaluate_all('''buttons => buttons.map(button => ({
+                top: button.offsetTop, height: button.getBoundingClientRect().height,
+            }))''')
+            assert len(buttons) == 10
+            assert len({button['top'] for button in buttons}) == 1, buttons
+            assert all(button['height'] == 36 for button in buttons), buttons
+            assert floor_tabs.evaluate('tabs => tabs.scrollWidth > tabs.clientWidth')
+            assert any(d['floor'] == 10 for d in expected)
+
         for floor in sorted({d['floor'] for d in expected}):
-            page.locator(f'#librarymonstertab-{floor}').click()
+            floor_button = page.locator(f'#librarymonstertab-{floor}')
+            if width == 390 and floor == 10:
+                assert floor_tabs.evaluate('''tabs => {
+                    tabs.scrollLeft = tabs.scrollWidth;
+                    return tabs.scrollLeft > 0;
+                }''')
+            floor_button.click()
+            if width == 390 and floor == 10:
+                assert floor_button.get_attribute('aria-selected') == 'true'
             details = page.locator('#librarybody .library-entry dl').evaluate_all(MONSTER_DETAILS)
             monsters = [d for d in expected if d['floor'] == floor]
             assert [entry['id'] for entry in details] == [d['id'] for d in monsters]
