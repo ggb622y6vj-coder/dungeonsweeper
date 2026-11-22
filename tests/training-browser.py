@@ -25,7 +25,7 @@ with sync_playwright() as p:
   assert page.locator('#librarybody .library-entry').count()==monster_total
   assert page.locator('#librarybody h4').all_text_contents()==['？？？']*monster_total
   assert page.locator('#librarybody dl').count()==0
-  for tab,total in [('items',56),('monsters',monster_total)]:
+  for tab,total in [('items',57),('monsters',monster_total)]:
    page.locator('#librarytab-'+tab).click()
    assert page.locator('#librarytab-'+tab).get_attribute('aria-selected')=='true'
    assert page.locator('#librarybody h4').all_text_contents()==['？？？']*total
