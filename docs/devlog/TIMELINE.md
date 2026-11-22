@@ -163,4 +163,4 @@
 | 125 | 2026-11-22 | 狭い画面で図書館のモンスター階タブを1行化し、高さを縮小 | 3041de3 | [spec](specs/125-library-floor-tabs.md) | [実施](reports/125.md) |
 | 126 | 2026-11-22 | Notion更新を反映。モンスター8種追加・3種改名、呪文抵抗と宝物グループの更新、植物に特効を持つ伐採の鎌を追加 | ccaac45 | [spec](specs/126-notion-data-update.md) | [実施](reports/126.md) |
 | 127 | 2026-11-22 | 術者22種に系統・習得Lv別の詠唱を導入。戦闘中は敵グループで魔力低下を共有 | 6473390 | [spec](specs/127-enemy-spellcasting.md) | [実施](reports/127.md) |
-| 128 | 2026-11-22 | ログ文8件を訂正し、悪魔・竜・魔獣に対する種族特効武器を6種追加 | — | [spec](specs/128-log-text-and-new-weapons.md) | [実施](reports/128.md) |
+| 128 | 2026-11-22 | ログ文8件を訂正し、悪魔・竜・魔獣に対する種族特効武器を6種追加 | 2a9b2bd | [spec](specs/128-log-text-and-new-weapons.md) | [実施](reports/128.md) |
