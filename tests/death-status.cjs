@@ -76,7 +76,7 @@ for (const [name, action, count] of [
   ['battle poison', 's.ailments[0].poison=true;tickAilments()', 1],
   ['generic damage', 'hurt(999)', 6],
   ['breath', "Math.random=()=>.2;monsterAction({id:'dragon'},s.commands)", 6],
-  ['spell', "Math.random=()=>.2;monsterAction({id:'sorcerer'},s.commands)", 6],
+  ['spell', "s.enemy={units:[makeEnemy('archmage',4)]};Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)", 6],
 ]) {
   const g = party();
   g.run(`s.hp=s.members.map(()=>1);s.commands=s.members.map(()=> 'fight');${action};`);

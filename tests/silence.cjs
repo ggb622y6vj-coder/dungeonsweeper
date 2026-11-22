@@ -20,11 +20,10 @@ const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
  assert.deepEqual(json(g,"[magic('montino').job,magic('montino').level,magic('montino').mp,magic('montino').where,magic('montino').target]"),[2,3,4,'battle','group']);
  for(const [id,chance] of [['darkpriest',.3],['witch',.25]]) {
   assert.equal(g.run(`enemyDefinition('${id}').spell`),chance);
-  assert.deepEqual(json(g,`enemyDefinition('${id}').spellInfo`),{id:'montino',name:'沈黙',target:'all',dice:null,effect:'silence'});
+  assert.deepEqual(json(g,`[enemyDefinition('${id}').mageSpellLevel,enemyDefinition('${id}').priestSpellLevel]`),[0,3]);
  }
- assert.equal(g.run("ENEMIES.every(d=>!d.spellInfo||['damage','silence'].includes(d.spellInfo.effect))"),true);
- assert.equal(g.run("ENEMIES.filter(d=>d.spellInfo?.effect==='silence').length"),2);
- assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1,firstFloor:4}).find(([k])=>k==='使用呪文')[1]"),'沈黙（全体）');
+ assert.equal(g.run("ENEMIES.filter(d=>d.priestSpellLevel>=magic('montino').level).length"),2);
+ assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1}).find(([k])=>k==='詠唱率')[1]"),'30%');
  g.run("afflict(0,'silence')");
  assert.equal(g.run('s.ailments[0].silence'),3);
  assert.equal(g.run("spellReason(0,magic('dios'))"),'沈黙している');
@@ -100,28 +99,28 @@ for(const end of ['win','enemy-flee','escape','defeat','town']) {
 {
  const g=party();
  g.run(`s.members[1].status='stone';s.hp[2]=0;s.members[2].status='dead';
-  var rolls=[.25,0,.99,0,.99];Math.random=()=>rolls.shift()??.99;
+  var rolls=[.25,0,0,.99,.99,0,.99,.99];Math.random=()=>rolls.shift()??.99;
   monsterAction(s.enemy.units[0],s.commands);`);
- assert.deepEqual(json(g,'s.ailments.map(a=>a.silence)'),[3,0,0,0,3,0]);
+ assert.deepEqual(json(g,'s.ailments.map(a=>a.silence)'),[0,0,0,0,3,0]);
  assert.deepEqual(json(g,'s.hp'),[10000,10000,0,10000,10000,10000]);
  assert.equal(g.run("logQueue[0].text"),'闇の司祭は沈黙を唱えた。');
  assert.equal(g.run("logQueue.some(e=>e.text==='sim3には効かなかった。')"),true);
- assert.equal(g.run("logQueue.find(e=>e.text==='sim0は沈黙した。').ailments[4].silence"),0,'later outcomes must not leak');
- assert.equal(g.run("logQueue[0].ailments[0].silence"),0,'cast snapshot precedes affliction');
- assert.equal(g.run("ailmentTags(0)"),'','pending silence not shown early');
- g.drain();assert.match(g.run('ailmentTags(0)'),/ailment-silence/);
+ assert.equal(g.run("logQueue.find(e=>e.text==='sim3には効かなかった。').ailments[4].silence"),0,'later outcomes must not leak');
+ assert.equal(g.run("logQueue[0].ailments[4].silence"),0,'cast snapshot precedes affliction');
+ assert.equal(g.run("ailmentTags(4)"),'','pending silence not shown early');
+ g.drain();assert.match(g.run('ailmentTags(4)'),/ailment-silence/);
 }
 
 // 10,000 actual enemy casts at equal levels, with a fixed independent RNG stream.
 {
  const g=party([2]);
  g.run(`enemyDefinition('darkpriest').spell=1;enemyDefinition('darkpriest').summon=0;
-   var hits=0;log=()=>{};
-   for(let n=0;n<10000;n++){s.ailments[0].silence=0;monsterAction(s.enemy.units[0],s.commands);if(s.ailments[0].silence===3)hits++}`);
+   s.enemy.monsterAC=2;var hits=0;log=()=>{};
+   for(let n=0;n<10000;n++){groupSpellLevels(s.enemy.units[0]).priest=3;s.ailments[0].silence=0;monsterAction(s.enemy.units[0],s.commands);if(s.ailments[0].silence===3)hits++}`);
  const rate=g.run('hits/10000');assert(Math.abs(rate-.5)<=.02,`enemy rate ${rate}`);
  console.log(`PASS enemy Montino 10000 casts: ${(rate*100).toFixed(2)}% (50% ±2%)`);
  for(const [level,roll,expected] of [[30,.049,3],[30,.05,0],[1,.939,3],[1,.94,0]]) {
-  g.run(`enemyDefinition('darkpriest').level=${level===1?30:8};s.members[0].level=${level};s.ailments[0].silence=0;Math.random=()=>${roll};monsterAction(s.enemy.units[0],s.commands)`);
+  g.run(`enemyDefinition('darkpriest').level=${level===1?30:8};s.members[0].level=${level};groupSpellLevels(s.enemy.units[0]).priest=3;s.ailments[0].silence=0;Math.random=()=>${roll};monsterAction(s.enemy.units[0],s.commands)`);
   assert.equal(g.run('s.ailments[0].silence'),expected,'enemy chance clamp');
  }
 }

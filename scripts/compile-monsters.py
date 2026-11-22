@@ -61,13 +61,18 @@ ids={
   "魔王の近衛": "royalguard", "堕天使": "fallenangel", "死神": "reaper", "混沌の竜": "chaosdragon", "地震雲": "chaosspawn", "大魔導師": "archmage", "サッキュバス": "succubus", "ダイダラボチ": "daidaraboti", "迷宮の主": "labyrinthlord"
 }
 BOSSES=['guardian','general','watcher','minogate','necromancer','vampire','ettin','demongeneral','ancientdragon','labyrinthlord']
-# 敵の呪文：名前→(id,対象,ダイス,効果)。全体は生存する味方全員に個別ダイス。
-MONSTER_SPELLS={'沈黙':('montino','全体',None,'silence'),'火炎':('halito','単体',[1,8,0],'damage'),'大火炎':('mahalito','全体',[4,6,0],'damage'),'吹雪':('dalto','全体',[5,6,0],'damage'),'大吹雪':('madalto','全体',[6,8,0],'damage'),'魔弾':('tiltowait','全体',[8,8,0],'damage')}
+def integer_field(row,col,maximum):
+ value=row[col]
+ assert re.fullmatch(r'[0-9]+',value) and int(value)<=maximum, f"Invalid {col} for {row['確定名']}: {value!r}"
+ return int(value)
+
 data=[]
 for r in rows:
  id=ids[r['確定名']]
- sp=None if r['呪文']=='なし' else re.fullmatch(r'(\S+?)/(単体|全体)/(\d+)%',r['呪文'])
- assert r['呪文']=='なし' or (sp and sp[1] in MONSTER_SPELLS and MONSTER_SPELLS[sp[1]][1]==sp[2]), 'Unsupported spell'
+ mage=integer_field(r,'魔法使い呪文Lv',13)
+ priest=integer_field(r,'僧侶呪文Lv',13)
+ spell_rate=integer_field(r,'呪文使用率',100)
+ assert mage or priest or spell_rate==0, f'Non-caster has spell rate: {id}'
  resistances=r['耐性'].split('・')
  assert (resistances==['なし'] or all(value in {'毒無効','炎半減','氷半減'} for value in resistances)), 'Unsupported resistance'
  group=[int(n) for n in re.findall(r'\d+',r['群れの数'])];group=group if len(group)==2 else group*2
@@ -89,7 +94,9 @@ for r in rows:
    assert 0<=int(effect[2])<=100, 'Invalid breath status chance'
    d['breath']['element']=effect[1]
    d['breath']['statuses']=[{'type':{'毒':'poison','麻痺':'paralysis'}[effect[3]],'chance':int(effect[2])/100}]
- d['spell']=pct(r['呪文']);d['spellInfo']=None if not sp else {'id':MONSTER_SPELLS[sp[1]][0],'name':sp[1],'target':'all' if sp[2]=='全体' else 'one','dice':MONSTER_SPELLS[sp[1]][2],'effect':MONSTER_SPELLS[sp[1]][3]};assert d['flee']+d['summon']+d['spell']+(d['breath']['chance'] if d['breath'] else 0)<=1; d['icon']='♛' if d['boss'] else {'植物':'♣','不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
+ d.update(mageSpellLevel=mage,priestSpellLevel=priest,spell=spell_rate/100)
+ assert round(d['flee']*100)+round(d['summon']*100)+spell_rate+(round(d['breath']['chance']*100) if d['breath'] else 0)<=100, f'Action probabilities exceed 100%: {id}'
+ d['icon']='♛' if d['boss'] else {'植物':'♣','不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
 for f in sorted({floor for d in data for floor in d['floors']}):
  assert sum(1 for d in data if f in d['floors'] and d['boss'])==1, f'floor {f} needs exactly one boss'
  assert any(f in d['floors'] and not d['boss'] for d in data), f'floor {f} needs normal monsters'

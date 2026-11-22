@@ -123,7 +123,7 @@ function planTurn(g) {
         const id = ['dialma','dial','dios'].find(id => m.known.includes(id) && s.mp[i] >= spellCost(magic(id)));
         if (target !== undefined && id) { s.magicPlans[i] = {id,target}; return 'spell'; }
         const casterGroup = enemyGroups().find(g => g.units.filter(e => e.hp > 0 && !e.silence &&
-          enemyDefinition(e.id).spellInfo && !enemyDefinition(e.id).boss).length >= 2);
+          (groupSpellLevels(e).mage || groupSpellLevels(e).priest) && !enemyDefinition(e.id).boss).length >= 2);
         if (casterGroup && !s.enemy.boss && !spellReason(i, magic('montino'))) {
           const target = casterGroup.units.find(e => e.hp > 0 && !e.silence).uid;
           s.magicPlans[i] = {id:'montino',target}; return 'spell';

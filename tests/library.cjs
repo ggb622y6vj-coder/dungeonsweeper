@@ -87,7 +87,7 @@ assert.notEqual(g.run("$('#librarydialog').open"),true,'library is town-only');
 g.run('enterTown();log("待機中");');g.run("$('#libraryopen').onclick()");
 assert.notEqual(g.run("$('#librarydialog').open"),true,'library cannot expose future log results');
 g.drain();
-assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['集団数','1d2'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['呪文抵抗（魔／僧）','0/0'],['特殊能力','なし'],['使用呪文','なし'],['経験値','6'],['撃破数','2体']]);
+assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['集団数','1d2'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['呪文抵抗（魔／僧）','0/0'],['特殊能力','なし'],['経験値','6'],['撃破数','2体']]);
 assert.equal(g.run("libraryMonsterDetails(ENEMIES.find(d=>d.name==='邪眼'),{count:1,firstFloor:8}).find(([label])=>label==='特殊能力')[1].children.map(x=>x.className).join(' ')").includes('ailment-paralysis'),true);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('holysword')))"),/4d8\+5.*hitBonus \+3.*2回.*6000.*迷宮限定/);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('plate')))"),/AC −5/);
@@ -106,10 +106,17 @@ assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([.
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
 assert.equal(g.run("$('#librarybody').children.some(e=>e.tagName==='H3')"),false);
-assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),22);
+assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),20);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
 assert.equal(g.run('ENEMIES.length'),108);
-assert.deepEqual(JSON.parse(g.run("JSON.stringify(ENEMIES.filter(d=>/\\d+%/.test(JSON.stringify(libraryMonsterDetails(d,{count:1,firstFloor:1}).map(([k,v])=>typeof v==='string'?v:v.textContent)))).map(d=>d.id))")),[],'no monster details contain numeric percentages');
+assert.deepEqual(JSON.parse(g.run("JSON.stringify(ENEMIES.filter(d=>/\\d+%/.test(JSON.stringify(libraryMonsterDetails(d,{count:1,firstFloor:1}).filter(([k])=>k!=='詠唱率').map(([k,v])=>typeof v==='string'?v:v.textContent)))).map(d=>d.id))")),[],'only casting rate may contain a percentage');
+for(const d of JSON.parse(g.run('JSON.stringify(ENEMIES)'))){
+ const fields=JSON.parse(g.run(`JSON.stringify(libraryMonsterDetails(enemyDefinition('${d.id}'),{count:1}).filter(([k])=>k==='呪文Lv（魔／僧）'||k==='詠唱率'))`));
+ const expected=d.mageSpellLevel||d.priestSpellLevel?[
+  ['呪文Lv（魔／僧）',`${d.mageSpellLevel}／${d.priestSpellLevel}`],['詠唱率',Math.round(d.spell*100)+'%']
+ ]:[];
+ assert.deepEqual(fields,expected,d.id);
+}
 const oldRecordSave=reload(g);
 oldRecordSave.run("renderLibrary();var oldEntry=$('#librarybody').children.find(e=>e.className==='library-entry'&&e.children[0].textContent.startsWith('スライム'))");
 assert.equal(oldRecordSave.run("oldEntry.children[2].children.some(e=>e.textContent==='初撃破階')"),false);

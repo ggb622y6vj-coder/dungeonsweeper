@@ -47,8 +47,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "gas",
@@ -98,8 +99,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "skeleton",
@@ -148,8 +150,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "wolf",
@@ -198,8 +201,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "goblin",
@@ -248,8 +252,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "bat",
@@ -298,8 +303,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "rat",
@@ -348,8 +354,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 5,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "spider",
@@ -398,8 +405,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "scout",
@@ -448,8 +456,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "apprentice",
@@ -498,8 +507,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "guardian",
@@ -548,8 +558,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "poisonslime",
@@ -603,8 +614,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ghostknight",
@@ -653,8 +665,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "firefly",
@@ -711,8 +724,9 @@ const ENEMIES=[
       ],
       "chance": 0.6
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "orc",
@@ -761,8 +775,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "bigspider",
@@ -811,8 +826,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 5,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "mage",
@@ -861,18 +877,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.5,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.5
   },
   {
     "id": "bandit",
@@ -926,8 +933,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ghoul",
@@ -981,8 +989,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "stone",
@@ -1031,18 +1040,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.5,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.5
   },
   {
     "id": "general",
@@ -1104,8 +1104,9 @@ const ENEMIES=[
       ],
       "chance": 0.6
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "acidslime",
@@ -1163,8 +1164,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "archer",
@@ -1214,8 +1216,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "blackwolf",
@@ -1264,8 +1267,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "shaman",
@@ -1314,18 +1318,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.5,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.5
   },
   {
     "id": "venomspider",
@@ -1374,8 +1369,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "thief",
@@ -1424,8 +1420,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "dragon",
@@ -1487,8 +1484,9 @@ const ENEMIES=[
       ],
       "chance": 0.5
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "rabbit",
@@ -1537,8 +1535,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "iron",
@@ -1592,18 +1591,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.6,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.6
   },
   {
     "id": "terror",
@@ -1652,8 +1642,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "watcher",
@@ -1715,18 +1706,9 @@ const ENEMIES=[
       ],
       "chance": 0.6
     },
-    "spell": 0.1,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.1
   },
   {
     "id": "ogre",
@@ -1775,8 +1757,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "zombie",
@@ -1830,8 +1813,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "harpy",
@@ -1880,8 +1864,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "viper",
@@ -1935,8 +1920,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "armorant",
@@ -1985,8 +1971,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "darkpriest",
@@ -2035,14 +2022,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.3,
-    "spellInfo": {
-      "id": "montino",
-      "name": "沈黙",
-      "target": "all",
-      "dice": null,
-      "effect": "silence"
-    }
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 3,
+    "spell": 0.3
   },
   {
     "id": "sorcerer",
@@ -2091,18 +2073,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.25
   },
   {
     "id": "gargoyle",
@@ -2156,8 +2129,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "minogate",
@@ -2206,8 +2180,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "wight",
@@ -2256,8 +2231,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "troll",
@@ -2306,8 +2282,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "werewolf",
@@ -2356,8 +2333,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "scorpion",
@@ -2415,8 +2393,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ninja",
@@ -2465,8 +2444,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "highmage",
@@ -2515,18 +2495,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.25
   },
   {
     "id": "salamander",
@@ -2583,8 +2554,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "blob",
@@ -2638,8 +2610,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 3,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "necromancer",
@@ -2688,18 +2661,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.35,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.35
   },
   {
     "id": "wraith",
@@ -2753,8 +2717,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "stonegiant",
@@ -2808,8 +2773,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "chimera",
@@ -2866,8 +2832,9 @@ const ENEMIES=[
       ],
       "chance": 0.2
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "darkknight",
@@ -2916,8 +2883,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "fungus",
@@ -2975,8 +2943,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "darkelf",
@@ -3025,18 +2994,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.25
   },
   {
     "id": "vampbat",
@@ -3090,8 +3050,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "vampire",
@@ -3140,18 +3101,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.2,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.2
   },
   {
     "id": "gasdragon",
@@ -3208,8 +3160,9 @@ const ENEMIES=[
       ],
       "chance": 0.3
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "minotaur",
@@ -3258,8 +3211,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "fleshgolem",
@@ -3308,8 +3262,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ninjachief",
@@ -3358,8 +3313,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "deathmage",
@@ -3408,18 +3364,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "dalto",
-      "name": "吹雪",
-      "target": "all",
-      "dice": [
-        5,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 7,
+    "priestSpellLevel": 0,
+    "spell": 0.25
   },
   {
     "id": "hellhound",
@@ -3481,8 +3428,9 @@ const ENEMIES=[
       ],
       "chance": 0.3
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "crawler",
@@ -3536,8 +3484,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ettin",
@@ -3586,8 +3535,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "lesserdemon",
@@ -3636,18 +3586,9 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 3,
     "breath": null,
-    "spell": 0.2,
-    "spellInfo": {
-      "id": "mahalito",
-      "name": "大火炎",
-      "target": "all",
-      "dice": [
-        4,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 5,
+    "priestSpellLevel": 0,
+    "spell": 0.2
   },
   {
     "id": "bluedragon",
@@ -3710,8 +3651,9 @@ const ENEMIES=[
         }
       ]
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "deathknight",
@@ -3760,8 +3702,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "witch",
@@ -3810,14 +3753,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "montino",
-      "name": "沈黙",
-      "target": "all",
-      "dice": null,
-      "effect": "silence"
-    }
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 3,
+    "spell": 0.25
   },
   {
     "id": "hydra",
@@ -3866,8 +3804,9 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "assassin",
@@ -3916,8 +3855,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "evileye",
@@ -3975,18 +3915,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.4,
-    "spellInfo": {
-      "id": "halito",
-      "name": "火炎",
-      "target": "one",
-      "dice": [
-        1,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 1,
+    "priestSpellLevel": 0,
+    "spell": 0.4
   },
   {
     "id": "demongeneral",
@@ -4035,18 +3966,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.3,
-    "spellInfo": {
-      "id": "dalto",
-      "name": "吹雪",
-      "target": "all",
-      "dice": [
-        5,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 7,
+    "priestSpellLevel": 0,
+    "spell": 0.3
   },
   {
     "id": "greaterdemon",
@@ -4096,18 +4018,9 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.1,
-    "spellInfo": {
-      "id": "madalto",
-      "name": "大吹雪",
-      "target": "all",
-      "dice": [
-        6,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 8,
+    "priestSpellLevel": 0,
+    "spell": 0.1
   },
   {
     "id": "frostgiant",
@@ -4156,8 +4069,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "vampirelord",
@@ -4206,18 +4120,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.15,
-    "spellInfo": {
-      "id": "dalto",
-      "name": "吹雪",
-      "target": "all",
-      "dice": [
-        5,
-        6,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 7,
+    "priestSpellLevel": 0,
+    "spell": 0.15
   },
   {
     "id": "reddragon",
@@ -4274,8 +4179,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "masterninja",
@@ -4324,8 +4230,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "lich",
@@ -4374,18 +4281,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.25,
-    "spellInfo": {
-      "id": "madalto",
-      "name": "大吹雪",
-      "target": "all",
-      "dice": [
-        6,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 8,
+    "priestSpellLevel": 0,
+    "spell": 0.25
   },
   {
     "id": "fiendhound",
@@ -4447,8 +4345,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ancientdragon",
@@ -4505,8 +4404,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "royalguard",
@@ -4555,8 +4455,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "fallenangel",
@@ -4605,18 +4506,9 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.15,
-    "spellInfo": {
-      "id": "madalto",
-      "name": "大吹雪",
-      "target": "all",
-      "dice": [
-        6,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 8,
+    "priestSpellLevel": 0,
+    "spell": 0.15
   },
   {
     "id": "reaper",
@@ -4670,8 +4562,9 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "chaosdragon",
@@ -4728,8 +4621,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "chaosspawn",
@@ -4791,8 +4685,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "archmage",
@@ -4841,18 +4736,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.15,
-    "spellInfo": {
-      "id": "tiltowait",
-      "name": "魔弾",
-      "target": "all",
-      "dice": [
-        8,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 13,
+    "priestSpellLevel": 0,
+    "spell": 0.15
   },
   {
     "id": "succubus",
@@ -4907,8 +4793,9 @@ const ENEMIES=[
     "icon": "♜",
     "summonCap": 3,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "daidaraboti",
@@ -4963,8 +4850,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "kashadokuro",
@@ -5022,8 +4910,9 @@ const ENEMIES=[
       ],
       "chance": 0.25
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "labyrinthlord",
@@ -5072,18 +4961,9 @@ const ENEMIES=[
     "icon": "♛",
     "summonCap": 4,
     "breath": null,
-    "spell": 0.35,
-    "spellInfo": {
-      "id": "tiltowait",
-      "name": "魔弾",
-      "target": "all",
-      "dice": [
-        8,
-        8,
-        0
-      ],
-      "effect": "damage"
-    }
+    "mageSpellLevel": 13,
+    "priestSpellLevel": 0,
+    "spell": 0.35
   },
   {
     "id": "takenoko",
@@ -5133,8 +5013,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 5,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "kinoko",
@@ -5184,8 +5065,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "sirakaba",
@@ -5235,8 +5117,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "insectivore",
@@ -5291,8 +5174,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "dendenko",
@@ -5342,8 +5226,9 @@ const ENEMIES=[
     "icon": "✥",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "dynamotuboro",
@@ -5407,8 +5292,9 @@ const ENEMIES=[
         }
       ]
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "akumaikire",
@@ -5458,8 +5344,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "poisongiant",
@@ -5524,8 +5411,9 @@ const ENEMIES=[
         }
       ]
     },
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "ameba",
@@ -5575,8 +5463,9 @@ const ENEMIES=[
     "icon": "◉",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "rafflesia",
@@ -5626,8 +5515,9 @@ const ENEMIES=[
     "icon": "♣",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "virusbat",
@@ -5682,8 +5572,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "cathuman",
@@ -5733,8 +5624,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "cathuman2",
@@ -5784,8 +5676,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "cathuman3",
@@ -5835,8 +5728,9 @@ const ENEMIES=[
     "icon": "♞",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "poltergeist",
@@ -5886,8 +5780,9 @@ const ENEMIES=[
     "icon": "◆",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   },
   {
     "id": "namakubi",
@@ -5937,7 +5832,8 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "spell": 0,
-    "spellInfo": null
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0
   }
 ];

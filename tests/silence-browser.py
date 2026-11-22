@@ -36,23 +36,24 @@ def seed(page):
 
 
 def silence_cast(page):
-    # Exercise the real enemy action with one spell roll and six independent saves.
+    # Exercise the real enemy action with one spell roll and three independent saves in the front row.
     # Observe each replayed frame, including the cast before any afflictions appear.
     page.evaluate('''window.framesSeen=[];
       const originalPump=pumpLog;
       pumpLog=function(){originalPump();if(displayVitals)framesSeen.push({
-        text:s.logs[0],
+        text:s.logs[0], priest:visibleCombat().spellLevels["row/17"].priest,
         names:[...document.querySelectorAll('#party .card > b')].map(e=>e.firstChild.textContent.trim()).join(''),
         tags:[...document.querySelectorAll('#party .card')].map(e=>!!e.querySelector('.ailment-silence')),
         expected:displayVitals.ailments.map(a=>a.silence>0)
-      })};
-      const originalRandom=Math.random,rolls=[.25,0,.99,0,.99,0,.99];
+      });else pumpLog=originalPump};
+      const originalRandom=Math.random,rolls=[.25,0,0,0,0,.99,0,0];
       try {Math.random=()=>rolls.shift()??.99;enemyTurn(s.commands);}
       finally {Math.random=originalRandom;}
       render();''')
     page.wait_for_function('!logBusy()')
     frames = page.evaluate('framesSeen')
-    assert len(frames) == 7, frames
+    assert len(frames) == 5, frames
+    assert [f['priest'] for f in frames] == [3, 3, 3, 3, 1]
     for frame in frames:
         assert frame['names'] == 'ABCDEF', frame
         assert frame['tags'] == frame['expected'], frame
@@ -61,7 +62,9 @@ def silence_cast(page):
     assert frames[1]['text'] == 'Aは沈黙した。'
     assert frames[1]['tags'] == [True, False, False, False, False, False]
     assert frames[2]['text'] == 'Bには効かなかった。'
-    assert page.evaluate('s.ailments.map(a=>a.silence)') == [3, 0, 3, 0, 3, 0]
+    assert frames[3]['text'] == 'Cは沈黙した。'
+    assert frames[4]['text'] == '闇の司祭の魔力が衰えた。'
+    assert page.evaluate('s.ailments.map(a=>a.silence)') == [3, 0, 3, 0, 0, 0]
 
 
 with sync_playwright() as p:
@@ -85,7 +88,8 @@ with sync_playwright() as p:
                 has=page.get_by_role('heading', name=name, exact=True))
             entry.scroll_into_view_if_needed()
             assert entry.is_visible()
-            assert '沈黙（全体）' in entry.inner_text() and '%' not in entry.inner_text(), (chance, entry.inner_text())
+            fields = dict(zip(entry.locator('dt').all_inner_texts(), entry.locator('dd').all_inner_texts()))
+            assert fields['呪文Lv（魔／僧）'] == '0／3' and fields['詠唱率'] == f'{chance}%', fields
             no_overflow(page)
             page.screenshot(path=str(output / f'montino-library-{chance}-{width}.png'))
         page.locator('#libraryclose').click()
@@ -110,7 +114,7 @@ with sync_playwright() as p:
         page.locator('#magicclose').click()
 
         silence_cast(page)
-        for i in (0, 2, 4):
+        for i in (0, 2):
             tag = page.locator('#party .card').nth(i).locator('.ailment-silence')
             assert tag.is_visible() and tag.inner_text() == '沈黙'
             assert tag.evaluate('e=>getComputedStyle(e).backgroundColor') == 'rgb(56, 45, 67)'

@@ -182,11 +182,11 @@ planTurn(silenceAI);
 assert.equal(silenceAI.run('s.magicPlans[0].id'), 'montino');
 assert.equal(silenceAI.run('s.magicPlans[0].target'), 91, 'target is a unit UID, not its row key');
 for (const condition of ['s.enemy.units[1].hp=0', 's.enemy.units[1].silence=true',
-  's.enemy.boss=true', 's.mp[0]=3']) {
+  's.enemy.boss=true', 's.mp[0]=3', 'groupSpellLevels(s.enemy.units[0]).priest=0']) {
   silenceAI.run(condition);
   planTurn(silenceAI);
   assert.equal(silenceAI.run('s.magicPlans[0]'), null, condition);
-  silenceAI.run('s.enemy.units[1].hp=20;s.enemy.units[1].silence=false;s.enemy.boss=false;s.mp[0]=100');
+  silenceAI.run('s.enemy.units[1].hp=20;s.enemy.units[1].silence=false;s.enemy.boss=false;s.mp[0]=100;groupSpellLevels(s.enemy.units[0]).priest=3');
 }
 silenceAI.run('s.hp[2]=1');
 planTurn(silenceAI);

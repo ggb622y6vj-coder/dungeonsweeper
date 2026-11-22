@@ -92,7 +92,7 @@ test('chest does not prevent death, unequipped armor has no effect',()=>{
 });
 for(const route of ['physical','breath','spell','needle','blast','chestTrap','poison'])test('chest reacts through '+route,()=>{
  const g=setup('sword','chestsac');g.run("s.hp[0]=11;enemyDefinition('goblin').flee=0;enemyDefinition('goblin').summon=0");
- const calls={physical:"enemyDefinition('goblin').attack=[1,1,0];enemyDefinition('goblin').swings=1;hits=()=>true;Math.random=()=>0;enemyAction(s.enemy.units[0],new Map())",breath:"enemyDefinition('goblin').breath={chance:1,element:'炎',dice:[1,1,0]};Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)",spell:"enemyDefinition('goblin').spell=1;enemyDefinition('goblin').spellInfo={id:'halito',target:'all',dice:[1,1,0]};Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)",needle:"s.enemy=null;Math.random=()=>0;triggerFloorTrap(s.cells[s.pos])",blast:"s.enemy=null;var rolls=[.3,0,0,0];Math.random=()=>rolls.shift()??0;triggerFloorTrap(s.cells[s.pos])",chestTrap:"s.enemy=null;Math.random=()=>0;triggerChestTrap({trap:'needle'})",poison:"s.ailments[0].poison=true;tickAilments()"};
+ const calls={physical:"enemyDefinition('goblin').attack=[1,1,0];enemyDefinition('goblin').swings=1;hits=()=>true;Math.random=()=>0;enemyAction(s.enemy.units[0],new Map())",breath:"enemyDefinition('goblin').breath={chance:1,element:'炎',dice:[1,1,0]};Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)",spell:"enemyDefinition('goblin').spell=1;enemyDefinition('goblin').mageSpellLevel=1;Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)",needle:"s.enemy=null;Math.random=()=>0;triggerFloorTrap(s.cells[s.pos])",blast:"s.enemy=null;var rolls=[.3,0,0,0];Math.random=()=>rolls.shift()??0;triggerFloorTrap(s.cells[s.pos])",chestTrap:"s.enemy=null;Math.random=()=>0;triggerChestTrap({trap:'needle'})",poison:"s.ailments[0].poison=true;tickAilments()"};
  g.run(calls[route]);assert.equal(g.run('s.hp[0]'),16,route);assert.ok(!g.run("s.inventory[0].includes('chestsac')"));
 });
 for(const ailment of ['poison','paralysis','stone','silence','fear'])test('helmet intercepts '+ailment+'; repeat status preserves armor',()=>{
@@ -101,9 +101,9 @@ for(const ailment of ['poison','paralysis','stone','silence','fear'])test('helme
  if(['silence','fear'].includes(ailment))assert.equal(repeat.run(`s.ailments[0]['${ailment}']`),3);
 });
 test('helmet enemy sleep spell path and already-asleep refresh',()=>{
- const g=setup('sword','helmetsac');g.run("enemyDefinition('goblin').flee=0;enemyDefinition('goblin').summon=0;enemyDefinition('goblin').spell=1;enemyDefinition('goblin').spellInfo={id:'katino',effect:'sleep',target:'all',dice:null};Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)");
+ const g=setup('sword','helmetsac');g.run("enemyDefinition('goblin').flee=0;enemyDefinition('goblin').summon=0;enemyDefinition('goblin').spell=1;enemyDefinition('goblin').mageSpellLevel=1;Math.random=()=>.75;monsterAction(s.enemy.units[0],s.commands)");
  assert.equal(g.run('s.ailments[0].sleep'),0);assert.equal(g.run('s.ailments[1].sleep'),2);assert.ok(!g.run("s.inventory[0].includes('helmetsac')"));
- g.run("s.inventory[0].push('helmetsac');s.armor[0].head=1;s.ailments[0].sleep=1;monsterAction(s.enemy.units[0],s.commands)");assert.equal(g.run('s.ailments[0].sleep'),2);assert.ok(g.run("s.inventory[0].includes('helmetsac')"));
+ g.run("s.inventory[0].push('helmetsac');s.armor[0].head=1;s.ailments[0].sleep=1;s.ailments[1].sleep=0;monsterAction(s.enemy.units[0],s.commands)");assert.equal(g.run('s.ailments[0].sleep'),2);assert.ok(g.run("s.inventory[0].includes('helmetsac')"));
 });
 test('headlight reveals only adjacent safe cells, preserves chest/flags; no events, no duplicate effects',()=>{
  const g=setup('sword','headlight');g.run("s.enemy=null;s.cells.forEach(c=>c.open=false);var near=around(s.pos);s.cells[near[0]].trap=true;s.cells[near[1]].chest={gold:10,opened:false};s.cells[near[2]].type='boss';s.cells[near[3]].flag='power';s.inventory[1].push('headlight');s.armor[1].head=s.inventory[1].length-1;var before=JSON.stringify(s);revealHeadlight()");

@@ -131,12 +131,12 @@ for(const [monster,id,oldName,name] of [
  ['deathmage','dalto','ダルト','吹雪'],['greaterdemon','madalto','マダルト','大吹雪'],
  ['archmage','tiltowait','ティルトウェイト','魔弾'],['darkpriest','montino','沈黙','沈黙']]){
  const g=party();battle(g,[monster]);
- assert.deepEqual(J(g,`[enemyDefinition('${monster}').spellInfo.id,enemyDefinition('${monster}').spellInfo.name]`),[id,name]);
+ assert(g.run(`enemySpellCandidates(s.enemy.units[0]).some(x=>x.id==='${id}'&&x.name==='${name}')`));
  g.run(`Object.assign(enemyDefinition('${monster}'),{flee:0,summon:0,breath:null,spell:1});
-  Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands)`);
+  var rolls=[0,0,${['madalto','dalto'].includes(id)?.99:0}];Math.random=()=>rolls.shift()??0;monsterAction(s.enemy.units[0],s.commands)`);
  const logs=J(g,'logQueue.map(e=>e.text)');assert(logs.some(t=>t.includes(`は${name}を唱えた。`)));
  if(name!==oldName)assert(!logs.some(t=>t.includes(oldName)));
- if(id==='madalto')assert.deepEqual(J(g,`enemyDefinition('${monster}').spellInfo.dice`),[6,8,0],'enemy dice stay 6d8');
+ if(id==='madalto')assert.deepEqual(J(g,`ENEMY_DAMAGE_DICE['${id}']`),[6,8,0],'enemy dice stay 6d8');
 }
 console.log('PASS spell-sync logic: spawns, elemental damage, persistent AC, 30-step light, all-row per-enemy identification, demon immunity, learning, enemy spell names');
 

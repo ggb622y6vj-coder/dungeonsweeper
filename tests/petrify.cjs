@@ -95,10 +95,10 @@ for(const rear of [false,true]){
 }
 for(const kind of ['one','all','breath']){
  const g=party();stone(g);battle(g);
- g.run(`foe.spell=${kind==='breath'?0:1};foe.spellInfo={name:'検証呪文',target:'${kind}',dice:[1,1,0]};
+ g.run(`foe.spell=${kind==='breath'?0:1};foe.mageSpellLevel=${kind==='all'?13:1};
   foe.breath=${kind==='breath'?"{chance:1,element:'炎',dice:[1,1,0]}":'null'};
   var targets=[],originalHurt=monsterHurt;monsterHurt=(i,...args)=>{targets.push(s.members[i].name);originalHurt(i,...args)};
-  Math.random=()=>.5;enemyTurn(s.commands)`);
+  Math.random=()=>0;enemyTurn(s.commands)`);
  assert.equal(g.run("targets.includes('B')"),false);
  assert.equal(g.run('targets.length'),kind==='one'?1:5);
 }

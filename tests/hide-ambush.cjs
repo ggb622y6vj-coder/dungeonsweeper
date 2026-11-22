@@ -153,7 +153,7 @@ console.log('PASS 124d confirmed damage doubled once, unchanged swings/hits/flag
   const g = battle([3,0]);
   g.run(`s.enemy.hiddenIds=['p0'];Math.random=()=>0;var cmds=['fight','fight'];
     monsterAction({id:'firefly'},cmds);
-    enemyDefinition('slime').spell=1;monsterAction(s.enemy.units[0],cmds);
+    enemyDefinition('slime').spell=1;enemyDefinition('slime').mageSpellLevel=1;monsterAction(s.enemy.units[0],cmds);
     afflict(0,'poison');afflict(0,'silence');tickAilments()`);
   assert.deepEqual(read(g,'s.hp'), [95,98]); // breath 2 each, single spell 1, poison 2
   assert(g.run('isHidden(0)'));
@@ -162,7 +162,7 @@ console.log('PASS 124d confirmed damage doubled once, unchanged swings/hits/flag
     assert(!g.run('isHidden(0)'), status);
     g.run("s.members[0].status='ok';s.ailments[0]=freshAilments()");
   }
-  g.run(`s.enemy.hiddenIds=['p0'];enemyDefinition('slime').spellInfo={effect:'sleep',target:'one',name:'誘睡'};
+  g.run(`s.enemy.hiddenIds=['p0'];groupSpellLevels(s.enemy.units[0]).mage=1;Math.random=()=>.75;
     monsterAction(s.enemy.units[0],cmds)`);
   assert(g.run('!isHidden(0)&&s.ailments[0].sleep>0'));
   g.run("s.enemy.hiddenIds=['p0'];monsterHurt(0,100,cmds,'敵')");

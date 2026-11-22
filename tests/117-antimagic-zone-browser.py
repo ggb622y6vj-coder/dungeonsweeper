@@ -240,7 +240,7 @@ with sync_playwright() as p:
         assert page.evaluate("s.enemy.units[0].hp === 99 && s.enemy.initiative === 'normal' && !s.magicPlans[0]")
 
         logs = page.evaluate('s.logs')
-        # 闇の司祭は仲間呼び10%の次に沈黙30%。.25で呪文分岐に入る。
+        # 闇の司祭は仲間呼び10%の次に詠唱30%。.25で呪文分岐に入る。
         assert monster_action(page, [.25, 0, 0])
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.logs') == [NEGATED, *logs]
@@ -255,7 +255,7 @@ with sync_playwright() as p:
         assert page.evaluate('s.enemy.units.length') == 2
         page.evaluate('() => { s.pos = 39; s.enemy.units[0].silence = false; render(); }')
         logs = page.evaluate('s.logs')
-        assert monster_action(page, [.25, 0, 0])
+        assert monster_action(page, [.25, 0, 0, 0, 0, .99])
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.logs[2]') == '闇の司祭は沈黙を唱えた。'
         assert page.evaluate('s.logs.slice(3)') == logs

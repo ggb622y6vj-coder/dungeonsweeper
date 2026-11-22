@@ -14,7 +14,7 @@ chrome_path = os.environ.get('CHROME_PATH') or next((p for p in (
 output = Path(os.environ.get('LIBRARY_FIELDS_SCREENSHOT_DIR', '/tmp/library-fields-browser'))
 output.mkdir(parents=True, exist_ok=True)
 ORDER = ['種族', '出現階', '集団数', 'HP', '物理ダメージ', '攻撃回数', '呪文抵抗（魔／僧）',
-         '特殊能力', '使用呪文', '経験値', '撃破数']
+         '特殊能力', '経験値', '撃破数']
 # Spot checks straight from data/monsters.csv (HP, 物理ダメージ, 経験値, 出現階, 種族).
 CSV = {'rat': ('獣', '1F', '1d6+2', '1d5', '15'), 'evileye': ('魔獣', '8F', '6d8', '1d10', '3000'),
        'daidaraboti': ('人型', '9F・10F', '15d10', '5d9', '4500')}
@@ -49,8 +49,9 @@ with sync_playwright() as p:
             e.scroll_into_view_if_needed()
             assert e.locator('h4').inner_text().startswith(page.evaluate(f"enemyDefinition('{key}').name"))
             assert e.locator('.library-subtext').inner_text() == page.evaluate(f"enemyDefinition('{key}').unknown")
-            assert e.locator('dt').all_inner_texts() == ORDER, e.locator('dt').all_inner_texts()
-            fields = dict(zip(ORDER, e.locator('dd').all_inner_texts()))
+            order = ORDER[:-2] + ['呪文Lv（魔／僧）', '詠唱率'] + ORDER[-2:] if key == 'evileye' else ORDER
+            assert e.locator('dt').all_inner_texts() == order, e.locator('dt').all_inner_texts()
+            fields = dict(zip(order, e.locator('dd').all_inner_texts()))
             assert tuple(fields[label] for label in ('種族', '出現階', 'HP', '物理ダメージ', '経験値')) == (race, floor, hp, dmg, xp), fields
             assert fields['撃破数'] == {'rat': '3体', 'evileye': '1体', 'daidaraboti': '2体'}[key]
             box = e.bounding_box()
@@ -64,9 +65,13 @@ with sync_playwright() as p:
         assert [t.inner_text() for t in tags('evileye').all()] == ['麻痺', '石化', '後衛攻撃']
         evileye = page.locator('[data-library-entry="monster-evileye"]')
         assert [t.inner_text() for t in tags('evileye').all()].count('麻痺') == 1
-        assert '%' not in evileye.inner_text()
+        assert '40%' in evileye.inner_text() and '1／0' in evileye.inner_text()
         assert page.locator('#librarybody .library-entry').count() == page.evaluate('ENEMIES.filter(d=>d.floors[0]===8).length')
-        assert all('%' not in entry.inner_text() for entry in page.locator('#librarybody .library-entry').all())
+        for entry in page.locator('#librarybody .library-entry').all():
+            rate = entry.locator('dt', has_text='詠唱率')
+            assert entry.inner_text().count('%') == rate.count()
+            if rate.count():
+                assert rate.locator('xpath=following-sibling::dd[1]').inner_text().endswith('%')
         assert page.locator('.library-chance').count() == 0
         assert [t.inner_text() for t in tags('daidaraboti').all()] == ['麻痺', '後衛攻撃', '炎半減', '氷半減']
         assert tags('daidaraboti').nth(2).get_attribute('class') == 'ailment-tag ailment-other'
