@@ -160,4 +160,4 @@
 | 122 | 2026-11-21 | 未鑑定品の表示と鑑定導線の見直し（謎の武器・謎の防具、司教鑑定をアイテム欄へ、「謎のアイテムを集める」、鍛冶屋に売買／鑑定タブ、常時警告の全廃） | 93c4ebd | [spec](specs/122-identification-ui-rework.md) | [実施](reports/122.md) |
 | 123 | 2026-11-21 | 反呪文の結界の説明、探索済みマスの遭遇率、撃破後の守護者の通常遭遇 | e54b9c4 | [spec](specs/123-encounter-adjustments.md) | [実施](reports/123.md) |
 | 124 | 2026-11-21 | 盗賊・忍者に「隠れる／奇襲」を追加。防御はターン開始時に潜伏解除 | fbbd7a4 | [spec](specs/124-hide-ambush.md) | [実施](reports/124.md) |
-| 125 | 2026-11-22 | 狭い画面で図書館のモンスター階タブを1行化し、高さを縮小 | — | [spec](specs/125-library-floor-tabs.md) | [実施](reports/125.md) |
+| 125 | 2026-11-22 | 狭い画面で図書館のモンスター階タブを1行化し、高さを縮小 | 3041de3 | [spec](specs/125-library-floor-tabs.md) | [実施](reports/125.md) |
