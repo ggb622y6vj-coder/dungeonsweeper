@@ -1,4 +1,4 @@
-# 050 verify — fed7246 (live site, 1280 mouse / 390 tap) — OK
+# 050 verify — cd5e7ca (live site, 1280 mouse / 390 tap) — OK
 
 Deploy: dist/*.js + index.html match live. Script: /tmp/v050/b.py. JS errors: none.
 

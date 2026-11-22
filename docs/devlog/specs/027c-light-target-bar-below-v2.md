@@ -1,5 +1,5 @@
 # 027b-light-target-bar-below：対象選択バーをパーティー欄の下へ、「キャンセル」を「戻る」の位置に
-ティア: light / 依存: 027・028 の後（main afd33ae 時点のコードが前提）
+ティア: light / 依存: 027・028 の後（main 8dcc206 時点のコードが前提）
 
 ## 共通ルール（必読・/workspace/dsw-queue/README-handoff.md と同じ）
 - 先に AGENTS.md、docs/HANDOFF.md、docs/SPECIFICATION.md を読む。実行コードが正本。
@@ -11,7 +11,7 @@
 ## 目的
 本人のフィードバックです。027 の対象選択モードでは、案内バー #allytargetbar（案内文 #allytargetprompt・#allytargetcancel・従来の select/ボタン #allytargetfallback）が .party-wrap 内で #party の**上**に挿入されるため、モードに入るとパーティー欄全体が約144px下にずれる（027-verify で計測）。枠がずれるのは嫌なので、バーをパーティー欄の**下**に置く。また「キャンセル」は普段「戻る」がある位置に置き、モード中は「戻る」を表示しない。
 
-## 現状（afd33ae）
+## 現状（8dcc206）
 - dist/index.html：`.party-wrap` = `#allytargetbar`（hidden）→ `#commandreviewpopup` → `#party`。その下が #bosschoice、.controls（探索時の移動）、#battle（戦闘時：#commandentry ＋ #flee）。
 - 戦闘中の「戻る」：dist/combatui.js renderCommandEntry が #commandentry の末尾（.commandchoices の下）に `<button data-command-back>` を描画。コマンド入力中は「前のメンバーへ戻る」（先頭メンバーでは disabled）、行選択中は行選択解除、呪文対象選択中は pendingSpell 解除、行動確認画面では最後のメンバーへ戻る。027 では対象選択モード中も「戻る」が表示され、押すと cancelAllyTargetPick()。#flee はモード中 hidden。
 - 探索中は「戻る」ボタンは存在しない（呪文・薬は #magicdialog/#medicinedialog/#inventorydialog から入り、キャンセルでそのダイアログに戻る）。

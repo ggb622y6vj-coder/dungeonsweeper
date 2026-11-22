@@ -4,7 +4,7 @@
 - 既存テストを弱めない。dist と MANIFEST を更新し、全テスト（tests/*.cjs、compile-monsters --check、sim selftest、browser テスト 1280/390）を通してから push。
 - オーナー依頼 pt76u。
 
-## 現状（6501fd7 で調査）
+## 現状（987558e で調査）
 - 前衛／後衛は並び順のみで決まる（index 0–2 が前衛、3–5 が後衛。game.js の statcard、party パネル、training.js）。
 - 自動並べ替えは無い。前衛が死んでも枠に残る。
 - 敵の攻撃対象は「HP>0 の前衛」から選ばれる。前衛の生存者がいない場合、または後衛攻撃「可」の敵の場合は生存者全員から選ばれる（game.js の swings ループ）。このため前衛2人が倒れると、残る1人に攻撃が集中する。

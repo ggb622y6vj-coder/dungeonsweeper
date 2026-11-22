@@ -1,4 +1,4 @@
-033 石化 — 2026-11-02（基点: 032 / d562680）
+033 石化 — 2026-11-02（基点: 032 / c4b550e）
 
 PASS tests/auto-reorder.cjs
 PASS tests/auto-temple.cjs

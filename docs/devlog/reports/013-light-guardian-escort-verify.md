@@ -1,5 +1,5 @@
 # 013-light-guardian-escort 検証結果 — 判定: OK（推奨Lvで目標どおり。調整 todo なし）
-- 対象: 6c3a771（dist/monsters.js monsterFormation、BALANCE.md、テスト）。テスト3つと sim selftest すべて成功
+- 対象: 6c02680（dist/monsters.js monsterFormation、BALANCE.md、テスト）。テスト3つと sim selftest すべて成功
 - node（/tmp/v13.cjs）:
   - 隊列（各階2000回）: 2列 約49%、3列 約51%。1列目は常に守護者。3列のうち約5%は随伴2種が同じ種類（別の列として出る。仕様の範囲）
   - 随伴だけ全滅 → 戦闘は続き、守護者だけが残る。下り階段は出ない
@@ -8,7 +8,7 @@
 - 本番（monsters.js・game.js がリポジトリと一致）: game 関数で守護者戦を開始し、3列（守護者／随伴×2列）が一人称視点に表示された。pageerror 0
   - スクリーンショット: /workspace/sim/v013-desktop.png, /workspace/sim/v013-mobile.png
 - 守護者戦 sim（n=1000、0,0,2,3,1,2）。勝率 / 全滅率:
-  | 条件 | 修正前 ac1f853 | 修正後 |
+  | 条件 | 修正前 73a9edd | 修正後 |
   |---|---|---|
   | Lv1/1F | 100% / 0% | 96.5% / 3.5% |
   | Lv3/1F | 100% / 0% | 99.5% / 0.5% |

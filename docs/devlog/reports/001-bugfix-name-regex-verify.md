@@ -2,10 +2,10 @@
 
 判定: **OK**（追加の修正タスク 001a は不要）
 
-対象コミット: fd6b926
+対象コミット: 642c95f
 
 ## 確認した内容
-1. `git pull` で fd6b926 まで進めた後、`node tests/game.cjs && node tests/training.cjs && python3 scripts/compile-monsters.py --check` を実行し、すべて PASS（モンスター定義 31 件の検証も OK）。
+1. `git pull` で 642c95f まで進めた後、`node tests/game.cjs && node tests/training.cjs && python3 scripts/compile-monsters.py --check` を実行し、すべて PASS（モンスター定義 31 件の検証も OK）。
 2. node での再現スクリプト（/workspace/sim/bugs2.cjs）で、`(テスト` `[a` `a.*+?^$` `\` `a.b` `a|b` `)` `{1}` の各名前を試した。
    - どの名前でも例外は発生しない。
    - 「名前の攻撃。」の部分は log-ally として色付けされる。

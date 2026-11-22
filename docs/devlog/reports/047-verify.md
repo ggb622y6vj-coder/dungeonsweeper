@@ -1,5 +1,5 @@
 # 047 味方対象プルダウン削除 検証 — OK
-対象: 255e617（origin/main、/workspace/verify-clone2、push なし）
+対象: 0c4eb24（origin/main、/workspace/verify-clone2、push なし）
 
 ## 結果
 - デプロイ: dist/*.js と index.html がライブと一致

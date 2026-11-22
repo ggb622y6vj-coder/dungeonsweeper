@@ -1,4 +1,4 @@
-# 032 verify (d562680, origin/main HEAD)
+# 032 verify (c4b550e, origin/main HEAD)
 判定: OK
 - 解釈（了承済み）: 行動可能な先頭3人を前衛へ。残りは元の順。B死亡→ACDBEF、A麻痺→CDEABF。後衛に行動可能者がいなければ並べ替えない。迷宮内ロードでは並べ替えない（町ロードは 029b 搬送の後に実行）。
 - Pages 反映後 live = dist 一致。node 10本（auto-reorder.cjs 新規を含む）、compile-monsters --check、selftest PASS。

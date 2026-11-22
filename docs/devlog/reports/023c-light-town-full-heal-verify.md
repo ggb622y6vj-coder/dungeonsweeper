@@ -1,9 +1,9 @@
-# 023c-light-town-full-heal 検証 (d8e022d) — 機能OK／ブラウザテスト不合格（テスト側のバグ）
+# 023c-light-town-full-heal 検証 (6539a46) — 機能OK／ブラウザテスト不合格（テスト側のバグ）
 ## テスト
 - tests/*.cjs 全PASS、compile-monsters --check・selftest PASS（クリーン /tmp/c23c）
 - 差分: 弱化なし、むしろ強化。帰還=全員HP/MP全快を検証（旧: メンバー0のみ）、馬小屋=全員のLv・MP全快・HP不変・無料・全員分のレベル報告、部屋の関数とHTMLが消えたことを検証。death-status: okのみ全快・死者は帰還前値のまま、馬小屋で死者Lv1・HP/MP0のまま・ok全員レベルアップ
 - **tests/training-browser.py: FAIL**（python playwright を /tmp/pyv に入れ、Chrome パスだけ置換して本番に対し実行）。43行 `#backtown` クリックでタイムアウト。#backtown は s.done 時だけ表示されるのに、テストは1人を倒しただけで迷宮内のまま。直前コミット版のテストは同じ本番で PASS → 新規追加部分のバグ。ゲーム本体は正常 → todo/023d
-## 実機（Pages=d8e022d一致、PC+390x844）
+## 実機（Pages=6539a46一致、PC+390x844）
 - 開始マスで階段から帰還: ok全員 HP/MP全快、死亡者 HP0、Lvは1のまま
 - 宿屋は「馬小屋に泊まる（無料）」のみ（#room なし、説明文「HP・MPは町への帰還時に全快します」）→ 宿泊でok5人がLv7/7/6/6/5、死亡者Lv1、レベル報告表示、金貨0のまま。pageerror 0
 - SS: /workspace/sim/v023c-{desktop,mobile}-{inn,level}.png

@@ -1,6 +1,6 @@
 # 028 verify — OK
 
-- origin/main = afd33ae (included); live dist/*.js + index.html byte-identical.
+- origin/main = 8dcc206 (included); live dist/*.js + index.html byte-identical.
 - Suite: node tests/*.cjs 7本 PASS, compile-monsters --check 88 OK, sim selftest PASS, training-browser / target-select-browser / town-layout-browser (live) 1280・390 全 PASS.
 - Test change: new tests/town-layout-browser.py only; no existing test lines changed/removed → stricter (additive).
 - Independent check (/tmp/town028.py, live, party of 6):

@@ -1,6 +1,6 @@
 # 044 ラカニトのLv判定整理 — push 済み
 
-- コミット: 0e9e33f（origin/main、ec05f80 の上）
+- コミット: 4b70d1c（origin/main、219f6e2 の上）
 - モデル: gpt-6-luna low（1回目）。Codex は Lv17 テストに守護者の「双頭の巨人」を使って失敗したまま終了 → executor が非守護者 Lv17「霜の巨人」に差し替えて修正。ドキュメントも executor が更新。
 
 ## 変更内容
@@ -10,12 +10,12 @@
 - SPELLS.md / docs/DATA_CATALOG.md / docs/HANDOFF.md 更新、MANIFEST.sha256 再生成。
 - keynav.js・キー割り当て・フォーカスは未変更。T キーなし。セーブ形式変更なし（ash-v1 互換）。
 
-## テスト（clean worktree 0e9e33f）
+## テスト（clean worktree 4b70d1c）
 - tests/makanito.cjs に追加: Lv10（トロル）乱数39.9で死亡「息絶えた」/40.0で「耐えた。」、Lv17（霜の巨人）乱数0/0.5/0.999999で必ず「耐えた。」、守護者・不死（リッチ）・構造体（石の番人）が「〇〇には効かない！」。
 - tests/*.cjs 全17本 PASS、compile-monsters --check PASS、sim selftest PASS。
 - ブラウザ全15本 PASS（各 1280/390）。新規ブラウザテストなし。
 
-## シム（--jobs 0,0,2,3,1,2 --n 400、before=worktree ec05f80、after=worktree 0e9e33f）
+## シム（--jobs 0,0,2,3,1,2 --n 400、before=worktree 219f6e2、after=worktree 4b70d1c）
 | 階 | Lv | 全滅 before→after | 死亡/戦 before→after |
 |---|---|---|---|
 | 1F | 3 | 0→0 | 0.010→0.010 |
@@ -35,6 +35,6 @@
 ## 044b 追記（2026-11-03、シムAI修正）
 - 原因: シムAIが lakanitoApplies が全員偽の列（構造体・不死・守護者）にもラカニトを唱え MP を浪費していた。
 - 修正: scripts/sim/combat.cjs のみ。対象列に lakanitoApplies が真の生存敵がいなければラカニトを候補から外す（ゲームロジック・モンスター数値は不変）。
-- 再計測: ec05f80（前）vs 修正後 main（045 含む）、各階10シード×n400、jobs 0,0,2,3,1,2。
+- 再計測: 219f6e2（前）vs 修正後 main（045 含む）、各階10シード×n400、jobs 0,0,2,3,1,2。
   6F 死亡/戦闘 .1390→.1062（−.033）、全滅 .475%→.400%。7F .0870→.0785、全滅 .275%→.200%。全階で +0.03 以内（最大 10F +.0008）。
 - テスト: node 17件、compile --check、selftest、ブラウザ15件（1280/390）すべて PASS。MANIFEST 再生成・sha256sum -c OK。push 済み。

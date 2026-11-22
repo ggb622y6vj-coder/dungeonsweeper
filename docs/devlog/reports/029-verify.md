@@ -1,4 +1,4 @@
-# 029 verify (e67bd3f, origin/main HEAD)
+# 029 verify (05c6c47, origin/main HEAD)
 判定: 029本体 OK / 酒場パーティ編成に既存の穴あり → 029a 起票
 - live 配信 = dist 一致。全 tests/*.cjs PASS、compile-monsters --check、selftest PASS。
 - live browser (1280/390): training / target-select / town-layout / auto-temple-browser すべて PASS。

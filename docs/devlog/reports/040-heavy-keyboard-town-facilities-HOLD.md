@@ -1,6 +1,6 @@
 # 040 町と施設のキーボード操作: HOLD（未push）
 
-- 作業ブランチ: ローカル `hold/040`（3eac9b7、MANIFEST再生成済み）。main は 3f94b4c のまま。
+- 作業ブランチ: ローカル `hold/040`（3eac9b7、MANIFEST再生成済み）。main は 4d928ad のまま。
 - モデル: codex gpt-6-astra high（1回で完了、約12分）。ログ: report/codex040.log
 
 ## 保留理由（指示書と既存チェックの矛盾）

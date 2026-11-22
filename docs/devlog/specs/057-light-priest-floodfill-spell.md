@@ -1,7 +1,7 @@
 # 057 [light] Priest spell: flood-fill exploration (minesweeper-style auto-reveal)
 
 ## Background
-(Code as of origin/main 3ec9448.)
+(Code as of origin/main 9d6c988.)
 - **Cells:** a floor is a size×size grid, `s.cells[i] = {trap, open, flag, type, ...}`. `type` is '' / 'stairs' (up) / 'down' / 'boss' (guardian room). `open` means explored. Traps are the "mines". `num(i)` = the number of trap cells among the **8 neighbours** (`around(i)`; diagonals included; the grid edge is the outer wall). Zero = `num(i)===0`, shown as 「静かな部屋。周囲に罠はない。」. There are no inner walls or doors; the only walls are outside the grid (`face(i<0)` = 外壁). `flag` is a player marker; you can't step onto a flagged cell.
 - **Stepping onto a cell** (`cell()` in dist/game.js), in this order:
   1. Guardian room with `!s.relic` → open it and show the guardian prompt.

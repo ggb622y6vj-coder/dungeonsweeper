@@ -1,6 +1,6 @@
 # 029a bugfix: 酒場で死亡/灰/ロストを加入不可 — 完了
 
-- commit: 0dddaa2 (main, pushed 2026-11-02 JST; base e67bd3f)
+- commit: 16eaced (main, pushed 2026-11-02 JST; base 05c6c47)
 - model: gpt-6-luna (reasoning low), 1回目で成功 (~2分20秒)
 
 ## Codex の実装

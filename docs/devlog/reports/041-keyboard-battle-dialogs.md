@@ -1,6 +1,6 @@
 # 041 戦闘・確認・各種ダイアログのキーボード操作: pushed
 
-- コミット: a19f5ae（main、origin/main へ push 済み）。親は 3f94b4c。040（hold/040）は含まない。
+- コミット: 711e286（main、origin/main へ push 済み）。親は 4d928ad。040（hold/040）は含まない。
 - モデル: codex gpt-6-astra high（1回で完了、約15分）。ログ: report/codex041.log
 
 ## Codex の実装
@@ -33,7 +33,7 @@
    - 薬ダイアログを開いた時点の状態で hidden を決めるように変更した。
 3. Node ハーネスに document.documentElement がなく、game.cjs と target-select.cjs が FAIL していた。参照を optional chaining にした。
 
-## テスト（a19f5ae のクリーンな worktree で実行）
+## テスト（711e286 のクリーンな worktree で実行）
 - node tests/*.cjs: 15本 PASS
 - compile-monsters --check: PASS
 - sim selftest: 4行 PASS

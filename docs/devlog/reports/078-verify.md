@@ -1,6 +1,6 @@
 # 078 検証記録（2026-11-06 JST）
 
-対象：`main` 8c89299（0a92c29 から fast-forward 統合）
+対象：`main` 0ebae93（3ef8526 から fast-forward 統合）
 
 ## 統合と CI
 - `hold/078` を push 後、main へ fast-forward 統合して push した（マージコミットなし）。

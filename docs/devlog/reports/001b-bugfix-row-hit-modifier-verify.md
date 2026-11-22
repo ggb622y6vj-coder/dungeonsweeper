@@ -2,11 +2,11 @@
 
 判定: **OK**（追加の bugfix todo は不要）
 
-- 対象コミット: 89c47c0
+- 対象コミット: 34beb5f
 - 検証日時: 2026-11-01 23:00 頃 JST
 
 ## 1. テスト
-`git pull` で 89c47c0 まで進めた後、`node tests/game.cjs && node tests/training.cjs && python3 scripts/compile-monsters.py --check` を実行し、すべて PASS（新しい回帰テスト「row hit thresholds 10/13/16」も含む）。
+`git pull` で 34beb5f まで進めた後、`node tests/game.cjs && node tests/training.cjs && python3 scripts/compile-monsters.py --check` を実行し、すべて PASS（新しい回帰テスト「row hit thresholds 10/13/16」も含む）。
 
 ## 2. node での独立検証（/workspace/sim/rowcheck.cjs）
 条件は Lv1 戦士・STR12（補正0）・武器の命中補正0・AC9 のスライム。d20 の 20 通りの出目をすべて試した。
@@ -14,7 +14,7 @@
 | | 1列目 | 2列目 | 3列目 | 前列全滅後（旧2列目/旧3列目） |
 |---|---|---|---|---|
 | 修正後 | 50% | 35% | 20% | 50% / 35% |
-| 修正前（fd6b926） | 65% | 80% | 95% | 65% / 80% |
+| 修正前（642c95f） | 65% | 80% | 95% | 65% / 80% |
 
 - 仕様（1列目は補正0で、後列ほど命中しにくい）どおり。前列が全滅すると列が詰まり、旧2列目が index 0（50%）として扱われることも確認した。
 - コードは `threshold = … + 3 * 現在の列index`。それ以外の命中計算は変わっていない。

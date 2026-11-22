@@ -1,5 +1,5 @@
 # 049 石化メンバーのグレーアウト 検証 — OK（既存の軽い問題1点）
-対象: 47fdb08（origin/main b2526e1、/workspace/verify-clone2、push なし）
+対象: f5ffafb（origin/main ab1a8e3、/workspace/verify-clone2、push なし）
 
 ## 結果（OKの判定方法 1〜6）
 - デプロイ: dist/*.js と index.html がライブと一致。sha256sum -c OK

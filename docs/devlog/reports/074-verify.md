@@ -1,6 +1,6 @@
 # 074 検証記録 (2026-11-05 JST)
 
-対象: `hold/074`（origin/main 78d47d6 基点）
+対象: `hold/074`（origin/main 6af249d 基点）
 
 ## 結果
 - `tests/*.cjs` 全31本: PASS。
@@ -9,7 +9,7 @@
 - `tests/library-spell-tabs-browser.py`: Chromium 1280px／390pxともPASS。職業フィルタ、既定魔法使い、クリック／Enter／Space、`aria-selected`、発見済み／未発見、詳細、スクロール先頭復帰、JSエラーなし、横はみ出しなしを確認。
 - 関連既存 `tests/town-keys-browser.py`: Chromium 1280px／390pxともPASS。上位タブQ/E・方向キー、一覧、詳細、Escを確認。
 - 関連既存 `tests/training-browser.py`: Chromium 1280px／390pxともPASS。図書館の開閉・切替・一覧・スクロール・横はみ出し・JSエラーなしを確認。
-- 新ブラウザテストを旧ビルド origin/main 78d47d6 に対して実行し、下位タブ不在で期待どおりFAIL。新ビルドのみPASSを確認。
+- 新ブラウザテストを旧ビルド origin/main 6af249d に対して実行し、下位タブ不在で期待どおりFAIL。新ビルドのみPASSを確認。
 - `MANIFEST.sha256`: 再生成後に `shasum -a 256 -c` で全件OK。
 
 ## 目視確認

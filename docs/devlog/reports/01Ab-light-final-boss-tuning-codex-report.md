@@ -1,5 +1,5 @@
 # 01Ab-light-final-boss-tuning 報告
-- commit: 03133bc（main に push 済み）
+- commit: 12be35f（main に push 済み）
 - model: gpt-6-luna / low（1回目で成功）
 - 変更: data/monsters.csv の labyrinthlord のみ（HP 26d8+60→44d8+110、swings 3→4、spell 0.15→0.35）、dist/monster-data.js 再生成、MANIFEST.sha256 更新。
 - テスト: tests/*.cjs 全PASS（final-boss, death-status, game, training）、compile-monsters --check 88体。

@@ -1,11 +1,11 @@
 # 046 「戦う」の対象列自動切替（ログなし）検証 — OK
-対象: 6559121（origin/main、/workspace/verify-clone2、push なし）
+対象: cf747bd（origin/main、/workspace/verify-clone2、push なし）
 
 ## 結果
 - 変更点: dist は game.js の1行だけ（`selectedEnemy(i)||reachableEnemyGroups(i)[0]?.units.find(e=>e.hp>0)`）。呪文処理は変更なし
 - デプロイ: dist/*.js と index.html がライブと一致
 - テスト: Node 18件（attack-retarget.cjs 追加）・compile --check（88体）・selftest・ブラウザ15件（ライブURL）すべてPASS
-- attack-retarget.cjs の有効性: 2d0ab22 の dist で動かすと「second fighter attacks next living row」で失敗する（テストが変更を検出できている）
+- attack-retarget.cjs の有効性: c59b3dd の dist で動かすと「second fighter attacks next living row」で失敗する（テストが変更を検出できている）
 - ライブ 1280（マウスクリック）/390（タップ）、/tmp/v046/m.py:
   - 敵は4列: hp1・999・999・999
   - 2人とも前列（row 7）で「戦う」を入力 → 1人目が倒し、2人目は次の列に9ダメージ。3・4列目は無傷

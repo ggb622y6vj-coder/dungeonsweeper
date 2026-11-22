@@ -1,10 +1,10 @@
-# 041 検証レポート（a19f5ae キーボード操作：戦闘・ダイアログ）
+# 041 検証レポート（711e286 キーボード操作：戦闘・ダイアログ）
 
 **判定: OK**
 
 ## 環境
-- verify-clone2 を origin/main（a19f5ae）で検証した。push はしていない。/workspace/dungeonsweeper には触れていない。
-- ライブ反映：dist/*.js と index.html が、すべて a19f5ae と一致した（cmp）。
+- verify-clone2 を origin/main（711e286）で検証した。push はしていない。/workspace/dungeonsweeper には触れていない。
+- ライブ反映：dist/*.js と index.html が、すべて 711e286 と一致した（cmp）。
 - ログは /tmp/v041/ に保存した。
 
 ## 全テスト

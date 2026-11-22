@@ -10,5 +10,5 @@
 - モデル: gpt-6.1-sol (reasoning effort medium)、33,949 tokens
 - 変更: dist/game.js physicalAttack() の列補正を `+3×現在の列index`（1列目0）に修正。docs/HANDOFF.md・SPECIFICATION.md 更新。tests/game.cjs に全d20出目を列挙する回帰テスト追加（閾値10/13/16＝50%/35%/20%、前列全滅後に詰まることも確認）。MANIFEST.sha256 再生成。
 - テスト: game.cjs / training.cjs / compile-monsters --check 全PASS
-- コミット: 89c47c0（main へ push）
+- コミット: 34beb5f（main へ push）
 - Codex自身の報告: report/001b-codex-retry-output.md

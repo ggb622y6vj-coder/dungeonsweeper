@@ -1,6 +1,6 @@
 # 032 heavy: 行動不能メンバーの自動後退 — 完了
 
-- コミット: d562680（main に push 済み、2026-11-02 18:11 JST）
+- コミット: c4b550e（main に push 済み、2026-11-02 18:11 JST）
 - モデル: gpt-6-astra / reasoning high、1回目で成功（約11分）。Codex はブラウザ未実行（Playwright なし）のため push せず終了 → executor が検証・修正して push。
 - Codex ログ: report/codex032.log
 

@@ -15,7 +15,7 @@ Grok Build は flagview（旗視）の実装を途中まで進めたが、完了
 | セッション記録のモデル ID | `grok-4.7`（エージェント名 `grok-build-plan`） |
 | reasoning effort | `high` |
 | CLI の cwd | `/workspace/gb096` |
-| 作業ツリー | `/tmp/dsw-096`（`origin/main` の `d24d574` から切った `hold/096`） |
+| 作業ツリー | `/tmp/dsw-096`（`origin/main` の `1a664b2` から切った `hold/096`） |
 | 起動時刻 | 2026-11-10 07:12:54 JST（最初のツール実行は 07:13:00 JST） |
 
 カタログ上のモデル ID（当時の `models_cache`）は `grok-4.7` と `grok-4.7-build-fast` などだった。セッションに残った ID は `grok-4.7` である。指示文で `grok-4.7-build` と書くことがあるが、ログ上の ID と別名で呼ぶなら、起動後にセッションの `current_model_id` を確認すること。
@@ -25,7 +25,7 @@ Grok Build は flagview（旗視）の実装を途中まで進めたが、完了
 ### 時系列（すべて JST、2026-11-10）
 
 - **07:12:54** headless セッション開始。モデルは `grok-4.7`、effort `high`。
-- **07:13:00–07:13:08** リポジトリを確認し、`git worktree add /tmp/dsw-096 origin/main` のあと `hold/096` を作成。先頭は `d24d574`（095 のライブ検証記録）。`/workspace/dungeonsweeper` には触っていない。
+- **07:13:00–07:13:08** リポジトリを確認し、`git worktree add /tmp/dsw-096 origin/main` のあと `hold/096` を作成。先頭は `1a664b2`（095 のライブ検証記録）。`/workspace/dungeonsweeper` には触っていない。
 - **07:13–07:55** 仕様どおり呪文定義・詠唱判定・盤面 HTML・町帰還などの既存パターンを調査。effort `high` のため、ツールとツールのあいだに長い推論間隔がある（例: 07:20–07:41、07:42–07:46 の推論は約 267 秒）。
 - **07:58:36** 実装の書き込み（`search_replace`）を開始。
 - **08:08:17–08:08:18** 追記と構文確認。この時点で `dist/game.js` / `dist/spells.js` に `flagSight` / `flagview` が入っている。

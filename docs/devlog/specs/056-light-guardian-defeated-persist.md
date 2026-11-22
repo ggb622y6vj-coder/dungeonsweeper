@@ -1,7 +1,7 @@
 # 056 [light] A defeated guardian never reappears (persists across town, regeneration and save/load)
 
 ## Background
-(Code as of origin/main 3ec9448.) Each floor's guardian lives in cell `s.boss` (type `'boss'`). Beating the guardian group (`monsters.js`, battle end) sets `s.relic=true`, turns the cell into `'down'` and asks to go down. On 10F, beating the labyrinth lord sets `s.cleared=true` instead. `travelFloor()` refuses to go down unless `s.relic` and the party is on the `'down'` cell (「次の階層へ進むには守護者を倒す必要がある。」).
+(Code as of origin/main 9d6c988.) Each floor's guardian lives in cell `s.boss` (type `'boss'`). Beating the guardian group (`monsters.js`, battle end) sets `s.relic=true`, turns the cell into `'down'` and asks to go down. On 10F, beating the labyrinth lord sets `s.cleared=true` instead. `travelFloor()` refuses to go down unless `s.relic` and the party is on the `'down'` cell (「次の階層へ進むには守護者を倒す必要がある。」).
 Nothing remembers a defeat beyond the current dungeon run. `enterTown()` always calls `resetDungeon()` → `fresh(1)` and `s.floors={}`, so every trip starts again on 1F with freshly generated floors, `relic:false`, and every guardian alive again. `fresh()` keeps only a whitelist of profile fields (gold, library, cleared, members, …). The save is the whole `s` (`rosterSaveState`, key `ash-v1`), so a field that `fresh()` keeps is saved automatically.
 
 User request: once a guardian is beaten it is gone for good. Returning to town still resets the dungeon layout, but the guardian is gone and the party can go straight to the next floor.

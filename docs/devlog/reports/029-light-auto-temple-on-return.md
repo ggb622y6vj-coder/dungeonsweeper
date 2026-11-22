@@ -1,5 +1,5 @@
 # 029 完了報告：帰還時に死者を自動で寺院へ
-- コミット: e67bd3f（main に push 済み。baec29f の次）
+- コミット: 05c6c47（main に push 済み。d5f19e5 の次）
 - モデル: gpt-6-luna low（1回目で実装。Codex 環境に Playwright がなくブラウザ検証とブラウザテスト作成は executor が実施）
 - 日時: 2026-11-02 JST
 
@@ -26,7 +26,7 @@
 ## テスト結果（すべて PASS）
 - node tests/*.cjs：auto-temple, death-status, final-boss, game, library, monster-dice, target-select, temple, training の9本（作業ツリーとクリーンな worktree の両方）
 - python3 scripts/compile-monsters.py --check：88 monster definitions validated
-- sim selftest（node scripts/sim/selftest.cjs、e67bd3f のクリーンな worktree）：PASS
+- sim selftest（node scripts/sim/selftest.cjs、05c6c47 のクリーンな worktree）：PASS
 - training-browser / target-select-browser / town-layout-browser / auto-temple-browser：1280・390 とも PASS（JS エラーなし、横スクロールなし）
 
 ## 所見

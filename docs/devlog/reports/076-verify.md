@@ -1,6 +1,6 @@
 # 076 検証記録（2026-11-06 JST）
 
-対象：`main` 543e23a（a18627f から fast-forward 統合。076 本体＋Amendment 1 を含む）
+対象：`main` ca29071（0c14660 から fast-forward 統合。076 本体＋Amendment 1 を含む）
 
 ## 統合と CI
 - `hold/076` を push 後、main へ fast-forward 統合して push した（マージコミットなし）。

@@ -1,4 +1,4 @@
-# 019-light-chest-loot-table 検証（82674aa）
+# 019-light-chest-loot-table 検証（188ff14）
 判定：**OK（入手性は解消）。8F/9F の守護者が推奨下限Lvで目標をやや下回るため、調整todo 019a を作成**
 
 ## テスト

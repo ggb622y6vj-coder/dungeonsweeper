@@ -1,5 +1,5 @@
 # 037 report
-Commit: 68b57d8 (origin/main). Model: gpt-6-astra (high), single run.
+Commit: a754406 (origin/main). Model: gpt-6-astra (high), single run.
 Change: ailments.fear (3 turns, tickBattleFear/clearBattleFear mirroring silence; cleared on win/flee/defeat/town), Fight disabled with 「恐怖で攻撃できない」 (canWeaponAttack + partyAction guard), guard/spell/item allowed, not in auto-reorder; Dialko/Madi/気付け薬 cure; CSV 恐怖/命中時 for wraith/hellhound/fiendhound 15%, reaper 20%; library 「恐怖 N%」; tag + CSS; Morlis/Mamorlis text; sim: feared member casts (cure>damage>buff) else guards.
 Review: full diff reviewed; no fixes needed.
 Test changes: silence.cjs/silence-browser.py now expect fear cured by Dialko/気付け薬 (spec change, in commit msg).

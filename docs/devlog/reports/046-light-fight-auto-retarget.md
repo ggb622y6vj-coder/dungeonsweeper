@@ -1,5 +1,5 @@
 # 046 fight auto-retarget — report
-Commit 6559121 (hold/046 → main, fast-forwarded and pushed). Codex: gpt-6-luna left it incomplete (game.cjs failed), so it was reset and rerun with gpt-6.1-sol (medium), which passed.
+Commit cf747bd (hold/046 → main, fast-forwarded and pushed). Codex: gpt-6-luna left it incomplete (game.cjs failed), so it was reset and rerun with gpt-6.1-sol (medium), which passed.
 ## Changes
 - dist/game.js partyAction: `selectedEnemy(i)||reachableEnemyGroups(i)[0]?.units.find(e=>e.hp>0)`. The row switch makes no log. The "全滅している" log now appears only when no reachable group is alive.
 - tests/attack-retarget.cjs (new, required from game.cjs): two fighters on the same row, no extra log, melee limited to the front 2 rows, ranged reaches all rows, empty battlefield, spell retarget unchanged.

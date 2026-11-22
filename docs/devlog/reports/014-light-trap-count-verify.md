@@ -1,5 +1,5 @@
 # 014-light-trap-count 検証結果 — 判定: OK（実装は仕様どおり。2Fの難しさは要観察）
-- 対象: 918b954（dist/balance.js trapCount、dist/game.js fresh、仕様書、テスト）。テスト3つと sim selftest すべて成功
+- 対象: 3f04840（dist/balance.js trapCount、dist/game.js fresh、仕様書、テスト）。テスト3つと sim selftest すべて成功
 - node（/tmp/v14.cjs、各階1000盤面）:
   - 罠数: 1F=9（8×8）、2F=15（10×10）、3F=23（12×12）が1000/1000。修正前は全階とも10個
   - 上限は size²×0.22（1F 14・2F 22・3F 31）で、今回は上限に届かない

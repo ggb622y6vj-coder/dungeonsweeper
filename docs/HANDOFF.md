@@ -86,7 +86,7 @@ Sites project_id：appgprj_6ae2ad2e8d1881918d4dc813e0e1df34
 
 ## 石化（033・2026-11-02）
 
-032（d562680）の後に実装。`member.status='stone'`、HP保持・ailments解除。`activeMember` / `activeMembers` で石化者を敵・罠の対象と全滅判定の生存者から除外し、032の行動境界で自動後退する。全滅の遺体記録でもstoneとHPを維持する。マディと寺院の「石化解除」でok・HP全快に戻す。寺院費用はmin(150L,40L²)、成功率100%。寺院解除ではMPも最大まで回復し、マディ治療ではMPを変えない（034）。
+032（c4b550e）の後に実装。`member.status='stone'`、HP保持・ailments解除。`activeMember` / `activeMembers` で石化者を敵・罠の対象と全滅判定の生存者から除外し、032の行動境界で自動後退する。全滅の遺体記録でもstoneとHPを維持する。マディと寺院の「石化解除」でok・HP全快に戻す。寺院費用はmin(150L,40L²)、成功率100%。寺院解除ではMPも最大まで回復し、マディ治療ではMPを変えない（034）。
 
 帰還・町ロードで控えへ搬送し、HP/MP/XP/レベルを保持。酒場・訓練所は（石化）表示・加入不可。CSVのガーゴイル／石巨人／邪眼／地震雲・サッキュバスに命中時5/8/10/5/5%を追加、図鑑も対応。simは石化者の行動・通常回復対象除外、マディ選択、全滅時の死亡数と保持HP（奇襲全滅を含む）に対応。
 
@@ -96,7 +96,7 @@ Sites project_id：appgprj_6ae2ad2e8d1881918d4dc813e0e1df34
 
 ## 沈黙・モンティノ（036、035完了後）
 
-035（6aa4723）の状態初期化統一を土台に、前回の実装コミット0577692を確認して再開。味方の沈黙は `ailments[i].silence` の残り3ターンで、戦闘終了・帰還時に解除する。呪文を封じ、攻撃・防御・アイテムと隊列は維持する。ディアルコ・マディ・気付け薬でも解除できる。状態タグは `displayVitals` に同期する。
+035（95198ec）の状態初期化統一を土台に、前回の実装コミット0577692を確認して再開。味方の沈黙は `ailments[i].silence` の残り3ターンで、戦闘終了・帰還時に解除する。呪文を封じ、攻撃・防御・アイテムと隊列は維持する。ディアルコ・マディ・気付け薬でも解除できる。状態タグは `displayVitals` に同期する。
 
 僧侶Lv3・MP4のモンティノを追加。敵1グループの各個体へカティノと同式で判定し、ボス・守護者には無効。敵に付与した沈黙は戦闘中持続し、呪文の抽選枠だけ通常攻撃へ変える。敵の使用者は闇の司祭（4F、30%）と魔女（8F、25%）で、生存かつ非石化の味方全員へ個別判定する。CSVから生成する `spellInfo.effect` はdamage/silence、図鑑に沈黙・全体・行動確率を表示する。詳細と計算式は仕様書3・6章、呪文一覧は `SPELLS.md`。
 
@@ -112,7 +112,7 @@ sim内の状態初期化は `{poison:false,paralysis:0,sleep:0,silence:0,fear:0}
 
 ## 恐怖（037、035・036完了後）
 
-035（6aa4723）・036（84e2108）を確認して実装。`ailments[i].fear` は付与・重ね掛けで3、`tickBattleFear` で戦闘ターン終了ごとに1減り、0で「〇〇は落ち着きを取り戻した。」。036と同じ位置で呼び、逃走失敗は1回だけ進む。`clearBattleFear` を勝利・敵の退散・逃走成功・全滅に追加し、遺体記録前にも解除する。帰還は既存の `freshAilments()`、戦闘中の再読込は残りターン数を保持する。
+035（95198ec）・036（aaf7324）を確認して実装。`ailments[i].fear` は付与・重ね掛けで3、`tickBattleFear` で戦闘ターン終了ごとに1減り、0で「〇〇は落ち着きを取り戻した。」。036と同じ位置で呼び、逃走失敗は1回だけ進む。`clearBattleFear` を勝利・敵の退散・逃走成功・全滅に追加し、遺体記録前にも解除する。帰還は既存の `freshAilments()`、戦闘中の再読込は残りターン数を保持する。
 
 「戦う」を無効化し、理由「恐怖で攻撃できない」をボタン内とtitleに表示する。`canWeaponAttack`・列選択・実行時の `partyAction` でも攻撃を止める。防御・呪文・アイテム・解呪は維持し、032の自動後退判定は変更しない。タグ `.ailment-fear` は既存の `visibleAilments` / `displayVitals` に同期する。
 
@@ -319,7 +319,7 @@ Node新規テストは64通りの前職／転職先、特徴文、生成拒否�
 
 Amendment（2026-11-16、ChatGPTレビュー必須修正への対応をオーナーが承認し Muse が直接実施）：F-01＝互換性の基準を「訓練所導入後」から最初のGitHub Pages公開版（88b675f、2026-11-01、訓練所導入前の並列配列形式）に訂正し、そのビルドで実際に生成したセーブを `tests/fixtures/first-public-save.json` として固定、読込・再保存の回帰テストを `tests/legacy-save.cjs` に追加。F-02＝membersはあるが並行配列（hp/mp/inventory/equipped/armor/ailments）のいずれかを欠くセーブが起動時に例外で落ちる問題に、起動時の構造チェック（欠けた場合は安全に新規開始）を追加し、同テストで固定。Muse側検証：node tests/game.cjs 214 PASS、ブラウザテスト47/47、compile-monsters、sim selftest、Notion同期テスト、MANIFEST不一致0。
 
-統合（2026-11-16、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` を main へ fast-forward 統合（dbaf707）。Pages デプロイ成功（run 43809653935）。ライブ検証：配信17ファイルすべて HTTP 200、配信 game.js に構造チェックがあり削除した移行関数（ensureStats／ensureSixParty／migrateMonsterBattle）がないことを確認。
+統合（2026-11-16、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` を main へ fast-forward 統合（2eccc32）。Pages デプロイ成功（run 43809653935）。ライブ検証：配信17ファイルすべて HTTP 200、配信 game.js に構造チェックがあり削除した移行関数（ensureStats／ensureSixParty／migrateMonsterBattle）がないことを確認。
 
 ## デザイン評価と可読性・タッチ領域の改修（2026-11-16）
 
@@ -329,7 +329,7 @@ Amendment（2026-11-16、ChatGPTレビュー必須修正への対応をオーナ
 
 検証：Node全57本PASS。Python版Playwrightを一時環境に入れ、`tests/*-browser.py` 全47本を1280/390pxで実行。改修前は44本PASS・3本FAIL（favicon 404）、改修後は全47本PASS（quick-attackは上記取りやめ後に再実行）。
 
-統合（2026-11-17、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93`（4853084）を main へマージ統合（3a8d402）。コンフリクトは MANIFEST.sha256 のみで、再生成して解消。カタログ削除は指示書113と同一内容のため重複なく統合され、113の変更（PASS名の言い換え等）も維持。Muse 側検証はブランチ時点とマージ後の両方で実施：node 214 PASS、ブラウザ47/47、compile-monsters、sim selftest、Notion 同期テスト、MANIFEST 不一致0。実画面確認（1280/390px）：図書館モンスター階タブ幅が26px→59px（5列×2段）、ステータス・ダンジョン画面に崩れなし、コンソールエラー0。ChatGPT レビューは統合可・必須修正なし。任意提案 D-01〜D-05 は将来候補とし、D-01（favicon 記述の環境限定化）はこの記録で対応済み。Pages デプロイ成功（run 43976890771）。ライブ検証：配信17ファイルすべて SHA-256 が統合後ツリーと一致、配信 index.html に可読性改修ブロックと favicon／theme-color があり catalogdialog がないこと、配信 game.js に catalogclose／data-attack-row がないことを確認。Fable ブランチも main と同位置に同期済み。
+統合（2026-11-17、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93`（5168371）を main へマージ統合（353805e）。コンフリクトは MANIFEST.sha256 のみで、再生成して解消。カタログ削除は指示書113と同一内容のため重複なく統合され、113の変更（PASS名の言い換え等）も維持。Muse 側検証はブランチ時点とマージ後の両方で実施：node 214 PASS、ブラウザ47/47、compile-monsters、sim selftest、Notion 同期テスト、MANIFEST 不一致0。実画面確認（1280/390px）：図書館モンスター階タブ幅が26px→59px（5列×2段）、ステータス・ダンジョン画面に崩れなし、コンソールエラー0。ChatGPT レビューは統合可・必須修正なし。任意提案 D-01〜D-05 は将来候補とし、D-01（favicon 記述の環境限定化）はこの記録で対応済み。Pages デプロイ成功（run 43976890771）。ライブ検証：配信17ファイルすべて SHA-256 が統合後ツリーと一致、配信 index.html に可読性改修ブロックと favicon／theme-color があり catalogdialog がないこと、配信 game.js に catalogclose／data-attack-row がないことを確認。Fable ブランチも main と同位置に同期済み。
 
 ## 配色の統一とCSS整理（2026-11-17）
 
@@ -344,4 +344,4 @@ Amendment（2026-11-16、ChatGPTレビュー必須修正への対応をオーナ
 
 検証：整理のみの版は、63画面状態×4画面幅（1280／700／420／360px）で全要素の計算済みスタイルが整理前と一致（約24.6万要素、差分は時間依存の点滅アニメーションのみ）。配色適用後は同じ範囲で色以外の差分なし、色の差は許容幅内。コントラスト4.5:1未満の文字なし。Node全58本、敵CSV整合、sim/selftest PASS。既存 `tests/*-browser.py` 全47本を1280/390pxで実行しPASS。
 
-CSS整理（2026-11-17、Fable セッション作業、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` の 29f71f9 を main へ fast-forward 統合。dist/index.html のインラインCSSを1行1規則に再整形（554→402規則）、不透明色を :root パレット75トークン（色相×明度ランプ命名）へ集約し、近似色をランプ上のトークンへ統合（ピクセル単位で同一ではない。CSS全体の最大チャンネル差は19＝踏破済みラベル文字色）。未使用セレクタ（旧迷宮描画・旧戦闘UI・旧地図UI等）を削除。カスケード維持のため重複3件（main、.hpvalue、.statcard>button）は意図的に残置し、新規テスト tests/css-structure.cjs が構造（1行1規則、不透明色のパレット経由、未使用トークン検出、重複禁止と例外）を固定。半透明色と階層テーマ --theme-* はリテラル例外。JS・データ・セーブは無変更。Muse 側検証はブランチ時点と統合後の両方で実施：node 215 PASS、ブラウザ47/47、compile-monsters、sim selftest、Notion 同期テスト、MANIFEST 不一致0。新旧の computed styles 比較（同一セーブ、町・ダンジョン×1280/390px）ではレイアウト系プロパティの差分0、差分は色のみ84件。ChatGPT レビューは統合可・必須修正なし。任意改善 C-01（パレット運用方針の本書への明記）〜C-05 は将来候補。Pages デプロイ成功（run 44048183328）。ライブ検証：配信17ファイルすべて SHA-256 が統合後ツリーと一致し、配信 index.html にパレット定義があることを確認。
+CSS整理（2026-11-17、Fable セッション作業、オーナー承認）：ブランチ `claude/beautiful-ride-lp0z93` の 6e4d763 を main へ fast-forward 統合。dist/index.html のインラインCSSを1行1規則に再整形（554→402規則）、不透明色を :root パレット75トークン（色相×明度ランプ命名）へ集約し、近似色をランプ上のトークンへ統合（ピクセル単位で同一ではない。CSS全体の最大チャンネル差は19＝踏破済みラベル文字色）。未使用セレクタ（旧迷宮描画・旧戦闘UI・旧地図UI等）を削除。カスケード維持のため重複3件（main、.hpvalue、.statcard>button）は意図的に残置し、新規テスト tests/css-structure.cjs が構造（1行1規則、不透明色のパレット経由、未使用トークン検出、重複禁止と例外）を固定。半透明色と階層テーマ --theme-* はリテラル例外。JS・データ・セーブは無変更。Muse 側検証はブランチ時点と統合後の両方で実施：node 215 PASS、ブラウザ47/47、compile-monsters、sim selftest、Notion 同期テスト、MANIFEST 不一致0。新旧の computed styles 比較（同一セーブ、町・ダンジョン×1280/390px）ではレイアウト系プロパティの差分0、差分は色のみ84件。ChatGPT レビューは統合可・必須修正なし。任意改善 C-01（パレット運用方針の本書への明記）〜C-05 は将来候補。Pages デプロイ成功（run 44048183328）。ライブ検証：配信17ファイルすべて SHA-256 が統合後ツリーと一致し、配信 index.html にパレット定義があることを確認。

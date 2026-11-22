@@ -1,4 +1,4 @@
-# 017-light-monsters-4-10f 検証（ae5dab2）
+# 017-light-monsters-4-10f 検証（e59a742）
 判定：**OK（バランスは018の装備込みで条件付き）**
 
 ## テスト

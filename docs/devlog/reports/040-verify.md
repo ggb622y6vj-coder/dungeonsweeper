@@ -1,10 +1,10 @@
-# 040 検証レポート（a3f9cac キーボード：町・施設）
+# 040 検証レポート（99e8118 キーボード：町・施設）
 
 **判定: OK**（軽微な指摘2件、仕様からの逸脱1件の記録。いずれも差し戻しは不要）
 
 ## 環境
-- verify-clone2 を origin/main（a3f9cac）で検証した。push はしていない。/workspace/dungeonsweeper には触れていない。
-- ライブの dist/*.js と index.html はすべて a3f9cac と一致した（cmp）。
+- verify-clone2 を origin/main（99e8118）で検証した。push はしていない。/workspace/dungeonsweeper には触れていない。
+- ライブの dist/*.js と index.html はすべて 99e8118 と一致した（cmp）。
 - ログは /tmp/v040/ に保存した。
 
 ## 全テスト
@@ -51,7 +51,7 @@
 - ユーザーの決定「図書館の記録は全滅や削除をしても残る」と食い違う。
 - 修正案：習得した時点で `s.library.spells[id]=true` に記録し、表示はその記録から作る。既存のセーブには、ロード時に登録中の冒険者が覚えている呪文から一度だけ記録を作る。
 
-## 追記: 223d427（呪文記録 s.library.spells）— OK
+## 追記: 29ca901（呪文記録 s.library.spells）— OK
 - デプロイ一致確認済み。Node 16件PASS・compile --check・sim selftest OK・ブラウザ14件PASS（ライブURL）。
 - /tmp/v040/spells.py（1280/390 両方 OK）:
   - 旧セーブ（library.spells無し）→ パーティ＋控えから初期化（6件、控えB僧侶のdios/kalki含む）

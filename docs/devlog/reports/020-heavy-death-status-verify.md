@@ -1,4 +1,4 @@
-# 020-heavy-death-status 検証（16e4efa）
+# 020-heavy-death-status 検証（9e3291a）
 判定：**OK（UX上の不具合1件 → todo/020a-bugfix-town-entry-message.md）**
 
 ## テスト

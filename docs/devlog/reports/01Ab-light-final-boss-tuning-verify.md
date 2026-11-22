@@ -1,9 +1,9 @@
-# 01Ab-light-final-boss-tuning 検証（03133bc）
+# 01Ab-light-final-boss-tuning 検証（12be35f）
 判定：**OK**
 
 ## テスト・ライブ
 - tests/*.cjs、compile-monsters（88体）、sim selftest がすべてPASSした。
-- ライブの monster-data.js、monsters.js、game.js は 03133bc と一致した。
+- ライブの monster-data.js、monsters.js、game.js は 12be35f と一致した。
 - ボス戦は 01A の検証と同じ手順で、pageerror 0件。
 
 ## 最終ボス（現実的な装備ハーネス、n=1000）
@@ -18,8 +18,8 @@
 ## Codex の sim01Ab.cjs が 0% になった件
 | 実行 | Lv18 |
 |---|---|
-| sim01Ab.cjs の harness をクリーンコピー（/tmp/cAb = 03133bc）に差し替え | **81.7%**（私の値と完全に一致） |
-| sim01Ab.cjs を元のまま（/workspace/dungeonsweeper を参照、現在は 03133bc でクリーン） | 84.0%（n=300） |
+| sim01Ab.cjs の harness をクリーンコピー（/tmp/cAb = 12be35f）に差し替え | **81.7%**（私の値と完全に一致） |
+| sim01Ab.cjs を元のまま（/workspace/dungeonsweeper を参照、現在は 12be35f でクリーン） | 84.0%（n=300） |
 - 装備の割り当ては sim019b.cjs と同じロジックで、迷宮産のリストが15品に増えただけ。私のハーネスと結果が一致しているので、割り当ては正しい。
 - 0%（毎回6人全滅）と変更前の 6〜31% は再現しない。測定した時点の /workspace/dungeonsweeper 作業ツリー（020/020a 作業中の未コミット dist）を読んだのが原因。
   - 毎回全滅していることから、死亡状態がトライアル間に持ち越されていた可能性が高い。

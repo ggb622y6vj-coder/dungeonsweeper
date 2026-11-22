@@ -1,6 +1,6 @@
 # 024 verify — OK
 
-- Clone: /workspace/verify-clone2 @ origin/main = 141d142 (includes 141d142). Live game.js byte-identical to dist (Pages deployed).
+- Clone: /workspace/verify-clone2 @ origin/main = 5e27d8f (includes 5e27d8f). Live game.js byte-identical to dist (Pages deployed).
 - node tests/*.cjs: death-status, final-boss, game, temple, training all PASS
 - compile-monsters.py --check: 88 defs OK; sim selftest PASS
 - training-browser.py (live URL) 1280px / 390px PASS

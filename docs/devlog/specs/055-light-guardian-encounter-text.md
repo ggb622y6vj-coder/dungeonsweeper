@@ -1,7 +1,7 @@
 # 055 [light] Guardian encounter: new message and 「戦う」/「戻る」 choices
 
 ## Background
-(Code as of origin/main 3ec9448.) Every floor has one guardian room (`s.boss`, cell type `'boss'`). When the party steps onto it while `!s.relic`, `cell()` in dist/game.js opens the cell, sets `s.pendingBoss={previous}`, logs 「守護者と戦いますか？」 and shows `#bosschoice`. `#bosschoice` holds 2 buttons from dist/index.html, `#bossyes`「はい」 and `#bossno`「いいえ」, which the stairs prompt (`s.pendingStairs`, 「地下N階に移動しますか？」) also uses. `answerBoss(yes)`:
+(Code as of origin/main 9d6c988.) Every floor has one guardian room (`s.boss`, cell type `'boss'`). When the party steps onto it while `!s.relic`, `cell()` in dist/game.js opens the cell, sets `s.pendingBoss={previous}`, logs 「守護者と戦いますか？」 and shows `#bosschoice`. `#bosschoice` holds 2 buttons from dist/index.html, `#bossyes`「はい」 and `#bossno`「いいえ」, which the stairs prompt (`s.pendingStairs`, 「地下N階に移動しますか？」) also uses. `answerBoss(yes)`:
 - はい → `encounter(s.pos)` (a guardian-group battle; `monsterFormation(true)` = the floor's boss plus 1–2 normal monsters)
 - いいえ → `s.pos = pending.previous`, log 「戦闘を避け、一歩前のマスへ戻った。」
 

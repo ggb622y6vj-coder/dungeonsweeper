@@ -1,6 +1,6 @@
 # 027 verify — OK（軽微な所見あり）
 
-- origin/main = ad11a9c (included); live dist/*.js + index.html byte-identical.
+- origin/main = f392212 (included); live dist/*.js + index.html byte-identical.
 - Suite: node tests/*.cjs 7本 PASS (incl. target-select.cjs), compile-monsters --check 88 OK, sim selftest PASS, training-browser.py 1280/390 PASS, target-select-browser.py (live) 1280/390 PASS. Test diff = additions only (+1 require in game.cjs).
 - target-select-browser.py covers: field/battle spell & medicine, fallback select/button parity, dead/ash/lost/HP0 untargetable, cancel/Esc/戻る returning to dialog with selection kept, Tab/Enter/Space, rerender focus, 44px taps at 390, no overflow, no JS errors.
 - Independent checks (/tmp/ts.py, live, 1280 & 390):

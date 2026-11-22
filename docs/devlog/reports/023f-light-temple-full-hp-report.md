@@ -1,4 +1,4 @@
-# 023f report — pushed (13300fe)
+# 023f report — pushed (e9223cf)
 - Model: gpt-6-luna low, 1 try. Log: codex023f.log
 - Change: templeRaise success sets HP=maxHP and MP=maxMP (party and reserve); failure (dead→ash, ash→lost) unchanged. Notice text: 「HP・MPが全快した。」 BALANCE/SPEC updated.
 - Tests: the HP1 assertions in temple.cjs/training.cjs replaced with maxHP plus new maxMP checks (stricter). Nothing weakened.

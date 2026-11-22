@@ -1,5 +1,5 @@
 # 017b-light-sim-floor-range 報告
-- コミット: eee76ad（main へ push 済み）
+- コミット: 085678d（main へ push 済み）
 - モデル: gpt-6-luna（effort low）、1回目で成功
 - 変更: scripts/sim/combat.cjs で --floor を1〜10に拡張、--gear shop|drop を追加（省略時は初期装備のまま）。selftest に floor10 と --gear のケースを追加。MANIFEST.sha256 を再生成。
 - テスト: sim selftest、tests/game.cjs、tests/training.cjs、compile-monsters --check（88体）すべてPASS。

@@ -1,7 +1,7 @@
 # 051 [light] Sync monster names and unidentified names with the Notion monster DB
 
 ## Background
-The user's Notion monster DB is the source of truth for monster data. Compared with data/monsters.csv (main b2526e1; unchanged at fed7246), 11 monsters have a different display name (確定名) and 13 have a different unidentified name (不確定名). The internal IDs are the same, so these are renames, not deletions plus additions.
+The user's Notion monster DB is the source of truth for monster data. Compared with data/monsters.csv (main ab1a8e3; unchanged at cd5e7ca), 11 monsters have a different display name (確定名) and 13 have a different unidentified name (不確定名). The internal IDs are the same, so these are renames, not deletions plus additions.
 scripts/compile-monsters.py maps 確定名 → ID with its `ids` table, so a rename in the CSV must also rename the key in `ids`. Otherwise the compiler fails with a KeyError, or the ID changes.
 
 Depends on: none. Do this first. 052 and 054 edit the same CSV rows and the same `ids` table.

@@ -2,7 +2,7 @@
 
 ## 背景
 - ユーザーの要望：「スマホの画面の時、戦闘中は地図のボタンは非表示にする」。
-- 今の実装（origin/main 6c4ac79 で確認）：
+- 今の実装（origin/main 410cd48 で確認）：
   - 地図ボタンは `#maptoggle`（dist/index.html）です。
     - 幅 701px 以上では `#maptoggle{display:none}` になり、地図は常に右側の `#mapdock` に表示されます。
     - 幅 700px 以下の `@media(max-width:700px)` では、`#mapdock` が非表示になり、`#maptoggle` が画面右下に固定ボタンとして出ます。z-index は 50、420px 以下では 20 です。390 幅はこの「スマホ表示」に入ります。

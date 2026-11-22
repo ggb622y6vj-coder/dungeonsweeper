@@ -2,7 +2,7 @@
 
 ## 背景
 - ユーザーの要望（原文）：「図書館のモンスターに載る情報ですが、『毒15%』とか出てきますが、15%は取ってください」
-- 今の実装（origin/main 6c4ac79、dist/library.js の `libraryMonsterDetails`）：
+- 今の実装（origin/main 410cd48、dist/library.js の `libraryMonsterDetails`）：
   - **状態異常タグ**（060、色付きの `ailment-tag ailment-{type}`）：対象は毒・麻痺・石化・恐怖・睡眠・沈黙です。タグの後ろに、`span.library-chance` で「15%」などが付きます。
   - **その他能力タグ**（灰色の `ailment-other`）：ブレス（「炎のブレス」）、アイテム奪取、レベル吸収、即死、仲間呼び、後衛攻撃、逃走、耐性。どれも名前だけで、数値は付きません。
   - **使用呪文の欄**：沈黙の呪文だけ「{呪文名}（沈黙・全体 N%）」と % が付きます。そのほかは呪文名だけです。

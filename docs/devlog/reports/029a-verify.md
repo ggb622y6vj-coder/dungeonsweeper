@@ -1,4 +1,4 @@
-# 029a verify (0dddaa2, origin/main HEAD)
+# 029a verify (16eaced, origin/main HEAD)
 判定: OK（旧セーブ向けに軽微な 029b を起票）
 - Pages 反映後 live = dist 一致。全 tests/*.cjs、compile-monsters --check、selftest PASS。
 - live browser 1280/390: training / target-select / town-layout / auto-temple / tavern-browser(新規) すべて PASS。

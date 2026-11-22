@@ -1,5 +1,5 @@
 # 016-light-floor-config-10f 検証結果 — 判定: OK（todo なし）
-- 対象: 985f4e2（balance.js MAX_FLOOR と trapPower、traps.js、game.js triggerChestTrap、BALANCE.md、テスト）。テスト3つと sim selftest すべて成功
+- 対象: b3f0c26（balance.js MAX_FLOOR と trapPower、traps.js、game.js triggerChestTrap、BALANCE.md、テスト）。テスト3つと sim selftest すべて成功
 - 仕様との照合（done/016）: 盤面サイズと trapCount は変更なし。宝箱の罠は needle・poison・paralysis だけで爆発がないので、宝箱は針だけに倍率が掛かる（仕様の「宝箱の針・爆発」とは矛盾しない）。BALANCE.md はルート直下で、仕様の docs/BALANCE.md と場所が違うが、元からルートにある既存ファイルなので問題なし
 - node（/tmp/v16.cjs、Math.random=0.5 に固定）:
   - trapPower 1/5/10/11 = 1/2/3.25/3.25

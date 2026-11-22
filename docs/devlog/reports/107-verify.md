@@ -1,7 +1,7 @@
 # 指示書107 ライブ検証記録
 
 - 日時：2026-11-12（統合承認後）
-- main：bb70545（hold/107 を fast-forward 統合、Amendment 1 を含む）
+- main：02d62c3（hold/107 を fast-forward 統合、Amendment 1 を含む）
 - デプロイ：GitHub Actions "Deploy GitHub Pages" run 43141428063、成功
 
 ## 検証

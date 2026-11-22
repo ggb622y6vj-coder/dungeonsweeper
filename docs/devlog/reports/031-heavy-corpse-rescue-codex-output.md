@@ -1309,9 +1309,9 @@ dist/game.js:15:function log(t,options={}){if(displayCombat===undefined)displayC
 dist/game.js:63: for(const key of PARTY_FIELDS)s[key]=[];
 drwxr-xr-x 6 box box  4096 Nov  2 00:10 /workspace/dsw-queue
 -rw-r--r-- 1 box box 23042 Nov  1 22:31 /workspace/dungeonsweeper-review.md
-9b17e17 030a: シミュレータが全滅時の死者数を finishDefeat 前に記録するよう修正（selftest 復旧）
-62fac1d 030: 全滅時に遺体（記録・所持金）を迷宮に残し、パーティを空にして町へ。訓練所に遺体表示
-08c7b6e 023a: 宿屋のレベルアップを正常メンバーに限定（死亡/灰はXP保持で据え置き）、費用文言を式に合わせる
+e7f6594 030a: シミュレータが全滅時の死者数を finishDefeat 前に記録するよう修正（selftest 復旧）
+3027892 030: 全滅時に遺体（記録・所持金）を迷宮に残し、パーティを空にして町へ。訓練所に遺体表示
+9866613 023a: 宿屋のレベルアップを正常メンバーに限定（死亡/灰はXP保持で据え置き）、費用文言を式に合わせる
 
 codex
 030の遺体データは、装備・経験値・所持金を保持しています。この形式を維持し、遺体マスの罠だけを移します。移動先から開始地点周辺と守護者への安全経路を除外し、回収後は既存の寺院で蘇生できることも検証します。

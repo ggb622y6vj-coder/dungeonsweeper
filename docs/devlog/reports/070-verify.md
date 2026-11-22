@@ -1,8 +1,8 @@
-# 070/070b 戦闘コマンド 検証（main 30ff726）
+# 070/070b 戦闘コマンド 検証（main e393da0）
 総合：OK（NGなし）。全テストで1件だけ一時的な失敗があったが、再実行で通った（備考を参照）。
 
 ## デプロイ・テスト
-- 公開サイトの dist/*.js・index.html が 30ff726 と一致（cmp で差分なし）。
+- 公開サイトの dist/*.js・index.html が e393da0 と一致（cmp で差分なし）。
 - 全テスト：59/60 PASS。対象はテストファイル58本＋ compile --check ＋ selftest。
 - 唯一の失敗は identifyfoe-browser.py。
   - 54行目の `wait_for_function('!logBusy()')` が30秒でタイムアウトした。

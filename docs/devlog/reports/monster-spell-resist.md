@@ -1,6 +1,6 @@
 # モンスターの呪文抵抗率：今の実装と原作の比較
 
-調べた版：origin/main eb7c9cb（data/monsters.csv、dist/spells.js、dist/game.js）
+調べた版：origin/main 3d91187（data/monsters.csv、dist/spells.js、dist/game.js）
 
 ## 結論
 **今のゲームには「呪文抵抗率」という数値はありません。** モンスターの CSV にも、そういう列はありません（列は 確定名〜即死・耐性 だけです）。

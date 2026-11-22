@@ -1,7 +1,7 @@
 # 指示書105 ライブ検証記録
 
 - 日時：2026-11-11（統合承認後）
-- main：af6ca7e（hold/105 を fast-forward 統合）
+- main：4b946d1（hold/105 を fast-forward 統合）
 - デプロイ：GitHub Actions "Deploy GitHub Pages" run 43017624624、成功
 
 ## 検証

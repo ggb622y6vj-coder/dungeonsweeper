@@ -1,5 +1,5 @@
-# 071 検証（main 4510127, 公開サイト）
-- HEAD 4510127 / 公開サイト配信一致（dist/*.js, index.html cmp OK）
+# 071 検証（main aca4692, 公開サイト）
+- HEAD aca4692 / 公開サイト配信一致（dist/*.js, index.html cmp OK）
 - 全テスト 60/60 PASS（/tmp/v071-suite.log）
 - スクリプト /tmp/v071.py、スクショ report/071-shots-live/（20枚）
 

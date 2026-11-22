@@ -1,7 +1,7 @@
 # 024 light auto-levelup / remove inn — report
 
 - Model: gpt-6-luna (reasoning low), 1 try (~1.5 min). Log: report/codex024.log
-- Commit: 141d142 (pushed to origin/main)
+- Commit: 5e27d8f (pushed to origin/main)
 
 ## Changes
 - dist/game.js: enterTown() now runs levelUp for status==='ok' members, then refills HP/MP to new max for ok members, then showLevelReport() (only shows when someone leveled; levelReport is replaced each levelUp). stayAtInn and the #innopen/#innclose/#stable handlers removed.

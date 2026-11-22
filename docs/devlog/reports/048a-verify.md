@@ -1,5 +1,5 @@
 # 048a 宝箱が満杯のときのログ統一 検証 — OK
-対象: b2526e1（origin/main、push なし）
+対象: ab1a8e3（origin/main、push なし）
 
 ## 結果
 - dist の変更は game.js の rewardChest だけ。eligible の分岐を削除し、満杯時は `${w.name}を見つけたが、アイテムがいっぱいだ。` を出す

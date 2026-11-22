@@ -11,7 +11,7 @@
 ## 目的
 本人の要望です。死者が出た状態で町に帰ると、現在は死者がパーティーに残り、enterDungeon で「死亡したメンバーを外してください。」と止められ、訓練所で手動で外す必要がある。帰還時に死亡・灰（・ロスト）のメンバーを自動でパーティーから外して寺院に運び、メッセージウィンドウで知らせる。
 
-## 現状（afd33ae）
+## 現状（8dcc206）
 - dist/game.js enterTown()：status==='ok' のみ levelUp と HP/MP 全回復 → resetDungeon() → render() → showLevelReport()（s.levelReport があれば #leveldialog を showModal）。
 - enterDungeon()：`s.members.some(m=>m.status!=='ok')` なら #townnotice に「死亡したメンバーを外してください。」で中止（020）。
 - 寺院 renderTemple / templeRaise は trainingRoster()（パーティー＋s.reserve）から dead/ash を列挙するので、控え（reserve）にいても表示・蘇生できる（表示は「控え」）。

@@ -1,6 +1,6 @@
 # 026a-light-2f3f-monster-dice 報告（未 push・OK判定不合格）
 Codex: gpt-6-luna / low、1回目で実装完了（約1.6分）。ログ: report/codex026a.log
-コミット 2cbf455 はローカルブランチ hold/026a-dice に保存。main は origin/main (e54494b) のまま。task は todo/ に残置。
+コミット 2cbf455 はローカルブランチ hold/026a-dice に保存。main は origin/main (47f2a18) のまま。task は todo/ に残置。
 
 ## 変更（2cbf455）
 - data/monsters.csv / dist/monster-data.js: 2F 9種 → 1d8+1（火蜻蛉 1d8）、3F 4種 → 2d6+1、黒牙狼 → 2d8+1。指定どおり。ガーディアン（深層の魔将・奈落の監視者）とブレスは不変。
@@ -10,7 +10,7 @@ Codex: gpt-6-luna / low、1回目で実装完了（約1.6分）。ログ: report
 tests/*.cjs 全7本、compile-monsters.py --check（88種）、sim selftest、training-browser.py 1280/390px。
 
 ## sim（クリーン worktree, --jobs 0,0,2,3,1,2 --n 150, 勝率/死者毎戦）
-| 構成 | 前 e54494b | 後 2cbf455 |
+| 構成 | 前 47f2a18 | 後 2cbf455 |
 |---|---|---|
 | 装備なし 2F Lv2 通常 | 84.0% / 0.70 | 84.0% / 0.67 ✔(≥84) |
 | 装備なし 3F Lv3 通常 | 66.0% / 1.56 | 68.0% / 1.33 ✔(≥66) |

@@ -1,4 +1,4 @@
-# 023-light-inn 検証 (8227c95) — 機能OK／軽微バグ1／序盤バランス要調整
+# 023-light-inn 検証 (493b82f) — 機能OK／軽微バグ1／序盤バランス要調整
 ## テスト
 - tests/*.cjs 全PASS、compile-monsters.py --check・selftest PASS（クリーン /tmp/c23）
 ## 仕様照合（node, /tmp/v23.cjs）
@@ -17,7 +17,7 @@ tests/game.cjs
 tests/death-status.cjs
 5. `s.mp[1]===maxMP` → `===帰還前MP`（妥当）
 6. `hp: 死者0・他maxHP` → `全員 帰還前HPと一致`（妥当。死者0は帰還前値に含意）
-## 実機（Pages=8227c95一致、PC+390x844）
+## 実機（Pages=493b82f一致、PC+390x844）
 - 帰還後 HP3/MP0・Lv1のまま・popupなし → 宿屋「普通の部屋：60 G」、所持金1Gで部屋disabled・馬小屋有効 → 部屋泊 1000→940G、HP全快、Lv7/7/6/6/5/6 とレベル報告表示。pageerror 0
 - SS: /workspace/sim/v023-{desktop,mobile}-{inn,levelup}.png
 ## 自動プレイ（/workspace/sim/bot2.cjs + run2.cjs、DIST=/tmp/c23/dist）

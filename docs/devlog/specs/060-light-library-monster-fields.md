@@ -1,7 +1,7 @@
 # 060 [light] 図書館のモンスター情報の項目・表記の変更と状態異常タグ
 
 ## 背景
-（origin/main eb7c9cb 時点）
+（origin/main 3d91187 時点）
 - `libraryMonsterDetails` の表示項目は、出現階（地下n階）・HPの目安・攻撃（ダイス）・攻撃回数・使う呪文・特殊能力（「・」でつないだ文字列。耐性も含む）・撃破数・初撃破階です。
 - パーティーのステータス画面の状態異常タグは、`ailmentTags()` が出力する `<span class="ailment-tag ailment-{poison|paralysis|stone|dead|fear|silence|sleep}">` で、色は dist/index.html の CSS で決まっています。
 

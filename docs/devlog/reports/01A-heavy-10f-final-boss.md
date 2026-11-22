@@ -1,5 +1,5 @@
 # 01A-heavy-10f-final-boss 報告
-- コミット: be3906c（main へ push 済み）
+- コミット: 60eee8e（main へ push 済み）
 - モデル: gpt-6-astra / reasoning high（1回目）
 - 変更: 10Fで迷宮の主（取り巻き込み）撃破で cleared=true、下り階段なし、クリアログとクリア表示（町に戻るボタン）。travelFloor は1〜10以外を拒否、旧セーブの10F以降の下り階段も無効化。町に「迷宮踏破済み」表示。SPECIFICATION に終了条件。tests/final-boss.cjs 追加（game.cjs から実行）。
 - テスト: game.cjs / training.cjs / compile-monsters --check / sim selftest すべてPASS。MANIFEST 更新。

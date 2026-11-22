@@ -1,5 +1,5 @@
 # 005-bugfix-chest-item-pool 検証結果 — 判定: OK
-- 対象: 82a7f8f（/workspace/verify-clone）
+- 対象: 6d9fb09（/workspace/verify-clone）
 - テスト: game.cjs・training.cjs・compile-monsters --check すべて成功
 - node（chestItemPool(floor) から各階5000回抽選）:
   - 1F: 最高価格 130G（chain）、20種類。板金鎧(plate 300G)は出ず、150G超も0件

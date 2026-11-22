@@ -1,5 +1,5 @@
 # 002-bugfix-poison-death-log 検証結果 — 判定: OK
-- 対象: c59a7dc（検証クローン /workspace/verify-clone、HEAD=0d94aaa）
+- 対象: 2298ca5（検証クローン /workspace/verify-clone、HEAD=52ab8f1）
 - テスト: tests/game.cjs・tests/training.cjs・compile-monsters.py --check すべて成功
 - node（/workspace/sim/harness.cjs、tickAilmentsを直接実行）:
   - 探索中に毒で死亡（logPoison=false）: ["Aは毒で倒れた。"] 1回だけ

@@ -1,5 +1,5 @@
 # 013-light-guardian-escort 実装報告
-- コミット: 6c3a771（main へ push 済み）
+- コミット: 6c02680（main へ push 済み）
 - モデル: gpt-6-luna（reasoning low）、1回目で成功
 - 変更: dist/monsters.js monsterFormation(boss) を [守護者, 同階の非守護者1種, 50%でもう1種]（2〜3列、守護者は1列目）に。BALANCE.md の守護者記述を更新。tests/game.cjs の守護者テストを編成3列・随伴だけ撃破で戦闘継続・守護者撃破で下り階段化に更新。MANIFEST.sha256 再生成。
 - テスト: tests/game.cjs、tests/training.cjs、compile-monsters --check、scripts/sim/selftest.cjs すべて PASS。ブラウザ未確認。

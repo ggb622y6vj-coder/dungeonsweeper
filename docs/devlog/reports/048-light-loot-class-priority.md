@@ -1,4 +1,4 @@
-# 048 拾得アイテムの職業優先受取 — 完了（5ad5413、main へ push）
+# 048 拾得アイテムの職業優先受取 — 完了（7c88d18、main へ push）
 - Codex: gpt-6-luna low（1回目で採用、ログ report/codex048.log）
 - 変更: items.js に共通関数 lootRecipient(w)（使える職業かつ10個未満の先頭 → なければ10個未満の先頭 → なければ -1）。宝箱 rewardChest・敵ドロップ dropWeapon・薬 dropMedicine をこれに統一。ログ文言は不変。受取者の生存/石化判定は従来どおり見ない。
 - テスト: 新規 tests/loot-recipient.cjs（宝箱/ドロップ両方で: 魔法使い専用杖→魔法使い、魔法使い満杯→空きのある別メンバー（ドロップでも捨てない）、使える職業内はパーティー順、全員満杯→いっぱいログ、薬は先頭から）。main の dist では失敗することを確認。

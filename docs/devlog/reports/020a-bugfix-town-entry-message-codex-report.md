@@ -1,5 +1,5 @@
 # 020a-bugfix-town-entry-message 実装報告
-- コミット: 8405059（main に push 済み）
+- コミット: 6451d7f（main に push 済み）
 - モデル: gpt-6-luna（reasoning low）、1回目で成功
 - 変更: dist/index.html の町に <p id="townnotice" role="status"> を追加。enterDungeon の拒否時に log の代わりに #townnotice へ「死亡したメンバーを外してください。」を表示、入場成功時に空にする。拒否判定は不変。
 - テスト: tests/death-status.cjs に通知文言と入場時の消去を追加。tests/*.cjs 全PASS、compile-monsters --check PASS、MANIFEST 再生成。

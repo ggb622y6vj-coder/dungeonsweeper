@@ -1,6 +1,6 @@
-# 040 町と施設のキーボード操作: 完了（main a3f9cac、push済み）
+# 040 町と施設のキーボード操作: 完了（main 99e8118、push済み）
 
-hold/040（3eac9b7）を main（041 a19f5ae → 作業中に push された 042 ad6d6a0）の上へ統合し、単一コミット a3f9cac として push。HANDOFF は 041・042・040 の節を順に並べた。
+hold/040（3eac9b7）を main（041 711e286 → 作業中に push された 042 885a4f3）の上へ統合し、単一コミット 99e8118 として push。HANDOFF は 041・042・040 の節を順に並べた。
 
 ## オーナー決定の反映
 - (a) KeyNav の帯優先を採用。`nearest` が同じ行・列の帯を優先し、該当がなければ中心距離。041 の `gridMove`/`step`（戦闘コマンド・列・呪文・薬一覧・味方/ステータスカード）はそのまま残して両立。書き換えた keynav-browser.py の期待値（同じ厳しさ）を採用。tests/keynav.cjs の 041 チェック「中心距離だけだと全幅の戻るを選ぶ」は、新ルールに合わせて「nearest でも同じ行の防御を選ぶ」＋「同じ行がなければ中心距離で戻る」に置き換え（チェック数は1→2）。
@@ -12,10 +12,10 @@ hold/040（3eac9b7）を main（041 a19f5ae → 作業中に push された 042 
 ## 競合の解消
 keynav.js（ヒント文言は宝箱 Esc＋Q/E タブを両立、defaultItem はボス/階段/ステータスの特例＋040 の既定選択、back は宝箱/logBusy＋順番変更の選択解除、keydown は logBusy/ステータスカード＋タブ操作/順番変更）。index.html は 040 版に 041 の #medicinelist（CSS・div）を戻す。docs は両方の節を残し、統合メモを追加。
 
-## テスト（a3f9cac、042 統合後に全件再実行）
+## テスト（99e8118、042 統合後に全件再実行）
 - node tests/*.cjs: 16本 PASS（monster-level-hit 含む）
 - compile-monsters --check: PASS
-- sim selftest（クリーンな worktree a3f9cac）: 4行 PASS
+- sim selftest（クリーンな worktree 99e8118）: 4行 PASS
 - ブラウザ全14本（各 1280/390）: PASS
 - 10回連続: town-keys・keynav・explore-keys・battle-keys が各 10/10
 - MANIFEST.sha256: 再生成（65ファイル）、sha256sum -c OK
@@ -28,4 +28,4 @@ keynav.js（ヒント文言は宝箱 Esc＋Q/E タブを両立、defaultItem は
 ## 040b follow-up (2026-11-03): permanent spell record
 - Library spell tab now uses a permanent `s.library.spells` record (saved in ash-v1 with monsters/items) instead of currently registered adventurers' `known`. Recorded on recruit registration, `learnMagic` (level up), `ensureMagic`, every `save()`, and on render. Legacy saves without the record are seeded from party + reserve. Survives deletion/wipe/loss; explicit full reset still clears the library. Never-learned spells stay 「？？？」.
 - tests/library.cjs: new block (creation, level-up, saved record, learned spells shown after deleting the only learner + reload, legacy migration from party + reserve).
-- Checks: all node tests/*.cjs, compile-monsters --check, sim selftest (clean worktree), all 14 browser tests at 1280/390, town-keys-browser 10/10; MANIFEST regenerated, sha256sum -c OK. Commit 223d427 pushed to origin main.
+- Checks: all node tests/*.cjs, compile-monsters --check, sim selftest (clean worktree), all 14 browser tests at 1280/390, town-keys-browser 10/10; MANIFEST regenerated, sha256sum -c OK. Commit 29ca901 pushed to origin main.

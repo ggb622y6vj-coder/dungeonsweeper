@@ -1,5 +1,5 @@
 # 036 report
-Commit: 84e2108 (single squashed commit on origin/main). Model: gpt-6-astra (high), two runs (first stopped at usage limit; resumed from wip/036 after owner's reset).
+Commit: aaf7324 (single squashed commit on origin/main). Model: gpt-6-astra (high), two runs (first stopped at usage limit; resumed from wip/036 after owner's reset).
 Change: silence ailment (3 turns, ticks per combat turn, cleared at battle end/flee/defeat/town), spellReason '沈黙している', status tag + CSS, Dialko/Madi/気付け薬 cure silence; player Montino (priest Lv3, MP4, group, Katino formula, boss-immune, e.silence blocks enemy spell -> normal attack); enemy Montino via spellInfo.effect (dark priest 4F 30%, witch 8F 25%), compile-monsters updated; library display; sim AI + full ailment shape; docs.
 Review: full diff reviewed; no bugs found needing changes.
 Test changes: game.cjs MAGIC count 25->26 / priest known 13->14 (new spell); training.cjs fixture uses full ailment shape.

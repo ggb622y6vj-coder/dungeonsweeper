@@ -1,6 +1,6 @@
 # 043 マカニト — 保留（HELD）
 
-- 状態: **push していない**。ローカルブランチ `hold/043`（ec05f80 = Codex c1034bb + MANIFEST 再生成）。main は origin/main 223d427 のまま。
+- 状態: **push していない**。ローカルブランチ `hold/043`（219f6e2 = Codex 1c25508 + MANIFEST 再生成）。main は origin/main 29ca901 のまま。
 - モデル: gpt-6-astra high（1回目で完了）。レビューで修正は不要だった。
 - 保留理由: シム基準「1〜4F は死亡・全滅とも基準以下」を 4F が n=400 で満たさない（全滅 0→0.25%、死亡 0→0.005/戦）。
 
@@ -11,11 +11,11 @@
 - シム planTurn: 魔術師が MP12 以上・使用可能で、対象になる生存敵が3体以上ならマカニト。恐怖時の代替呪文選択からは除外。
 - テスト: tests/makanito.cjs 新規（game.cjs から require）、tests/makanito-browser.py 新規、game.cjs の呪文数 26→27・魔術師習得数 12→13、town-keys-browser.py の図鑑呪文数 26→27。docs/SPELLS.md・HANDOFF・SPECIFICATION・docs/043-MAKANITO.md。
 
-## テスト（worktree ec05f80 相当 = c1034bb のコード）
+## テスト（worktree 219f6e2 相当 = 1c25508 のコード）
 - tests/*.cjs 全17本 PASS、compile-monsters --check PASS、sim selftest PASS（clean worktree）。
 - ブラウザ全15本 PASS（各テストが 1280/390 両方を実行）。makanito-browser.py 10/10 PASS。T キー割り当てなし。
 
-## シム（--jobs 0,0,2,3,1,2 --n 400、before=worktree 223d427、after=worktree c1034bb）
+## シム（--jobs 0,0,2,3,1,2 --n 400、before=worktree 29ca901、after=worktree 1c25508）
 | 階 | Lv | 全滅 before→after | 死亡/戦 before→after |
 |---|---|---|---|
 | 1F | 3 | 0→0 | 0.010→0.010 |

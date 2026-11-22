@@ -12,7 +12,7 @@
 町画面（dist/index.html `#town`）は ♜アイコン（.townart font-size:80px）と「灯の町」見出しが中央に大きく、パネル上部の padding 36px と合わせて画面上部を占有している。最もよく押す「迷宮への入り口」(#entrance) は .townmenu の最後にあり、390px では縦1列の最下段（スクロール位置次第で画面外）になる。
 見出しを左上の小さなヘッダーにまとめ、#entrance を最上段に全幅で目立たせ、残りのボタンを2列グリッドで並べる。
 
-## 現状（141d142）
+## 現状（5e27d8f）
 - HTML: `<section id="town" class="panel"><div class="townart">♜</div><h2>灯の町</h2><p id="townnotice" role="status"></p><small id="clearedmark" hidden>迷宮踏破済み</small><button id="resetopen">冒険データをリセット</button><div class="townmenu"> #trainingopen #tavernopen #blacksmith #templeopen #entrance </div></section>`
 - CSS: `#town{text-align:center;padding:36px 20px}` `.townart{font-size:80px}` `#town h2{letter-spacing:7px}` `.townmenu{display:flex;gap:16px;padding:20px}` `.townmenu button{min-width:180px;padding:22px}`、`@media(max-width:700px){.townmenu{flex-direction:column}}`、別箇所に `.townmenu{flex-wrap:wrap}`。
 

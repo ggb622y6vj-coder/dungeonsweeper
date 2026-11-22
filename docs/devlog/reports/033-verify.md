@@ -1,4 +1,4 @@
-# 033 verify (ac053d1, origin/main HEAD)
+# 033 verify (253b827, origin/main HEAD)
 判定: OK
 - Pages 反映後 live = dist 一致。node 11本（petrify.cjs 新規を含む）、compile-monsters --check、selftest（stone の sim 対応を含む）PASS。live browser 8本 × 1280/390 全 PASS（petrify-browser 新規）。
 - 独自確認（/tmp/v033*.cjs, /tmp/v033b.py）

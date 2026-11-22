@@ -1,5 +1,5 @@
-# 072 検証（main b73ead5, 公開サイト）— 全項目 OK
-- HEAD b73ead5、公開サイト配信一致（dist/*.js・index.html cmp OK）
+# 072 検証（main c60e4d0, 公開サイト）— 全項目 OK
+- HEAD c60e4d0、公開サイト配信一致（dist/*.js・index.html cmp OK）
 - 全テスト 63/63 PASS（61ファイル + compile + selftest、/tmp/v072-suite.log）
 - 公開サイトで確認（1280/390 とも同結果、JSエラー・横スクロールなし）。スクリプト: tests/notion-sync-browser.py（公開URL指定）と /tmp/v072.py
 - スクショ report/072-shots-live/: library / spells / enemy-spell-log / milwa-29 / identify（各 1280・390）

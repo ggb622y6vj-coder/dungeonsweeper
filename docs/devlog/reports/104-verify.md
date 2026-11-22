@@ -1,7 +1,7 @@
 # 指示書104 ライブ検証記録
 
 - 日時：2026-11-11（統合承認後）
-- main：caad41c（hold/104 を fast-forward 統合）
+- main：e869f48（hold/104 を fast-forward 統合）
 - デプロイ：GitHub Actions "Deploy GitHub Pages" run 42978455774、成功
 
 ## 検証

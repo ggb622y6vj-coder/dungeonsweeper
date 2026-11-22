@@ -1,5 +1,5 @@
 # 019b-light-ancientdragon-tuning 報告
-- コミット: dfa3ee1（main へ push 済み）
+- コミット: c86181b（main へ push 済み）
 - モデル: gpt-6-luna / reasoning low（1回目で成功）
 - 変更: data/monsters.csv の古竜(9F)のみ。HP 18d8+36→16d8+32、ブレス発動率 35%→25%（7d8 は据え置き）。dist/monster-data.js 再生成、MANIFEST.sha256 更新。
 - テスト: tests/game.cjs / tests/training.cjs / tests/final-boss.cjs / compile-monsters --check（88体）/ sim selftest すべてPASS。

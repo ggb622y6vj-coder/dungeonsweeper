@@ -1,5 +1,5 @@
 # 017-light-monsters-4-10f 実装報告
-- コミット: ae5dab2（main に push 済み）
+- コミット: e59a742（main に push 済み）
 - モデル: gpt-6-luna / reasoning low（1回目で成功）
 - 変更: data/monsters.csv と scripts/compile-monsters.py を assets の用意済みファイルに置換（内容一致を確認、数値変更なし）、dist/monster-data.js 再生成、dist/monsters.js（monsterFormation の階上限を ENEMIES の最大階に／敵呪文を spellInfo 対応、target=all は生存者全員）、tests/game.cjs（CSV 88体、1〜11F の出現表と守護者10体、マハリトの全体呪文テスト追加）、BALANCE.md に階ごとの敵一覧、MANIFEST.sha256 再生成
 - テスト: node tests/game.cjs、node tests/training.cjs、compile-monsters.py --check（88 monster definitions validated）、scripts/sim/selftest.cjs すべて PASS

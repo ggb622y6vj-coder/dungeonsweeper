@@ -1,4 +1,4 @@
-# 019a-light-guardian-8f-9f-tuning 検証（f8fca08）
+# 019a-light-guardian-8f-9f-tuning 検証（78e51b7）
 判定：**8F OK / 9F 未達 → todo/019b-light-ancientdragon-tuning.md**
 
 ## テスト・データ

@@ -1,4 +1,4 @@
-# 047 味方対象プルダウン廃止 — 完了（255e617、main へ push）
+# 047 味方対象プルダウン廃止 — 完了（0c4eb24、main へ push）
 - Codex: gpt-6-luna low（1回目で採用、ログ report/codex047.log）
 - 変更: index.html から #medicinechoice（#medicinetarget/#medicineuse）と案内バーのフォールバック枠を削除。spells.js は ally 呪文で #magictarget を作らず #magiccast 非表示。combatui.js の #allytargetspellselect/#allytargetspelluse とフォールバック処理を削除。items.js の medicineuse ハンドラ削除。SPECIFICATION.md 更新。
 - レビューで追加修正: 戦闘中の ally 呪文でコマンド欄に味方名ボタン（data-spell-target）が残っていた旧方式も削除（spellTargetButtons が ally で空、commandentry の ally 分岐削除）。敵/グループ/階層対象は不変。

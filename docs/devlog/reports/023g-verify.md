@@ -1,5 +1,5 @@
-# 023g 検証 (7b91da1) — OK
-- verify-clone で git fetch → origin/main を checkout、HEAD=7b91da1、作業ツリーはクリーン
+# 023g 検証 (c654cc6) — OK
+- verify-clone で git fetch → origin/main を checkout、HEAD=c654cc6、作業ツリーはクリーン
 - 差分: tests/training-browser.py と MANIFEST.sha256 のみ。ゲームコード(dist/)の変更なし。docsの変更もなし
 - Chromeを探す順: CHROME_PATH → /usr/bin/chromium → /usr/bin/google-chrome → /usr/bin/chromium-browser → どれもなければ executable_path を指定せず Playwright 同梱のブラウザ。指示どおり
 - 無改変で実行（/tmp/pyv、CHROME_PATH 未設定、クリーンな dist をローカルで配信）: google-chrome を自動選択、1280px・390px とも PASS（幅2つはスクリプト内のループ）

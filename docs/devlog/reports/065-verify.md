@@ -1,8 +1,8 @@
-# 065/065a 検証（main d18fb9e）
+# 065/065a 検証（main 68e9809）
 総合：OK（NGなし）
 
 ## デプロイ・テスト
-- 公開サイトの dist/*.js・index.html が d18fb9e と一致（cmp で差分なし）。
+- 公開サイトの dist/*.js・index.html が 68e9809 と一致（cmp で差分なし）。
 - 全テスト 53/53 PASS（テストファイル51本〔新規 mobile-map-battle-browser を含む〕＋ compile --check ＋ selftest）。
 
 ## 公開サイトでの確認（/tmp/v065.py、スクショは 065-shots-live/）

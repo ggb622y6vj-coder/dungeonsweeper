@@ -1,5 +1,5 @@
 # 015-light-flag-tuning 実装報告
-- コミット: 88292fe（main へ push 済み）
+- コミット: 76817d9（main へ push 済み）
 - モデル: gpt-6-luna（reasoning low）、1回目で成功
 - 変更: dist/flags.js flagChance() を二乗式 min(.50,.005n²) → 線形 min(.40,.04n)（FLAG_CHANCE_PER/FLAG_CHANCE_CAP 定数追加）。tests/game.cjs の旗確率テスト2か所を 0→0/1→.04/5→.2/10→.4/100→.4 に更新。docs/SPECIFICATION.md・BALANCE.md 更新。MANIFEST.sha256 再生成。発動効果・誤旗の呪いは変更なし。
 - テスト: tests/game.cjs、tests/training.cjs、compile-monsters --check、scripts/sim/selftest.cjs すべて PASS

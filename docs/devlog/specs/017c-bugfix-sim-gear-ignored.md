@@ -1,5 +1,5 @@
 # 017c-bugfix-sim-gear-ignored
-ティア：LIGHT　依存：017b（eee76ad）
+ティア：LIGHT　依存：017b（085678d）
 
 ## 共通ルール（必読・/workspace/dsw-queue/README-handoff.md と同じ）
 - 先に AGENTS.md、docs/HANDOFF.md、docs/SPECIFICATION.md を読む。実行コードが正本。

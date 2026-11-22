@@ -1,5 +1,5 @@
 # 010-light-sim-tool 検証結果 — 判定: 条件付きOK（仕組みは信頼できる。011より前に 010a で AI を1点修正したい）
-- 対象: 945e527。変更は scripts/sim/*、README、MANIFEST のみ。`git show --stat` で dist/・tests/・data/ に変更なし
+- 対象: ea7020b。変更は scripts/sim/*、README、MANIFEST のみ。`git show --stat` で dist/・tests/・data/ に変更なし
 - テスト: selftest PASS。Lv1/3F n=100 → 勝率46% / 全滅7%（9.4秒）。n=1000 → 47.9% / 5.6% / 死者2.05/戦
 - 仕組みの忠実さ: OK。harness は実 dist の12ファイルを vm で実行し、戦闘は generateRecruit、registerRecruit、changeRecruitParty、levelUp、fresh、encounter、attack、flee、finishMonsterBattle といった実関数だけで回している。命中・ダメージ・呪文・奇襲などの式の再実装はない。乱数は呼び出しごとに固定シードを1回だけ設定し、試行間で連続させている（1回目の失敗の原因だったシードの巻き戻しは解消済み）
 - 差の原因（AI の方針）:

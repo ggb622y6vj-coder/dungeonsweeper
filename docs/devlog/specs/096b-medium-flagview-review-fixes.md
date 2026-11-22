@@ -1,7 +1,7 @@
 # 096b 旗視（flagview）レビュー指摘の修正
 
 - 優先度: medium
-- 対象ブランチ: **hold/096**（現在の先頭 451c966 の上に追加コミット。新ブランチは切らない）
+- 対象ブランチ: **hold/096**（現在の先頭 55338ce の上に追加コミット。新ブランチは切らない）
 - 元仕様: docs/devlog/specs/096-medium-mage-flag-count-spell.md
 - 根拠: ChatGPT（GPT-6 Thinking high）によるhold/096レビュー、結論「修正後に可」
   https://chatgpt.com/c/6af2742e-bea8-83ee-bd91-a42fbc07657d
@@ -10,14 +10,14 @@
 ## 必須修正
 
 ### 1. 無関係な075スクショの差分を元に戻す
-hold/096 で以下4枚が変更されている（試遊が `git diff --stat d24d574..451c966` で確認済み）。096とは無関係なので **main d24d574 の内容に戻す**。
+hold/096 で以下4枚が変更されている（試遊が `git diff --stat 1a664b2..55338ce` で確認済み）。096とは無関係なので **main 1a664b2 の内容に戻す**。
 - docs/devlog/reports/075-shots/disarm-1280.png
 - docs/devlog/reports/075-shots/disarm-390.png
 - docs/devlog/reports/075-shots/spell-1280.png
 - docs/devlog/reports/075-shots/spell-390.png
 
 あわせて、なぜ変わったか（テストやスクショ生成スクリプトが075の出力先に書いたのか等）を調べ、再発しないようにする。原因はレポートに書く。
-完了条件: `git diff --stat d24d574..HEAD` に 096 と関係しない既存ファイルの変更が含まれないこと（096で意図した変更のみ）。
+完了条件: `git diff --stat 1a664b2..HEAD` に 096 と関係しない既存ファイルの変更が含まれないこと（096で意図した変更のみ）。
 
 ### 2. 発動中の再詠唱理由を「発動中」を優先にする
 現状 `spellReason()` で MP不足判定が「発動中」判定より先にあるため、MP5で旗視を唱えてMP0になると再選択時に「MP不足」と出る。

@@ -1,4 +1,4 @@
-# 031-heavy-corpse-rescue 検証 (62b44e3) — OK（バグなし）
+# 031-heavy-corpse-rescue 検証 (84d5396) — OK（バグなし）
 ## テスト
 - tests/*.cjs 全PASS、compile-monsters --check PASS、selftest PASS（030aで復旧済み）
 - テスト差分は追加のみ（tests/training.cjs +99行、削除行0）→弱化なし
@@ -8,7 +8,7 @@
 - 複数遺体: 同マスは一度に全回収、別階の遺体は残る。10F遺体（MAX_FLOOR）も罠なし・開始外
 - 救出隊が帰還前に再全滅: 回収済み6人は控え(dead)に残り、新遺体は救出隊6人のみ、IDの重複0、金貨は新遺体に引き継ぎ（消失・重複なし）
 - 控え人数の上限はコード上なし（registerRecruitも無制限）→ 溢れ問題なし
-## 実機（Pages=62b44e3一致、PC+390x844）
+## 実機（Pages=84d5396一致、PC+390x844）
 - 1F守護者戦で実全滅（遺体 gold300）→訓練所UIで3人作成＋控えRでパーティ→入場、遺体マスに 🦴 表示（指示文の🤴ではなく仕様どおり骨）・罠なし
 - 遺体マスへ移動→「遺体を回収した。」、控えに W0〜W5:dead、金貨300復帰、遺体0 → 町→寺院でW0蘇生成功。pageerror 0
 - SS: /workspace/sim/v031-{desktop,mobile}-{training,bone,rescued,temple}.png

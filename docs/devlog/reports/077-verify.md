@@ -1,6 +1,6 @@
 # 077 検証記録（2026-11-06 JST）
 
-対象：`main` 0c45df0（b7401e0 から fast-forward 統合。077 の変更1〜4とレビュー対応記録を含む）
+対象：`main` f27ab58（a0aaae1 から fast-forward 統合。077 の変更1〜4とレビュー対応記録を含む）
 
 ## 統合と CI
 - `hold/077` を push 後、main へ fast-forward 統合して push した（マージコミットなし）。

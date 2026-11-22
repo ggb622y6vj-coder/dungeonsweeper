@@ -1,5 +1,5 @@
 # 017c-bugfix-sim-gear-ignored 報告
-- コミット: 4487a97（main へ push 済み）
+- コミット: 679cb92（main へ push 済み）
 - モデル: gpt-6-luna / reasoning low（1回目で成功）
 - 変更: scripts/sim/combat.cjs の gearParty 末尾で simBase を取り直し、prepareTrial 後も装備が残るようにした。Lv1基準の成長リセットは維持。selftest.cjs に回帰テスト（prepareTrial 後の装備保持、固定seedで drop/shop が装備なしと異なる）を追加。MANIFEST.sha256 更新。
 - テスト: selftest / tests/game.cjs / tests/training.cjs / compile-monsters --check すべてPASS。

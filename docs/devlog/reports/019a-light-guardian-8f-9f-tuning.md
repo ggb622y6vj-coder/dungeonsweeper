@@ -1,5 +1,5 @@
 # 019a-light-guardian-8f-9f-tuning 報告
-- コミット: f8fca08（main へ push 済み）
+- コミット: 78e51b7（main へ push 済み）
 - モデル: gpt-6-luna / reasoning low（1回目で成功）
 - 変更: 案A。data/monsters.csv の魔将軍(8F) HP 16d8+40→14d8+35、古竜(9F) HP 20d8+40→18d8+36（約10%減）。dist/monster-data.js 再生成、MANIFEST.sha256 更新。
 - テスト: tests/game.cjs / tests/training.cjs / compile-monsters --check / sim selftest すべてPASS。

@@ -1,4 +1,4 @@
-# 01A-heavy-10f-final-boss 検証（be3906c）
+# 01A-heavy-10f-final-boss 検証（60eee8e）
 判定：**機能はOK。難易度は易しすぎる → todo/01Ab-light-final-boss-tuning.md**
 
 ## テスト

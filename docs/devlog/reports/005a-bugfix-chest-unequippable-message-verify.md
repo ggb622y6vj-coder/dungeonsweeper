@@ -1,5 +1,5 @@
 # 005a-bugfix-chest-unequippable-message 検証結果 — 判定: OK
-- 対象: 2f1d1c7（/workspace/verify-clone）。テスト3つすべて成功
+- 対象: b22c023（/workspace/verify-clone）。テスト3つすべて成功
 - node（Math.random=0.1 に固定し、1Fで短剣を引く。/tmp/v5a.cjs）:
   - 全員戦士: 「短剣を見つけたが、誰も扱えないので置いていった。」が1回、所持品は変化なし
   - 盗賊はいるが全員の所持品が10個: 「アイテムがいっぱいで装備品を持ち帰れなかった。」、所持品は変化なし

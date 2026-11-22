@@ -1,7 +1,7 @@
 # 指示書103 ライブ検証記録
 
 - 日時：2026-11-11（統合承認後）
-- main：fbbbfab（hold/103 を fast-forward 統合）
+- main：aee5aec（hold/103 を fast-forward 統合）
 - デプロイ：GitHub Actions "Deploy GitHub Pages" run 42958362162、成功
 
 ## 検証

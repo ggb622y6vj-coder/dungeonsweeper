@@ -1,5 +1,5 @@
 # 054 report
-- Branch hold/054 on hold/053, commit 3ec9448. Codex gpt-6-luna (low), 1 try.
+- Branch hold/054 on hold/053, commit 9d6c988. Codex gpt-6-luna (low), 1 try.
 - Changes: 2 CSV rows (before 迷宮の主), ids succubus/daidaraboti (not in BOSSES), dist/monster-data.js rebuilt (90). 10F pool is built from ENEMIES by floor, so there's no table to edit. Icons come from race (♜/♟) and no new art was needed. Counts 88→90 in README, HANDOFF, SPECIFICATION, tests/game.cjs, library.cjs, town-keys-browser.py, training-browser.py. BALANCE.md 10F rows added. monster-dice.cjs spot-checks every listed field plus the 10F single-boss check. game.cjs checks the seeded 10F encounter pool, the unknown name 悪魔, the 図鑑 entry after a win, and dalto/halito halving through spellHalvedBy.
 - Reviewer fix: reverted Codex's full regeneration of docs/DATA_CATALOG.md and data/catalog.snapshot.json. Those files are a stale 31-monster (1–3F) snapshot, so no 10F rows were added. Needs a user decision: regenerate the catalog for all 90?
 - Tests: all cjs, compile --check (90), selftest, all 16 browser tests PASS. MANIFEST OK.

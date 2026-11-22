@@ -1,5 +1,5 @@
 // 089: characterization tests for the three floor-travel routes.
-// These pin CURRENT behavior (main 89d85e4) before any refactoring of the
+// These pin CURRENT behavior (main 812e773) before any refactoring of the
 // shared save/restore skeleton in travelFloor / travelElevator / descendPitfall.
 // How to treat a failure here: pins that come from the specs (076/077/087/088)
 // must not change. Pins that merely record current behavior (marked OBSERVED)

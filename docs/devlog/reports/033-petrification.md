@@ -1,6 +1,6 @@
 # 033 heavy: 石化（stone） — 完了
 
-- コミット: ac053d1（main に push 済み、2026-11-02 18:43 JST）
+- コミット: 253b827（main に push 済み、2026-11-02 18:43 JST）
 - モデル: gpt-6-astra / reasoning high、1回目で成功（約13分）。Codex は Playwright・ソケット無しで browser 未実行のため push せず終了 → executor が検証・修正して push。
 - Codex ログ: report/codex033.log
 
@@ -18,7 +18,7 @@
 1. tests/petrify-browser.py: 酒場の（石化）option の無効判定が Playwright `is_disabled()` で偽陰性になり失敗 → tavern-browser.py と同じ `e.disabled` 評価に変更（実 DOM は disabled 付き、判定強度同等）。
 2. docs/HANDOFF.md・docs/TEST_RESULTS.txt の「ブラウザ未検証・push未実施」を実結果に差し替え。MANIFEST 再生成。
 
-## テスト結果（clean worktree of ac053d1、compile-monsters 再生成で差分無し）
+## テスト結果（clean worktree of 253b827、compile-monsters 再生成で差分無し）
 - node tests/*.cjs 11本 全PASS、compile-monsters.py --check PASS（88体）、sim selftest PASS（石化含む）。
 - browser 8本（auto-reorder, auto-temple, load-carry, petrify[新], target-select, tavern, town-layout, training）× 1280/390 全PASS、JSエラー・横スクロール無し。
 

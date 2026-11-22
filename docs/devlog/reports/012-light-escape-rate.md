@@ -1,5 +1,5 @@
 # 012-light-escape-rate 実装報告
-- コミット: ac1f853（main へ push 済み）
+- コミット: 73a9edd（main へ push 済み）
 - モデル: gpt-6-luna（reasoning low）、1回目で成功
 - 変更: dist/game.js escapeChance() を平均Lv差の式（50+5×差+人数補正、10〜95 clamp、有効味方0人→10、ボス/誤旗0）に。docs/SPECIFICATION.md を暫定式として更新。tests/game.cjs に 45/90/60・上限95・0人10 の回帰テスト。MANIFEST.sha256 再生成。
 - テスト: tests/game.cjs、tests/training.cjs、compile-monsters --check、scripts/sim/selftest.cjs すべて PASS

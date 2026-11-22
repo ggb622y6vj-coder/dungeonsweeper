@@ -1,7 +1,7 @@
 # 059 [light] 図書館のモンスター情報は「識別」の呪文で識別したものだけ開示する
 
 ## 背景
-（origin/main eb7c9cb 時点）
+（origin/main 3d91187 時点）
 - 図書館のモンスタータブ（dist/library.js `renderLibrary`）は、`s.library.monsters[id].count>0`（1体でも倒した）なら確定名と詳細をすべて表示し、それ以外は「？？？」と表示します。
 - 記録は `recordLibraryVictory` が戦闘後に `{count, firstFloor}` を加算します。データはセーブ `ash-v1` の `s.library` に入ります。
 - ユーザーの要望：「識別」の呪文で識別したモンスターだけ確定名と情報を開示する。戦闘中の自動識別で確定名に変わっただけのものは、不確定名だけを表示する。

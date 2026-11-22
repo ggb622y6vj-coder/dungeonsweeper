@@ -1,6 +1,6 @@
 # 026 verify — OK
 
-- origin/main = e54494b (includes e54494b); all live dist/*.js byte-identical to repo.
+- origin/main = 47f2a18 (includes 47f2a18); all live dist/*.js byte-identical to repo.
 - templeCost Lv1-6 (dead/ash): 25/60, 100/240, 225/540, 400/960, 500/1250, 600/1500 — matches min(100L,25L²) / min(250L,60L²).
 - Live temple UI (1280 & 390): dead Lv1/2/3/5 = 25/100/225/500 G, ash = 60/240/540/1250 G shown; button disabled at cost-1 G, enabled at exact cost.
 - Lv1 dead raise (Math.random=0): gold 100→75, status ok, HP/MP full, notice 「蘇生した。HP・MPが全快した。」 (023f holds). No JS errors.

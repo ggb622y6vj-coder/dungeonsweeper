@@ -1,9 +1,9 @@
-# 019b-light-ancientdragon-tuning 検証（dfa3ee1）
+# 019b-light-ancientdragon-tuning 検証（c86181b）
 判定：**OK**
 
 ## テスト・ライブ
 - テストはすべてPASSした。
-- ライブの monster-data.js は dfa3ee1 と一致した（monsters.js などは既に 020 に進んでいた）。
+- ライブの monster-data.js は c86181b と一致した（monsters.js などは既に 020 に進んでいた）。
 
 ## 9F 守護者 Lv13（n=1000）
 私のハーネスで **90.7%**。019a 検証時に事前測定した値と一致した。
@@ -11,7 +11,7 @@
 ## Codex の 55.3% との差
 | 実行 | 結果 |
 |---|---|
-| /workspace/sim/sim019b.cjs の harness 参照先を dfa3ee1 のクリーンコピーに差し替え | **90.7%**（私のハーネスと完全に一致） |
+| /workspace/sim/sim019b.cjs の harness 参照先を c86181b のクリーンコピーに差し替え | **90.7%**（私のハーネスと完全に一致） |
 | 同スクリプトを元のまま（/workspace/dungeonsweeper を参照） | 89.7%（n=300、現時点の作業ツリー） |
 
 - 装備の割り当ては実質同じだった。どちらも「店装備＋同じ12品から部位ごとに最良」を選ぶ。

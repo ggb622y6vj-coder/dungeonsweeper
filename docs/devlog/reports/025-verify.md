@@ -1,8 +1,8 @@
 # 025 verify — OK
 
-- Clone /workspace/verify-clone2 @ origin/main = b9cb093 (includes b9cb093). Live game.js / library.js byte-identical to dist.
+- Clone /workspace/verify-clone2 @ origin/main = 7b009b0 (includes 7b009b0). Live game.js / library.js byte-identical to dist.
 - Tests: node tests/*.cjs (death-status, final-boss, game, library, temple, training) PASS; compile-monsters --check 88 OK; sim selftest PASS; training-browser.py (live) 1280/390 PASS.
-- Test diff vs 141d142: only additions + library.js added to load lists; no asserts removed/weakened.
+- Test diff vs 5e27d8f: only additions + library.js added to load lists; no asserts removed/weakened.
 - Independent playwright (/tmp/lib.py, live, 1280 & 390):
   - New game: モンスター 0/88 · アイテム 0/52, all ？？？ in both tabs.
   - DOM leak: undiscovered entries are bare `<h4>？？？</h4>` with no dl/data-attrs; dialog HTML contains no names/stats of undiscovered entries. (Floor group headers 地下N階 reveal per-floor entry counts only — acceptable.)

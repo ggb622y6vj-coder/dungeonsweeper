@@ -1,8 +1,8 @@
-# 069 呪いを解く 列指定 検証（main 076e70b）
+# 069 呪いを解く 列指定 検証（main 7762131）
 総合：OK（NGなし）
 
 ## デプロイ・テスト
-- 確認開始時点では、公開サイトの combatui.js・game.js・monsters.js がまだ旧版だった。その後、待機ループ1回目のチェックで dist/*.js・index.html すべてが 076e70b と一致（cmp で差分なし）。
+- 確認開始時点では、公開サイトの combatui.js・game.js・monsters.js がまだ旧版だった。その後、待機ループ1回目のチェックで dist/*.js・index.html すべてが 7762131 と一致（cmp で差分なし）。
 - 全テスト 58/58 PASS（テストファイル56本〔新規 dispel-row.cjs・dispel-row-browser を含む〕＋ compile --check ＋ selftest）。
 
 ## 公開サイトでの確認（/tmp/v069.py）

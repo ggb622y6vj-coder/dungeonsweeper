@@ -1,6 +1,6 @@
 # 028 town-menu-layout 報告
 
-- 結果: push 済み afd33ae（main == origin/main）
+- 結果: push 済み 8dcc206（main == origin/main）
 - モデル: gpt-6-luna / reasoning low、1回目で実装（約1.5分）。Codex サンドボックスでは HTTP サーバー/Chromium が起動できずブラウザテスト未実行 → executor 側で実行。
 - executor 修正: tests/town-layout-browser.py の「#entrance 上端 == .townmenu 上端」判定が .townmenu の padding-top(16px/12px) を考慮しておらず失敗 → padding-top を加味した比較に修正し、「#entrance の下端が他の全メニューボタンの上端より上」の判定を追加（強化方向。既存テストは変更なし）。
 - 変更ファイル: dist/index.html（HTML 構造＋CSS のみ、JS 変更なし）, 新規 tests/town-layout-browser.py, MANIFEST.sha256

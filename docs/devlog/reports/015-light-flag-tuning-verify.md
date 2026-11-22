@@ -1,5 +1,5 @@
 # 015-light-flag-tuning 検証結果 — 判定: OK（旗は意味があり、強すぎない。todo なし）
-- 対象: 88292fe（dist/flags.js、BALANCE.md、仕様書、テスト）。テスト3つと sim selftest すべて成功
+- 対象: 76817d9（dist/flags.js、BALANCE.md、仕様書、テスト）。テスト3つと sim selftest すべて成功
 - node（/tmp/v15.cjs）:
   - flagChance: 正しい旗 0/1/5/10/100 本 → 0 / 0.04 / 0.20 / 0.40 / 0.40（上限）
   - 1F で罠に怪力の旗を正しく3本立てて戦闘: flagEffect は {power:3}。flagDamage 20000回中 2379回が発動 = 11.89%（95%信頼区間 ±0.45pt、理論値12%）。発動ごとに「怪力の旗がはためいた！」が1回ずつ

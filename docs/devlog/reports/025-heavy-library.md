@@ -1,6 +1,6 @@
 # 025 町に図書館（モンスター図鑑・アイテム図鑑） 報告
 
-- コミット: b9cb093（main に push 済み）
+- コミット: 7b009b0（main に push 済み）
 - モデル: gpt-6-astra（reasoning high）、1回目で成功、リトライなし、所要 約6分（12:46〜12:53 JST）
 - Codexログ: report/codex025.log
 

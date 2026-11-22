@@ -1,4 +1,4 @@
-# 030-heavy-corpse-on-wipe 検証 (62fac1d) — ゲーム本体OK／シミュレータ回帰1件
+# 030-heavy-corpse-on-wipe 検証 (3027892) — ゲーム本体OK／シミュレータ回帰1件
 ## テスト
 - tests/*.cjs 全PASS、compile-monsters --check PASS
 - **scripts/sim/selftest.cjs FAIL**（113行 wipe.deaths 0 !== 6）。直前コミットではPASS。全滅でパーティが空になり、sim が死者0と数える。combat.cjs Lv1 3F指定 300戦: deathsPerBattle 2.73→1.06（勝率・全滅率は同程度で試行間の復元は機能）→ todo/030a
@@ -6,7 +6,7 @@
 ## 実装確認（コード）
 - defeat(): 全員dead・HP0、corpses に {id(UUID),floor,cell,records(完全コピー),gold} 追加、gold=0、defeatPending、save()。ログ再生終了で finishDefeat()：PARTY_FIELDS を空、resetDungeon（area=town）。起動時 defeatPending なら finishDefeat
 - rosterSaveState: defeatPending 中は roster=控えのみ・partyIds=[]（再生途中リロードでもパーティが控えに混入しない）、corpses 保存、旧セーブは []
-## 実機（Pages=62fac1d一致）
+## 実機（Pages=3027892一致）
 - 1F守護者戦で実際に全滅→ログ再生中（defeatPending=true, 6人表示）: gold 777→0、corpse {地下1階, cell14, gold777, 6人dead}。SS v030-wipe-replay.png
 - 再生途中でリロード→ area=town、パーティ0人、gold0、corpses1、名簿は控えRのみ（全滅組は名簿にも控えにもいない）
 - 訓練所「迷宮に残された遺体：地下1階（W0、W1、W2、W3、W4、W5）」 SS v030-training.png / v030-mobile-training.png(390x844)

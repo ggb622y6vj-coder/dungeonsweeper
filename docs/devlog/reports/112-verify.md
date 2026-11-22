@@ -1,7 +1,7 @@
 # 指示書112 ライブ検証
 
 - 検証日: 2026-11-14
-- 対象: main 327faf9（実装 1bc18b4 を fast-forward 統合）
+- 対象: main 69bcbd6（実装 fe87592 を fast-forward 統合）
 - Pages ワークフロー: run 43570924184 success
 
 ## 結果: 17/17 一致

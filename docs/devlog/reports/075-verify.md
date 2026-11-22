@@ -1,6 +1,6 @@
 # 075 検証記録（2026-11-06 JST）
 
-対象：`main` b595961（1c06532 から fast-forward 統合。075 本体＋Amendment 1・Amendment 2 を含む）
+対象：`main` 29a323f（9d950aa から fast-forward 統合。075 本体＋Amendment 1・Amendment 2 を含む）
 
 ## 統合と CI
 - `hold/075` を push 後、main へ fast-forward 統合して push した（マージコミットなし）。

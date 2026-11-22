@@ -14,7 +14,7 @@
 - afflict: type を poison/paralysis/stone/silence/fear で明示分岐し、未知の type は何もせず console.warn（麻痺にしない）。silence/fear の中身は036/037で実装（ここでは分岐の枠だけ）。
 
 ## OKの判定方法
-1. 既存の毒・麻痺・石化の挙動とログが ac053d1（＋034）と同一（既存テストPASS）。
+1. 既存の毒・麻痺・石化の挙動とログが 253b827（＋034）と同一（既存テストPASS）。
 2. node で `afflict(0,'xxx')` → ailments 変化なし。
 3. 旧セーブ（sleep等キー欠落）をロード → 全キーが揃い、JSエラーなし。
 4. `rg "paralysis:0}" dist` が freshAilments 定義以外でヒットしない。
