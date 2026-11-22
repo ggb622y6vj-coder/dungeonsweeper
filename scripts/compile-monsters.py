@@ -6,8 +6,16 @@ def dice(v):
 def pct(v):
  m=re.search(r'(\d+)%',v);return int(m[1])/100 if m else 0
 ids={
+  "アメーバ": "ameba",
+  "ラフレシア": "rafflesia",
+  "ウイルス蝙蝠": "virusbat",
+  "チシャ猫": "cathuman",
+  "人間チシャ猫": "cathuman2",
+  "地獄チシャ猫": "cathuman3",
+  "ポルターガイスト": "poltergeist",
+  "罪人の視線": "namakubi",
   "デンデンツボロ": "dendenko", "ダイナモツボロ": "dynamotuboro", "悪魔いきれ": "akumaikire", "毒の巨人": "poisongiant",
-  "キューズドバンブー": "takenoko",
+  "猛攻竹": "takenoko",
   "テングダケ": "kinoko",
   "武者のくくり樹": "sirakaba",
   "髑髏カヅラ": "insectivore",
@@ -31,7 +39,7 @@ ids={
   "洞窟の魔術師": "mage",
   "バンディット": "bandit",
   "コープスイーター": "ghoul",
-  "ストーンゴーレム": "stone",
+  "石の番人": "stone",
   "ゴヅメヅ": "general",
   "硫化スライム": "acidslime",
   "骸骨の射手": "archer",
@@ -46,7 +54,7 @@ ids={
   "地獄の獄卒": "watcher",
   "オーガ": "ogre", "ゾンビ": "zombie", "ハーピー": "harpy", "大毒蛇": "viper", "鎧蟻": "armorant", "闇の司祭": "darkpriest", "迷宮の妖術師": "sorcerer", "ガーゴイル": "gargoyle", "牛頭の門番": "minogate",
   "墓所の亡者": "wight", "トロル": "troll", "人狼": "werewolf", "大蠍": "scorpion", "忍びの者": "ninja", "高位の魔術師": "highmage", "火蜥蜴": "salamander", "ブロブ": "blob", "屍術師": "necromancer",
-  "亡霊": "wraith", "石巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "毒茸の群れ": "fungus", "ダークエルフ": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
+  "亡霊": "wraith", "岩石の巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "毒茸の群れ": "fungus", "ダークエルフ": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
   "毒竜": "gasdragon", "牛頭の戦士": "minotaur", "肉の巨像": "fleshgolem", "忍びの頭目": "ninjachief", "死霊魔導士": "deathmage", "地獄の犬": "hellhound", "這い寄る大蟲": "crawler", "双頭の巨人": "ettin",
   "レッサーデーモン": "lesserdemon", "雷竜": "bluedragon", "死の騎士": "deathknight", "魔女": "witch", "多頭竜": "hydra", "影の暗殺者": "assassin", "邪眼": "evileye", "魔将軍": "demongeneral",
   "グレーターデーモン": "greaterdemon", "霜の巨人": "frostgiant", "夜の貴族": "vampirelord", "赤竜": "reddragon", "上忍": "masterninja", "リッチ": "lich", "魔界の猟犬": "fiendhound", "古竜": "ancientdragon",
@@ -69,7 +77,7 @@ for r in rows:
  resist_values=[]
  for col in ('魔法使い呪文抵抗','僧侶呪文抵抗'):
   value=r[col]
-  assert re.fullmatch(r'\d+',value or '') and 0<=int(value)<=95, f"Invalid {col} for {id}: {value!r}"
+  assert re.fullmatch(r'\d+',value or '') and 0<=int(value)<=100, f"Invalid {col} for {id}: {value!r}"
   resist_values.append(int(value)/100)
  d=dict(id=id,name=r['確定名'],unknown=r['不確定名'],floor=floors[0],floors=floors,level=int(r['Lv']),hp=dice(r['HP']),ac=int(r['AC']),hit=int(r['命中補正']),attack=dice(r['物理ダメージ']),xp=float(r['経験値']),groupSize=group,gold=dice(r['金貨']),race=r['種族'],mageResist=resist_values[0],priestResist=resist_values[1],swings=int(r['攻撃回数']),rear=r['後衛攻撃']=='可',flee=pct(r['逃走']),summon=pct(r['仲間呼び']),steal=pct(r['アイテム奪取']),drain=pct(r['Lv吸収']),death=pct(r['即死']),statuses=[{'type':{'毒':'poison','麻痺':'paralysis','石化':'stone','恐怖':'fear'}[name],'chance':int(p)/100} for name,p in re.findall(r'(毒|麻痺|石化|恐怖)/命中時(\d+)%',r['状態異常'])],resistance=r['耐性'],boss=id in BOSSES,icon='♛' if id in BOSSES else '◈')
  assert not d['boss'] or len(floors)==1, f"Guardian must have exactly one floor: {id}"

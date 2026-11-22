@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { game } = require('../scripts/sim/harness.cjs');
 const { createParty, planTurn, seededRandom } = require('../scripts/sim/combat.cjs');
 const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
-function battle(ids = ['thief','ogre','skeleton','stone','guardian','goblin']) {
+function battle(ids = ['thief','viper','skeleton','stone','guardian','goblin']) {
   const g = game(null, seededRandom(43));
   // Mage in slot zero checks that jobs are independent of party position.
   createParty(g, [1,0,2]);
@@ -56,7 +56,7 @@ for (const random of [0, .999999]) {
   assert.equal(g.run('resistRolls'),1,'exactly one spell-resistance roll');
 }
 {
-  const g = battle(['ogre']);
+  const g = battle(['viper']);
   // Boundary must follow value, not an embedded literal threshold.
   g.run("magic('makanito').value=8");
   g.run("castMagic(0,'makanito',null)");
@@ -161,7 +161,7 @@ for(const [ids,mp,known,silence,fear,want] of [
   [['thief','goblin','harpy'],6,true,0,0,true],
   [['thief','goblin','harpy','guardian'],6,true,0,0,true],
   [['thief','goblin'],6,true,0,0,false],
-  [['thief','goblin','ogre','skeleton','stone','guardian'],6,true,0,0,false],
+  [['thief','goblin','viper','skeleton','stone','guardian'],6,true,0,0,false],
   [['thief','goblin','harpy'],4,true,0,0,false],
   [['thief','goblin','harpy'],6,false,0,0,false],
   [['thief','goblin','harpy'],6,true,3,0,false],

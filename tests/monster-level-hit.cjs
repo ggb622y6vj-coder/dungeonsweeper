@@ -40,7 +40,7 @@ g.run(`monsterAction=()=>false;monsterOnHit=()=>{};log=()=>{};
     return landed/(rolls.length*enemyDefinition(id).swings);
   };`);
 const monsters = JSON.parse(g.run('JSON.stringify(ENEMIES.filter(d=>d.floor===6&&!d.boss&&d.level>=10&&d.level<=12).map(d=>({id:d.id,level:d.level})))'));
-assert.equal(monsters.length, 7, 'all seven ordinary 6F monsters');
+assert.equal(monsters.length, 8, 'all eight ordinary 6F monsters in the tested level range');
 // A fixed-seed shuffle of balanced d20 samples gives exactly 5% per face,
 // avoiding sampling noise at the acceptance interval's 5-point boundary.
 const rng = seededRandom(42);

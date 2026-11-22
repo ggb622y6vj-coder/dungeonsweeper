@@ -1,5 +1,5 @@
 """072: Notion-synced names in the real UI at 1280 and 390 px: battle spell menu (name+description from
-data/notion-spells.json), monster library (96 names from data/notion-monsters.json incl. 3 new) and enemy spell log.
+data/notion-spells.json), monster library (all names from data/notion-monsters.json) and enemy spell log.
 Run: /tmp/pyv/bin/python tests/notion-sync-browser.py [http://127.0.0.1:8000/]
 """
 import json, os, sys
@@ -32,11 +32,11 @@ with sync_playwright() as p:
         page.reload()
         page.evaluate('''[1,2,0,0,0,0].forEach((job,i)=>{
           const r=generateRecruit('ABCDEF'[i],job);registerRecruit(r);changeRecruitParty(r.members.id,true);});render();''')
-        # Library: all 96 identified; names equal the Notion rows (incl. the 3 additions).
+        # Library: all identified names match the Notion rows.
         page.evaluate('''s.library.monsters=Object.fromEntries(ENEMIES.map(e=>[e.id,{count:1,firstFloor:e.floor,identified:true}]));
           delete s.library.monsterIdentifyVersion;save();render();''')
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 100/100'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 108/108'), page.locator('#libraryprogress').inner_text()
         for r in monsters:
             floor = page.evaluate('(id)=>enemyDefinition(id).floors[0]', r['userDefined:ID'])
             page.locator(f'#librarymonstertab-{floor}').click()
@@ -78,6 +78,6 @@ with sync_playwright() as p:
         page.screenshot(path=str(output / f'enemy-spell-log-{width}.png'))
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
-        print(f'PASS notion-sync Chromium {width}px: {len(battle_mage)} battle spells, enemy log 火炎, 96 library names; no JS errors')
+        print(f'PASS notion-sync Chromium {width}px: {len(battle_mage)} battle spells, enemy log 火炎, {len(monsters)} library names; no JS errors')
         context.close()
     browser.close()

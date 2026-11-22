@@ -228,9 +228,10 @@ function partyAction(i){
  }
  const label=ambush?'奇襲':'攻撃',result=physicalAttack(i,e);
  if(!result.hitsCount){log(`${NAMES[i]}の${label}は${enemyDisplay(e)}にかわされた。`);return}
- const damage=flagDamage(result.damage)*(ambush?2:1);e.hp=Math.max(0,e.hp-damage);
+ const effect=equippedWeapon(i).effect;
+ const raceMultiplier=effect?.kind==='raceSlayer'&&enemyDefinition(e.id).race===effect.race?effect.mult:1;
+ const damage=flagDamage(result.damage)*(ambush?2:1)*raceMultiplier;e.hp=Math.max(0,e.hp-damage);
  log(`${NAMES[i]}の${label}。${enemyDisplay(e)}に${damage}ダメージ。`);
- const effect=equippedWeapon(i)?.effect;
  if(effect?.kind==='poison'&&e.hp>0&&!e.poison&&Math.random()<effect.chance&&afflictMonster(e,'poison'))log(`${enemyDisplay(e)}は毒に侵された。`);
  if(effect?.kind==='drainMP'&&damage>0){const before=s.mp[i];s.mp[i]=Math.min(s.members[i].maxMP,before+damage);if(s.mp[i]>before)log(`${NAMES[i]}のMPが${s.mp[i]-before}回復した。`)}
  if(e.hp===0)killReward(e);

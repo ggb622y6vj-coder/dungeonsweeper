@@ -1,4 +1,4 @@
-"""063: 10F demons resist 魔弾 per individual.
+"""063: 8F demons resist 魔弾 per individual.
 Run: /tmp/pyv/bin/python tests/spell-resist-browser.py [http://127.0.0.1:8000/]
 """
 import os
@@ -32,11 +32,11 @@ with sync_playwright() as p:
         });render();''')
         page.locator('#entrance').click()
         page.wait_for_function('!logBusy()')
-        page.evaluate('''s.floor=10;s.pendingStairs=false;s.pendingBoss=null;s.cells.forEach(c=>{c.flag=false;delete c.chest});
+        page.evaluate('''s.floor=8;s.pendingStairs=false;s.pendingBoss=null;s.cells.forEach(c=>{c.flag=false;delete c.chest});
           s.members[0].level=30;if(!s.members[0].known.includes('tiltowait'))s.members[0].known.push('tiltowait');s.mp[0]=200;
-          s.enemy={dataVersion:1,units:[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>({...makeEnemy('fallenangel',91+i),row:17,hp:9999,identified:true})),initiative:'normal',flagEffect:{}};
+          s.enemy={dataVersion:1,units:[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>({...makeEnemy('lesserdemon',91+i),row:17,hp:9999,identified:true})),initiative:'normal',flagEffect:{}};
           s.commands=s.members.map(()=>'guard');s.attackRows=s.members.map(()=>17);resetCommandEntry();render();''')
-        assert page.evaluate("enemyDefinition('fallenangel').mageResist") == 0.5
+        assert page.evaluate("enemyDefinition('lesserdemon').mageResist") == 0.5
         page.locator('[data-command-choice="spell"]').click()
         page.locator('[data-spell="tiltowait"]').click()
         targets = page.locator('[data-spell-target]')
@@ -57,6 +57,6 @@ with sync_playwright() as p:
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         page.screenshot(path=str(output / f'after-{width}.png'))
         assert not errors, errors
-        print(f'PASS spell-resist Chromium {width}px: 魔弾 vs 12 堕天使 (10F, 50%), some resisted / others damaged, readable log; no JS errors')
+        print(f'PASS spell-resist Chromium {width}px: 魔弾 vs 12 レッサーデーモン (8F, 50%), some resisted / others damaged, readable log; no JS errors')
         context.close()
     browser.close()

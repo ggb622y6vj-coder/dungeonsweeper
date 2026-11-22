@@ -533,8 +533,8 @@ const ENEMIES=[
       20
     ],
     "race": "人型",
-    "mageResist": 0.1,
-    "priestResist": 0.1,
+    "mageResist": 0.3,
+    "priestResist": 0.3,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -688,8 +688,8 @@ const ENEMIES=[
       0
     ],
     "race": "虫",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -986,7 +986,7 @@ const ENEMIES=[
   },
   {
     "id": "stone",
-    "name": "ストーンゴーレム",
+    "name": "石の番人",
     "unknown": "震える石像",
     "floor": 2,
     "floors": [
@@ -1016,7 +1016,7 @@ const ENEMIES=[
       0
     ],
     "race": "構造体",
-    "mageResist": 0.15,
+    "mageResist": 0.5,
     "priestResist": 0.0,
     "swings": 1,
     "rear": true,
@@ -1076,8 +1076,8 @@ const ENEMIES=[
       0
     ],
     "race": "悪魔",
-    "mageResist": 0.3,
-    "priestResist": 0.3,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -1139,8 +1139,8 @@ const ENEMIES=[
       6
     ],
     "race": "不定形",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1199,7 +1199,7 @@ const ENEMIES=[
       6
     ],
     "race": "不死",
-    "mageResist": 0.05,
+    "mageResist": 0.0,
     "priestResist": 0.15,
     "swings": 1,
     "rear": true,
@@ -1249,8 +1249,8 @@ const ENEMIES=[
       0
     ],
     "race": "魔獣",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1299,8 +1299,8 @@ const ENEMIES=[
       6
     ],
     "race": "人型",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0.1,
@@ -1359,8 +1359,8 @@ const ENEMIES=[
       6
     ],
     "race": "虫",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1409,8 +1409,8 @@ const ENEMIES=[
       0
     ],
     "race": "人型",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0.1,
@@ -1460,7 +1460,7 @@ const ENEMIES=[
     ],
     "race": "竜",
     "mageResist": 0.15,
-    "priestResist": 0.05,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1522,8 +1522,8 @@ const ENEMIES=[
       0
     ],
     "race": "獣",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1572,8 +1572,8 @@ const ENEMIES=[
       0
     ],
     "race": "構造体",
-    "mageResist": 0.2,
-    "priestResist": 0.05,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1637,8 +1637,8 @@ const ENEMIES=[
       0
     ],
     "race": "不死",
-    "mageResist": 0.05,
-    "priestResist": 0.15,
+    "mageResist": 0.0,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -1687,8 +1687,8 @@ const ENEMIES=[
       0
     ],
     "race": "悪魔",
-    "mageResist": 0.35,
-    "priestResist": 0.35,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -1736,7 +1736,7 @@ const ENEMIES=[
     "floors": [
       4
     ],
-    "level": 8,
+    "level": 7,
     "hp": [
       4,
       8,
@@ -1760,8 +1760,8 @@ const ENEMIES=[
       8
     ],
     "race": "人型",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1810,7 +1810,7 @@ const ENEMIES=[
       6
     ],
     "race": "不死",
-    "mageResist": 0.05,
+    "mageResist": 0.0,
     "priestResist": 0.15,
     "swings": 1,
     "rear": false,
@@ -1865,8 +1865,8 @@ const ENEMIES=[
       6
     ],
     "race": "魔獣",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -1915,8 +1915,8 @@ const ENEMIES=[
       6
     ],
     "race": "獣",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -1970,8 +1970,8 @@ const ENEMIES=[
       6
     ],
     "race": "虫",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2021,7 +2021,7 @@ const ENEMIES=[
     ],
     "race": "人型",
     "mageResist": 0.05,
-    "priestResist": 0.05,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -2076,8 +2076,8 @@ const ENEMIES=[
       8
     ],
     "race": "人型",
-    "mageResist": 0.05,
-    "priestResist": 0.05,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": true,
     "flee": 0.1,
@@ -2136,8 +2136,8 @@ const ENEMIES=[
       8
     ],
     "race": "構造体",
-    "mageResist": 0.2,
-    "priestResist": 0.05,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2191,7 +2191,7 @@ const ENEMIES=[
       30
     ],
     "race": "人型",
-    "mageResist": 0.15,
+    "mageResist": 1.0,
     "priestResist": 0.15,
     "swings": 2,
     "rear": false,
@@ -2391,8 +2391,8 @@ const ENEMIES=[
       10
     ],
     "race": "虫",
-    "mageResist": 0.1,
-    "priestResist": 0.1,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2758,7 +2758,7 @@ const ENEMIES=[
   },
   {
     "id": "stonegiant",
-    "name": "石巨人",
+    "name": "岩石の巨人",
     "unknown": "巨大な石像",
     "floor": 6,
     "floors": [
@@ -2788,8 +2788,8 @@ const ENEMIES=[
       12
     ],
     "race": "構造体",
-    "mageResist": 0.25,
-    "priestResist": 0.1,
+    "mageResist": 0.8,
+    "priestResist": 0.8,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -2843,8 +2843,8 @@ const ENEMIES=[
       12
     ],
     "race": "魔獣",
-    "mageResist": 0.1,
-    "priestResist": 0.1,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -2951,8 +2951,8 @@ const ENEMIES=[
       12
     ],
     "race": "植物",
-    "mageResist": 0.1,
-    "priestResist": 0.1,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3011,7 +3011,7 @@ const ENEMIES=[
     ],
     "race": "人型",
     "mageResist": 0.1,
-    "priestResist": 0.1,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": true,
     "flee": 0,
@@ -3070,8 +3070,8 @@ const ENEMIES=[
       12
     ],
     "race": "獣",
-    "mageResist": 0.1,
-    "priestResist": 0.1,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -3293,8 +3293,8 @@ const ENEMIES=[
       15
     ],
     "race": "構造体",
-    "mageResist": 0.35,
-    "priestResist": 0.2,
+    "mageResist": 1.0,
+    "priestResist": 0.8,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3343,8 +3343,8 @@ const ENEMIES=[
       15
     ],
     "race": "人型",
-    "mageResist": 0.2,
-    "priestResist": 0.2,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 2,
     "rear": false,
     "flee": 0.1,
@@ -3453,8 +3453,8 @@ const ENEMIES=[
       15
     ],
     "race": "魔獣",
-    "mageResist": 0.2,
-    "priestResist": 0.2,
+    "mageResist": 0.0,
+    "priestResist": 0.0,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -3621,8 +3621,8 @@ const ENEMIES=[
       20
     ],
     "race": "悪魔",
-    "mageResist": 0.4,
-    "priestResist": 0.4,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 2,
     "rear": false,
     "flee": 0,
@@ -4590,7 +4590,7 @@ const ENEMIES=[
       40
     ],
     "race": "悪魔",
-    "mageResist": 0.5,
+    "mageResist": 1.0,
     "priestResist": 0.5,
     "swings": 2,
     "rear": false,
@@ -4944,7 +4944,7 @@ const ENEMIES=[
     ],
     "race": "人型",
     "mageResist": 0.3,
-    "priestResist": 0.3,
+    "priestResist": 0.0,
     "swings": 2,
     "rear": true,
     "flee": 0,
@@ -5087,7 +5087,7 @@ const ENEMIES=[
   },
   {
     "id": "takenoko",
-    "name": "キューズドバンブー",
+    "name": "猛攻竹",
     "unknown": "繁茂する植物",
     "floor": 1,
     "floors": [
@@ -5524,6 +5524,419 @@ const ENEMIES=[
         }
       ]
     },
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "ameba",
+    "name": "アメーバ",
+    "unknown": "意志を持つ液体",
+    "floor": 1,
+    "floors": [
+      1,
+      2
+    ],
+    "level": 3,
+    "hp": [
+      2,
+      10,
+      0
+    ],
+    "ac": 7,
+    "hit": 2,
+    "attack": [
+      1,
+      3,
+      0
+    ],
+    "xp": 10.0,
+    "groupSize": [
+      3,
+      4
+    ],
+    "gold": [
+      1,
+      10,
+      0
+    ],
+    "race": "不定形",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "◉",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "rafflesia",
+    "name": "ラフレシア",
+    "unknown": "巨大な花",
+    "floor": 4,
+    "floors": [
+      4,
+      5
+    ],
+    "level": 5,
+    "hp": [
+      4,
+      9,
+      5
+    ],
+    "ac": 3,
+    "hit": 5,
+    "attack": [
+      2,
+      10,
+      0
+    ],
+    "xp": 50.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      5,
+      2,
+      0
+    ],
+    "race": "植物",
+    "mageResist": 0.5,
+    "priestResist": 0.5,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♣",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "virusbat",
+    "name": "ウイルス蝙蝠",
+    "unknown": "蝙蝠",
+    "floor": 4,
+    "floors": [
+      4,
+      5
+    ],
+    "level": 5,
+    "hp": [
+      4,
+      8,
+      0
+    ],
+    "ac": 4,
+    "hit": 3,
+    "attack": [
+      2,
+      5,
+      2
+    ],
+    "xp": 20.0,
+    "groupSize": [
+      2,
+      5
+    ],
+    "gold": [
+      5,
+      2,
+      0
+    ],
+    "race": "獣",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [
+      {
+        "type": "poison",
+        "chance": 0.15
+      }
+    ],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "cathuman",
+    "name": "チシャ猫",
+    "unknown": "人面猫",
+    "floor": 3,
+    "floors": [
+      3,
+      4
+    ],
+    "level": 5,
+    "hp": [
+      3,
+      8,
+      2
+    ],
+    "ac": 4,
+    "hit": 3,
+    "attack": [
+      3,
+      3,
+      0
+    ],
+    "xp": 20.0,
+    "groupSize": [
+      2,
+      4
+    ],
+    "gold": [
+      2,
+      3,
+      0
+    ],
+    "race": "獣",
+    "mageResist": 1.0,
+    "priestResist": 1.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "cathuman2",
+    "name": "人間チシャ猫",
+    "unknown": "人面猫",
+    "floor": 4,
+    "floors": [
+      4,
+      5
+    ],
+    "level": 7,
+    "hp": [
+      4,
+      8,
+      2
+    ],
+    "ac": 4,
+    "hit": 3,
+    "attack": [
+      2,
+      9,
+      0
+    ],
+    "xp": 50.0,
+    "groupSize": [
+      3,
+      5
+    ],
+    "gold": [
+      5,
+      3,
+      0
+    ],
+    "race": "獣",
+    "mageResist": 1.0,
+    "priestResist": 1.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "cathuman3",
+    "name": "地獄チシャ猫",
+    "unknown": "人面猫",
+    "floor": 6,
+    "floors": [
+      6,
+      7
+    ],
+    "level": 10,
+    "hp": [
+      6,
+      5,
+      2
+    ],
+    "ac": 3,
+    "hit": 7,
+    "attack": [
+      1,
+      5,
+      3
+    ],
+    "xp": 150.0,
+    "groupSize": [
+      3,
+      4
+    ],
+    "gold": [
+      5,
+      5,
+      0
+    ],
+    "race": "魔獣",
+    "mageResist": 1.0,
+    "priestResist": 1.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "poltergeist",
+    "name": "ポルターガイスト",
+    "unknown": "動き出す物体",
+    "floor": 4,
+    "floors": [
+      4,
+      5
+    ],
+    "level": 8,
+    "hp": [
+      5,
+      8,
+      6
+    ],
+    "ac": 5,
+    "hit": 4,
+    "attack": [
+      3,
+      5,
+      2
+    ],
+    "xp": 100.0,
+    "groupSize": [
+      1,
+      2
+    ],
+    "gold": [
+      4,
+      4,
+      0
+    ],
+    "race": "構造体",
+    "mageResist": 1.0,
+    "priestResist": 0.0,
+    "swings": 2,
+    "rear": true,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "毒無効",
+    "boss": false,
+    "icon": "◆",
+    "summonCap": 4,
+    "breath": null,
+    "spell": 0,
+    "spellInfo": null
+  },
+  {
+    "id": "namakubi",
+    "name": "罪人の視線",
+    "unknown": "生首",
+    "floor": 4,
+    "floors": [
+      4,
+      5
+    ],
+    "level": 8,
+    "hp": [
+      5,
+      8,
+      0
+    ],
+    "ac": 5,
+    "hit": 2,
+    "attack": [
+      1,
+      10,
+      0
+    ],
+    "xp": 20.0,
+    "groupSize": [
+      1,
+      3
+    ],
+    "gold": [
+      4,
+      4,
+      0
+    ],
+    "race": "不死",
+    "mageResist": 0.0,
+    "priestResist": 0.2,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0.1,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "☠",
+    "summonCap": 4,
+    "breath": null,
     "spell": 0,
     "spellInfo": null
   }

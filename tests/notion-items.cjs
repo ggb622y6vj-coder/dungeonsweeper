@@ -8,7 +8,7 @@ const unesc=t=>String(t??'').replace(/<\/?p>/g,'').replace(/<br\s*\/>/g,'').repl
 const dice=t=>{const m=/^(\d+)d(\d+)(?:\+(\d+))?$/.exec(t);assert.ok(m,'bad dice '+t);return [+m[1],+m[2],+(m[3]||0)]};
 const JOB={戦士:0,魔法使い:1,僧侶:2,盗賊:3,侍:4,君主:5,忍者:6,司教:7},PART={'防具(頭)':'head','防具(胴)':'body','防具(足)':'feet'};
 const diffs=[],eq=(where,a,b)=>{try{assert.deepEqual(a,b)}catch{diffs.push(`${where}: game=${JSON.stringify(a)} notion=${JSON.stringify(b)}`)}};
-assert.equal(rows.length,85);assert.equal(items.length,85);
+assert.equal(rows.length,86);assert.equal(items.length,86);
 assert.equal(new Set(rows.map(r=>r['userDefined:ID'])).size,rows.length);
 assert.equal(new Set(items.map(w=>w.id)).size,items.length);
 for(const r of rows){
@@ -39,10 +39,10 @@ for(const r of rows){
 }
 for(const w of items)if(!rows.some(r=>r['userDefined:ID']===w.id))diffs.push(w.id+' not in Notion');
 if(diffs.length){console.error(diffs.join('\n'));assert.fail(`${diffs.length} Notion/game differences`)}
-console.log('PASS notion-items: 85 items match the Notion snapshot, 0 differences');
+console.log('PASS notion-items: 86 items match the Notion snapshot, 0 differences');
 
 // Descriptors are the contract for the separately implemented combat hooks.
-const effects={flagaxe:{kind:'flagDamage'},mitibikinoono:{kind:'flagDamage'},mumeinoken:{kind:'zeroSwings'},zerosword:{kind:'zeroSwings'},flagsword:{kind:'flagMatchAC'},reversalblade:{kind:'flagMatchAC'},hatajirusinosentui:{kind:'victoryDisarm',chance:.1},sealinghammer:{kind:'victoryDisarm',chance:.1},surveyorstaff:{kind:'surveyor'},hatajirusinotanken:{kind:'victoryOpen',chance:.2},scoutingdagger:{kind:'victoryOpen',chance:1},eighteyespear:{kind:'numberDamage'},hatajirusinoyumi:{kind:'flagMatchFirstHit',pct:10},deductiondagger:{kind:'flagMatchFirstHit',pct:15},makyuu:{kind:'firstHitUnexplored',pct:25}};
+const effects={flagaxe:{kind:'flagDamage'},mitibikinoono:{kind:'flagDamage'},mumeinoken:{kind:'zeroSwings'},zerosword:{kind:'zeroSwings'},flagsword:{kind:'flagMatchAC'},reversalblade:{kind:'flagMatchAC'},hatajirusinosentui:{kind:'victoryDisarm',chance:.1},sealinghammer:{kind:'victoryDisarm',chance:.1},surveyorstaff:{kind:'surveyor'},hatajirusinotanken:{kind:'victoryOpen',chance:.2},scoutingdagger:{kind:'victoryOpen',chance:1},eighteyespear:{kind:'numberDamage'},hatajirusinoyumi:{kind:'flagMatchFirstHit',pct:10},deductiondagger:{kind:'flagMatchFirstHit',pct:15},makyuu:{kind:'firstHitUnexplored',pct:25},sickle:{kind:'raceSlayer',race:'植物',mult:2}};
 const {game}=require('../scripts/sim/harness.cjs'),g=game();
 g.run("const r=generateRecruit('冒険者',0);registerRecruit(r);changeRecruitParty(r.members.id,true)");
 for(const [id,effect] of Object.entries(effects)){
@@ -56,7 +56,7 @@ for(const [id,effect] of Object.entries(effects)){
 }
 assert.equal(g.run("itemDescription(weapon('sword'))"),'1d6+2 · 近距離');
 assert.equal(g.run("libraryItemDetails(weapon('sword')).some(([label])=>label==='追加効果')"),false);
-console.log('PASS notion-items: 15 descriptors and library/shop/inventory descriptions; ordinary weapon display unchanged');
+console.log('PASS notion-items: 16 descriptors and library/shop/inventory descriptions; ordinary weapon display unchanged');
 
 for(const w of items){
  const details=JSON.parse(g.run(`JSON.stringify(libraryItemDetails(weapon('${w.id}')))`));

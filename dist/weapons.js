@@ -62,7 +62,8 @@ const WEAPONS = [
  {"id":"eighteyespear","lootRank":3,"name":"八目の槍","range":"melee","dice":[2,6,2],"classes":[0,4,6],"price":1520,"sell":760,"drop":true,"minFloor":5,"shop":false,"desc":"戦闘開始時、現在地に表示された数字1につき相手に与えるダメージ+1。","effect":{"kind":"numberDamage"}},
  {"id":"hatajirusinoyumi","lootRank":2,"name":"旗印の弓","range":"ranged","dice":[2,3,0],"classes":[3,6,0],"price":1000,"sell":500,"drop":true,"minFloor":2,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+10%。","effect":{"kind":"flagMatchFirstHit","pct":10}},
  {"id":"deductiondagger","lootRank":3,"name":"不意打ちの弓","range":"ranged","dice":[2,4,0],"classes":[3,6,0],"price":1400,"sell":700,"drop":true,"minFloor":5,"shop":false,"desc":"攻撃時、周囲8マスに旗があり、現在地の数字と周囲8マスの旗数が合うなら、この戦闘で最初に命中した通常攻撃のダメージ+15%。","effect":{"kind":"flagMatchFirstHit","pct":15}},
- {"id":"makyuu","lootRank":4,"name":"魔弓","range":"ranged","dice":[2,4,3],"classes":[3,6,0],"price":4000,"sell":2000,"drop":true,"minFloor":8,"shop":false,"desc":"周囲8マスに未探索のマスがあるなら、戦闘で最初に命中した通常攻撃のダメージ+25%。","effect":{"kind":"firstHitUnexplored","pct":25}}
+ {"id":"makyuu","lootRank":4,"name":"魔弓","range":"ranged","dice":[2,4,3],"classes":[3,6,0],"price":4000,"sell":2000,"drop":true,"minFloor":8,"shop":false,"desc":"周囲8マスに未探索のマスがあるなら、戦闘で最初に命中した通常攻撃のダメージ+25%。","effect":{"kind":"firstHitUnexplored","pct":25}},
+ {"id":"sickle","lootRank":1,"name":"伐採の鎌","range":"melee","dice":[1,6,2],"classes":[0,3,4,6],"price":200,"sell":100,"drop":true,"minFloor":1,"shop":false,"desc":"植物に対して与えるダメージが2倍。","effect":{"kind":"raceSlayer","race":"植物","mult":2}}
 ] .map(w=>({range:'melee',hitBonus:0,minAttacks:1,minFloor:1,...w}));
 
 const ARMOR=[

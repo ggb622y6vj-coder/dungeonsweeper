@@ -45,13 +45,13 @@ for(const field of ['魔法使い呪文抵抗','僧侶呪文抵抗']){
   const row=nm.find(r=>r['userDefined:ID']==='takenoko');
   assert.deepEqual(notionMonster({...row,[field]:null}),notionMonster({...row,[field]:0}));
 }
-assert.equal(nm.length,100,'Notion monster rows');assert.equal(ENEMIES.length,100,'game monsters');
+assert.equal(nm.length,108,'Notion monster rows');assert.equal(ENEMIES.length,108,'game monsters');
 const gm=new Map(ENEMIES.map(e=>[e.id,e]));
 for(const r of nm){const id=r['userDefined:ID'];if(!gm.has(id)){diffs.push(`monster ${id} missing in game`);continue}
   const a=gameMonster(gm.get(id)),b=notionMonster(r);for(const k of Object.keys(b))eq(`monster ${id}.${k}`,a[k],b[k])}
 for(const e of ENEMIES)if(!nm.some(r=>r['userDefined:ID']===e.id))diffs.push(`monster ${e.id} not in Notion`);
 
-if(!diffs.length)console.log('PASS notion-sync monsters: 100 definitions match the Notion snapshot field by field (0 differences)');
+if(!diffs.length)console.log('PASS notion-sync monsters: 108 definitions match the Notion snapshot field by field (0 differences)');
 else {console.error(diffs.join('\n'));assert.fail(`${diffs.length} monster differences`)}
 
 const JOB={魔法使い:1,僧侶:2},WHERE={探索:'field',戦闘:'battle','戦闘・探索':'both',宝箱:'chest'};
@@ -67,4 +67,4 @@ for(const r of ns){const id=r['userDefined:ID'],x=MAGIC.find(m=>m.id===id);if(!x
   for(const k of Object.keys(b))eq(`spell ${id}.${k}`,x[k],b[k]);}
 for(const x of MAGIC)if(!ns.some(r=>r['userDefined:ID']===x.id))diffs.push(`spell ${x.id} not in Notion`);
 if(diffs.length){console.error(diffs.join('\n'));assert.fail(`${diffs.length} Notion/game differences`)}
-console.log('PASS notion-sync: 100 monsters and 42 spells match the Notion snapshot field by field');
+console.log('PASS notion-sync: 108 monsters and 42 spells match the Notion snapshot field by field');

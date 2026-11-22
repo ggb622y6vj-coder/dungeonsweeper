@@ -34,8 +34,14 @@ for(const [id,effect,job,target] of [['halito','damage',1,800],['katino','sleep'
  assert.equal(g.run('s.enemy.units[0].hp'),991,'resistance roll precedes damage dice; fire damage is halved');
 }
 {
+ const g=battle(['cathuman']);
+ g.run("Math.random=()=>.999999;castMagic(1,'halito',800);castMagic(2,'lorto',800)");
+ assert.equal(g.run('s.enemy.units[0].hp'),999);
+ assert.equal(json(g,'logQueue.map(e=>e.text)').filter(t=>t==='チシャ猫は呪文をはね返した！').length,2);
+}
+{
  const source=fs.readFileSync(path.join(__dirname,'../data/monsters.csv'),'utf8');
- for(const bad of ['96','-1','']){
+ for(const bad of ['101','-1','']){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'spell-resist-'));fs.mkdirSync(path.join(dir,'data'));fs.mkdirSync(path.join(dir,'dist'));fs.mkdirSync(path.join(dir,'scripts'));
   fs.copyFileSync(path.join(__dirname,'../scripts/compile-monsters.py'),path.join(dir,'scripts/compile-monsters.py'));
   const lines=source.trimEnd().split('\n');const cols=lines[1].split(',');cols[23]=bad;lines[1]=cols.join(',');fs.writeFileSync(path.join(dir,'data/monsters.csv'),lines.join('\n')+'\n');

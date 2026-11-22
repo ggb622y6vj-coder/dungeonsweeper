@@ -21,7 +21,7 @@ function stone(g,name='B'){g.run(`afflict(index('${name}'),'stone');autoReorderP
 // All four CSV-generated definitions; retain the evil eye's existing paralysis.
 {
  const g=party();
- for(const [name,chance] of [['ガーゴイル',.05],['石巨人',.08],['邪眼',.1],['地震雲',.05],['サッキュバス',.05]]){
+ for(const [name,chance] of [['ガーゴイル',.05],['岩石の巨人',.08],['邪眼',.1],['地震雲',.05],['サッキュバス',.05]]){
   const d=json(g,`ENEMIES.find(d=>d.name==='${name}')`);
   assert.equal(d.statuses.find(a=>a.type==='stone')?.chance,chance,name);
   assert.equal(g.run(`libraryMonsterDetails(enemyDefinition('${d.id}'),{count:1,firstFloor:${d.floor}}).find(r=>r[0]==='特殊能力')[1].children.some(e=>e.textContent.includes('石化'))`),true);
