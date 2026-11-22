@@ -66,7 +66,7 @@
 その他：
 - ogre：Lv 8→7（抵抗の引き下げと同時）
 
-## 5. 宝物グループの付け替え（data/loot-tables.json の monsterGroups、既存17件）
+## 5. 宝物グループの付け替え（data/loot-tables.json の monsterGroups、既存16件）
 
 - →G1：apprentice、bat、spider、scout
 - →G2：mage、bandit、stone、ghoul、bigspider、acidslime、venomspider
