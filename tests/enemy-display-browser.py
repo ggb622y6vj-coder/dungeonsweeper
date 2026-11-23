@@ -37,7 +37,7 @@ with sync_playwright() as p:
             const icons=[...document.querySelectorAll('#scene [data-enemy-uid]')];
             return {
               ids:icons.map(e=>e.dataset.enemyUid),
-              sleeping:icons.filter(e=>e.textContent.includes('Zzz')).map(e=>e.dataset.enemyUid),
+              zzzIds:icons.filter(e=>e.textContent.includes('Zzz')).map(e=>e.dataset.enemyUid),
               boxes:icons.map(e=>['x','y','width','height'].map(a=>Number(e.querySelector('rect').getAttribute(a)))),
               rows:[...document.querySelectorAll('.scene-enemies > div')].map(e=>e.textContent)
             };
@@ -45,12 +45,12 @@ with sync_playwright() as p:
           return readEnemyScene();
         }""")
         assert first['ids'] == ['11', '20'], first
-        assert first['sleeping'] == ['11'], first
+        assert first['zzzIds'] == [], first
         assert first['boxes'] == [[186, 140, 108, 121], [346, 140, 108, 121]], first
         assert first['rows'] == ['1：ゴブリン ×4(2)', '2：スライム ×2(2)', '3：ハイウルフ ×3(0)'], first
         page.wait_for_function('!logBusy()')
         last = page.evaluate('readEnemyScene()')
-        assert last['ids'] == ['20', '30'] and last['sleeping'] == [], last
+        assert last['ids'] == ['20', '30'] and last['zzzIds'] == [], last
         assert last['rows'] == ['1：スライム ×2(1)', '2：ハイウルフ ×3(0)'], last
         single = page.evaluate("""()=>{
           for(const e of s.enemy.units.filter(e=>e.row===28)){e.hp=0;e.rewarded=true}
@@ -58,7 +58,7 @@ with sync_playwright() as p:
           return readEnemyScene();
         }""")
         assert single['boxes'] == [[266, 140, 108, 121]], single
-        print(f'PASS enemy display {width}px: first two icons, sleep, full row counts and snapshot order')
+        print(f'PASS enemy display {width}px: first two icons, no Zzz, full row counts and snapshot order')
 
         layout = page.evaluate("""()=>{
           s.floor = 3;
@@ -87,15 +87,15 @@ with sync_playwright() as p:
         enemy_list = layout['list']
         assert enemy_list['width'] > 0 and enemy_list['height'] > 0, layout
         for icon in layout['icons']:
-            emoji, sleep = icon['texts']
-            assert emoji['label'] and sleep['label'] == 'Zzz', icon
-            for text in (emoji, sleep):
-                box = text['box']
-                assert box['width'] > 0 and box['height'] > 0, text
-                assert (
-                    box['right'] <= enemy_list['left'] or box['left'] >= enemy_list['right']
-                    or box['bottom'] <= enemy_list['top'] or box['top'] >= enemy_list['bottom']
-                ), (width, icon['uid'], text, enemy_list)
-        print(f'PASS enemy display {width}px: four-row list clears both icons and Zzz labels')
+            assert len(icon['texts']) == 1, icon
+            emoji = icon['texts'][0]
+            assert emoji['label'] and emoji['label'] != 'Zzz', icon
+            box = emoji['box']
+            assert box['width'] > 0 and box['height'] > 0, emoji
+            assert (
+                box['right'] <= enemy_list['left'] or box['left'] >= enemy_list['right']
+                or box['bottom'] <= enemy_list['top'] or box['top'] >= enemy_list['bottom']
+            ), (width, icon['uid'], emoji, enemy_list)
+        print(f'PASS enemy display {width}px: four-row list clears both emoji')
         page.close()
     browser.close()
