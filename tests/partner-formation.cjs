@@ -9,6 +9,7 @@ const g = game(null, () => {
 });
 const enemies = Array.from(g.run('ENEMIES'));
 const monster = id => enemies.find(d => d.id === id);
+assert.equal(monster('blob').summonCap, 6, 'blob summon cap');
 const configured = [
   ['goblin', 'goblin', .4], ['mage', 'orc', .55], ['shaman', 'blackwolf', .4],
   ['darkpriest', 'zombie', .6], ['highmage', 'troll', .5], ['troll', 'ninja', .3],

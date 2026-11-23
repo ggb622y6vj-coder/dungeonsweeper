@@ -2709,7 +2709,7 @@ const ENEMIES=[
     "resistance": "なし",
     "boss": false,
     "icon": "◉",
-    "summonCap": 3,
+    "summonCap": 6,
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
