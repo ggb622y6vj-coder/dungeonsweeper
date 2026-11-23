@@ -165,3 +165,4 @@
 | 127 | 2026-11-22 | 術者22種に系統・習得Lv別の詠唱を導入。戦闘中は敵グループで魔力低下を共有 | e528b82 | [spec](specs/127-enemy-spellcasting.md) | [実施](reports/127.md) |
 | 128 | 2026-11-22 | ログ文8件を訂正し、悪魔・竜・魔獣に対する種族特効武器を6種追加 | 47fac1b | [spec](specs/128-log-text-and-new-weapons.md) | [実施](reports/128.md) |
 | 129 | 2026-11-23 | 床罠「浮上穴」を追加。1つ上の階へ転移し、1Fでは不発 | 29ef368 | [spec](specs/129-upward-teleport-trap.md) | [実施](reports/129.md) |
+| 130 | 2026-11-23 | モンスター随伴機能を混合方式で導入。設定例12種を先行 | 65de4d0 | [spec](specs/130-monster-partner.md) | [実施](reports/130.md) |
