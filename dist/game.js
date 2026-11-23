@@ -302,9 +302,9 @@ function canWeaponAttack(i){return !(s.ailments[i].fear>0)&&(i<3||equippedWeapon
 function itemDescription(w){if(w.unknown)return '';return diceLabel(w)+(w.dice?' · '+(w.range==='ranged'?'遠距離':'近距離'):'')+(w.desc?' · '+w.desc:'')}
 function drawEnemies(combat=visibleCombat()){
  if(!combat)return '';
- const groups=enemyGroups(combat).slice(0,2),y=62,height=130;
+ const groups=enemyGroups(combat).slice(0,2),y=140,height=130;
  return groups.map((g,row)=>{
-  const e=g.units.find(unit=>!unit.rewarded),x=groups.length===1?320:160+row*320;
+  const e=g.units.find(unit=>!unit.rewarded),x=groups.length===1?320:240+row*160;
   return `<g data-enemy-uid="${e.uid}"><rect x="${x-54}" y="${y}" width="108" height="${height-9}" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="${y+height*.65}" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text><text x="${x}" y="${y+height-18}" text-anchor="middle" fill="#dac595" font-size="16">${e.sleep>0?'Zzz':''}</text></g>`;
  }).join('');
 }

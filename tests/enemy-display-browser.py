@@ -1,4 +1,4 @@
-"""131: representative enemy icons and per-row counts during combat log playback."""
+"""132: enemy icons, per-row counts during log playback, and overlay clearance."""
 import os
 import sys
 from pathlib import Path
@@ -46,7 +46,7 @@ with sync_playwright() as p:
         }""")
         assert first['ids'] == ['11', '20'], first
         assert first['sleeping'] == ['11'], first
-        assert first['boxes'] == [[106, 62, 108, 121], [426, 62, 108, 121]], first
+        assert first['boxes'] == [[186, 140, 108, 121], [346, 140, 108, 121]], first
         assert first['rows'] == ['1：ゴブリン ×4(2)', '2：スライム ×2(2)', '3：ハイウルフ ×3(0)'], first
         page.wait_for_function('!logBusy()')
         last = page.evaluate('readEnemyScene()')
@@ -57,7 +57,45 @@ with sync_playwright() as p:
           render();
           return readEnemyScene();
         }""")
-        assert single['boxes'] == [[266, 62, 108, 121]], single
+        assert single['boxes'] == [[266, 140, 108, 121]], single
         print(f'PASS enemy display {width}px: first two icons, sleep, full row counts and snapshot order')
+
+        layout = page.evaluate("""()=>{
+          s.floor = 3;
+          s.enemy = {dataVersion: 1, initiative: 'normal', flagEffect: {}, units:
+            ['firefly', 'dragon', 'rabbit', 'thief'].map((id, row) => ({
+              id, row, uid: row + 40, hp: 5, identified: true, sleep: row < 2 ? 2 : 0
+            }))
+          };
+          render();
+          const list = document.querySelector('#scene .scene-enemies');
+          const icons = [...document.querySelectorAll('#scene [data-enemy-uid]')];
+          return {
+            rowCount: list.children.length,
+            list: list.getBoundingClientRect().toJSON(),
+            icons: icons.map(icon => ({
+              uid: icon.dataset.enemyUid,
+              texts: [...icon.querySelectorAll('text')].map(text => ({
+                label: text.textContent,
+                box: text.getBoundingClientRect().toJSON()
+              }))
+            }))
+          };
+        }""")
+        assert layout['rowCount'] == 4, layout
+        assert [icon['uid'] for icon in layout['icons']] == ['40', '41'], layout
+        enemy_list = layout['list']
+        assert enemy_list['width'] > 0 and enemy_list['height'] > 0, layout
+        for icon in layout['icons']:
+            emoji, sleep = icon['texts']
+            assert emoji['label'] and sleep['label'] == 'Zzz', icon
+            for text in (emoji, sleep):
+                box = text['box']
+                assert box['width'] > 0 and box['height'] > 0, text
+                assert (
+                    box['right'] <= enemy_list['left'] or box['left'] >= enemy_list['right']
+                    or box['bottom'] <= enemy_list['top'] or box['top'] >= enemy_list['bottom']
+                ), (width, icon['uid'], text, enemy_list)
+        print(f'PASS enemy display {width}px: four-row list clears both icons and Zzz labels')
         page.close()
     browser.close()
