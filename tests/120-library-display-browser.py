@@ -89,7 +89,7 @@ with sync_playwright() as p:
                 assert (entry['group'], entry['resist']) == (monster['group'], monster['resist']), entry
                 assert entry['tracks'] == 4 and not entry['overlap'] and not entry['overflow'], (width, entry)
                 if entry['id'] == 'slime':
-                    assert (entry['group'], entry['resist']) == ('1d2', '0/0')
+                    assert (entry['group'], entry['resist']) == ('1d2+1', '0/0')
             if floor == 1:
                 page.locator('#librarydialog').screenshot(path=str(output / f'library-{width}.png'))
 

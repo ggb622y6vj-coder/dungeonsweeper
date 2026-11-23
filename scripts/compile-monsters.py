@@ -53,7 +53,7 @@ ids={
   "テラー": "terror",
   "地獄の獄卒": "watcher",
   "オーガ": "ogre", "ゾンビ": "zombie", "ハーピー": "harpy", "大毒蛇": "viper", "鎧蟻": "armorant", "闇の司祭": "darkpriest", "迷宮の妖術師": "sorcerer", "ガーゴイル": "gargoyle", "牛頭の門番": "minogate",
-  "墓所の亡者": "wight", "トロル": "troll", "人狼": "werewolf", "大蠍": "scorpion", "忍びの者": "ninja", "高位の魔術師": "highmage", "火蜥蜴": "salamander", "ブロブ": "blob", "屍術師": "necromancer",
+  "墓所の亡者": "wight", "トロル": "troll", "人狼": "werewolf", "大蠍": "scorpion", "忍びの者": "ninja", "高位の魔術師": "highmage", "サラマンダー": "salamander", "ブロブ": "blob", "屍術師": "necromancer",
   "亡霊": "wraith", "岩石の巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "毒茸の群れ": "fungus", "ダークエルフ": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
   "毒竜": "gasdragon", "牛頭の戦士": "minotaur", "肉の巨像": "fleshgolem", "忍びの頭目": "ninjachief", "死霊魔導士": "deathmage", "地獄の犬": "hellhound", "這い寄る大蟲": "crawler", "双頭の巨人": "ettin",
   "レッサーデーモン": "lesserdemon", "雷竜": "bluedragon", "死の騎士": "deathknight", "魔女": "witch", "多頭竜": "hydra", "影の暗殺者": "assassin", "邪眼": "evileye", "魔将軍": "demongeneral",
@@ -100,6 +100,7 @@ for r in rows:
  d['icon']='♛' if d['boss'] else {'植物':'♣','不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
 by_id={d['id']:d for d in data}
 for d in data:
+ assert not d['boss'] or d['partnerRate'] in (0,1), f"Guardian partner rate must be 0 or 100: {d['id']}"
  partner_id=d['partnerId']
  if partner_id is None:
   assert d['partnerRate']==0, f"Missing partner ID for {d['id']}"

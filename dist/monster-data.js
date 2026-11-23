@@ -23,8 +23,8 @@ const ENEMIES=[
     ],
     "xp": 6.0,
     "groupSize": [
-      1,
-      2
+      2,
+      3
     ],
     "gold": [
       1,
@@ -50,8 +50,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "ameba",
+    "partnerRate": 0.4
   },
   {
     "id": "gas",
@@ -130,8 +130,8 @@ const ENEMIES=[
     ],
     "xp": 12.0,
     "groupSize": [
-      2,
-      3
+      1,
+      5
     ],
     "gold": [
       2,
@@ -157,8 +157,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "goblin",
+    "partnerRate": 0.5
   },
   {
     "id": "wolf",
@@ -210,8 +210,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "spider",
+    "partnerRate": 0.5
   },
   {
     "id": "goblin",
@@ -236,8 +236,8 @@ const ENEMIES=[
     ],
     "xp": 17.0,
     "groupSize": [
-      2,
-      3
+      3,
+      4
     ],
     "gold": [
       2,
@@ -289,8 +289,8 @@ const ENEMIES=[
     ],
     "xp": 13.0,
     "groupSize": [
-      1,
-      2
+      2,
+      3
     ],
     "gold": [
       1,
@@ -316,8 +316,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "skeleton",
+    "partnerRate": 0.4
   },
   {
     "id": "rat",
@@ -369,8 +369,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "wolf",
+    "partnerRate": 0.4
   },
   {
     "id": "spider",
@@ -378,7 +378,8 @@ const ENEMIES=[
     "unknown": "うごめく虫",
     "floor": 1,
     "floors": [
-      1
+      1,
+      2
     ],
     "level": 3,
     "hp": [
@@ -395,8 +396,8 @@ const ENEMIES=[
     ],
     "xp": 17.0,
     "groupSize": [
-      1,
-      2
+      2,
+      3
     ],
     "gold": [
       1,
@@ -475,8 +476,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "apprentice",
+    "partnerRate": 0.6
   },
   {
     "id": "apprentice",
@@ -528,8 +529,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "skeleton",
+    "partnerRate": 0.4
   },
   {
     "id": "guardian",
@@ -639,8 +640,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "ameba",
+    "partnerRate": 0.6
   },
   {
     "id": "ghostknight",
@@ -692,8 +693,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "ghoul",
+    "partnerRate": 1.0
   },
   {
     "id": "firefly",
@@ -859,8 +860,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "spider",
+    "partnerRate": 0.8
   },
   {
     "id": "mage",
@@ -970,8 +971,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "bandit",
+    "partnerRate": 0.5
   },
   {
     "id": "ghoul",
@@ -1028,8 +1029,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "ghoul",
+    "partnerRate": 0.8
   },
   {
     "id": "stone",
@@ -1081,8 +1082,8 @@ const ENEMIES=[
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
     "spell": 0.5,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "stone",
+    "partnerRate": 0.8
   },
   {
     "id": "general",
@@ -1174,7 +1175,7 @@ const ENEMIES=[
     "xp": 30.0,
     "groupSize": [
       1,
-      2
+      4
     ],
     "gold": [
       3,
@@ -1263,8 +1264,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "archer",
+    "partnerRate": 0.5
   },
   {
     "id": "blackwolf",
@@ -1289,8 +1290,8 @@ const ENEMIES=[
     ],
     "xp": 49.0,
     "groupSize": [
-      2,
-      4
+      1,
+      5
     ],
     "gold": [
       3,
@@ -1316,8 +1317,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "rabbit",
+    "partnerRate": 0.8
   },
   {
     "id": "shaman",
@@ -1378,7 +1379,9 @@ const ENEMIES=[
     "unknown": "おぞましい虫",
     "floor": 3,
     "floors": [
-      3
+      3,
+      9,
+      10
     ],
     "level": 7,
     "hp": [
@@ -1541,8 +1544,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "archer",
+    "partnerRate": 0.7
   },
   {
     "id": "rabbit",
@@ -1705,8 +1708,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "terror",
+    "partnerRate": 0.7
   },
   {
     "id": "watcher",
@@ -1798,7 +1801,7 @@ const ENEMIES=[
     "xp": 70.0,
     "groupSize": [
       1,
-      2
+      4
     ],
     "gold": [
       4,
@@ -1833,7 +1836,9 @@ const ENEMIES=[
     "unknown": "動く死体",
     "floor": 4,
     "floors": [
-      4
+      4,
+      5,
+      6
     ],
     "level": 7,
     "hp": [
@@ -1882,8 +1887,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "archer",
+    "partnerRate": 0.6
   },
   {
     "id": "harpy",
@@ -1935,8 +1940,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "virusbat",
+    "partnerRate": 0.7
   },
   {
     "id": "viper",
@@ -1993,8 +1998,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "armorant",
+    "partnerRate": 1.0
   },
   {
     "id": "armorant",
@@ -2046,8 +2051,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "dynamotuboro",
+    "partnerRate": 0.3
   },
   {
     "id": "darkpriest",
@@ -2152,8 +2157,8 @@ const ENEMIES=[
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
     "spell": 0.25,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "poltergeist",
+    "partnerRate": 0.5
   },
   {
     "id": "gargoyle",
@@ -2210,8 +2215,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "zombie",
+    "partnerRate": 0.6
   },
   {
     "id": "minogate",
@@ -2422,8 +2427,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "namakubi",
+    "partnerRate": 0.6
   },
   {
     "id": "scorpion",
@@ -2595,7 +2600,7 @@ const ENEMIES=[
   },
   {
     "id": "salamander",
-    "name": "火蜥蜴",
+    "name": "サラマンダー",
     "unknown": "赤い鱗",
     "floor": 5,
     "floors": [
@@ -2651,8 +2656,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "werewolf",
+    "partnerRate": 0.7
   },
   {
     "id": "blob",
@@ -2677,8 +2682,8 @@ const ENEMIES=[
     ],
     "xp": 90.0,
     "groupSize": [
-      1,
-      2
+      3,
+      5
     ],
     "gold": [
       4,
@@ -3107,8 +3112,8 @@ const ENEMIES=[
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
     "spell": 0.25,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "zombie",
+    "partnerRate": 0.8
   },
   {
     "id": "vampbat",
@@ -5059,7 +5064,7 @@ const ENEMIES=[
     "xp": 3600.0,
     "groupSize": [
       1,
-      1
+      2
     ],
     "gold": [
       100,
@@ -5093,8 +5098,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "venomspider",
+    "partnerRate": 0.6
   },
   {
     "id": "labyrinthlord",
@@ -5200,8 +5205,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "takenoko",
+    "partnerRate": 0.4
   },
   {
     "id": "kinoko",
@@ -5228,7 +5233,7 @@ const ENEMIES=[
     "xp": 25.0,
     "groupSize": [
       1,
-      2
+      3
     ],
     "gold": [
       2,
@@ -5254,8 +5259,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "takenoko",
+    "partnerRate": 0.6
   },
   {
     "id": "sirakaba",
@@ -5282,7 +5287,7 @@ const ENEMIES=[
     "xp": 40.0,
     "groupSize": [
       1,
-      1
+      2
     ],
     "gold": [
       2,
@@ -5308,8 +5313,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "poisonslime",
+    "partnerRate": 0.8
   },
   {
     "id": "insectivore",
@@ -5336,7 +5341,7 @@ const ENEMIES=[
     "xp": 50.0,
     "groupSize": [
       1,
-      1
+      2
     ],
     "gold": [
       3,
@@ -5367,8 +5372,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "venomspider",
+    "partnerRate": 0.6
   },
   {
     "id": "dendenko",
@@ -5377,7 +5382,8 @@ const ENEMIES=[
     "floor": 2,
     "floors": [
       2,
-      3
+      3,
+      4
     ],
     "level": 4,
     "hp": [
@@ -5395,7 +5401,7 @@ const ENEMIES=[
     "xp": 25.0,
     "groupSize": [
       1,
-      2
+      3
     ],
     "gold": [
       2,
@@ -5404,7 +5410,7 @@ const ENEMIES=[
     ],
     "race": "虫",
     "mageResist": 0.1,
-    "priestResist": 0.1,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -5421,8 +5427,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "dendenko",
+    "partnerRate": 0.7
   },
   {
     "id": "dynamotuboro",
@@ -5489,8 +5495,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "dendenko",
+    "partnerRate": 1.0
   },
   {
     "id": "akumaikire",
@@ -5720,8 +5726,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "dynamotuboro",
+    "partnerRate": 0.3
   },
   {
     "id": "virusbat",
@@ -5969,7 +5975,7 @@ const ENEMIES=[
     "xp": 100.0,
     "groupSize": [
       1,
-      2
+      5
     ],
     "gold": [
       4,
@@ -5995,8 +6001,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "poltergeist",
+    "partnerRate": 0.6
   },
   {
     "id": "namakubi",
@@ -6049,7 +6055,7 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "namakubi",
+    "partnerRate": 0.7
   }
 ];

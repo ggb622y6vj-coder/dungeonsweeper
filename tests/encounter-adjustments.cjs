@@ -29,29 +29,35 @@ for (let floor = 1; floor <= maxFloor; floor++) {
   ]`);
   g.run(`s.floor=${floor};s.guardiansDefeated=[];s.guardianKilledThisRun=false`);
   const cap = Math.min(4, floor + 1), last = pool.at(-1);
+  const sources = [...pool, guardian].map(id => g.run(`enemyDefinition(${JSON.stringify(id)})`));
+  const guardianDef = sources.at(-1);
   for (const [index, id] of pool.entries()) {
-    const d = g.run(`enemyDefinition(${JSON.stringify(id)})`);
-    // A .999 partner roll ends a configured ordinary species' chain.
-    const tail = d.partnerRate > 0 && pool.includes(d.partnerId) ? [] : Array(cap - 1).fill(last);
-    const draws = [(index + .5) / pool.length, ...Array(Math.max(1, tail.length)).fill(.999)];
-    assert.deepEqual(formation(false, draws), [id, ...tail], `undefeated ${floor}F pool`);
+    const d = sources[index];
+    if (d.partnerRate > 0 && d.partnerRate < 1 && pool.includes(d.partnerId)) {
+      assert.deepEqual(formation(false, [(index + .5) / pool.length, .999]), [id],
+        `failed partner roll for ${id} on ${floor}F`);
+    }
+  }
+  if (guardianDef.partnerRate) {
+    g.run('s.guardiansDefeated=[s.floor]');
+    assert.deepEqual(formation(false, [.999, .999, .999]), [guardian, guardianDef.partnerId]);
+  }
+
+  // Replay 123 with independent draws for every species, including the end of the pool.
+  const rates = sources.map(d => d.partnerRate);
+  sources.forEach(d => { d.partnerRate = 0; });
+  g.run('s.guardiansDefeated=[]');
+  for (const [index, id] of pool.entries()) {
+    const draws = [(index + .5) / pool.length, ...Array(cap - 1).fill(.999)];
+    assert.deepEqual(formation(false, draws), [id, ...Array(cap - 1).fill(last)], `undefeated ${floor}F pool`);
   }
   g.run(`s.guardiansDefeated=[${floor === 1 ? 2 : floor - 1}];s.guardianKilledThisRun=true`);
   assert.deepEqual(formation(false, Array(cap).fill(.999)), Array(cap).fill(last),
     `another floor's defeat and a stale run flag cannot unlock the ${floor}F guardian`);
 
   g.run('s.guardiansDefeated=[s.floor];s.guardianKilledThisRun=false');
-  const guardianDef = g.run(`enemyDefinition(${JSON.stringify(guardian)})`);
-  if (guardianDef.partnerRate) {
-    assert.deepEqual(formation(false, [.999, .999, .999]), [guardian, guardianDef.partnerId]);
-  } else {
-    assert.deepEqual(formation(false, [.999, ...Array(cap - 1).fill((pool.length - .5) / (pool.length + 1))]),
-      [guardian, ...Array(cap - 1).fill(last)]);
-  }
-  // Force consecutive independent guardian draws, even on floors with guaranteed escorts.
-  const sources = [pool[0], guardian].map(id => g.run(`enemyDefinition(${JSON.stringify(id)})`));
-  const rates = sources.map(d => d.partnerRate);
-  sources.forEach(d => { d.partnerRate = 0; });
+  assert.deepEqual(formation(false, [.999, ...Array(cap - 1).fill((pool.length - .5) / (pool.length + 1))]),
+    [guardian, ...Array(cap - 1).fill(last)]);
   assert.deepEqual(formation(false, [...Array(cap).fill(.999), ...Array(cap - 1).fill(0)]),
     [guardian, ...Array(cap - 1).fill(pool[0])], `consecutive guardians on the real ${floor}F`);
 

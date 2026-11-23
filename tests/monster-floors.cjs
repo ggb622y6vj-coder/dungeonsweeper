@@ -10,6 +10,11 @@ const dataSrc = fs.readFileSync(path.join(root, 'dist/monster-data.js'), 'utf8')
 const dataContext = vm.createContext({});
 vm.runInContext(dataSrc, dataContext);
 const enemies = JSON.parse(vm.runInContext('JSON.stringify(ENEMIES)', dataContext));
+for (const [id, floors] of [
+  ['dendenko', [2, 3, 4]], ['zombie', [4, 5, 6]], ['spider', [1, 2]], ['venomspider', [3, 9, 10]],
+]) {
+  assert.deepEqual(enemies.find(d => d.id === id).floors, floors, id);
+}
 for (const id of ['succubus', 'daidaraboti']) {
   assert.deepEqual(Array.from(enemies.find(d => d.id === id).floors), [9, 10]);
   assert.equal(enemies.find(d => d.id === id).floor, 9);
@@ -27,13 +32,14 @@ assert.deepEqual([gas.hp, gas.ac, gas.attack, gas.xp], [[3, 9, 0], 7, [1, 5, 1],
 assert.deepEqual([gas.level, gas.hit, Array.from(gas.groupSize), gas.gold, gas.race, gas.swings, gas.icon], [5, 3, [2, 4], [2, 4, 0], '不定形', 1, '◉']);
 assert.deepEqual(Array.from(kasha.floors), [9, 10]);
 assert.deepEqual([kasha.hp, kasha.ac, kasha.attack, kasha.xp], [[10, 8, 14], -5, [5, 8, 0], 3600]);
-assert.deepEqual([kasha.level, kasha.hit, Array.from(kasha.groupSize), kasha.gold, kasha.race, kasha.swings, kasha.icon], [23, 11, [1, 1], [100, 3, 0], '不死', 2, '☠']);
+assert.deepEqual([kasha.level, kasha.hit, Array.from(kasha.groupSize), kasha.gold, kasha.race, kasha.swings, kasha.icon], [23, 11, [1, 2], [100, 3, 0], '不死', 2, '☠']);
 assert.deepEqual(kasha.breath, { element: '炎', dice: [15, 8, 0], chance: .25 });
 assert.equal(kasha.resistance, '炎半減');
 assert.equal(kasha.race, '不死');
 assert.equal(kasha.statuses.length, 0);
 
 const context = vm.createContext({ s: { floor: 1 }, ENEMIES: enemies, Math: Object.create(Math) });
+vm.runInContext(fs.readFileSync(path.join(root, 'dist/spells.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(root, 'dist/monsters.js'), 'utf8'), context);
 for (const floor of [8, 9, 10]) {
   context.s.floor = floor;
@@ -84,12 +90,16 @@ try {
   fs.mkdirSync(path.join(temp, 'data'));
   fs.mkdirSync(path.join(temp, 'dist'));
   fs.copyFileSync(path.join(root, 'scripts/compile-monsters.py'), path.join(temp, 'scripts/compile-monsters.py'));
-  let csv = fs.readFileSync(path.join(root, 'data/monsters.csv'), 'utf8');
-  csv = csv.replace(/^テアシナガ,([^,]+),1F,/m, 'テアシナガ,$1,1F・2F,');
-  fs.writeFileSync(path.join(temp, 'data/monsters.csv'), csv);
-  const result = spawnSync('python3', [path.join(temp, 'scripts/compile-monsters.py')], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0, 'compiler rejects a guardian on multiple floors');
-  assert.match(result.stderr, /Guardian must have exactly one floor/);
+  const csv = fs.readFileSync(path.join(root, 'data/monsters.csv'), 'utf8');
+  for (const [invalid, error] of [
+    [csv.replace(/^テアシナガ,([^,]+),1F,/m, 'テアシナガ,$1,1F・2F,'), /Guardian must have exactly one floor/],
+    [csv.replace(/,wight,100$/m, ',wight,99'), /Guardian partner rate must be 0 or 100: necromancer/],
+  ]) {
+    fs.writeFileSync(path.join(temp, 'data/monsters.csv'), invalid);
+    const result = spawnSync('python3', [path.join(temp, 'scripts/compile-monsters.py')], { encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, error);
+  }
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

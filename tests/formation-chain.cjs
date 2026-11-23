@@ -44,17 +44,33 @@ check(5, ['ninja', 'highmage', .5], ['ninja', 'highmage']);
 console.log('PASS random continuation picks a species whose own settings determine subsequent rows');
 
 const archer = enemies.find(d => d.id === 'archer');
+const { partnerId, partnerRate } = archer;
 Object.assign(archer, { partnerId: 'zombie', partnerRate: 1 }); // Zombie is on 4F, absent on 3F.
-check(3, ['archer', 'shaman', .39, 'firefly'], ['archer', 'shaman', 'blackwolf', 'firefly']);
-check(4, ['archer', .999, 'ogre', 'ogre'], ['archer', 'zombie', 'ogre', 'ogre']);
-Object.assign(archer, { partnerId: null, partnerRate: 0 });
+check(3, ['archer', 'shaman', .39, .79], ['archer', 'shaman', 'blackwolf', 'rabbit']);
+check(4, ['archer', .999, .59, .999], ['archer', 'zombie', 'archer', 'zombie']);
+Object.assign(archer, { partnerId, partnerRate });
 console.log('PASS out-of-floor partner falls back to the pool and the chain resumes');
 
+// On these floors the configured partner is absent. The next roll selects a
+// normal species, and its own partner roll can end the chain.
+for (const [floor, source, next] of [
+  [3, 'sirakaba', 'archer'], [4, 'insectivore', 'namakubi'],
+  [5, 'zombie', 'wight'], [6, 'zombie', 'vampbat'], [5, 'rafflesia', 'wight'],
+]) {
+  check(floor, [source, next, .999], [source, next]);
+}
+check(2, ['sirakaba', .79, .99], ['sirakaba', 'poisonslime']);
+check(3, ['insectivore', .59, 'archer', .99], ['insectivore', 'venomspider', 'archer']);
+check(4, ['zombie', .59, .99], ['zombie', 'archer']);
+check(4, ['rafflesia', .29, .999, .99], ['rafflesia', 'dynamotuboro', 'dendenko']);
+console.log('PASS all four partially overlapping partners on shared and unshared floors');
+
 const necromancer = enemies.find(d => d.id === 'necromancer');
+const necromancerRate = necromancer.partnerRate;
 necromancer.partnerRate = .01;
 check(5, [.5], ['necromancer', 'wight'], { boss: true });
 check(5, [.49, .49], ['necromancer', 'wight', 'wight', 'wight'], { boss: true });
-necromancer.partnerRate = 1;
+necromancer.partnerRate = necromancerRate;
 check(1, ['goblin', .5], ['guardian', 'goblin'], { boss: true });
 check(1, ['goblin', .499999, 'slime'], ['guardian', 'goblin', 'slime'], { boss: true });
 console.log('PASS guaranteed guardian escort chains from row two and independent random escorts keep their 50% third row');

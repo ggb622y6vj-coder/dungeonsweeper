@@ -87,7 +87,7 @@ assert.notEqual(g.run("$('#librarydialog').open"),true,'library is town-only');
 g.run('enterTown();log("待機中");');g.run("$('#libraryopen').onclick()");
 assert.notEqual(g.run("$('#librarydialog').open"),true,'library cannot expose future log results');
 g.drain();
-assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['集団数','1d2'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['呪文抵抗（魔／僧）','0/0'],['特殊能力','なし'],['経験値','6'],['撃破数','2体']]);
+assert.deepEqual(JSON.parse(g.run("JSON.stringify(libraryMonsterDetails(enemyDefinition('slime'),{count:2,firstFloor:1}).map(([k,v])=>[k,typeof v==='string'?v:[...v.children].map(x=>x.textContent).join(' ')]))")),[['種族','不定形'],['出現階','1F'],['集団数','1d2+1'],['HP','1d6+3'],['物理ダメージ','1d4'],['攻撃回数','1回'],['呪文抵抗（魔／僧）','0/0'],['特殊能力','なし'],['経験値','6'],['撃破数','2体']]);
 assert.equal(g.run("libraryMonsterDetails(ENEMIES.find(d=>d.name==='邪眼'),{count:1,firstFloor:8}).find(([label])=>label==='特殊能力')[1].children.map(x=>x.className).join(' ')").includes('ailment-paralysis'),true);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('holysword')))"),/4d8\+5.*hitBonus \+3.*2回.*6000.*迷宮限定/);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('plate')))"),/AC −5/);
