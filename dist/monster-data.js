@@ -49,7 +49,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "gas",
@@ -101,7 +103,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "skeleton",
@@ -152,7 +156,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "wolf",
@@ -203,7 +209,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "goblin",
@@ -254,7 +262,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": "goblin",
+    "partnerRate": 0.4
   },
   {
     "id": "bat",
@@ -305,7 +315,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "rat",
@@ -356,7 +368,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "spider",
@@ -407,7 +421,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "scout",
@@ -458,7 +474,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "apprentice",
@@ -509,7 +527,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "guardian",
@@ -560,7 +580,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "poisonslime",
@@ -616,7 +638,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ghostknight",
@@ -667,7 +691,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "firefly",
@@ -726,7 +752,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "orc",
@@ -777,7 +805,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "bigspider",
@@ -828,7 +858,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "mage",
@@ -879,7 +911,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.5
+    "spell": 0.5,
+    "partnerId": "orc",
+    "partnerRate": 0.55
   },
   {
     "id": "bandit",
@@ -935,7 +969,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ghoul",
@@ -991,7 +1027,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "stone",
@@ -1042,7 +1080,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.5
+    "spell": 0.5,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "general",
@@ -1106,7 +1146,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "acidslime",
@@ -1166,7 +1208,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "archer",
@@ -1218,7 +1262,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "blackwolf",
@@ -1269,7 +1315,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "shaman",
@@ -1320,7 +1368,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.5
+    "spell": 0.5,
+    "partnerId": "blackwolf",
+    "partnerRate": 0.4
   },
   {
     "id": "venomspider",
@@ -1371,7 +1421,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "thief",
@@ -1422,7 +1474,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "dragon",
@@ -1486,7 +1540,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "rabbit",
@@ -1537,7 +1593,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "iron",
@@ -1593,7 +1651,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.6
+    "spell": 0.6,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "terror",
@@ -1644,7 +1704,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "watcher",
@@ -1708,7 +1770,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.1
+    "spell": 0.1,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ogre",
@@ -1759,7 +1823,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "zombie",
@@ -1815,7 +1881,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "harpy",
@@ -1866,7 +1934,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "viper",
@@ -1922,7 +1992,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "armorant",
@@ -1973,7 +2045,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "darkpriest",
@@ -2024,7 +2098,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 3,
-    "spell": 0.3
+    "spell": 0.3,
+    "partnerId": "zombie",
+    "partnerRate": 0.6
   },
   {
     "id": "sorcerer",
@@ -2075,7 +2151,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "gargoyle",
@@ -2131,7 +2209,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "minogate",
@@ -2182,7 +2262,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "wight",
@@ -2233,7 +2315,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": "wight",
+    "partnerRate": 0.5
   },
   {
     "id": "troll",
@@ -2284,7 +2368,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": "ninja",
+    "partnerRate": 0.3
   },
   {
     "id": "werewolf",
@@ -2335,7 +2421,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "scorpion",
@@ -2395,7 +2483,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ninja",
@@ -2446,7 +2536,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "highmage",
@@ -2497,7 +2589,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": "troll",
+    "partnerRate": 0.5
   },
   {
     "id": "salamander",
@@ -2556,7 +2650,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "blob",
@@ -2612,7 +2708,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "necromancer",
@@ -2663,7 +2761,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.35
+    "spell": 0.35,
+    "partnerId": "wight",
+    "partnerRate": 1.0
   },
   {
     "id": "wraith",
@@ -2719,7 +2819,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "stonegiant",
@@ -2775,7 +2877,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "chimera",
@@ -2834,7 +2938,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "darkknight",
@@ -2885,7 +2991,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "fungus",
@@ -2945,7 +3053,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "darkelf",
@@ -2996,7 +3106,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "vampbat",
@@ -3052,7 +3164,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": "vampbat",
+    "partnerRate": 0.5
   },
   {
     "id": "vampire",
@@ -3103,7 +3217,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.2
+    "spell": 0.2,
+    "partnerId": "vampbat",
+    "partnerRate": 1.0
   },
   {
     "id": "gasdragon",
@@ -3162,7 +3278,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "minotaur",
@@ -3213,7 +3331,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "fleshgolem",
@@ -3264,7 +3384,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ninjachief",
@@ -3315,7 +3437,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "deathmage",
@@ -3366,7 +3490,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 7,
     "priestSpellLevel": 0,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "hellhound",
@@ -3430,7 +3556,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "crawler",
@@ -3486,7 +3614,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ettin",
@@ -3537,7 +3667,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "lesserdemon",
@@ -3588,7 +3720,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.2
+    "spell": 0.2,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "bluedragon",
@@ -3653,7 +3787,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "deathknight",
@@ -3704,7 +3840,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "witch",
@@ -3755,7 +3893,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 3,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "hydra",
@@ -3806,7 +3946,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "assassin",
@@ -3857,7 +3999,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "evileye",
@@ -3917,7 +4061,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
-    "spell": 0.4
+    "spell": 0.4,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "demongeneral",
@@ -3968,7 +4114,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 7,
     "priestSpellLevel": 0,
-    "spell": 0.3
+    "spell": 0.3,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "greaterdemon",
@@ -4020,7 +4168,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 8,
     "priestSpellLevel": 0,
-    "spell": 0.1
+    "spell": 0.1,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "frostgiant",
@@ -4071,7 +4221,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "vampirelord",
@@ -4122,7 +4274,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 7,
     "priestSpellLevel": 0,
-    "spell": 0.15
+    "spell": 0.15,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "reddragon",
@@ -4181,7 +4335,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "masterninja",
@@ -4232,7 +4388,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "lich",
@@ -4283,7 +4441,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 8,
     "priestSpellLevel": 0,
-    "spell": 0.25
+    "spell": 0.25,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "fiendhound",
@@ -4347,7 +4507,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ancientdragon",
@@ -4406,7 +4568,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "royalguard",
@@ -4457,7 +4621,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": "archmage",
+    "partnerRate": 0.5
   },
   {
     "id": "fallenangel",
@@ -4508,7 +4674,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 8,
     "priestSpellLevel": 0,
-    "spell": 0.15
+    "spell": 0.15,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "reaper",
@@ -4564,7 +4732,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "chaosdragon",
@@ -4623,7 +4793,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "chaosspawn",
@@ -4687,7 +4859,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "archmage",
@@ -4738,7 +4912,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 13,
     "priestSpellLevel": 0,
-    "spell": 0.15
+    "spell": 0.15,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "succubus",
@@ -4795,7 +4971,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "daidaraboti",
@@ -4852,7 +5030,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "kashadokuro",
@@ -4912,7 +5092,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "labyrinthlord",
@@ -4963,7 +5145,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 13,
     "priestSpellLevel": 0,
-    "spell": 0.35
+    "spell": 0.35,
+    "partnerId": "royalguard",
+    "partnerRate": 1.0
   },
   {
     "id": "takenoko",
@@ -5015,7 +5199,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "kinoko",
@@ -5067,7 +5253,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "sirakaba",
@@ -5119,7 +5307,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "insectivore",
@@ -5176,7 +5366,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "dendenko",
@@ -5228,7 +5420,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "dynamotuboro",
@@ -5294,7 +5488,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "akumaikire",
@@ -5346,7 +5542,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "poisongiant",
@@ -5413,7 +5611,9 @@ const ENEMIES=[
     },
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "ameba",
@@ -5465,7 +5665,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "rafflesia",
@@ -5517,7 +5719,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "virusbat",
@@ -5574,7 +5778,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "cathuman",
@@ -5626,7 +5832,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "cathuman2",
@@ -5678,7 +5886,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "cathuman3",
@@ -5730,7 +5940,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "poltergeist",
@@ -5782,7 +5994,9 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "namakubi",
@@ -5834,6 +6048,8 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
-    "spell": 0.0
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   }
 ];

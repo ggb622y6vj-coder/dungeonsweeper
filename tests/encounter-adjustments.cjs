@@ -37,13 +37,18 @@ for (let floor = 1; floor <= maxFloor; floor++) {
 
   g.run('s.guardiansDefeated=[s.floor];s.guardianKilledThisRun=false');
   assert.deepEqual(formation(false, [0, .999]), [guardian]);
+  // Force consecutive independent guardian draws, even on floors with guaranteed escorts.
+  const sources = [pool[0], guardian].map(id => g.run(`enemyDefinition(${JSON.stringify(id)})`));
+  const rates = sources.map(d => d.partnerRate);
+  sources.forEach(d => { d.partnerRate = 0; });
   assert.deepEqual(formation(false, [.999, 0, .999, .999, .999]), [pool[0], guardian, pool.at(-1)],
     'replace only later guardian groups with normal enemies');
   assert.deepEqual(formation(false, [.999, .999, .999, .999, 0, .999]), [guardian, pool[0], pool.at(-1)]);
   assert.deepEqual(formation(true, [.999, .999]), [guardian, pool.at(-1)]);
   assert.deepEqual(formation(true, [.999, .25, 0]), [guardian, pool.at(-1), pool[0]]);
+  sources.forEach((d, i) => { d.partnerRate = rates[i]; });
 }
-console.log('PASS guardian formation on every floor, separate defeat records, duplicate replacement and unchanged boss escorts');
+console.log('PASS guardian formation on every floor without partners, separate defeat records, duplicate replacement and random escorts');
 
 g.run(`Math.random=()=>.5;fresh(1);s.area='town';
   const recruit=generateRecruit('冒険者',0);

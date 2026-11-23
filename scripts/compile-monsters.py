@@ -95,8 +95,19 @@ for r in rows:
    d['breath']['element']=effect[1]
    d['breath']['statuses']=[{'type':{'毒':'poison','麻痺':'paralysis'}[effect[3]],'chance':int(effect[2])/100}]
  d.update(mageSpellLevel=mage,priestSpellLevel=priest,spell=spell_rate/100)
+ d.update(partnerId=r['随伴モンスターID'] or None,partnerRate=integer_field(r,'随伴率',100)/100)
  assert round(d['flee']*100)+round(d['summon']*100)+spell_rate+(round(d['breath']['chance']*100) if d['breath'] else 0)<=100, f'Action probabilities exceed 100%: {id}'
  d['icon']='♛' if d['boss'] else {'植物':'♣','不定形':'◉','不死':'☠','獣':'♞','魔獣':'♞','人型':'♟','虫':'✥','構造体':'◆','竜':'♜','悪魔':'♜'}.get(d['race'],'◈');data.append(d)
+by_id={d['id']:d for d in data}
+for d in data:
+ partner_id=d['partnerId']
+ if partner_id is None:
+  assert d['partnerRate']==0, f"Missing partner ID for {d['id']}"
+  continue
+ assert partner_id in by_id, f"Unknown partner for {d['id']}: {partner_id}"
+ partner=by_id[partner_id]
+ assert not partner['boss'], f"Guardian partner for {d['id']}: {partner_id}"
+ assert set(d['floors']).intersection(partner['floors']), f"No shared floor for {d['id']} and partner {partner_id}"
 for f in sorted({floor for d in data for floor in d['floors']}):
  assert sum(1 for d in data if f in d['floors'] and d['boss'])==1, f'floor {f} needs exactly one boss'
  assert any(f in d['floors'] and not d['boss'] for d in data), f'floor {f} needs normal monsters'

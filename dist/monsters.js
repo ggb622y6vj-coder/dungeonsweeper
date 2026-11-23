@@ -3,13 +3,30 @@ function lowerMemberLevel(i){if(s.members[i].level<=1)return false;let m=s.membe
 function monsterFormation(boss){
  const floor=Math.min(Math.max(...ENEMIES.flatMap(d=>d.floors)),s.floor||1);
  const pool=ENEMIES.filter(d=>d.floors.includes(floor)&&!d.boss);
+ const pick=candidates=>candidates[Math.random()*candidates.length|0];
+ // The normal pool already excludes guardians and species unavailable on this floor.
+ const partnerOf=d=>d.partnerId && d.partnerRate>0 ? pool.find(candidate=>candidate.id===d.partnerId) : null;
+ function nextRow(previous,candidates){
+  const partner=partnerOf(previous);
+  return partner && Math.random()<previous.partnerRate ? partner : pick(candidates);
+ }
  if(boss){
   const guardian=ENEMIES.find(d=>d.floors.includes(floor)&&d.boss);
-  return [guardian.id,pool[Math.random()*pool.length|0].id,...(Math.random()<.5?[pool[Math.random()*pool.length|0].id]:[])];
+  const partner=partnerOf(guardian);
+  const second=partner || pick(pool);
+  const formation=[guardian.id,second.id];
+  if(Math.random()<.5)formation.push((partner ? nextRow(second,pool) : pick(pool)).id);
+  return formation;
  }
  const guardian=(s.guardiansDefeated||[]).includes(s.floor)?ENEMIES.find(d=>d.floors.includes(floor)&&d.boss):null;
  const encounterPool=guardian?[...pool,guardian]:pool;
- const formation=Array.from({length:1+(Math.random()*3|0)},()=>encounterPool[Math.random()*encounterPool.length|0].id);
+ const rowCount=1+(Math.random()*3|0);
+ let previous=pick(encounterPool);
+ const formation=[previous.id];
+ while(formation.length<rowCount){
+  previous=nextRow(previous,encounterPool);
+  formation.push(previous.id);
+ }
  if(guardian){
   const first=formation.indexOf(guardian.id);
   for(let row=first+1;row<formation.length;row++){
