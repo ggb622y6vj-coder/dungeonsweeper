@@ -167,3 +167,4 @@
 | 129 | 2026-11-23 | 床罠「浮上穴」を追加。1つ上の階へ転移し、1Fでは不発 | 29ef368 | [spec](specs/129-upward-teleport-trap.md) | [実施](reports/129.md) |
 | 130 | 2026-11-23 | モンスター随伴機能を混合方式で導入。設定例12種を先行 | 65de4d0 | [spec](specs/130-monster-partner.md) | [実施](reports/130.md) |
 | 131 | 2026-11-23 | 随伴連鎖による最大4列の遭遇、前2列の代表アイコンと全列の行動可能数の表示 | d6d7ee5 | [spec](specs/131-formation-chain-and-enemy-display.md) | [実施](reports/131.md) |
+| 132 | 2026-11-23 | 戦闘画面の敵列ラベルを短縮し、代表アイコン2つを左右に配置 | | [spec](specs/132-enemy-display-tweaks.md) | [実施](reports/132.md) |

@@ -46,12 +46,18 @@ with sync_playwright() as p:
         }""")
         assert first['ids'] == ['11', '20'], first
         assert first['sleeping'] == ['11'], first
-        assert first['boxes'] == [[266, 62, 108, 121], [266, 192, 108, 121]], first
-        assert first['rows'] == ['1列：ゴブリン ×4(2)', '2列：スライム ×2(2)', '3列：ハイウルフ ×3(0)'], first
+        assert first['boxes'] == [[106, 62, 108, 121], [426, 62, 108, 121]], first
+        assert first['rows'] == ['1：ゴブリン ×4(2)', '2：スライム ×2(2)', '3：ハイウルフ ×3(0)'], first
         page.wait_for_function('!logBusy()')
         last = page.evaluate('readEnemyScene()')
         assert last['ids'] == ['20', '30'] and last['sleeping'] == [], last
-        assert last['rows'] == ['1列：スライム ×2(1)', '2列：ハイウルフ ×3(0)'], last
+        assert last['rows'] == ['1：スライム ×2(1)', '2：ハイウルフ ×3(0)'], last
+        single = page.evaluate("""()=>{
+          for(const e of s.enemy.units.filter(e=>e.row===28)){e.hp=0;e.rewarded=true}
+          render();
+          return readEnemyScene();
+        }""")
+        assert single['boxes'] == [[266, 62, 108, 121]], single
         print(f'PASS enemy display {width}px: first two icons, sleep, full row counts and snapshot order')
         page.close()
     browser.close()
