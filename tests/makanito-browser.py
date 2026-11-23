@@ -57,7 +57,7 @@ with sync_playwright() as p:
           pumpLog=function(){originalPump();if(displayVitals)framesSeen.push({
             text:s.logs[0],
             shown:[...document.querySelectorAll('#scene [data-enemy-uid]')].map(e=>Number(e.dataset.enemyUid)),
-            expected:(visibleCombat()?.units||[]).filter(e=>!e.rewarded).map(e=>e.uid)
+            expected:(visibleCombat()?.units||[]).filter(e=>!e.rewarded).slice(0,2).map(e=>e.uid)
           })};''')
         assert page.evaluate('s.floor') == 1
         page.locator('[data-command-choice="spell"]').click()
@@ -79,9 +79,9 @@ with sync_playwright() as p:
         assert '窒息を唱えた。' in log and log.count('息絶えた。') == 3, log
         frames = page.evaluate('framesSeen')
         cast = next(f for f in frames if '窒息を唱えた。' in f['text'])
-        assert sorted(cast['shown']) == [100, 101, 102], cast
+        assert cast['shown'] == [100, 101], cast
         for frame in frames:
-            assert sorted(frame['shown']) == sorted(frame['expected']), frame
+            assert frame['shown'] == frame['expected'], frame
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
         page.screenshot(path=str(output / f'makanito-{width}.png'))

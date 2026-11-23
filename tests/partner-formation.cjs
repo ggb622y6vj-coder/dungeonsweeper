@@ -42,26 +42,25 @@ function check(boss, draws, expected) {
 
 const firstFloor = onFloor(1);
 const slime = firstFloor('slime'), goblin = firstFloor('goblin');
-for (const [draw, count] of [[0, 1], [1/3 - .000001, 1], [1/3, 2], [2/3 - .000001, 2], [2/3, 3], [.999999, 3]]) {
-  check(false, [draw, ...Array(count).fill(slime)], Array(count).fill('slime'));
-}
-check(false, [.999, goblin, .399999, 0], ['goblin', 'goblin', 'goblin']);
-check(false, [.5, goblin, .4, slime], ['goblin', 'slime']);
+check(false, [slime, slime], ['slime', 'slime']);
+check(false, [goblin, .399999], ['goblin', 'goblin']);
+check(false, [goblin, .4], ['goblin']);
 const fifthFloor = onFloor(5);
-check(false, [.999, fifthFloor('highmage'), .499999, .299999], ['highmage', 'troll', 'ninja']);
-check(false, [.999, fifthFloor('highmage'), .5, fifthFloor('troll'), .3, fifthFloor('wight')],
-  ['highmage', 'troll', 'wight']);
-console.log('PASS uniform row count boundaries, separate goblin rows and chained partners on 5F');
+check(false, [fifthFloor('highmage'), .499999, .299999, fifthFloor('wight')],
+  ['highmage', 'troll', 'ninja', 'wight']);
+check(false, [fifthFloor('highmage'), .5], ['highmage']);
+check(false, [fifthFloor('highmage'), .499999, .3], ['highmage', 'troll']);
+console.log('PASS separate goblin rows and exact success/termination boundaries for chained partners on 5F');
 
 onFloor(1);
 const source = monster('slime');
 source.partnerId = 'goblin';
-check(false, [.5, slime, slime], ['slime', 'slime']); // Rate zero with a valid target.
+check(false, [slime, slime], ['slime', 'slime']); // Rate zero with a valid target.
 source.partnerRate = 1;
-check(false, [.5, slime, .999999], ['slime', 'goblin']);
+check(false, [slime, .999999], ['slime', 'goblin']);
 for (const id of ['wight', 'guardian', 'missing']) {
   source.partnerId = id;
-  check(false, [.5, slime, goblin], ['slime', 'goblin']);
+  check(false, [slime, goblin], ['slime', 'goblin']);
 }
 source.partnerId = null;
 source.partnerRate = 0;
@@ -72,12 +71,18 @@ for (const [id, partner] of configured.filter(([id]) => monster(id).boss)) {
   const normalPick = onFloor(floor);
   const third = monster(partner).partnerId;
   check(true, [.5], [id, partner]);
-  check(true, [.499999, 0], [id, partner, third]);
-  check(true, [0, .999, normalPick(partner)], [id, partner, partner]);
+  check(true, [.499999, monster(third).partnerId ? .5 : normalPick(partner)],
+    monster(third).partnerId ? [id, partner, third] : [id, partner, third, partner]);
 
   const pick = onFloor(floor, true);
-  // Row three draws the guardian again after a failed partner roll. Only that row is replaced.
-  check(false, [.999, pick(id), .999, .999, pick(id), normalPick(third)], [id, partner, third]);
+  check(false, [pick(id), .999, .5], [id, partner]);
+  // Two independent draws of the guardian, separated by its guaranteed escort.
+  // Use an unconfigured escort to allow the second draw. Its own escort must
+  // still be chosen before the duplicate guardian is replaced.
+  const escort = monster(partner), rate = escort.partnerRate;
+  escort.partnerRate = 0;
+  check(false, [pick(id), .999, pick(id), .999, normalPick(third)], [id, partner, third, partner]);
+  escort.partnerRate = rate;
 }
 onFloor(1);
 const guardian = monster('guardian');

@@ -20,9 +20,9 @@ for(const [id,floors] of [['takenoko',[1,2]],['kinoko',[1,2]],['sirakaba',[2,3]]
  for(const floor of floors){
   g.drain();g.run(`s.enemy=null;fresh(${floor});s.cells[s.pos].type='';
    var pool=ENEMIES.filter(d=>d.floors.includes(${floor})&&!d.boss),pick=(pool.findIndex(d=>d.id==='${id}')+.5)/pool.length;
-   var rolls=[0,pick];Math.random=()=>rolls.shift()??.99;encounter(s.pos)`);
+   var rolls=Array(Math.min(4,s.floor+1)).fill(pick);Math.random=()=>rolls.shift()??.99;encounter(s.pos)`);
   assert.equal(g.run('s.enemy.units.every(e=>e.id==='+JSON.stringify(id)+')'),true,`${id} spawns on ${floor}F`);
-  assert.equal(g.run('s.enemy.units.length>=enemyDefinition('+JSON.stringify(id)+').groupSize[0]'),true);
+  assert.equal(g.run('enemyGroups().every(g=>g.units.length>=enemyDefinition('+JSON.stringify(id)+').groupSize[0])'),true);
  }
 }
 // Use identical dice against resistant and unresistant enemies; spell resistance itself is disabled.

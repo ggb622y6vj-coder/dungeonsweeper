@@ -28,22 +28,45 @@ for (let floor = 1; floor <= maxFloor; floor++) {
     ...ENEMIES.filter(d=>d.floors.includes(${floor})&&!d.boss).map(d=>d.id)
   ]`);
   g.run(`s.floor=${floor};s.guardiansDefeated=[];s.guardianKilledThisRun=false`);
+  const cap = Math.min(4, floor + 1), last = pool.at(-1);
   for (const [index, id] of pool.entries()) {
-    assert.deepEqual(formation(false, [0, (index + .5) / pool.length]), [id], `undefeated ${floor}F pool`);
+    const d = g.run(`enemyDefinition(${JSON.stringify(id)})`);
+    // A .999 partner roll ends a configured ordinary species' chain.
+    const tail = d.partnerRate > 0 && pool.includes(d.partnerId) ? [] : Array(cap - 1).fill(last);
+    const draws = [(index + .5) / pool.length, ...Array(Math.max(1, tail.length)).fill(.999)];
+    assert.deepEqual(formation(false, draws), [id, ...tail], `undefeated ${floor}F pool`);
   }
   g.run(`s.guardiansDefeated=[${floor === 1 ? 2 : floor - 1}];s.guardianKilledThisRun=true`);
-  assert.deepEqual(formation(false, [.999, .999, .999, .999]), Array(3).fill(pool.at(-1)),
+  assert.deepEqual(formation(false, Array(cap).fill(.999)), Array(cap).fill(last),
     `another floor's defeat and a stale run flag cannot unlock the ${floor}F guardian`);
 
   g.run('s.guardiansDefeated=[s.floor];s.guardianKilledThisRun=false');
-  assert.deepEqual(formation(false, [0, .999]), [guardian]);
+  const guardianDef = g.run(`enemyDefinition(${JSON.stringify(guardian)})`);
+  if (guardianDef.partnerRate) {
+    assert.deepEqual(formation(false, [.999, .999, .999]), [guardian, guardianDef.partnerId]);
+  } else {
+    assert.deepEqual(formation(false, [.999, ...Array(cap - 1).fill((pool.length - .5) / (pool.length + 1))]),
+      [guardian, ...Array(cap - 1).fill(last)]);
+  }
   // Force consecutive independent guardian draws, even on floors with guaranteed escorts.
   const sources = [pool[0], guardian].map(id => g.run(`enemyDefinition(${JSON.stringify(id)})`));
   const rates = sources.map(d => d.partnerRate);
   sources.forEach(d => { d.partnerRate = 0; });
-  assert.deepEqual(formation(false, [.999, 0, .999, .999, .999]), [pool[0], guardian, pool.at(-1)],
+  assert.deepEqual(formation(false, [...Array(cap).fill(.999), ...Array(cap - 1).fill(0)]),
+    [guardian, ...Array(cap - 1).fill(pool[0])], `consecutive guardians on the real ${floor}F`);
+
+  // Replay both original three-draw cases with this floor's exact pool.
+  // 2F is the depth whose unconfigured chains end after exactly three rows.
+  const originalRoster = Array.from(g.run('ENEMIES'));
+  const replayRoster = originalRoster.filter(d => d.floors.includes(floor)).map(d => ({ ...d, floors: [2] }));
+  const roster = g.run('ENEMIES');
+  roster.splice(0, roster.length, ...replayRoster);
+  g.run('s.floor=2;s.guardiansDefeated=[2]');
+  assert.deepEqual(formation(false, [0, .999, .999, .999]), [pool[0], guardian, pool.at(-1)],
     'replace only later guardian groups with normal enemies');
-  assert.deepEqual(formation(false, [.999, .999, .999, .999, 0, .999]), [guardian, pool[0], pool.at(-1)]);
+  assert.deepEqual(formation(false, [.999, .999, .999, 0, .999]), [guardian, pool[0], pool.at(-1)]);
+  roster.splice(0, roster.length, ...originalRoster);
+  g.run(`s.floor=${floor};s.guardiansDefeated=[s.floor]`);
   assert.deepEqual(formation(true, [.999, .999]), [guardian, pool.at(-1)]);
   assert.deepEqual(formation(true, [.999, .25, 0]), [guardian, pool.at(-1), pool[0]]);
   sources.forEach((d, i) => { d.partnerRate = rates[i]; });
@@ -56,9 +79,14 @@ g.run(`Math.random=()=>.5;fresh(1);s.area='town';
   s.guardiansDefeated=[1];fresh(1);
   s.pos=s.cells.findIndex(c=>c.type===''&&!c.trap&&!c.open);
   s.cells[s.pos].open=true;
-  // Select one group and the guardian, then roll party initiative after unit generation.
-  var rolls=0;Math.random=()=>++rolls===2?.999:.15;
-  encounter(s.pos,true);`);
+  // Isolate the original single-guardian reward case: the guardian is drawn
+  // normally, then its test-only partner roll fails before unit generation.
+  const guardianDef=enemyDefinition('guardian');
+  const originalPartner=[guardianDef.partnerId,guardianDef.partnerRate];
+  guardianDef.partnerId='slime';guardianDef.partnerRate=.5;
+  const draws=[.999,.5];Math.random=()=>draws.shift()??.15;
+  encounter(s.pos,true);
+  [guardianDef.partnerId,guardianDef.partnerRate]=originalPartner;`);
 assert.equal(g.run('s.enemy.boss'), false);
 assert.equal(g.run('s.enemy.initiative'), 'party');
 assert.ok(g.run('escapeChance()') > 0);
