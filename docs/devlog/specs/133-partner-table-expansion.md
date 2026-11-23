@@ -109,3 +109,7 @@ scripts/compile-monsters.py に検証を追加する：守護者（boss）の随
 - docs/devlog/reports/133.md を作成し、docs/devlog/TIMELINE.md に133の行を追加する。
 - node tests/game.cjs、compile-monsters --check、sim selftest、notion-sync／notion-items、ブラウザテスト全件、MANIFEST 再生成と照合。
 - 統合承認後：main へ統合し、ライブ検証（17ファイルの SHA-256 一致と配信コードの確認）を行う。
+
+## Amendment 1（2026-11-23、レビュー確認事項へのユーザーの決定）
+
+ブロブの仲間呼びの列上限を 3体 → 6体 に変更する。理由：群れが 3〜5 になったため、上限3では生存3体以上の間は仲間呼びが常に不発になる。他の仲間呼び持ちの上限は群れの最大数か最大数+1 が通例で、最大数+1 の 6 に合わせる。変更箇所は data/monsters.csv のブロブの仲間呼び（列上限6体）、再コンパイルした dist/monster-data.js、data/notion-monsters.json のブロブの特殊（仲間呼び15%(上限6)）。戦闘全体の召喚上限（4体）や他の種は変更しない。Notion 実データのブロブの特殊セルも統合後の記録作業で合わせる。
