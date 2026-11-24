@@ -118,7 +118,8 @@ with sync_playwright() as p:
                 # Gain XP, then run the real level-up routine to learn priest spells.
                 page.evaluate('s.members[0].xp=s.members[0].xpTargets[2];Math.random=()=>0;levelUp();s.hp[0]=1;render()')
                 assert page.evaluate("s.members[0].known.includes('dios')")
-                open_field_magic(page)
+                assert page.locator('#statsdialog').is_visible()
+                page.locator('[data-stat-cast="0"]').click()
                 assert page.locator('#magictab-1').get_attribute('aria-selected') == 'true'
                 page.locator('#magictab-2').click()
                 page.locator('[data-spell="dios"]').click()

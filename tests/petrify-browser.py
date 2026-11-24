@@ -173,6 +173,10 @@ with sync_playwright() as p:
                 if attempt == 0:
                     page.locator(f'[data-spell="{spell}"]').click()
             page.keyboard.press('Escape')
+            assert page.locator('#magicdialog').is_hidden()
+            assert page.locator('#statsdialog').is_visible()
+            page.keyboard.press('Escape')
+            assert page.locator('#statsdialog').is_hidden()
         # Medicine follows the same disabled-card rule and cannot consume stock.
         seed(page)
         petrify_hit(page)

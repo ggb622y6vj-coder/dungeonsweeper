@@ -162,8 +162,18 @@ function commitMagicChoice(i,x,t){
 function pickFieldSpell(){
  const i=spellMember,x=magic(spellSelected);
  if(!x||spellBrowse||s.enemy||x.target!=='ally'||spellReason(i,x)||logBusy())return;
+ const statsDialog=$('#statsdialog'),restoreStats=statsDialog.open;
  beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),canWork:t=>s.members[t].status!=='stone',prompt:x.name,
-  onPick:t=>commitMagicChoice(i,x,t),onCancel:()=>{renderMagic();$('#magicdialog').showModal();$('#magicpick').focus()}});
+  onPick:t=>commitMagicChoice(i,x,t),
+  onCancel:()=>{
+   if(restoreStats){
+    renderStats();
+    statsDialog.showModal();
+   }
+   renderMagic();
+   $('#magicdialog').showModal();
+   $('#magicpick').focus();
+  }});
 }
 function magicUI(){
  for(const job of [1,2])$('#magictab-'+job).onclick=()=>selectSpellSchool(job);

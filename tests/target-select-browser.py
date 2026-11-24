@@ -57,13 +57,13 @@ def medicine(page, battle=False):
     assert page.locator('#allytargetprompt').inner_text() == '対象を選んでください：傷薬'
 
 
-def finished(page):
+def finished(page, *, stats_restored=False):
     assert page.evaluate('allyTargetPick===null && pendingSpell===null')
     assert page.locator('#party [data-ally-target]').count() == 0
     assert page.locator('#party .targetable,#party .untargetable').count() == 0
     assert page.locator('#allytargetbar').is_hidden()
     assert page.locator('#allytargetbattlebar').is_hidden()
-    assert not page.locator('#statsdialog').is_visible()
+    assert page.locator('#statsdialog').is_visible() == stats_restored
     assert page.locator('#party').get_attribute('role') == 'button'
 
 
@@ -254,7 +254,7 @@ with sync_playwright() as p:
                     else:
                         page.locator('#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel').click()
                     assert_layout(before_layout, layout(page), battle=battle)
-                    finished(page)
+                    finished(page, stats_restored=not battle and begin == spell)
                     assert snapshot(page) == before
                     if battle:
                         back_again = page.locator('#commandentry > [data-command-back]').bounding_box()
@@ -290,7 +290,7 @@ with sync_playwright() as p:
             cancel_selector = '#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel'
             assert page.locator(cancel_selector).evaluate('(el)=>document.activeElement===el')
             page.locator(cancel_selector).click()
-            finished(page)
+            finished(page, stats_restored=not battle)
 
         # Keyboard Tab skips dead members; Enter and Space both commit.
         for key in ('Enter', 'Space'):

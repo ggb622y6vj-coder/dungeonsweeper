@@ -136,7 +136,7 @@ with sync_playwright() as p:
         page.keyboard.press('Space')
         assert page.locator('#magictab-2').get_attribute('aria-selected') == 'true'
         page.locator('#magicclose').click()
-        page.locator('#party').click()
+        assert page.locator('#statsdialog').is_visible()
         page.locator('[data-stat-cast="0"]').click()
         assert page.locator('#magictab-1').get_attribute('aria-selected') == 'true'
         no_overflow(page)
@@ -148,7 +148,7 @@ with sync_playwright() as p:
         assert page.evaluate('s.mp[0]') == mp - 2
         # Healing uses the ordinary party-card target flow after selecting priest tab.
         page.evaluate('s.hp[0]=1;render()')
-        page.locator('#party').click()
+        assert page.locator('#statsdialog').is_visible()
         page.locator('[data-stat-cast="0"]').click()
         page.locator('#magictab-2').click()
         page.locator('[data-spell="dios"]').click()
