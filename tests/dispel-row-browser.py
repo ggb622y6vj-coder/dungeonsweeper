@@ -54,7 +54,7 @@ with sync_playwright() as p:
         press('[data-command-choice="dispel"]')
         assert '呪いを解く' in page.locator('.commandheading').inner_text()
         choices = page.locator('[data-row-choice]').all_inner_texts()
-        assert [c.split('：')[0] for c in choices] == ['1列', '3列'] and choices[0].endswith('×2') and choices[1].endswith('×1'), choices
+        assert [c.split('：')[0] for c in choices] == ['1', '3'] and choices[0].endswith('×2') and choices[1].endswith('×1'), choices
         box = page.locator('#commandentry').bounding_box(); assert box['x'] >= 0 and box['x'] + box['width'] <= width
         page.screenshot(path=str(out / f'rows-{width}.png'))
         press('[data-row-choice="39"]')
