@@ -26,16 +26,22 @@ const configured = [
   ['gargoyle', 'zombie', .6], ['zombie', 'archer', .6], ['sorcerer', 'poltergeist', .5],
   ['viper', 'armorant', 1], ['armorant', 'dynamotuboro', .3], ['salamander', 'werewolf', .7],
   ['werewolf', 'namakubi', .6], ['darkelf', 'zombie', .8], ['rafflesia', 'dynamotuboro', .3],
-  ['poltergeist', 'poltergeist', .6], ['namakubi', 'namakubi', .7], ['kashadokuro', 'venomspider', .6],
+  ['poltergeist', 'poltergeist', .6], ['namakubi', 'namakubi', .7],
+  ['thief', 'iron', .6], ['rabbit', 'thief', .5], ['iron', 'shaman', .7],
+  ['acidslime', 'iron', .4], ['venomspider', 'dynamotuboro', .3], ['akumaikire', 'archer', .6],
+  ['ogre', 'harpy', .6], ['scorpion', 'troll', .6], ['fungus', 'rafflesia', .5],
+  ['stonegiant', 'stonegiant', .4], ['fallenangel', 'succubus', .6], ['succubus', 'lich', .5],
+  ['ameba', 'slime', .5], ['virusbat', 'armorant', .6], ['ganyu', 'ganyu', .5],
+  ['namakubi2', 'darkelf', 1],
 ];
-assert.equal(new Set(configured.map(([id]) => id)).size, 48);
-assert.equal(enemies.filter(d => !d.partnerId).length, 60);
+assert.equal(new Set(configured.map(([id]) => id)).size, 63);
+assert.equal(enemies.filter(d => !d.partnerId).length, 48);
 for (const d of enemies) {
   const entry = configured.find(([id]) => id === d.id);
   assert.deepEqual([d.partnerId, d.partnerRate], entry ? entry.slice(1) : [null, 0], d.id);
 }
 assert.ok(configured.every(([id]) => monster(id)));
-console.log('PASS partner settings for all 108 species');
+console.log('PASS partner settings for all 111 species');
 
 function onFloor(floor, defeated = false) {
   g.run(`s.floor=${floor};s.guardiansDefeated=${JSON.stringify(defeated ? [floor] : [])}`);

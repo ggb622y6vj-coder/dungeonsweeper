@@ -36,7 +36,7 @@ with sync_playwright() as p:
         page.evaluate('''s.library.monsters=Object.fromEntries(ENEMIES.map(e=>[e.id,{count:1,firstFloor:e.floor,identified:true}]));
           delete s.library.monsterIdentifyVersion;save();render();''')
         page.locator('#libraryopen').click()
-        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 108/108'), page.locator('#libraryprogress').inner_text()
+        assert page.locator('#libraryprogress').inner_text().startswith('モンスター 111/111'), page.locator('#libraryprogress').inner_text()
         for r in monsters:
             floor = page.evaluate('(id)=>enemyDefinition(id).floors[0]', r['userDefined:ID'])
             page.locator(f'#librarymonstertab-{floor}').click()

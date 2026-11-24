@@ -56,14 +56,22 @@ console.log('PASS out-of-floor partner falls back to the pool and the chain resu
 for (const [floor, source, next] of [
   [3, 'sirakaba', 'archer'], [4, 'insectivore', 'namakubi'],
   [5, 'zombie', 'wight'], [6, 'zombie', 'vampbat'], [5, 'rafflesia', 'wight'],
+  [9, 'venomspider', 'ganyu'], [10, 'succubus', 'ganyu'], [2, 'ameba', 'bandit'],
+  [5, 'virusbat', 'wight'],
 ]) {
   check(floor, [source, next, .999], [source, next]);
 }
 check(2, ['sirakaba', .79, .99], ['sirakaba', 'poisonslime']);
-check(3, ['insectivore', .59, 'archer', .99], ['insectivore', 'venomspider', 'archer']);
+check(3, ['insectivore', .59, .29, .999], ['insectivore', 'venomspider', 'dynamotuboro', 'dendenko']);
 check(4, ['zombie', .59, .99], ['zombie', 'archer']);
 check(4, ['rafflesia', .29, .999, .99], ['rafflesia', 'dynamotuboro', 'dendenko']);
-console.log('PASS all four partially overlapping partners on shared and unshared floors');
+check(9, ['succubus', .49, 'ganyu', .5], ['succubus', 'lich', 'ganyu']);
+check(1, ['ameba', .49], ['ameba', 'slime']);
+check(4, ['virusbat', .59, .3], ['virusbat', 'armorant']);
+check(6, ['namakubi2', .999, .8], ['namakubi2', 'darkelf']);
+check(7, ['namakubi2', 'gasdragon', 'gasdragon', 'gasdragon'], ['namakubi2', 'gasdragon', 'gasdragon', 'gasdragon']);
+check(6, ['fungus', .49, 'stonegiant', .4], ['fungus', 'rafflesia', 'stonegiant']);
+console.log('PASS partially overlapping partners on shared and unshared floors');
 
 const necromancer = enemies.find(d => d.id === 'necromancer');
 const necromancerRate = necromancer.partnerRate;

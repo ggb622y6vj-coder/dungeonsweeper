@@ -44,7 +44,7 @@ const spells = (g, expression) => assert.deepEqual(read(g, 'ids()'), expression.
     darkpriest:[0,3,30], witch:[0,3,25]
   };
   const masters = read(g, 'ENEMIES');
-  assert.equal(masters.length,108);
+  assert.equal(masters.length,111);
   assert.equal(masters.filter(d=>Object.hasOwn(assigned,d.id)).length,22);
   for (const d of masters) {
     const [mage,priest,percent] = assigned[d.id] || [0,0,0];

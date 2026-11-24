@@ -6,6 +6,9 @@ def dice(v):
 def pct(v):
  m=re.search(r'(\d+)%',v);return int(m[1])/100 if m else 0
 ids={
+  "巌熊": "ganyu",
+  "遊女の流し目": "namakubi2",
+  "戦闘グマ": "warbear",
   "アメーバ": "ameba",
   "ラフレシア": "rafflesia",
   "ウイルス蝙蝠": "virusbat",
@@ -54,7 +57,7 @@ ids={
   "地獄の獄卒": "watcher",
   "オーガ": "ogre", "ゾンビ": "zombie", "ハーピー": "harpy", "大毒蛇": "viper", "鎧蟻": "armorant", "闇の司祭": "darkpriest", "迷宮の妖術師": "sorcerer", "ガーゴイル": "gargoyle", "牛頭の門番": "minogate",
   "墓所の亡者": "wight", "トロル": "troll", "人狼": "werewolf", "大蠍": "scorpion", "忍びの者": "ninja", "高位の魔術師": "highmage", "サラマンダー": "salamander", "ブロブ": "blob", "屍術師": "necromancer",
-  "亡霊": "wraith", "岩石の巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "毒茸の群れ": "fungus", "ダークエルフ": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
+  "亡霊": "wraith", "岩石の巨人": "stonegiant", "キメラ": "chimera", "闇の騎士": "darkknight", "猛毒タケ": "fungus", "ダークエルフ": "darkelf", "吸血蝙蝠": "vampbat", "吸血鬼": "vampire",
   "毒竜": "gasdragon", "牛頭の戦士": "minotaur", "肉の巨像": "fleshgolem", "忍びの頭目": "ninjachief", "死霊魔導士": "deathmage", "地獄の犬": "hellhound", "這い寄る大蟲": "crawler", "双頭の巨人": "ettin",
   "レッサーデーモン": "lesserdemon", "雷竜": "bluedragon", "死の騎士": "deathknight", "魔女": "witch", "多頭竜": "hydra", "影の暗殺者": "assassin", "邪眼": "evileye", "魔将軍": "demongeneral",
   "グレーターデーモン": "greaterdemon", "霜の巨人": "frostgiant", "夜の貴族": "vampirelord", "赤竜": "reddragon", "上忍": "masterninja", "リッチ": "lich", "魔界の猟犬": "fiendhound", "古竜": "ancientdragon",

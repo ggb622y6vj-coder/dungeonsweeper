@@ -1210,8 +1210,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "iron",
+    "partnerRate": 0.4
   },
   {
     "id": "archer",
@@ -1425,8 +1425,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "dynamotuboro",
+    "partnerRate": 0.3
   },
   {
     "id": "thief",
@@ -1478,8 +1478,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "iron",
+    "partnerRate": 0.6
   },
   {
     "id": "dragon",
@@ -1597,8 +1597,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "thief",
+    "partnerRate": 0.5
   },
   {
     "id": "iron",
@@ -1655,8 +1655,8 @@ const ENEMIES=[
     "mageSpellLevel": 1,
     "priestSpellLevel": 0,
     "spell": 0.6,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "shaman",
+    "partnerRate": 0.7
   },
   {
     "id": "terror",
@@ -1827,8 +1827,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "harpy",
+    "partnerRate": 0.6
   },
   {
     "id": "zombie",
@@ -2489,8 +2489,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "troll",
+    "partnerRate": 0.6
   },
   {
     "id": "ninja",
@@ -2883,8 +2883,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "stonegiant",
+    "partnerRate": 0.4
   },
   {
     "id": "chimera",
@@ -3002,8 +3002,8 @@ const ENEMIES=[
   },
   {
     "id": "fungus",
-    "name": "毒茸の群れ",
-    "unknown": "動く茸",
+    "name": "猛毒タケ",
+    "unknown": "爛れた苗床",
     "floor": 6,
     "floors": [
       6
@@ -3015,7 +3015,7 @@ const ENEMIES=[
       0
     ],
     "ac": 8,
-    "hit": 5,
+    "hit": 4,
     "attack": [
       2,
       6,
@@ -3059,8 +3059,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "rafflesia",
+    "partnerRate": 0.5
   },
   {
     "id": "darkelf",
@@ -4680,8 +4680,8 @@ const ENEMIES=[
     "mageSpellLevel": 8,
     "priestSpellLevel": 0,
     "spell": 0.15,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "succubus",
+    "partnerRate": 0.6
   },
   {
     "id": "reaper",
@@ -4977,8 +4977,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "lich",
+    "partnerRate": 0.5
   },
   {
     "id": "daidaraboti",
@@ -5064,7 +5064,7 @@ const ENEMIES=[
     "xp": 3600.0,
     "groupSize": [
       1,
-      2
+      1
     ],
     "gold": [
       100,
@@ -5098,8 +5098,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": "venomspider",
-    "partnerRate": 0.6
+    "partnerId": null,
+    "partnerRate": 0.0
   },
   {
     "id": "labyrinthlord",
@@ -5549,8 +5549,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "archer",
+    "partnerRate": 0.6
   },
   {
     "id": "poisongiant",
@@ -5672,8 +5672,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "slime",
+    "partnerRate": 0.5
   },
   {
     "id": "rafflesia",
@@ -5682,7 +5682,8 @@ const ENEMIES=[
     "floor": 4,
     "floors": [
       4,
-      5
+      5,
+      6
     ],
     "level": 5,
     "hp": [
@@ -5785,8 +5786,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "armorant",
+    "partnerRate": 0.6
   },
   {
     "id": "cathuman",
@@ -5821,8 +5822,8 @@ const ENEMIES=[
       0
     ],
     "race": "獣",
-    "mageResist": 1.0,
-    "priestResist": 1.0,
+    "mageResist": 0.5,
+    "priestResist": 0.5,
     "swings": 1,
     "rear": false,
     "flee": 0,
@@ -6057,5 +6058,177 @@ const ENEMIES=[
     "spell": 0.0,
     "partnerId": "namakubi",
     "partnerRate": 0.7
+  },
+  {
+    "id": "ganyu",
+    "name": "巌熊",
+    "unknown": "山のような羆",
+    "floor": 9,
+    "floors": [
+      9,
+      10
+    ],
+    "level": 16,
+    "hp": [
+      10,
+      8,
+      50
+    ],
+    "ac": 1,
+    "hit": 9,
+    "attack": [
+      8,
+      5,
+      10
+    ],
+    "xp": 5000.0,
+    "groupSize": [
+      1,
+      1
+    ],
+    "gold": [
+      100,
+      2,
+      0
+    ],
+    "race": "獣",
+    "mageResist": 0.2,
+    "priestResist": 0.2,
+    "swings": 2,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [
+      {
+        "type": "paralysis",
+        "chance": 0.2
+      }
+    ],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0,
+    "partnerId": "ganyu",
+    "partnerRate": 0.5
+  },
+  {
+    "id": "namakubi2",
+    "name": "遊女の流し目",
+    "unknown": "女の生首",
+    "floor": 6,
+    "floors": [
+      6,
+      7
+    ],
+    "level": 7,
+    "hp": [
+      5,
+      8,
+      0
+    ],
+    "ac": 3,
+    "hit": 9,
+    "attack": [
+      5,
+      3,
+      0
+    ],
+    "xp": 230.0,
+    "groupSize": [
+      3,
+      5
+    ],
+    "gold": [
+      4,
+      6,
+      0
+    ],
+    "race": "不死",
+    "mageResist": 0.2,
+    "priestResist": 0.6,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "☠",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0,
+    "partnerId": "darkelf",
+    "partnerRate": 1.0
+  },
+  {
+    "id": "warbear",
+    "name": "戦闘グマ",
+    "unknown": "大熊",
+    "floor": 5,
+    "floors": [
+      5,
+      6
+    ],
+    "level": 6,
+    "hp": [
+      10,
+      5,
+      0
+    ],
+    "ac": 5,
+    "hit": 5,
+    "attack": [
+      3,
+      7,
+      0
+    ],
+    "xp": 110.0,
+    "groupSize": [
+      3,
+      7
+    ],
+    "gold": [
+      4,
+      4,
+      0
+    ],
+    "race": "獣",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [
+      {
+        "type": "paralysis",
+        "chance": 0.15
+      }
+    ],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♞",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 0,
+    "spell": 0.0,
+    "partnerId": null,
+    "partnerRate": 0.0
   }
 ];

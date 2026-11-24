@@ -12,6 +12,7 @@ vm.runInContext(dataSrc, dataContext);
 const enemies = JSON.parse(vm.runInContext('JSON.stringify(ENEMIES)', dataContext));
 for (const [id, floors] of [
   ['dendenko', [2, 3, 4]], ['zombie', [4, 5, 6]], ['spider', [1, 2]], ['venomspider', [3, 9, 10]],
+  ['rafflesia', [4, 5, 6]], ['ganyu', [9, 10]], ['namakubi2', [6, 7]], ['warbear', [5, 6]],
 ]) {
   assert.deepEqual(enemies.find(d => d.id === id).floors, floors, id);
 }
@@ -32,7 +33,7 @@ assert.deepEqual([gas.hp, gas.ac, gas.attack, gas.xp], [[3, 9, 0], 7, [1, 5, 1],
 assert.deepEqual([gas.level, gas.hit, Array.from(gas.groupSize), gas.gold, gas.race, gas.swings, gas.icon], [5, 3, [2, 4], [2, 4, 0], '不定形', 1, '◉']);
 assert.deepEqual(Array.from(kasha.floors), [9, 10]);
 assert.deepEqual([kasha.hp, kasha.ac, kasha.attack, kasha.xp], [[10, 8, 14], -5, [5, 8, 0], 3600]);
-assert.deepEqual([kasha.level, kasha.hit, Array.from(kasha.groupSize), kasha.gold, kasha.race, kasha.swings, kasha.icon], [23, 11, [1, 2], [100, 3, 0], '不死', 2, '☠']);
+assert.deepEqual([kasha.level, kasha.hit, Array.from(kasha.groupSize), kasha.gold, kasha.race, kasha.swings, kasha.icon], [23, 11, [1, 1], [100, 3, 0], '不死', 2, '☠']);
 assert.deepEqual(kasha.breath, { element: '炎', dice: [15, 8, 0], chance: .25 });
 assert.equal(kasha.resistance, '炎半減');
 assert.equal(kasha.race, '不死');
