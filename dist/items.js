@@ -230,7 +230,7 @@ function performItemService(action,target){
   else{removeCurse(i,slot);message=name+'の呪いを解除した。品は消滅した。'}
  }
  // These idle actions finish immediately. Persist the result text with the charge and item.
- s.logs.unshift(message);s.logs=s.logs.slice(0,30);render();
+ s.logs.unshift(message);s.logs=s.logs.slice(0,30);render({logPrepended:true});
  return message;
 }
 

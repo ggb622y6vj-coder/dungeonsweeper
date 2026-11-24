@@ -16,9 +16,14 @@ if not chrome_path:
 
 def assert_latest_visible(body):
     assert body.evaluate(
-        'e => e.scrollHeight > e.clientHeight && '
-        'Math.abs(e.scrollHeight - e.clientHeight - e.scrollTop) <= 1'
-    ), 'dialog log should be scrollable and at its latest row'
+        'e => e.scrollHeight > e.clientHeight && Math.abs(e.scrollTop) <= 1'
+    ), 'dialog log should be scrollable and at the top, with its latest row visible'
+
+
+def assert_matching_rows(log_rows, dialog_rows):
+    assert dialog_rows.all_text_contents() == log_rows.all_text_contents()
+    row_colors = 'rows => rows.map(row => getComputedStyle(row).color)'
+    assert dialog_rows.evaluate_all(row_colors) == log_rows.evaluate_all(row_colors)
 
 
 with sync_playwright() as p:
@@ -66,22 +71,40 @@ with sync_playwright() as p:
 
         open_log()
         assert body.bounding_box()['height'] > log.bounding_box()['height']
-        expect(dialog_rows.last.locator('.log-spell')).to_have_text('解毒')
-        assert dialog_rows.all_text_contents() == log_rows.all_text_contents()[::-1]
+        expect(dialog_rows.first.locator('.log-spell')).to_have_text('解毒')
+        assert_matching_rows(log_rows, dialog_rows)
         assert_latest_visible(body)
 
-        dialog_rows.last.click()
+        dialog_rows.first.click()
         expect(dialog).to_be_visible()
         page.evaluate("""() => {
           log('同期テスト 1');
           log('同期テスト 2');
         }""")
-        expect(dialog_rows.last).to_have_text('同期テスト 2')
-        assert dialog_rows.all_text_contents() == log_rows.all_text_contents()[::-1]
-        assert dialog_rows.all_text_contents()[-2:] == ['同期テスト 1', '同期テスト 2']
+        expect(dialog_rows.first).to_have_text('同期テスト 2')
+        assert_matching_rows(log_rows, dialog_rows)
+        assert dialog_rows.all_text_contents()[:2] == ['同期テスト 2', '同期テスト 1']
         expect(dialog_rows).to_have_count(30)
         assert_latest_visible(body)
         page.wait_for_function('!logBusy()')
+
+        reading_row = body.get_by_text('探索ログ 27', exact=True)
+        reading_row.evaluate("""row => {
+          const body = row.parentElement;
+          body.scrollTop += row.getBoundingClientRect().top - body.getBoundingClientRect().top - 8;
+        }""")
+        row_offset = 'e => e.getBoundingClientRect().top - e.parentElement.getBoundingClientRect().top'
+        reading_offset = reading_row.evaluate(row_offset)
+        assert 0 < reading_offset < body.evaluate('e => e.clientHeight')
+        assert body.evaluate('e => e.scrollTop') > 1
+
+        long_log = '過去ログ閲覧中に追加された行。' * 8
+        page.evaluate('text => { log(text); }', long_log)
+        expect(dialog_rows.first).to_have_text(long_log)
+        page.wait_for_function('!logBusy()')
+        assert_matching_rows(log_rows, dialog_rows)
+        expect(dialog_rows).to_have_count(30)
+        assert abs(reading_row.evaluate(row_offset) - reading_offset) <= 1
 
         if touch:
             page.touchscreen.tap(3, 3)
@@ -89,6 +112,7 @@ with sync_playwright() as p:
             page.mouse.click(3, 3)
         expect(dialog).to_be_hidden()
         open_log()
+        assert_latest_visible(body)
         page.keyboard.press('Escape')
         expect(dialog).to_be_hidden()
         open_log()
