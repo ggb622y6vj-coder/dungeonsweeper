@@ -1,9 +1,9 @@
 // 呪文の正本。職業: 1=魔法使い、2=僧侶。MP・効果は本作用の調整。
 const MAGIC = [
  ["reload","再抽選",1,4,2,false,"field","party","restore",null,"現在地のマス以外をすべて未探索状態にし、罠・階段・昇降機などのイベントマスの位置も全てランダマイズされる"],
- ["sweep","一掃",2,4,10,false,"field","party","restore",null,"罠に立ててある旗とその下にある罠がすべて解除され、探索済みになる。"],
+ ["sweep","一掃",2,4,5,false,"field","party","restore",null,"罠に立ててある旗とその下にある罠がすべて解除され、探索済みになる。"],
  ["flagkill","生贄の旗",1,4,2,true,"battle","enemy","damage",[2,5,2],"周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵1体に魔属性2d5+2。"],
- ["flagkill2","壊滅の旗",1,8,4,false,"battle","group","damage",[5,8],"周囲8マスに旗が立ててある罠がある場合、全ての旗とその下にある罠を解除し、探索済みにする。選択した列の敵に魔属性5d8。"],
+ ["flagkill2","壊滅の旗",1,8,3,false,"battle","group","damage",[5,8],"周囲8マスに旗が立ててある罠がある場合、全ての旗とその下にある罠を解除し、探索済みにする。選択した列の敵に魔属性5d8。"],
  ["flagdebuff","減退の旗",1,2,1,true,"battle","group","debuff",1,"周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。選択した敵の列のAC+1。"],
  ["flagdebuff2","大減退の旗",1,7,2,false,"battle","group","debuff",null,"周囲8マスに旗が立ててある罠がある場合、全ての旗とその下にある罠を解除し、探索済みにする。選択した敵の列のACを解除した旗の数だけ上げる。"],
  ["tempt","誘惑",1,5,1,false,"both","party","survey",null,"そのマスで敵とエンカウントする。"],
@@ -14,12 +14,12 @@ const MAGIC = [
  ["katino","誘睡",1,1,2,true,"battle","group","sleep",null,"選択した列の敵に睡眠判定。成功率は術者と敵のレベル差で変動、2回の敵行動を停止"],
  ["dilto","減退",1,3,1,true,"battle","group","debuff",2,"選択した列の敵のAC＋2。戦闘終了まで"],
  ["flagview","旗視",1,5,2,false,"field","party","flagcount",null,"町へ戻るまで、探索者の境界左下に周囲8マスの旗の数を表示する。"],
- ["mahalito","大火炎",1,5,4,false,"battle","group","damage",[4,6],"選択した列の敵に火炎4d6"],
- ["mamahalito","超火炎",1,8,6,false,"battle","group","damage",[6,6],"選択した列の敵に火炎6d6"],
- ["morlis","大減退",1,7,4,false,"battle","group","debuff",3,"選択した列の敵のAC＋3。戦闘終了まで"],
- ["dalto","吹雪",1,7,7,false,"battle","group","damage",[6,6,2],"選択した列の敵に冷気6d6+2"],
- ["madalto","大吹雪",1,8,9,false,"battle","group","damage",[7,8],"選択した列の敵に冷気7d8"],
- ["mamorlis","超減退",1,9,6,false,"battle","all","debuff",3,"敵全体のAC＋3。戦闘終了まで"],
+ ["mahalito","大火炎",1,5,3,false,"battle","group","damage",[4,6],"選択した列の敵に火炎4d6"],
+ ["mamahalito","超火炎",1,8,5,false,"battle","group","damage",[6,6],"選択した列の敵に火炎6d6"],
+ ["morlis","大減退",1,7,3,false,"battle","group","debuff",3,"選択した列の敵のAC＋3。戦闘終了まで"],
+ ["dalto","吹雪",1,7,6,false,"battle","group","damage",[6,6,2],"選択した列の敵に冷気6d6+2"],
+ ["madalto","大吹雪",1,8,7,false,"battle","group","damage",[7,8],"選択した列の敵に冷気7d8"],
+ ["mamorlis","超減退",1,9,4,false,"battle","all","debuff",3,"敵全体のAC＋3。戦闘終了まで"],
  ["nofice","抵抗減少",1,9,5,false,"battle","group","debuff",null,"選択した列の敵の呪文抵抗を下げる"],
  ["makanito","窒息",1,9,5,true,"battle","all","threshold-death",7,"Lv7以下の敵全体を確実に即死させる。不死・構造体・守護者には無効"],
  ["lakanito","大窒息",1,11,10,false,"battle","group","death",null,"選択した列の敵に即死判定（100−敵Lv×6 %）。守護者・不死・構造体・悪魔には無効"],
@@ -28,19 +28,22 @@ const MAGIC = [
  ["tiltowait","魔弾",1,13,12,false,"battle","all","damage",[10,15],"敵全体に10d15"],
  ["dios","回復",2,1,2,true,"both","ally","heal",[1,8],"生存する味方1人のHPを1d8回復"],
  ["kalki","防御",2,1,1,true,"battle","party","buff",1,"味方全員のAC−1。戦闘終了まで"],
+ ["flaghp","治癒の旗",2,2,1,false,"both","ally","heal",[2,8],"周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。生存する味方1人のHPを2d8回復。"],
  ["montino","沈黙",2,3,4,true,"battle","group","silence",null,"選択した列の敵に沈黙判定。戦闘終了まで呪文を封じる。守護者には無効"],
- ["matu","大防御",2,3,4,false,"battle","party","buff",2,"味方全員のAC−2。戦闘終了まで"],
+ ["matu","大防御",2,3,3,false,"battle","party","buff",2,"味方全員のAC−2。戦闘終了まで"],
  ["watchful","警戒結界",2,3,3,true,"field","party","watchful",null,"町へ戻るまで敵の奇襲を防ぐ。味方の先制率は変わらない"],
  ["milwa","透視",2,3,1,true,"field","party","light",null,"しばらくの間左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま"],
- ["calfo","仕掛解除",2,3,3,false,"chest","chest","identify",null,"宝箱の罠を95%の精度で識別。解除はしない"],
- ["lomilwa","大透視",2,7,5,false,"field","party","light",null,"町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま"],
- ["dialko","強壮",2,5,4,false,"both","ally","cure",null,"生存する味方1人の麻痺・睡眠・沈黙・恐怖を治す"],
+ ["calfo","仕掛解除",2,3,2,false,"chest","chest","identify",null,"宝箱の罠を95%の精度で識別。解除はしない"],
+ ["lomilwa","大透視",2,7,4,false,"field","party","light",null,"町へ戻るまで左右斜め前のマスを壁越しに表示。未探索の数字は隠したまま"],
+ ["dialko","強壮",2,5,3,false,"both","ally","cure",null,"生存する味方1人の麻痺・睡眠・沈黙・恐怖を治す"],
  ["teppeki","鉄壁",2,5,5,false,"both","party","buff",null,"町に戻るまで味方全員のAC-2。"],
- ["dial","大回復",2,7,4,true,"both","ally","heal",[4,4],"生存する味方1人のHPを4d4回復"],
+ ["dial","大回復",2,7,3,true,"both","ally","heal",[4,4],"生存する味方1人のHPを4d4回復"],
  ["latumofis","解毒",2,7,6,false,"both","ally","antidote",null,"生存する味方1人の毒を治す"],
- ["dialma","超回復",2,9,6,false,"both","ally","heal",[8,3],"生存する味方1人のHPを8d3回復"],
+ ["dialma","超回復",2,9,5,false,"both","ally","heal",[8,3],"生存する味方1人のHPを8d3回復"],
+ ["flaghp2","大治癒の旗",2,10,4,false,"both","ally","heal",[8,3],"周囲8マスに旗が立ててある罠がある場合、そのうち1つの旗とその下にある罠を解除し、探索済みにする。生存する味方1人のHPを8d3回復。"],
  ["lorto","聖化",2,11,6,true,"battle","group","damage",[6,6],"選択した列の敵に6d6"],
  ["madi","真回復",2,11,10,false,"both","ally","restore",null,"生存する味方1人のHP・状態異常を全回復。蘇生不可"],
+ ["jigen","示現",2,13,10,false,"field","party","survey",null,"次の階層へ進む階段の位置を象限で示す。"],
  ["malikto","大聖化",2,13,10,false,"battle","all","damage",[12,6],"敵全体に12d6"]
 ].map(([id,name,job,level,mp,guaranteed,where,target,effect,value,description])=>({id,name,job,level,mp,guaranteed,where,target,effect,value,description}));
 function baseSpellCost(x){return x.id==='dumapic'?2**Math.min(50,(s.dumapicUses||0)+1):x.id==='floodfill'?x.mp*2**Math.min(50,s.floodUses||0):x.mp}
@@ -86,14 +89,22 @@ function castMagic(i,id,t){
  let x=magic(id);if(!x||spellReason(i,x)||!validMagicTarget(x,t)){log(`${NAMES[i]}は呪文を使えなかった。`);return false}if(x.target==='ally'&&s.members[t].status==='stone'){log(`${x.name}では${NAMES[t]}の石化を治せない。`);return false}
  if(isAntimagicZone()){log('反呪文の結界に打ち消された！');return false}
  const weaponEffect=combatWeaponEffect(i),surveyNumber=weaponEffect?.kind==='surveyor'?weaponEffect.number:0;let cost=baseSpellCost(x);if(surveyNumber%2===1&&Math.random()<.1)cost=Math.ceil(cost/2);if(hasBloodSacrifice(i)){cost=spellCost(x,i);s.mp[i]-=cost;s.hp[i]-=cost}else flagConsumeMP(i,cost);log(`${NAMES[i]}は${x.name}を唱えた。`);if(x.id==='mahaman'){lowerMemberLevel(i);log(`${NAMES[i]}は代償として1レベル下がった。`);}
- // Count first; consume once before the first unresisted effect. All-resisted casts preserve flags.
- const flagSpell=['flagkill','flagkill2','flagdebuff','flagdebuff2'].includes(x.id);
+ // Enemy-targeted spells consume the flags only on their first unresisted target.
+ const flagSpell=['flagkill','flagkill2','flagdebuff','flagdebuff2','flaghp','flaghp2'].includes(x.id);
  const flags=flagSpell?around(s.pos).filter(j=>s.cells[j].flag&&s.cells[j].trap).sort((a,b)=>a-b):[];
- if(x.id==='flagkill'||x.id==='flagdebuff')flags.splice(1);
+ if(x.id!=='flagkill2'&&x.id!=='flagdebuff2')flags.splice(1);
  let flagsResolved=false;
  if(x.id==='reload'){reloadFloor()}
  else if(x.id==='sweep'){const flags=s.cells.flatMap((c,j)=>c.flag&&c.trap?[j]:[]);disarmSpellFlags(flags);log(`${flags.length}個の罠を解除し、探索済みにした。`)}
  else if(x.id==='tempt'){encounter(s.pos,false)}
+ else if(x.id==='jigen'){
+  if(s.floor>=MAX_FLOOR)log('この階に下り階段はない。');
+  else{
+   const width=size(),row=Math.floor(s.boss/width),column=s.boss%width;
+   const quadrant=(row<width/2?'北':'南')+(column<width/2?'西':'東');
+   log(`階段はこの階の${quadrant}にある。`);
+  }
+ }
  else if(['damage','sleep','silence','debuff','death','threshold-death'].includes(x.effect)){let picked=s.enemy.units.find(e=>e.uid===t);let targets=s.enemy.units.filter(e=>e.hp>0&&(x.target==='all'||(x.target==='group'?rowKey(e)===rowKey(picked):e.uid===t)));for(let e of targets){let name=enemyDisplay(e);if(x.id==='nofice'||x.id==='mahaman'){if(x.id==='mahaman'){e.spellResistNullified=true;log(`${name}の呪文抵抗が無効になった。`)}else if(!e.spellResistReduced&&!e.spellResistNullified){e.spellResistReduced=true;log(`${name}の呪文抵抗が下がった。`)}else log(`${name}の呪文抵抗は変わらなかった。`);continue}if(resistsEnemySpell(e,x)){log(`${name}は呪文をはね返した！`);continue}if(flagSpell&&!flagsResolved){flagsResolved=true;if(flags.length)disarmSpellFlags(flags)}if(x.id==='flagdebuff2'&&!flags.length){log(`${name}には解除する旗付き罠がなく、効果がなかった。`);continue}if(x.effect==='damage'){let n=dice(...x.value).value;if(spellHalvedBy(x,e))n=Math.floor(n/2);if(surveyNumber>0&&surveyNumber%2===0)n=Math.floor(n*110/100);e.hp=Math.max(0,e.hp-n);log(`${name}に${n}ダメージ。`)}else if(x.effect==='sleep'||x.effect==='silence'){let chance=Math.max(0,Math.min(94,49+5*(s.members[i].level-monsterLevel(e))));if(!enemyDefinition(e.id).boss&&Math.random()*100<chance){if(x.effect==='silence'){e.silence=true;log(`${name}は沈黙した。`)}else{e.sleep=Math.max(e.sleep||0,2);log(`${name}は眠った。`)}}else log(`${name}には効かなかった。`)}else if(x.effect==='debuff'){e.acPenalty=Math.max(e.acPenalty||0,x.id==='flagdebuff2'?flags.length:x.value);log(`${name}の守りが弱まった。`)}else if(x.effect==='threshold-death'){if(thresholdDeathApplies(e,x.value))killByMagic(e);else log(`${name}には効かなかった。`)}else if(x.effect==='death'){if(!lakanitoApplies(e))log(`${name}には効かない！`);else if(Math.random()*100<Math.max(0,100-monsterLevel(e)*6))killByMagic(e);else log(`${name}は耐えた。`)}if(e.hp===0&&!e.rewarded)killReward(e)}}
  else if(x.effect==='identifyfoe'){for(const e of s.enemy.units.filter(e=>e.hp>0)){
   const d=enemyDefinition(e.id),libraryKnown=!!s.library?.monsters?.[e.id]?.identified,known=!!e.identified;
@@ -103,7 +114,13 @@ function castMagic(i,id,t){
   else log(known?`${d.name}のことは詳しくわからなかった。`:`${UNKNOWN_NAMES[e.id]||'正体不明'}の正体は見破れなかった。`);
  }}
  else if(x.effect==='buff'){if(x.id==='teppeki')s.teppeki=true;else s.enemy.partyAC=Math.max(s.enemy.partyAC||0,x.value);log('一行の守りが強まった。')}
- else if(x.effect==='heal'||x.effect==='restore'){let before=s.hp[t];s.hp[t]=x.effect==='restore'?maxHP(t):Math.min(maxHP(t),s.hp[t]+dice(...x.value).value);if(x.effect==='restore')s.ailments[t]=freshAilments();log(`${NAMES[t]}のHPが${s.hp[t]-before}回復した。`)}
+ else if(x.effect==='heal'||x.effect==='restore'){
+  if(flags.length)disarmSpellFlags(flags);
+  const before=s.hp[t];
+  s.hp[t]=x.effect==='restore'?maxHP(t):Math.min(maxHP(t),before+dice(...x.value).value);
+  if(x.effect==='restore')s.ailments[t]=freshAilments();
+  log(`${NAMES[t]}のHPが${s.hp[t]-before}回復した。`);
+ }
  else if(x.effect==='cure'){s.ailments[t].paralysis=0;s.ailments[t].sleep=0;s.ailments[t].silence=0;s.ailments[t].fear=0;log(`${NAMES[t]}の麻痺・睡眠・沈黙・恐怖が解けた。`)}
  else if(x.effect==='antidote'){s.ailments[t].poison=false;log(`${NAMES[t]}の毒が消えた。`)}
  else if(x.effect==='identify'){let c=currentChest();fixChestTrap(c);let names={none:'罠なし',needle:'針',poison:'毒',paralysis:'麻痺',pitfall:'落とし穴'};let result=c.trap;if(Math.random()>=.95){let other=Object.keys(names).filter(k=>k!==result);result=other[Math.random()*other.length|0]}c.reading=names[result];log(`宝箱の鑑定結果：${c.reading}。`)}

@@ -125,7 +125,7 @@ with sync_playwright() as p:
         page.wait_for_function('!logBusy()')
         assert '仕掛解除を唱えた。' in page.locator('#log').inner_text()
         assert '宝箱の鑑定結果：毒。' in page.locator('#log').inner_text()
-        assert page.evaluate('s.mp[0]') == 37
+        assert page.evaluate('s.mp[0]') == 38
         assert page.evaluate("currentChest().trap === 'poison' && currentChest().reading === '毒'")
         page.evaluate('() => { delete s.cells[s.pos].chest; render(); }')
 

@@ -42,7 +42,7 @@ for(const id of ['flagkill','flagkill2','flagdebuff','flagdebuff2']){
 }
 {
  const g=setup();g.run("s.enemy=null;for(const j of [0,6,24])Object.assign(s.cells[j],{trap:true,flag:true});s.cells[1].flag=true;s.cells[2].trap=true;castMagic(1,'sweep',null)");
- assert.equal(g.run('s.cells.filter(c=>c.disarmed).length'),3);assert.equal(g.run('s.cells[1].flag'),true);assert.equal(g.run('s.cells[2].trap'),true);assert.equal(g.run('s.mp[1]'),90);assert.equal(g.run('s.unlockChecks'),1);assert(g.run('logQueue.some(e=>e.text.includes("3個の罠"))'));
+ assert.equal(g.run('s.cells.filter(c=>c.disarmed).length'),3);assert.equal(g.run('s.cells[1].flag'),true);assert.equal(g.run('s.cells[2].trap'),true);assert.equal(g.run('s.mp[1]'),95);assert.equal(g.run('s.unlockChecks'),1);assert(g.run('logQueue.some(e=>e.text.includes("3個の罠"))'));
 }
 {
  const g=setup();g.run("openMagic(0)");assert(!g.run("$('#magiclist').innerHTML.includes('data-spell=\"tempt\"')"));

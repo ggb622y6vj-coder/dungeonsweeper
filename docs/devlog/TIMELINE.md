@@ -172,3 +172,4 @@
 | 134 | 2026-11-24 | 対象選択の列ラベルを「N：」に統一し、旧資料2件の確定名を「サラマンダー」に更新 | fb644e5 | [spec](specs/134-label-and-doc-unification.md) | [実施](reports/134.md) |
 | 135 | 2026-11-24 | 巌熊・遊女の流し目・戦闘グマを追加。随伴設定を63種に更新。猛毒タケへの改名、チシャ猫の抵抗調整、ラフレシアの6F追加を反映 | a244570 | [spec](specs/135-notion-monsters-update.md) | [実施](reports/135.md) |
 | 136 | 2026-11-24 | 迷宮のログダイアログを追加し、パーティー欄の区切りラベルを削除 | 0612b65 | [spec](specs/136-log-dialog-and-party-rank.md) | [実施](reports/136.md) |
+| 137 | 2026-11-25 | 呪文14件の消費MPを引き下げ、僧侶に治癒の旗・大治癒の旗・示現を追加 | 未コミット | [spec](specs/137-spells-update.md) | [実施](reports/137.md) |
