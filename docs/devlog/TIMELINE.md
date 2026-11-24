@@ -171,4 +171,4 @@
 | 133 | 2026-11-23 | 随伴設定を48種に拡張し、4種の出現階・15種の群れ・僧侶呪文抵抗・確定名を更新 | 31a51fa | [spec](specs/133-partner-table-expansion.md) | [実施](reports/133.md) |
 | 134 | 2026-11-24 | 対象選択の列ラベルを「N：」に統一し、旧資料2件の確定名を「サラマンダー」に更新 | fb644e5 | [spec](specs/134-label-and-doc-unification.md) | [実施](reports/134.md) |
 | 135 | 2026-11-24 | 巌熊・遊女の流し目・戦闘グマを追加。随伴設定を63種に更新。猛毒タケへの改名、チシャ猫の抵抗調整、ラフレシアの6F追加を反映 | a244570 | [spec](specs/135-notion-monsters-update.md) | [実施](reports/135.md) |
-| 136 | 2026-11-24 | 迷宮のログダイアログを追加し、パーティー欄の区切りラベルを削除 |  | [spec](specs/136-log-dialog-and-party-rank.md) | [実施](reports/136.md) |
+| 136 | 2026-11-24 | 迷宮のログダイアログを追加し、パーティー欄の区切りラベルを削除 | 0612b65 | [spec](specs/136-log-dialog-and-party-rank.md) | [実施](reports/136.md) |
