@@ -24,7 +24,7 @@ def no_overflow(page):
 def formation(page, expected):
     assert page.evaluate("s.members.map(m=>m.name).join('')") == expected
     assert page.locator('#party .card > b').evaluate_all("es=>es.map(e=>e.firstChild.textContent.trim()).join('')") == expected
-    assert page.locator('#party .party-rank').all_text_contents() == ['前衛', '後衛']
+    assert page.locator('#party > *').count() == len(expected)
     page.locator('#party').click()
     headings = page.locator('#statsbody .statcard h3').all_text_contents()
     assert len(headings) == len(expected), headings

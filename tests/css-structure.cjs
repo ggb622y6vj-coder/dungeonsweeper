@@ -39,6 +39,9 @@ for (const raw of body.split('\n')) {
 }
 assert.equal(media, '', 'unclosed media block');
 assert.ok(rules.length > 300, 'rules were parsed');
+assert.ok(!rules.some(rule => rule.selector.includes('.party-rank')), 'removed party rank selectors');
+const controls = rules.find(rule => !rule.media && rule.selector === '.controls');
+assert.ok(controls?.declarations.split(';').includes('margin-top:8px'), 'space above dungeon controls');
 
 // Opaque hex colors live in the palette. Translucent ones (#rgba, #rrggbbaa) and the per-floor
 // --theme-* values stay literal.
