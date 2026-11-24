@@ -101,8 +101,9 @@ function castMagic(i,id,t){
   if(s.floor>=MAX_FLOOR)log('この階に下り階段はない。');
   else{
    const width=size(),row=Math.floor(s.boss/width),column=s.boss%width;
-   const quadrant=(row<width/2?'北':'南')+(column<width/2?'西':'東');
-   log(`階段はこの階の${quadrant}にある。`);
+   const north=row<width/2,east=column>=width/2;
+   const quadrant=north?(east?1:2):(east?4:3);
+   log(`階段は第${quadrant}象限にある。`);
   }
  }
  else if(['damage','sleep','silence','debuff','death','threshold-death'].includes(x.effect)){let picked=s.enemy.units.find(e=>e.uid===t);let targets=s.enemy.units.filter(e=>e.hp>0&&(x.target==='all'||(x.target==='group'?rowKey(e)===rowKey(picked):e.uid===t)));for(let e of targets){let name=enemyDisplay(e);if(x.id==='nofice'||x.id==='mahaman'){if(x.id==='mahaman'){e.spellResistNullified=true;log(`${name}の呪文抵抗が無効になった。`)}else if(!e.spellResistReduced&&!e.spellResistNullified){e.spellResistReduced=true;log(`${name}の呪文抵抗が下がった。`)}else log(`${name}の呪文抵抗は変わらなかった。`);continue}if(resistsEnemySpell(e,x)){log(`${name}は呪文をはね返した！`);continue}if(flagSpell&&!flagsResolved){flagsResolved=true;if(flags.length)disarmSpellFlags(flags)}if(x.id==='flagdebuff2'&&!flags.length){log(`${name}には解除する旗付き罠がなく、効果がなかった。`);continue}if(x.effect==='damage'){let n=dice(...x.value).value;if(spellHalvedBy(x,e))n=Math.floor(n/2);if(surveyNumber>0&&surveyNumber%2===0)n=Math.floor(n*110/100);e.hp=Math.max(0,e.hp-n);log(`${name}に${n}ダメージ。`)}else if(x.effect==='sleep'||x.effect==='silence'){let chance=Math.max(0,Math.min(94,49+5*(s.members[i].level-monsterLevel(e))));if(!enemyDefinition(e.id).boss&&Math.random()*100<chance){if(x.effect==='silence'){e.silence=true;log(`${name}は沈黙した。`)}else{e.sleep=Math.max(e.sleep||0,2);log(`${name}は眠った。`)}}else log(`${name}には効かなかった。`)}else if(x.effect==='debuff'){e.acPenalty=Math.max(e.acPenalty||0,x.id==='flagdebuff2'?flags.length:x.value);log(`${name}の守りが弱まった。`)}else if(x.effect==='threshold-death'){if(thresholdDeathApplies(e,x.value))killByMagic(e);else log(`${name}には効かなかった。`)}else if(x.effect==='death'){if(!lakanitoApplies(e))log(`${name}には効かない！`);else if(Math.random()*100<Math.max(0,100-monsterLevel(e)*6))killByMagic(e);else log(`${name}は耐えた。`)}if(e.hp===0&&!e.rewarded)killReward(e)}}

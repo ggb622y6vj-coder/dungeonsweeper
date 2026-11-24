@@ -60,10 +60,10 @@ for (const [id, maxHeal, cost] of [['flaghp', 16, 1], ['flaghp2', 24, 4]]) {
 
 // Cells immediately on either side of the center lines, before and after the guardian.
 for (const [floor, boss, type, result] of [
-  [1, 27, 'boss', '階段はこの階の北西にある。'],
-  [2, 45, 'down', '階段はこの階の北東にある。'],
-  [9, 77, 'boss', '階段はこの階の南西にある。'],
-  [9, 78, 'down', '階段はこの階の南東にある。'],
+  [1, 27, 'boss', '階段は第2象限にある。'],
+  [2, 45, 'down', '階段は第1象限にある。'],
+  [9, 77, 'boss', '階段は第3象限にある。'],
+  [9, 78, 'down', '階段は第4象限にある。'],
   [10, 78, 'boss', 'この階に下り階段はない。']
 ]) {
   const g = setup(floor);
