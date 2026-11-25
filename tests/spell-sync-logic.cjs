@@ -15,12 +15,14 @@ function battle(g,ids=['slime']){
  g.drain();g.run(`s.enemy={units:${JSON.stringify(ids)}.map((id,i)=>({...makeEnemy(id,100+i),row:7+i*16,hp:1000,identified:true})),initiative:'party',flagEffect:{}};resetPartyCommands()`);
 }
 // Deterministically select each new monster through encounter(), on every listed floor.
-for(const [id,floors] of [['takenoko',[1,2]],['kinoko',[1,2]],['sirakaba',[2,3]]]){
+for(const [id,floors] of [['takenoko',[1,2]],['kinoko',[1,2]],['sirakaba',[2,3]],['kitousha',[2]],['kitousha2',[3]],['kitousha3',[4]]]){
  const g=party();assert.deepEqual(J(g,`enemyDefinition('${id}').floors`),floors);
  for(const floor of floors){
   g.drain();g.run(`s.enemy=null;fresh(${floor});s.cells[s.pos].type='';
    var pool=ENEMIES.filter(d=>d.floors.includes(${floor})&&!d.boss),pick=(pool.findIndex(d=>d.id==='${id}')+.5)/pool.length;
-   var rolls=Array(Math.min(4,s.floor+1)).fill(pick);Math.random=()=>rolls.shift()??.99;encounter(s.pos)`);
+   // If the partner is available, end the chain. Otherwise draw the same species for each row.
+   var hasPartner=pool.some(d=>d.id===enemyDefinition('${id}').partnerId);
+   var rolls=hasPartner?[pick,.99]:Array(Math.min(4,s.floor+1)).fill(pick);Math.random=()=>rolls.shift()??.99;encounter(s.pos)`);
   assert.equal(g.run('s.enemy.units.every(e=>e.id==='+JSON.stringify(id)+')'),true,`${id} spawns on ${floor}F`);
   assert.equal(g.run('enemyGroups().every(g=>g.units.length>=enemyDefinition('+JSON.stringify(id)+').groupSize[0])'),true);
  }
@@ -127,9 +129,9 @@ for(const [id,resist,expected] of [['mamahalito','炎半減',36],['madalto','氷
 }
 // 085: enemy spell IDs stay stable; data and battle logs use current names.
 for(const [monster,id,oldName,name] of [
- ['mage','halito','ハリト','火炎'],['sorcerer','mahalito','マハリト','大火炎'],
+ ['mage','halito','ハリト','火炎'],['highmage','mahalito','マハリト','大火炎'],
  ['deathmage','dalto','ダルト','吹雪'],['greaterdemon','madalto','マダルト','大吹雪'],
- ['archmage','tiltowait','ティルトウェイト','魔弾'],['darkpriest','montino','沈黙','沈黙']]){
+ ['archmage','tiltowait','ティルトウェイト','魔弾'],['kitousha3','montino','沈黙','沈黙']]){
  const g=party();battle(g,[monster]);
  assert(g.run(`enemySpellCandidates(s.enemy.units[0]).some(x=>x.id==='${id}'&&x.name==='${name}')`));
  g.run(`Object.assign(enemyDefinition('${monster}'),{flee:0,summon:0,breath:null,spell:1});

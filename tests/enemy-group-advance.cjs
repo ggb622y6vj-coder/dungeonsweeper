@@ -15,8 +15,8 @@ g.run(`s.area='dungeon';
   }`);
 assert.equal(g.run(`strength('sorcerer', [
   {hp:45,poison:true,silence:true},{hp:5},{hp:0},
-  {hp:100,sleep:1},{hp:100,paralysis:1},{hp:100,stone:true},{hp:100,fear:1}])`), 20);
-assert.equal(g.run("strength('darkpriest',[{hp:30}])"), 21);
+  {hp:100,sleep:1},{hp:100,paralysis:1},{hp:100,stone:true},{hp:100,fear:1}])`), 32);
+assert.equal(g.run("strength('darkpriest',[{hp:30}])"), 18);
 assert.equal(g.run("strength('sorcerer',[{hp:1},{hp:2}])"), 0);
 assert.equal(g.run("strength('slime',[{hp:5,fear:1}])"), 0);
 console.log('PASS advance strength uses current HP, both master spell schools, actionable units and a group-level floor');

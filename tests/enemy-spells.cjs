@@ -37,15 +37,17 @@ const spells = (g, expression) => assert.deepEqual(read(g, 'ids()'), expression.
 {
   const g = battle();
   const assigned = {
-    mage:[1,0,50], stone:[1,0,50], shaman:[1,0,50], iron:[1,0,60], watcher:[1,0,10], evileye:[1,0,40],
-    sorcerer:[5,0,25], highmage:[5,0,25], necromancer:[5,0,35], darkelf:[5,0,25], vampire:[5,0,20], lesserdemon:[5,0,20],
-    deathmage:[7,0,25], demongeneral:[7,0,30], vampirelord:[7,0,15],
-    greaterdemon:[8,0,10], lich:[8,0,25], fallenangel:[8,0,15], archmage:[13,0,15], labyrinthlord:[13,0,35],
-    darkpriest:[0,3,30], witch:[0,3,25]
+    mage:[1,0,50], stone:[1,0,50], shaman:[1,0,50], iron:[1,0,60], watcher:[2,0,40], evileye:[1,0,40],
+    sorcerer:[3,0,50], highmage:[5,0,90], necromancer:[5,0,35], darkelf:[5,0,25], vampire:[5,0,20], lesserdemon:[5,0,20],
+    deathmage:[7,0,50], demongeneral:[7,0,30], vampirelord:[7,0,15],
+    greaterdemon:[8,0,10], lich:[8,0,50], fallenangel:[8,0,15], archmage:[13,0,50], labyrinthlord:[13,0,35],
+    darkpriest:[2,2,50], witch:[0,3,50], wraith:[4,0,50],
+    stonegiant:[0,4,50], troll:[0,2,40], poltergeist:[0,1,50],
+    kitousha:[0,1,70], kitousha2:[0,2,70], kitousha3:[0,3,70]
   };
   const masters = read(g, 'ENEMIES');
-  assert.equal(masters.length,111);
-  assert.equal(masters.filter(d=>Object.hasOwn(assigned,d.id)).length,22);
+  assert.equal(masters.length,114);
+  assert.equal(masters.filter(d=>Object.hasOwn(assigned,d.id)).length,29);
   for (const d of masters) {
     const [mage,priest,percent] = assigned[d.id] || [0,0,0];
     assert.deepEqual([d.mageSpellLevel,d.priestSpellLevel,d.spell],[mage,priest,percent/100],d.id);
@@ -79,11 +81,11 @@ console.log('PASS 127 assignments, allowlist, zero levels, school/band weights a
   // Only Montino remains. One resisted cast = one decline roll, independent
   // of its targets. Sleeping/silenced group members count, other rows do not.
   for (let size=1; size<=5; size++) {
-    const g=battle('darkpriest',3);
+    const g=battle('kitousha3',3);
     g.run(`s.enemy.monsterAC=2;
-      for (let i=1;i<${size};i++) add('darkpriest',17,{sleep:2,silence:true});
-      add('darkpriest',17,{hp:0}); add('darkpriest',17,{escaped:true,rewarded:true});
-      add('darkpriest',29);`);
+      for (let i=1;i<${size};i++) add('kitousha3',17,{sleep:2,silence:true});
+      add('kitousha3',17,{hp:0}); add('kitousha3',17,{escaped:true,rewarded:true});
+      add('kitousha3',29);`);
     const name=g.run('enemyDisplay(caster)');
     for (const [draw,decline] of [[1/(size+2),false],[1/(size+2)-1e-10,true]]) {
       g.run(`levels.priest=3; logQueue=[]; var rest=rolls(.25,.99,.99,.99,${draw});`);
@@ -94,7 +96,7 @@ console.log('PASS 127 assignments, allowlist, zero levels, school/band weights a
       assert.deepEqual(logs,[name+'は沈黙を唱えた。',...['sim0','sim1','sim2'].map(n=>n+'には効かなかった。'),...(decline?[name+'の魔力が衰えた。']:[])]);
     }
   }
-  const ward=battle('darkpriest');
+  const ward=battle('kitousha3');
   ward.run(`s.enemy.monsterAC=2; isAntimagicZone=()=>true;
     var rest=rolls(.25,1/3); cast()`);
   assert.deepEqual(read(ward,'[rest.length,levels.priest,logQueue.map(x=>x.text)]'),
@@ -119,7 +121,7 @@ console.log('PASS 127 decline boundaries for 1–5 living units, independent ban
 
 {
   const g=battle('darkpriest');
-  g.run(`levels.priest=1; s.enemy.monsterAC=2;
+  g.run(`levels.mage=0; levels.priest=1; s.enemy.monsterAC=2;
     // Its only remaining spell would heal. At full HP the slot becomes one normal attack.
     const turn=()=>enemyAction(caster,new Map(s.members.map((m,i)=>[m.id,cmds[i]])));
     var swings=0; hits=()=>{swings++;return false}; Math.random=()=>.25;`);

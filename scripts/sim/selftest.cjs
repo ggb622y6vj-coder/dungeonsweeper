@@ -181,12 +181,16 @@ silenceAI.run(`s.area='dungeon';s.pendingStairs=false;s.pendingBoss=null;
 planTurn(silenceAI);
 assert.equal(silenceAI.run('s.magicPlans[0].id'), 'montino');
 assert.equal(silenceAI.run('s.magicPlans[0].target'), 91, 'target is a unit UID, not its row key');
+silenceAI.run('var casterLevels=groupSpellLevels(s.enemy.units[0]);casterLevels.priest=0');
+planTurn(silenceAI);
+assert.equal(silenceAI.run('s.magicPlans[0].id'), 'montino', 'dark priests can still cast mage spells');
+silenceAI.run('casterLevels.priest=2');
 for (const condition of ['s.enemy.units[1].hp=0', 's.enemy.units[1].silence=true',
-  's.enemy.boss=true', 's.mp[0]=3', 'groupSpellLevels(s.enemy.units[0]).priest=0']) {
+  's.enemy.boss=true', 's.mp[0]=3', 'casterLevels.mage=casterLevels.priest=0']) {
   silenceAI.run(condition);
   planTurn(silenceAI);
   assert.equal(silenceAI.run('s.magicPlans[0]'), null, condition);
-  silenceAI.run('s.enemy.units[1].hp=20;s.enemy.units[1].silence=false;s.enemy.boss=false;s.mp[0]=100;groupSpellLevels(s.enemy.units[0]).priest=3');
+  silenceAI.run('s.enemy.units[1].hp=20;s.enemy.units[1].silence=false;s.enemy.boss=false;s.mp[0]=100;casterLevels.mage=casterLevels.priest=2');
 }
 silenceAI.run('s.hp[2]=1');
 planTurn(silenceAI);

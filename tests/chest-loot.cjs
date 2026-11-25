@@ -15,12 +15,12 @@ assert.equal(equipment.length, 87);
 for (const w of equipment) assert.ok(Number.isInteger(w.lootRank) && w.lootRank >= 1 && w.lootRank <= 5, w.id);
 for (const w of medicines) assert.equal(Object.hasOwn(w, 'lootRank'), false, w.id);
 assert.equal(tables.version, 1);
-assert.equal(enemies.length, 111);
+assert.equal(enemies.length, 114);
 assert.deepEqual(Object.keys(tables.monsterGroups).sort(), enemies.map(e => e.id).sort());
 const groupCounts = Array(10).fill(0);
 for (const group of Object.values(tables.monsterGroups)) groupCounts[group - 1]++;
-assert.deepEqual(groupCounts, [10,16,13,17,13,15,10,10,5,2]);
-for (const [id, group] of [['ganyu', 6], ['namakubi2', 4], ['warbear', 4]]) {
+assert.deepEqual(groupCounts, [10,17,15,17,13,15,10,10,5,2]);
+for (const [id, group] of [['ganyu', 6], ['namakubi2', 4], ['warbear', 4], ['kitousha', 2], ['kitousha2', 3], ['kitousha3', 3]]) {
   assert.equal(tables.monsterGroups[id], group, id);
 }
 for (const group of Object.values(tables.monsterGroups)) assert.ok(Number.isInteger(group) && group >= 1 && group <= 10);
@@ -89,7 +89,7 @@ for (let bits = 0; bits < 8; bits++) {
   });
   assert.deepEqual(roll('sorcerer', 10, rolls), expected, `ABC pattern ${bits}`);
 }
-// All 111 mappings must use their group's tiers, including zero-chance slots.
+// All 114 mappings must use their group's tiers, including zero-chance slots.
 for (const [monster, group] of Object.entries(tables.monsterGroups)) {
   const rolls = [], expected = [];
   for (const slot of tables.groups[group].slots) {
@@ -182,7 +182,7 @@ for (const [group, {slots}] of Object.entries(tables.groups)) {
 }
 g.run('LOOT_TABLES.pools=structuredClone(savedPools)');
 assert.deepEqual(plain(g, 'LOOT_TABLES'), tables);
-console.log('PASS chest loot: data validation/parity, 111 mappings, ABC 8 patterns, empty equipment pools rejected, all rank/medicine candidates on every floor, T1 excludes R3, 100k/tier and group rates');
+console.log('PASS chest loot: data validation/parity, 114 mappings, ABC 8 patterns, empty equipment pools rejected, all rank/medicine candidates on every floor, T1 excludes R3, 100k/tier and group rates');
 
 function party(job=3) {
   const t = game(null, () => .5);

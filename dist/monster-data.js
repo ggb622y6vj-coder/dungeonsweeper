@@ -8,7 +8,7 @@ const ENEMIES=[
     "floors": [
       1
     ],
-    "level": 2,
+    "level": 1,
     "hp": [
       1,
       6,
@@ -62,7 +62,7 @@ const ENEMIES=[
       2,
       3
     ],
-    "level": 5,
+    "level": 4,
     "hp": [
       3,
       9,
@@ -115,7 +115,7 @@ const ENEMIES=[
     "floors": [
       1
     ],
-    "level": 2,
+    "level": 1,
     "hp": [
       2,
       6,
@@ -221,7 +221,7 @@ const ENEMIES=[
     "floors": [
       1
     ],
-    "level": 2,
+    "level": 1,
     "hp": [
       2,
       6,
@@ -274,7 +274,7 @@ const ENEMIES=[
     "floors": [
       1
     ],
-    "level": 3,
+    "level": 1,
     "hp": [
       1,
       6,
@@ -381,7 +381,7 @@ const ENEMIES=[
       1,
       2
     ],
-    "level": 3,
+    "level": 2,
     "hp": [
       1,
       6,
@@ -487,7 +487,7 @@ const ENEMIES=[
     "floors": [
       1
     ],
-    "level": 4,
+    "level": 1,
     "hp": [
       1,
       6,
@@ -593,7 +593,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 4,
+    "level": 2,
     "hp": [
       2,
       9,
@@ -765,7 +765,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 4,
+    "level": 3,
     "hp": [
       2,
       6,
@@ -818,7 +818,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 5,
+    "level": 2,
     "hp": [
       2,
       10,
@@ -871,7 +871,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 5,
+    "level": 2,
     "hp": [
       2,
       6,
@@ -924,7 +924,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 5,
+    "level": 2,
     "hp": [
       2,
       6,
@@ -982,7 +982,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 5,
+    "level": 3,
     "hp": [
       2,
       6,
@@ -1040,7 +1040,7 @@ const ENEMIES=[
     "floors": [
       2
     ],
-    "level": 5,
+    "level": 2,
     "hp": [
       3,
       10,
@@ -1159,7 +1159,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 6,
+    "level": 3,
     "hp": [
       3,
       6,
@@ -1275,7 +1275,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 6,
+    "level": 3,
     "hp": [
       3,
       6,
@@ -1328,7 +1328,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 6,
+    "level": 5,
     "hp": [
       3,
       6,
@@ -1436,7 +1436,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 7,
+    "level": 3,
     "hp": [
       3,
       5,
@@ -1555,7 +1555,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 7,
+    "level": 3,
     "hp": [
       3,
       4,
@@ -1666,7 +1666,7 @@ const ENEMIES=[
     "floors": [
       3
     ],
-    "level": 8,
+    "level": 5,
     "hp": [
       3,
       10,
@@ -1771,9 +1771,9 @@ const ENEMIES=[
       ],
       "chance": 0.6
     },
-    "mageSpellLevel": 1,
+    "mageSpellLevel": 2,
     "priestSpellLevel": 0,
-    "spell": 0.1,
+    "spell": 0.4,
     "partnerId": null,
     "partnerRate": 0.0
   },
@@ -2089,7 +2089,7 @@ const ENEMIES=[
     "mageResist": 0.05,
     "priestResist": 0.0,
     "swings": 1,
-    "rear": true,
+    "rear": false,
     "flee": 0,
     "summon": 0.1,
     "steal": 0,
@@ -2101,9 +2101,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "mageSpellLevel": 0,
-    "priestSpellLevel": 3,
-    "spell": 0.3,
+    "mageSpellLevel": 2,
+    "priestSpellLevel": 2,
+    "spell": 0.5,
     "partnerId": "zombie",
     "partnerRate": 0.6
   },
@@ -2154,9 +2154,9 @@ const ENEMIES=[
     "icon": "♟",
     "summonCap": 4,
     "breath": null,
-    "mageSpellLevel": 5,
+    "mageSpellLevel": 3,
     "priestSpellLevel": 0,
-    "spell": 0.25,
+    "spell": 0.5,
     "partnerId": "poltergeist",
     "partnerRate": 0.5
   },
@@ -2230,7 +2230,7 @@ const ENEMIES=[
     "hp": [
       10,
       8,
-      20
+      40
     ],
     "ac": 3,
     "hit": 8,
@@ -2310,7 +2310,7 @@ const ENEMIES=[
     "flee": 0,
     "summon": 0,
     "steal": 0,
-    "drain": 0.08,
+    "drain": 0.1,
     "death": 0,
     "statuses": [],
     "resistance": "毒無効",
@@ -2336,7 +2336,7 @@ const ENEMIES=[
     "hp": [
       6,
       8,
-      10
+      30
     ],
     "ac": 5,
     "hit": 6,
@@ -2372,8 +2372,8 @@ const ENEMIES=[
     "summonCap": 4,
     "breath": null,
     "mageSpellLevel": 0,
-    "priestSpellLevel": 0,
-    "spell": 0.0,
+    "priestSpellLevel": 2,
+    "spell": 0.4,
     "partnerId": "ninja",
     "partnerRate": 0.3
   },
@@ -2594,7 +2594,7 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 5,
     "priestSpellLevel": 0,
-    "spell": 0.25,
+    "spell": 0.9,
     "partnerId": "troll",
     "partnerRate": 0.5
   },
@@ -2728,8 +2728,8 @@ const ENEMIES=[
     "level": 13,
     "hp": [
       8,
-      8,
-      20
+      10,
+      60
     ],
     "ac": 2,
     "hit": 8,
@@ -2751,12 +2751,12 @@ const ENEMIES=[
     "race": "人型",
     "mageResist": 0.2,
     "priestResist": 0.2,
-    "swings": 1,
+    "swings": 2,
     "rear": false,
     "flee": 0,
     "summon": 0,
     "steal": 0,
-    "drain": 0.05,
+    "drain": 0.1,
     "death": 0,
     "statuses": [],
     "resistance": "なし",
@@ -2772,7 +2772,7 @@ const ENEMIES=[
   },
   {
     "id": "wraith",
-    "name": "亡霊",
+    "name": "霧の幽霊",
     "unknown": "幽霊",
     "floor": 6,
     "floors": [
@@ -2782,7 +2782,7 @@ const ENEMIES=[
     "hp": [
       5,
       8,
-      0
+      20
     ],
     "ac": 3,
     "hit": 7,
@@ -2793,8 +2793,8 @@ const ENEMIES=[
     ],
     "xp": 170.0,
     "groupSize": [
-      1,
-      3
+      2,
+      4
     ],
     "gold": [
       5,
@@ -2822,11 +2822,11 @@ const ENEMIES=[
     "icon": "☠",
     "summonCap": 4,
     "breath": null,
-    "mageSpellLevel": 0,
+    "mageSpellLevel": 4,
     "priestSpellLevel": 0,
-    "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "spell": 0.5,
+    "partnerId": "darkknight",
+    "partnerRate": 0.6
   },
   {
     "id": "stonegiant",
@@ -2881,8 +2881,8 @@ const ENEMIES=[
     "summonCap": 4,
     "breath": null,
     "mageSpellLevel": 0,
-    "priestSpellLevel": 0,
-    "spell": 0.0,
+    "priestSpellLevel": 4,
+    "spell": 0.5,
     "partnerId": "stonegiant",
     "partnerRate": 0.4
   },
@@ -2944,8 +2944,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "warbear",
+    "partnerRate": 0.6
   },
   {
     "id": "darkknight",
@@ -2997,8 +2997,8 @@ const ENEMIES=[
     "mageSpellLevel": 0,
     "priestSpellLevel": 0,
     "spell": 0.0,
-    "partnerId": null,
-    "partnerRate": 0.0
+    "partnerId": "darkelf",
+    "partnerRate": 0.3
   },
   {
     "id": "fungus",
@@ -3085,8 +3085,8 @@ const ENEMIES=[
     ],
     "xp": 190.0,
     "groupSize": [
-      1,
-      2
+      3,
+      4
     ],
     "gold": [
       5,
@@ -3495,7 +3495,7 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 7,
     "priestSpellLevel": 0,
-    "spell": 0.25,
+    "spell": 0.5,
     "partnerId": null,
     "partnerRate": 0.0
   },
@@ -3898,7 +3898,7 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 0,
     "priestSpellLevel": 3,
-    "spell": 0.25,
+    "spell": 0.5,
     "partnerId": null,
     "partnerRate": 0.0
   },
@@ -4446,7 +4446,7 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 8,
     "priestSpellLevel": 0,
-    "spell": 0.25,
+    "spell": 0.5,
     "partnerId": null,
     "partnerRate": 0.0
   },
@@ -4917,7 +4917,7 @@ const ENEMIES=[
     "breath": null,
     "mageSpellLevel": 13,
     "priestSpellLevel": 0,
-    "spell": 0.15,
+    "spell": 0.5,
     "partnerId": null,
     "partnerRate": 0.0
   },
@@ -5217,7 +5217,7 @@ const ENEMIES=[
       1,
       2
     ],
-    "level": 4,
+    "level": 2,
     "hp": [
       3,
       5,
@@ -5271,7 +5271,7 @@ const ENEMIES=[
       2,
       3
     ],
-    "level": 3,
+    "level": 6,
     "hp": [
       3,
       10,
@@ -5284,7 +5284,7 @@ const ENEMIES=[
       5,
       0
     ],
-    "xp": 40.0,
+    "xp": 20.0,
     "groupSize": [
       1,
       2
@@ -5395,7 +5395,7 @@ const ENEMIES=[
     "hit": 2,
     "attack": [
       2,
-      10,
+      5,
       0
     ],
     "xp": 25.0,
@@ -5630,7 +5630,7 @@ const ENEMIES=[
       1,
       2
     ],
-    "level": 3,
+    "level": 2,
     "hp": [
       2,
       10,
@@ -6000,8 +6000,8 @@ const ENEMIES=[
     "summonCap": 4,
     "breath": null,
     "mageSpellLevel": 0,
-    "priestSpellLevel": 0,
-    "spell": 0.0,
+    "priestSpellLevel": 1,
+    "spell": 0.5,
     "partnerId": "poltergeist",
     "partnerRate": 0.6
   },
@@ -6230,5 +6230,164 @@ const ENEMIES=[
     "spell": 0.0,
     "partnerId": null,
     "partnerRate": 0.0
+  },
+  {
+    "id": "kitousha",
+    "name": "闇の祈祷者",
+    "unknown": "僧侶",
+    "floor": 2,
+    "floors": [
+      2
+    ],
+    "level": 3,
+    "hp": [
+      2,
+      5,
+      2
+    ],
+    "ac": 8,
+    "hit": 3,
+    "attack": [
+      3,
+      5,
+      0
+    ],
+    "xp": 40.0,
+    "groupSize": [
+      3,
+      5
+    ],
+    "gold": [
+      2,
+      10,
+      0
+    ],
+    "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♟",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 1,
+    "spell": 0.7,
+    "partnerId": "orc",
+    "partnerRate": 0.5
+  },
+  {
+    "id": "kitousha2",
+    "name": "悪魔の祈祷者",
+    "unknown": "僧侶",
+    "floor": 3,
+    "floors": [
+      3
+    ],
+    "level": 4,
+    "hp": [
+      3,
+      5,
+      3
+    ],
+    "ac": 6,
+    "hit": 3,
+    "attack": [
+      2,
+      5,
+      0
+    ],
+    "xp": 50.0,
+    "groupSize": [
+      3,
+      5
+    ],
+    "gold": [
+      3,
+      5,
+      0
+    ],
+    "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♟",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 2,
+    "spell": 0.7,
+    "partnerId": "terror",
+    "partnerRate": 0.6
+  },
+  {
+    "id": "kitousha3",
+    "name": "地獄の祈祷者",
+    "unknown": "僧侶",
+    "floor": 4,
+    "floors": [
+      4
+    ],
+    "level": 7,
+    "hp": [
+      4,
+      8,
+      0
+    ],
+    "ac": 5,
+    "hit": 5,
+    "attack": [
+      3,
+      7,
+      0
+    ],
+    "xp": 55.0,
+    "groupSize": [
+      3,
+      5
+    ],
+    "gold": [
+      3,
+      7,
+      0
+    ],
+    "race": "人型",
+    "mageResist": 0.0,
+    "priestResist": 0.0,
+    "swings": 1,
+    "rear": false,
+    "flee": 0,
+    "summon": 0,
+    "steal": 0,
+    "drain": 0,
+    "death": 0,
+    "statuses": [],
+    "resistance": "なし",
+    "boss": false,
+    "icon": "♟",
+    "summonCap": 4,
+    "breath": null,
+    "mageSpellLevel": 0,
+    "priestSpellLevel": 3,
+    "spell": 0.7,
+    "partnerId": "gargoyle",
+    "partnerRate": 0.4
   }
 ];

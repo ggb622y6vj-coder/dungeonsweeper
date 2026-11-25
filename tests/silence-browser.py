@@ -57,13 +57,13 @@ def silence_cast(page):
     for frame in frames:
         assert frame['names'] == 'ABCDEF', frame
         assert frame['tags'] == frame['expected'], frame
-    assert frames[0]['text'] == '闇の司祭は沈黙を唱えた。'
+    assert frames[0]['text'] == '地獄の祈祷者は沈黙を唱えた。'
     assert frames[0]['tags'] == [False] * 6
     assert frames[1]['text'] == 'Aは沈黙した。'
     assert frames[1]['tags'] == [True, False, False, False, False, False]
     assert frames[2]['text'] == 'Bには効かなかった。'
     assert frames[3]['text'] == 'Cは沈黙した。'
-    assert frames[4]['text'] == '闇の司祭の魔力が衰えた。'
+    assert frames[4]['text'] == '地獄の祈祷者の魔力が衰えた。'
     assert page.evaluate('s.ailments.map(a=>a.silence)') == [3, 0, 3, 0, 0, 0]
 
 
@@ -81,7 +81,7 @@ with sync_playwright() as p:
         seed(page)
 
         page.locator('#libraryopen').click()
-        for name, chance in (('闇の司祭', 30), ('魔女', 25)):
+        for name, levels, chance in (('闇の司祭', '2／2', 50), ('魔女', '0／3', 50)):
             floor = page.evaluate('(name)=>ENEMIES.find(d=>d.name===name).floors[0]', name)
             page.locator(f'#librarymonstertab-{floor}').click()
             entry = page.locator('#librarybody .library-entry').filter(
@@ -89,16 +89,16 @@ with sync_playwright() as p:
             entry.scroll_into_view_if_needed()
             assert entry.is_visible()
             fields = dict(zip(entry.locator('dt').all_inner_texts(), entry.locator('dd').all_inner_texts()))
-            assert fields['呪文Lv（魔／僧）'] == '0／3' and fields['詠唱率'] == f'{chance}%', fields
+            assert fields['呪文Lv（魔／僧）'] == levels and fields['詠唱率'] == f'{chance}%', fields
             no_overflow(page)
-            page.screenshot(path=str(output / f'montino-library-{chance}-{width}.png'))
+            page.screenshot(path=str(output / f'montino-library-{floor}F-{width}.png'))
         page.locator('#libraryclose').click()
 
         page.locator('#entrance').click()
         page.wait_for_function('!logBusy()')
         page.evaluate('''s.pendingStairs=false;s.pendingBoss=null;
           s.cells.forEach(c=>{c.flag=false;delete c.chest});
-          s.enemy={dataVersion:1,units:[{...makeEnemy('darkpriest',91),row:17,hp:999,identified:true}],
+          s.enemy={dataVersion:1,units:[{...makeEnemy('kitousha3',91),row:17,hp:999,identified:true}],
             initiative:'normal',flagEffect:{}};
           s.commands=s.members.map(()=>'guard');s.attackRows=s.members.map(()=>17);
           resetCommandEntry();render();''')

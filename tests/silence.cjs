@@ -2,14 +2,14 @@
 const assert = require('node:assert/strict');
 const { game } = require('../scripts/sim/harness.cjs');
 const { createParty, seededRandom } = require('../scripts/sim/combat.cjs');
-function party(jobs = [2,0,2,1,0,3]) {
+function party(jobs = [2,0,2,1,0,3], enemy = 'darkpriest') {
   const g = game(null, seededRandom(36));
   createParty(g, jobs);
   g.run(`s.area='dungeon';s.pendingStairs=false;s.pendingBoss=null;
     s.cells.forEach(c=>{c.flag=false;delete c.chest});
     s.members.forEach((m,i)=>{m.level=8;m.maxHP=10000;m.maxMP=1000;m.known=MAGIC.filter(x=>x.job===jobOf(i)).map(x=>x.id)});
     s.hp=s.members.map(m=>m.maxHP);s.mp=s.members.map(m=>m.maxMP);
-    s.enemy={dataVersion:1,units:[{...makeEnemy('darkpriest',91),row:17,hp:99999,identified:true}],initiative:'normal',flagEffect:{}};
+    s.enemy={dataVersion:1,units:[{...makeEnemy('${enemy}',91),row:17,hp:99999,identified:true}],initiative:'normal',flagEffect:{}};
     s.commands=s.members.map(()=>'guard');s.attackRows=s.members.map(()=>17);`);
   return g;
 }
@@ -18,12 +18,12 @@ const json = (g, code) => JSON.parse(g.run(`JSON.stringify(${code})`));
 {
  const g=party();
  assert.deepEqual(json(g,"[magic('montino').job,magic('montino').level,magic('montino').mp,magic('montino').where,magic('montino').target]"),[2,3,4,'battle','group']);
- for(const [id,chance] of [['darkpriest',.3],['witch',.25]]) {
+ for(const [id,mage,priest,chance] of [['darkpriest',2,2,.5],['witch',0,3,.5],['kitousha3',0,3,.7],['stonegiant',0,4,.5]]) {
   assert.equal(g.run(`enemyDefinition('${id}').spell`),chance);
-  assert.deepEqual(json(g,`[enemyDefinition('${id}').mageSpellLevel,enemyDefinition('${id}').priestSpellLevel]`),[0,3]);
+  assert.deepEqual(json(g,`[enemyDefinition('${id}').mageSpellLevel,enemyDefinition('${id}').priestSpellLevel]`),[mage,priest]);
  }
- assert.equal(g.run("ENEMIES.filter(d=>d.priestSpellLevel>=magic('montino').level).length"),2);
- assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1}).find(([k])=>k==='詠唱率')[1]"),'30%');
+ assert.equal(g.run("ENEMIES.filter(d=>d.priestSpellLevel>=magic('montino').level).length"),3);
+ assert.equal(g.run("libraryMonsterDetails(enemyDefinition('darkpriest'),{count:1}).find(([k])=>k==='詠唱率')[1]"),'50%');
  g.run("afflict(0,'silence')");
  assert.equal(g.run('s.ailments[0].silence'),3);
  assert.equal(g.run("spellReason(0,magic('dios'))"),'沈黙している');
@@ -97,13 +97,13 @@ for(const end of ['win','enemy-flee','escape','defeat','town']) {
 
 // Independently target each living member; never damage or target stone/dead.
 {
- const g=party();
+ const g=party(undefined,'kitousha3');
  g.run(`s.members[1].status='stone';s.hp[2]=0;s.members[2].status='dead';
   var rolls=[.25,0,0,.99,.99,0,.99,.99];Math.random=()=>rolls.shift()??.99;
   monsterAction(s.enemy.units[0],s.commands);`);
  assert.deepEqual(json(g,'s.ailments.map(a=>a.silence)'),[0,0,0,0,3,0]);
  assert.deepEqual(json(g,'s.hp'),[10000,10000,0,10000,10000,10000]);
- assert.equal(g.run("logQueue[0].text"),'闇の司祭は沈黙を唱えた。');
+ assert.equal(g.run("logQueue[0].text"),'地獄の祈祷者は沈黙を唱えた。');
  assert.equal(g.run("logQueue.some(e=>e.text==='sim3には効かなかった。')"),true);
  assert.equal(g.run("logQueue.find(e=>e.text==='sim3には効かなかった。').ailments[4].silence"),0,'later outcomes must not leak');
  assert.equal(g.run("logQueue[0].ailments[4].silence"),0,'cast snapshot precedes affliction');
@@ -113,14 +113,14 @@ for(const end of ['win','enemy-flee','escape','defeat','town']) {
 
 // 10,000 actual enemy casts at equal levels, with a fixed independent RNG stream.
 {
- const g=party([2]);
- g.run(`enemyDefinition('darkpriest').spell=1;enemyDefinition('darkpriest').summon=0;
+ const g=party([2],'kitousha3');
+ g.run(`enemyDefinition('kitousha3').spell=1;s.members[0].level=7;
    s.enemy.monsterAC=2;var hits=0;log=()=>{};
    for(let n=0;n<10000;n++){groupSpellLevels(s.enemy.units[0]).priest=3;s.ailments[0].silence=0;monsterAction(s.enemy.units[0],s.commands);if(s.ailments[0].silence===3)hits++}`);
  const rate=g.run('hits/10000');assert(Math.abs(rate-.5)<=.02,`enemy rate ${rate}`);
  console.log(`PASS enemy Montino 10000 casts: ${(rate*100).toFixed(2)}% (50% ±2%)`);
  for(const [level,roll,expected] of [[30,.049,3],[30,.05,0],[1,.939,3],[1,.94,0]]) {
-  g.run(`enemyDefinition('darkpriest').level=${level===1?30:8};s.members[0].level=${level};groupSpellLevels(s.enemy.units[0]).priest=3;s.ailments[0].silence=0;Math.random=()=>${roll};monsterAction(s.enemy.units[0],s.commands)`);
+  g.run(`enemyDefinition('kitousha3').level=${level===1?30:7};s.members[0].level=${level};groupSpellLevels(s.enemy.units[0]).priest=3;s.ailments[0].silence=0;Math.random=()=>${roll};monsterAction(s.enemy.units[0],s.commands)`);
   assert.equal(g.run('s.ailments[0].silence'),expected,'enemy chance clamp');
  }
 }

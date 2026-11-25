@@ -7,6 +7,14 @@ createParty(g, [0, 2, 1]);
 g.run(`var foe=makeEnemy('stonegiant',91);
   s.area='dungeon';s.enemy={units:[foe],flagEffect:{}};`);
 assert.equal(g.run('monsterLevel(foe)'), 12);
+g.run('s.members[1].level=5');
+for (const [id, level, bonus] of [
+  ['gas',4,0], ['akumaikire',8,1], ['bigspider',2,-1], ['venomspider',7,0],
+  ['ghoul',3,0], ['kinoko',2,-1], ['fungus',10,1],
+]) {
+  assert.equal(g.run(`monsterLevel({id:'${id}'})`), level, id);
+  assert.equal(g.run(`levelHitBonus({id:'${id}'},1)`), bonus, id);
+}
 for (const [difference, expected] of [[0,0],[2,0],[3,1],[8,2],[9,3],[30,3],[-2,0],[-3,-1],[-8,-2],[-9,-3],[-30,-3]]) {
   g.run(`s.members[1].level=${12-difference}`);
   assert.equal(g.run('levelHitBonus(foe,1)'), expected, `Lv difference ${difference}`);

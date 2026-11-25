@@ -112,7 +112,10 @@ const LOOT_TABLES = {
   "namakubi": 4,
   "ganyu": 6,
   "namakubi2": 4,
-  "warbear": 4
+  "warbear": 4,
+  "kitousha": 2,
+  "kitousha2": 3,
+  "kitousha3": 3
  },
  "groups": {
   "1": {

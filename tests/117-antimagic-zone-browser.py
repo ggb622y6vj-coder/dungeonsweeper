@@ -240,12 +240,12 @@ with sync_playwright() as p:
         assert page.evaluate("s.enemy.units[0].hp === 99 && s.enemy.initiative === 'normal' && !s.magicPlans[0]")
 
         logs = page.evaluate('s.logs')
-        # 闇の司祭は仲間呼び10%の次に詠唱30%。.25で呪文分岐に入る。
-        assert monster_action(page, [.25, 0, 0])
+        # 闇の司祭は仲間呼び10%の次に詠唱50%。魔法使い系の誘睡を選ぶ。
+        assert monster_action(page, [.25, 0, .99, .99])
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.logs') == [NEGATED, *logs]
         assert page.evaluate('s.hp') == before['hp']
-        assert page.evaluate('s.ailments.map(a => a.silence)') == [0, 0]
+        assert page.evaluate('s.ailments.map(a => a.sleep)') == [0, 0]
         page.evaluate('s.enemy.units[0].silence = true')
         assert not monster_action(page, [.25])
         assert page.evaluate('!logBusy()')
@@ -255,11 +255,11 @@ with sync_playwright() as p:
         assert page.evaluate('s.enemy.units.length') == 2
         page.evaluate('() => { s.pos = 39; s.enemy.units[0].silence = false; render(); }')
         logs = page.evaluate('s.logs')
-        assert monster_action(page, [.25, 0, 0, 0, 0, .99])
+        assert monster_action(page, [.25, 0, .99, .99])
         page.wait_for_function('!logBusy()')
-        assert page.evaluate('s.logs[2]') == '闇の司祭は沈黙を唱えた。'
+        assert page.evaluate('s.logs[2]') == '闇の司祭は誘睡を唱えた。'
         assert page.evaluate('s.logs.slice(3)') == logs
-        assert page.evaluate('s.ailments.map(a => a.silence)') == [3, 3]
+        assert page.evaluate('s.ailments.map(a => a.sleep)') == [2, 2]
 
         page.evaluate('() => { fresh(3); s.pos = 51; s.light = true; render(); }')
         open_map()

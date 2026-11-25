@@ -46,7 +46,7 @@ g.drain();
 console.log('PASS failed escape rolls per sleeper, successful escape and exploration retain sleep');
 
 g.run("s.enemy={dataVersion:1,units:[unit],flagEffect:{}};s.ailments.forEach(a=>a.sleep=0)");
-for (const [id, chance] of [['rat',.20], ['slime',.40], ['bat',.50], ['gas',.50]]) {
+for (const [id, chance] of [['rat',.20], ['slime',.20], ['bat',.20], ['spider',.40], ['ghoul',.50], ['gas',.50]]) {
   g.run(`unit.id='${id}';unit.sleep=1`);
   const name = g.run('enemyDisplay(unit)');
   // Repeated failures with an old positive sleep value never exhaust it.
@@ -75,3 +75,12 @@ assert.ok(g.run('enemyDefinition(unit.id).boss'));
 assert.equal(g.run('unit.sleep'), 0);
 assert.equal(g.run('logQueue.at(-1).text'), g.run("enemyDisplay(unit)+'には効かなかった。'"));
 console.log('PASS guardian remains immune to sleep after passing spell resistance');
+
+g.drain();
+g.run("unit.id='bigspider';s.members[0].level=5");
+for (const [roll, expected] of [[.639999, 2], [.64, 0]]) {
+  g.run(`unit.sleep=0;s.mp[0]=10;Math.random=()=>${roll};castMagic(0,'katino',unit.uid)`);
+  assert.equal(g.run('unit.sleep'), expected);
+  g.drain();
+}
+console.log('PASS Lv5 sleep spell succeeds below 64% against the Lv2 warrior spider');

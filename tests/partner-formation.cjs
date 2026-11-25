@@ -33,15 +33,17 @@ const configured = [
   ['stonegiant', 'stonegiant', .4], ['fallenangel', 'succubus', .6], ['succubus', 'lich', .5],
   ['ameba', 'slime', .5], ['virusbat', 'armorant', .6], ['ganyu', 'ganyu', .5],
   ['namakubi2', 'darkelf', 1],
+  ['chimera', 'warbear', .6], ['darkknight', 'darkelf', .3], ['wraith', 'darkknight', .6],
+  ['kitousha', 'orc', .5], ['kitousha2', 'terror', .6], ['kitousha3', 'gargoyle', .4],
 ];
-assert.equal(new Set(configured.map(([id]) => id)).size, 63);
-assert.equal(enemies.filter(d => !d.partnerId).length, 48);
+assert.equal(new Set(configured.map(([id]) => id)).size, 69);
+assert.equal(enemies.filter(d => !d.partnerId).length, 45);
 for (const d of enemies) {
   const entry = configured.find(([id]) => id === d.id);
   assert.deepEqual([d.partnerId, d.partnerRate], entry ? entry.slice(1) : [null, 0], d.id);
 }
 assert.ok(configured.every(([id]) => monster(id)));
-console.log('PASS partner settings for all 111 species');
+console.log('PASS partner settings for all 114 species');
 
 function onFloor(floor, defeated = false) {
   g.run(`s.floor=${floor};s.guardiansDefeated=${JSON.stringify(defeated ? [floor] : [])}`);

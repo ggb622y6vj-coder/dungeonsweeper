@@ -7,12 +7,12 @@ function party(){
  return g;
 }
 let g=game();
-assert.equal(g.run('ENEMIES.length'),111);
+assert.equal(g.run('ENEMIES.length'),114);
 assert.equal(g.run('WEAPONS.length'),87);
 assert.equal(g.run('JSON.stringify(s.library)'),'{"monsters":{},"items":{},"monsterIdentifyVersion":1,"spells":{}}');
 g.run("$('#libraryopen').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),true);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/111 · アイテム 0/87');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 0/114 · アイテム 0/87');
 g.run("$('#libraryclose').onclick()");
 assert.equal(g.run("$('#librarydialog').open"),false);
 g=party();
@@ -101,14 +101,14 @@ assert.equal(g.run("entries.every(e=>e.children.length===1 && e.children[0].text
 g.run(`s.library.monsters=Object.fromEntries(ENEMIES.map(d=>[d.id,{identified:true,count:1,firstFloor:d.floor}]));
  s.library.items=Object.fromEntries([...WEAPONS,...MEDICINES].map(w=>[w.id,true]));
  var entries=libraryMonsterFloors().flatMap(f=>{renderLibrary('monsters',1,'weapon',f);return $('#librarybody').children.filter(e=>e.className==='library-entry')});`);
-assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 111/111 · アイテム 87/87');
+assert.equal(g.run("$('#libraryprogress').textContent"),'モンスター 114/114 · アイテム 87/87');
 assert.equal(g.run("entries.every((e,i)=>e.children[0].textContent.startsWith([...ENEMIES].sort((a,b)=>a.floor-b.floor)[i].name))"),true);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('◆ 守護者')).length"),9);
 assert.equal(g.run("entries.filter(e=>e.children[0].textContent.includes('★ 迷宮の主')).length"),1);
 assert.equal(g.run("$('#librarybody').children.some(e=>e.tagName==='H3')"),false);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.length"),20);
 assert.equal(g.run("entries.find(e=>e.children[0].textContent.startsWith('スライム')).children[2].children.some(e=>e.textContent==='初撃破階')"),false);
-assert.equal(g.run('ENEMIES.length'),111);
+assert.equal(g.run('ENEMIES.length'),114);
 assert.deepEqual(JSON.parse(g.run("JSON.stringify(ENEMIES.filter(d=>/\\d+%/.test(JSON.stringify(libraryMonsterDetails(d,{count:1,firstFloor:1}).filter(([k])=>k!=='詠唱率').map(([k,v])=>typeof v==='string'?v:v.textContent)))).map(d=>d.id))")),[],'only casting rate may contain a percentage');
 for(const d of JSON.parse(g.run('JSON.stringify(ENEMIES)'))){
  const fields=JSON.parse(g.run(`JSON.stringify(libraryMonsterDetails(enemyDefinition('${d.id}'),{count:1}).filter(([k])=>k==='呪文Lv（魔／僧）'||k==='詠唱率'))`));

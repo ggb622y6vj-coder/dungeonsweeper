@@ -83,7 +83,7 @@ check(1, ['goblin', .5], ['guardian', 'goblin'], { boss: true });
 check(1, ['goblin', .499999, 'slime'], ['guardian', 'goblin', 'slime'], { boss: true });
 console.log('PASS guaranteed guardian escort chains from row two and independent random escorts keep their 50% third row');
 
-check(3, ['gas', 'watcher', 'watcher', 'watcher', 0, .999], ['gas', 'watcher', 'gas', 'cathuman'], { defeated: true });
+check(3, ['gas', 'watcher', 'watcher', 'watcher', 0, .999], ['gas', 'watcher', 'gas', 'kitousha2'], { defeated: true });
 console.log('PASS defeated guardians are deduplicated after the full chain');
 
 g.run("fresh(3);s.cells[s.pos].type='';Math.random=()=>.999;encounter(s.pos,true)");

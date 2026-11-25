@@ -30,7 +30,7 @@ assert.deepEqual(Array.from(firefly.floors), [3]);
 assert.deepEqual([firefly.mageResist, firefly.priestResist], [0, 0]);
 assert.deepEqual(Array.from(archer.floors), [3, 4]);
 assert.deepEqual([gas.hp, gas.ac, gas.attack, gas.xp], [[3, 9, 0], 7, [1, 5, 1], 20]);
-assert.deepEqual([gas.level, gas.hit, Array.from(gas.groupSize), gas.gold, gas.race, gas.swings, gas.icon], [5, 3, [2, 4], [2, 4, 0], '不定形', 1, '◉']);
+assert.deepEqual([gas.level, gas.hit, Array.from(gas.groupSize), gas.gold, gas.race, gas.swings, gas.icon], [4, 3, [2, 4], [2, 4, 0], '不定形', 1, '◉']);
 assert.deepEqual(Array.from(kasha.floors), [9, 10]);
 assert.deepEqual([kasha.hp, kasha.ac, kasha.attack, kasha.xp], [[10, 8, 14], -5, [5, 8, 0], 3600]);
 assert.deepEqual([kasha.level, kasha.hit, Array.from(kasha.groupSize), kasha.gold, kasha.race, kasha.swings, kasha.icon], [23, 11, [1, 1], [100, 3, 0], '不死', 2, '☠']);
