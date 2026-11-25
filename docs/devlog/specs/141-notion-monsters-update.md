@@ -46,7 +46,7 @@
 - darkpriest（闇の司祭）: 僧侶呪文Lv 3→2、魔法使い呪文Lv 0→2、呪文使用率 30→50
 - sorcerer（迷宮の妖術師）: 魔法使い呪文Lv 5→3、呪文使用率 25→50
 - highmage（高位の魔術師）: 呪文使用率 25→90
-- watcher（地獄の獄卒）: 魔法使い呪文Lv 1→2、呪文使用率 10→50
+- watcher（地獄の獄卒）: 魔法使い呪文Lv 1→2、呪文使用率 10→40（Notion では50だったが、ブレス60%との合計が上限100%を超えるため、ユーザーの決定で40にする。統合後に Notion 側のセルも40へ合わせる）
 - archmage（大魔導師）: 呪文使用率 15→50
 - deathmage（死霊魔導士）: 呪文使用率 25→50
 - lich（リッチ）: 呪文使用率 25→50
@@ -65,7 +65,7 @@
 - sirakaba（武者のくくり樹）: Lv 3→6、経験値 40→20
 
 モンスターLvの変更（22種。経験値などの他項目は変更しない）:
-- shaman（オーク呪術師）6→5、acidslime（硫化スライム）6→3、terror（テラー）8→5、rabbit（赤兎）7→3、thief（影の盗人）7→3、blackwolf（フェンリル狼）6→3、akumaikire（魔物いきれ）5→4、venomspider（武者グモ）5→2、orc（オーク戦士）4→3、corpseeater（コープスイーター）5→3、stone（石の番人）5→2、bandit（バンディット）5→2、mage（洞窟の魔術師）5→2、poisonslime（有毒スライム）4→2、ameba（アメーバ）3→2、fungus（猛毒タケ）4→2、skeleton（骸骨の衛兵）2→1、spider（髑髏グモ）3→2、bat（吸血コウモリ）3→1、apprentice（迷宮の詐欺師）4→1、slime（スライム）2→1、goblin（ゴブリン）2→1
+- shaman（オーク呪術師）6→5、acidslime（硫化スライム）6→3、terror（テラー）8→5、rabbit（赤兎）7→3、thief（影の盗人）7→3、blackwolf（フェンリル狼）6→3、gas（魔物いきれ）5→4、bigspider（武者グモ）5→2、orc（オーク戦士）4→3、ghoul（コープスイーター）5→3、stone（石の番人）5→2、bandit（バンディット）5→2、mage（洞窟の魔術師）5→2、poisonslime（有毒スライム）4→2、ameba（アメーバ）3→2、kinoko（テングダケ）4→2、skeleton（骸骨の衛兵）2→1、spider（髑髏グモ）3→2、bat（吸血コウモリ）3→1、apprentice（迷宮の詐欺師）4→1、slime（スライム）2→1、goblin（ゴブリン）2→1
 
 （いずれもモンスターLvのみの変更。）
 
