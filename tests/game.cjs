@@ -43,7 +43,8 @@ castMagic(1,'mahalito',0);if(s.enemy.units[0].hp!==476||s.enemy.units[1].hp!==47
 castMagic(1,'mamorlis',null);if(s.enemy.units.some(e=>e.acPenalty!==3))throw Error('debuff');
 var base=effectiveAC(0);castMagic(2,'matu',null);castMagic(2,'kalki',null);if(effectiveAC(0)!==base-2)throw Error('strongest buff');
 Math.random=()=>0;castMagic(1,'katino',0);if(s.enemy.units[0].sleep!==2||s.enemy.units[1].sleep!==2||s.enemy.units[2].sleep)throw Error('sleep group');
-var beforeSleepHP=s.hp.join();enemyTurn(['fight','fight','fight']);if(s.hp.join()!==beforeSleepHP||s.enemy.units[0].sleep!==1)throw Error('sleep turn');
+var beforeSleepHP=s.hp.join(),wakeRolls=[.99,.99];Math.random=()=>wakeRolls.shift()??0;
+enemyTurn(['fight','fight','fight']);if(s.hp.join()!==beforeSleepHP||s.enemy.units.slice(0,2).some(e=>e.sleep!==2))throw Error('sleep turn');
 s.enemy=null;if(effectiveAC(0)!==base)throw Error('buff expires');
 s.hp[0]=1;s.ailments[0]={poison:true,paralysis:3};castMagic(2,'madi',0);if(s.hp[0]!==maxHP(0)||s.ailments[0].poison||s.ailments[0].paralysis)throw Error('restore');
 s.hp[0]=0;var mp=s.mp[2];castMagic(2,'dios',0);if(s.hp[0]||s.mp[2]!==mp)throw Error('no revive');
@@ -335,6 +336,7 @@ require('./petrify.cjs');
 require('./enemy-spells.cjs');
 require('./ailments.cjs');
 require('./fear.cjs');
+require('./sleep-recuperation.cjs');
 require('./monster-level-hit.cjs');
 
 const html=fs.readFileSync(require('path').join(__dirname,'../dist/index.html'),'utf8');if(/id=["'](?:room|inncost|innopen|inndialog|stable)["']/.test(html)||html.includes('宿屋')||html.includes('馬小屋'))throw Error('inn remains in UI');console.log('PASS inn removed from town UI');

@@ -42,7 +42,7 @@ for(const [id,chance] of [['poisonsw',.10],['poisonsw2',.15],['poisonsw3',.20]])
 });
 test('enemy poison before sleep, lethal reward once and stable row targets',()=>{
  const g=setup();g.run("s.enemy.units[0].poison=true;s.enemy.units[0].sleep=2;enemyAction(s.enemy.units[0],new Map())");
- assert.equal(g.run('s.enemy.units[0].hp'),98);assert.equal(g.run('s.enemy.units[0].sleep'),1);
+ assert.equal(g.run('s.enemy.units[0].hp'),98);assert.equal(g.run('s.enemy.units[0].sleep'),2);
  assert.match(g.run('logQueue[0].text'),/は毒で2ダメージ。$/);assert.match(g.run('logQueue[1].text'),/は眠っている。$/);
  g.run("s.enemy.units[0].hp=2;s.enemy.units.push({...makeEnemy('goblin',11),row:99,hp:100,sleep:2});var xp=s.members[0].xp;enemyTurn(['guard','guard','guard'])");
  assert.equal(g.run('s.enemy.units[0].hp'),0);assert.equal(g.run('s.enemy.units[0].rewarded'),true);assert.equal(g.run('s.enemy.pendingDrops'),1);

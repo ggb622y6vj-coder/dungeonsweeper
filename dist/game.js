@@ -293,7 +293,7 @@ function attack(){
  }
  if(s.enemy&&!s.enemy.units.some(e=>e.hp>0))finishMonsterBattle();
  else if(s.enemy?.initiative==='party')s.enemy.initiative='normal';
- tickBattleSilence();tickBattleFear();
+ tickBattleSilence();tickBattleFear();tickBattleSleep();
  resetCommandEntry();resetPartyCommands();
  if(s.enemy){
   const next=s.enemy.units.find(e=>e.hp>0);
@@ -893,6 +893,16 @@ function tickBattleFear(){
  }
 }
 function clearBattleFear(){for(const a of s.ailments)a.fear=0}
+function tickBattleSleep(){
+ if(!s.enemy)return;
+ for(let i=0;i<s.members.length;i++){
+  const a=s.ailments[i];
+  if(activeMember(i)&&a.sleep>0&&Math.random()<Math.min(50,10*s.members[i].level)/100){
+   a.sleep=0;
+   log(`${NAMES[i]}は目を覚ました。`);
+  }
+ }
+}
 function tickAilments(logPoison=true){
  for(const id of s.members.map(m=>m.id)){
   const i=s.members.findIndex(m=>m.id===id),a=s.ailments[i];
@@ -967,7 +977,11 @@ $('#chestabandon').onclick=abandonChest;
 function enemyAction(e,commandsById){
  const currentCommands=s.members.map(m=>commandsById.get(m.id));
  if(e.poison){e.hp=Math.max(0,e.hp-2);log(`${enemyDisplay(e)}は毒で2ダメージ。`);if(e.hp===0){killReward(e);return}}
- if(e.sleep>0){e.sleep--;log(`${enemyDisplay(e)}は眠っている。`)}
+ if(e.sleep>0&&Math.random()<Math.min(50,20*monsterLevel(e))/100){
+  e.sleep=0;
+  log(`${enemyDisplay(e)}は目を覚ました。`);
+ }
+ if(e.sleep>0)log(`${enemyDisplay(e)}は眠っている。`);
  else if(!monsterAction(e,currentCommands)){
   const d=enemyDefinition(e.id);
   for(let n=0;n<d.swings;n++){
@@ -1006,7 +1020,7 @@ function combatActionOrder(){
 function levelHitBonus(e,i){return Math.max(-3,Math.min(3,Math.trunc((monsterLevel(e)-s.members[i].level)/3)))||0}
 function escapeChance(){if(!s.enemy||s.enemy.boss||s.enemy.flagEffect?.bad)return 0;let party=s.members.reduce((a,m,i)=>{if(activeMember(i)&&!s.ailments[i].poison&&!s.ailments[i].paralysis){a.total+=m.level;a.count++}return a},{total:0,count:0}),enemies=s.enemy.units.reduce((a,e)=>{if(e.hp>0&&!e.sleep){a.total+=monsterLevel(e);a.count++}return a},{total:0,count:0});if(!party.count)return 10;let bonus=party.count===1?15:party.count===2?10:party.count===3?5:0,partyAverage=party.total/party.count,enemyAverage=enemies.count?enemies.total/enemies.count:0;return Math.max(10,Math.min(95,50+5*(partyAverage-enemyAverage)+bonus))}
 var escapeMapHold=false;
-function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();clearBattleFear();s.enemy=null;setPlayerPosition(to);s.previousPos=from;autoReorderParty('escape');escapeMapHold=true;log('逃走に成功。一歩前のマスへ戻った。')}else{s.enemy.hiddenIds=[];log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();tickBattleFear();render()}
+function flee(){if(logBusy()||!s.enemy||s.done||s.enemy.boss||s.enemy.flagEffect?.bad)return;displayVitals=snapshotVitals();tickAilments();if(s.done){render();return}if(Math.random()*100<escapeChance()){let from=s.pos,to=s.enemy.escapeTo??s.previousPos??s.start;if(!adjacent(from,to)){to=around(from).find(i=>adjacent(from,i)&&s.cells[i].open&&!s.cells[i].trap)??from}clearBattleSilence();clearBattleFear();s.enemy=null;setPlayerPosition(to);s.previousPos=from;autoReorderParty('escape');escapeMapHold=true;log('逃走に成功。一歩前のマスへ戻った。')}else{s.enemy.hiddenIds=[];log('逃走に失敗！');if(s.enemy.initiative==='party')s.enemy.initiative='normal';else enemyTurn(s.members.map(()=>'flee'))}tickBattleSilence();tickBattleFear();tickBattleSleep();render()}
 
 magicUI();medicineUI();flagUI();partyUI();libraryUI();
 

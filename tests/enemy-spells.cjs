@@ -132,8 +132,8 @@ console.log('PASS 127 decline boundaries for 1–5 living units, independent ban
     assert.equal(g.run('levels.priest'),before);
     assert(!g.run("logQueue.some(x=>/唱えた|魔力/.test(x.text))"));
   }
-  g.run('caster.sleep=2; swings=0; logQueue=[]; Math.random=()=>.25; turn()');
-  assert.deepEqual(read(g,'[caster.sleep,swings,levels.priest,logQueue.length]'),[1,0,3,1]);
+  g.run('caster.sleep=2; swings=0; logQueue=[]; Math.random=()=>.5; turn()');
+  assert.deepEqual(read(g,'[caster.sleep,swings,levels.priest,logQueue.length]'),[2,0,3,1]);
   g.run('delete caster.sleep; levels.priest=1; Math.random=()=>.05; cast()');
   assert.deepEqual(read(g,'[s.enemy.units.length,s.enemy.units[1].row,groupSpellLevels(s.enemy.units[1]).priest]'),[2,17,1]);
   // Summoned caster uses the depleted school. With two living units, exactly .25 does not deplete it again.
