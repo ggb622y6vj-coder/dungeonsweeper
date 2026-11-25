@@ -322,7 +322,7 @@ console.log('PASS 121 all states survive JSON, ash-v1, reserve, stairs, death tr
  const g=party();
  const cursed=['cursedStaff','cursedDagger','cursedArmor','cursedHelm'];
  // The rank distribution itself is sampled in chest-loot.cjs. Select each cursed candidate
- // by its midpoint within its rank, then inspect every direct-drop candidate at each floor.
+ // by its midpoint within its rank, then open a chest and check the unidentified token.
  for(const id of cursed){
   const result=read(g,`(()=>{
    const w=weapon('${id}'),items=WEAPONS.filter(item=>item.lootRank===w.lootRank);
@@ -330,13 +330,8 @@ console.log('PASS 121 all states survive JSON, ash-v1, reserve, stairs, death tr
    return rollChestItems('rat',1,()=>rolls.shift());
   })()`);
   assert.deepEqual(result,[id]);
- }
- for(let floor=1;floor<=10;floor++){
-  g.run(`s.floor=${floor};s.inventory[0]=['staff'];Math.random=()=>0;
-   var candidates;weightedLoot=pool=>{candidates=pool.map(x=>x.item.id);return pool[0].item};dropWeapon()`);g.drain();
-  assert.ok(g.run('candidates.length>0'));
-  for(const id of cursed)assert.equal(g.run(`candidates.includes('${id}')`),false);
-  assert.equal(g.run("s.inventory[0][1]==='unid:'+candidates[0]"),true);
+  g.run(`s.inventory[0]=['staff'];rewardChest({gold:0,rewardVersion:1,items:${JSON.stringify(result)}})`);g.drain();
+  assert.deepEqual(read(g,'s.inventory[0]'),['staff','unid:'+id]);
  }
 }
 {
@@ -364,7 +359,7 @@ console.log('PASS 121 all states survive JSON, ash-v1, reserve, stairs, death tr
  assert.equal(g.run('s.inventory[0][s.equipped[0]]'),'unid:cursedStaff');
  assert.deepEqual(read(g,'s.library.items'),{});
 }
-console.log('PASS 121 all four chest candidates, direct pools on every floor, concealed slots/prices and transfer choices, bound box and training guards');
+console.log('PASS 121 all four cursed items received unidentified from chests, concealed slots/prices and transfer choices, bound box and training guards');
 
 {
  const g=party();g.run("s.inventory[0].push('unid:cap','unid:boots');equip(0,1)");

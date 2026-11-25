@@ -113,7 +113,7 @@ if(enemyGroups().length!==3||enemyGroups()[0].id!==enemyGroups()[2].id)throw Err
 s.attackRows=[2,1,0];if(selectedEnemy(0)!==undefined||rowKey(selectedEnemy(1))!==1||rowKey(selectedEnemy(2))!==0)throw Error('member targeting');
 render();if(!$('.controls').hidden)throw Error('combat controls');
 s.members[1].known.push('dilto');s.mp[1]=100;castMagic(1,'dilto',s.enemy.units.find(e=>e.row===2).uid);if(s.enemy.units.some(e=>e.row===0&&e.acPenalty)||s.enemy.units.some(e=>e.row===2&&!e.acPenalty))throw Error('spell crosses rows');
-`);drain();run(`s.enemy=null;render();if($('.controls').hidden)throw Error('exploration controls');s.inventory[0]=['healingPotion','sword','helm','antidote'];s.equipped[0]=1;s.armor[0]={head:2,body:null,feet:null};s.hp[1]=1;var medicineMP=s.mp.join();Math.random=()=>.999;if(!useMedicine(0,0,1)||s.hp[1]!==9||s.inventory[0].length!==3||s.equipped[0]!==0||s.armor[0].head!==1||s.mp.join()!==medicineMP)throw Error('healing medicine / equipment indices');`);drain();run(`s.ailments[1].poison=true;if(!useMedicine(0,2,1)||s.ailments[1].poison||s.inventory[0].length!==2)throw Error('antidote');`);drain();run(`s.inventory[0].push('healingPotion');s.hp[1]=maxHP(1);if(useMedicine(0,2,1)||s.inventory[0].length!==3)throw Error('wasted medicine');`);drain();run(`s.hp[1]=1;s.enemy={boss:false,units:[{id:'slime',uid:0,row:0,hp:9999}]};s.commands=['item','guard','guard'];s.itemPlans[0]={slot:2,target:1,id:'healingPotion'};Math.random=()=>0;var medicineMP=s.mp.join();attack();if(s.inventory[0].length!==2||s.commands.some(c=>c!=='fight')||s.itemPlans.some(Boolean)||s.mp.join()!==medicineMP)throw Error('battle medicine');`);drain();run(`s.enemy=null;s.inventory[0]=['sword'];Math.random=()=>0;dropMedicine();if(s.inventory[0][1]!=='healingPotion')throw Error('medicine drop');var rolls=[0,.99];Math.random=()=>rolls.shift()??.99;dropMedicine();if(s.inventory[0][2]!=='antidote')throw Error('antidote drop');ensureProfile();if(s.inventory[0][2]!=='antidote')throw Error('medicine migration');`);drain();
+`);drain();run(`s.enemy=null;render();if($('.controls').hidden)throw Error('exploration controls');s.inventory[0]=['healingPotion','sword','helm','antidote'];s.equipped[0]=1;s.armor[0]={head:2,body:null,feet:null};s.hp[1]=1;var medicineMP=s.mp.join();Math.random=()=>.999;if(!useMedicine(0,0,1)||s.hp[1]!==9||s.inventory[0].length!==3||s.equipped[0]!==0||s.armor[0].head!==1||s.mp.join()!==medicineMP)throw Error('healing medicine / equipment indices');`);drain();run(`s.ailments[1].poison=true;if(!useMedicine(0,2,1)||s.ailments[1].poison||s.inventory[0].length!==2)throw Error('antidote');`);drain();run(`s.inventory[0].push('healingPotion');s.hp[1]=maxHP(1);if(useMedicine(0,2,1)||s.inventory[0].length!==3)throw Error('wasted medicine');`);drain();run(`s.hp[1]=1;s.enemy={boss:false,units:[{id:'slime',uid:0,row:0,hp:9999}]};s.commands=['item','guard','guard'];s.itemPlans[0]={slot:2,target:1,id:'healingPotion'};Math.random=()=>0;var medicineMP=s.mp.join();attack();if(s.inventory[0].length!==2||s.commands.some(c=>c!=='fight')||s.itemPlans.some(Boolean)||s.mp.join()!==medicineMP)throw Error('battle medicine');`);drain();run(`s.enemy=null;s.inventory[0]=['sword'];Math.random=()=>0;dropMedicine();if(s.inventory[0][1]!=='healingPotion')throw Error('medicine drop');var rolls=[0,.5];Math.random=()=>rolls.shift()??.99;dropMedicine();if(s.inventory[0][2]!=='antidote')throw Error('antidote drop');ensureProfile();if(s.inventory[0][2]!=='antidote')throw Error('medicine migration');`);drain();
 console.log('PASS three rows, independent member targeting, group spell isolation, hidden exploration controls, medicine effects, slot shifts, battle action/reset, drops and save compatibility');
 drain();run(`
 s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.done=false;delete s.cells[s.pos].chest;fresh(1);s.pos=s.boss;
@@ -268,15 +268,27 @@ console.log('PASS exploration poison death once with HP snapshot, silent nonfata
 run(`s=structuredClone(sixInitial);ensureProfile();if(s.magicPlans.length!==6)throw Error('six-member magic plans');s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==6)throw Error('short plan padding');s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.magicPlans=[null,null,null];ensureMagic();if(s.magicPlans.length!==3)throw Error('legacy three-member magic plans');`);
 console.log('PASS magic plans pad to party length and preserve legacy three-member saves');
 
-run(`var plate=WEAPONS.find(w=>w.id==='plate');if(!plate||chestItemPool(2).some(x=>x.item===plate)||!chestItemPool(3).some(x=>x.item===plate))throw Error('floor chest minFloor');`);
-console.log('PASS chest item pool respects plate minFloor');
+run(`{
+ const caps=[150,200,350,500,1800,2200,3000,3600,6000,6000];
+ const equipment=WEAPONS.filter(w=>w.drop===true||w.part);
+ for(const [index,cap] of caps.entries()){
+  const pool=chestItemPool(index+1),expected=equipment.filter(w=>w.price<=cap);
+  if(pool.length!==expected.length||!expected.every(w=>pool.some(x=>x.item===w&&x.weight===1)))throw Error('legacy chest pool on floor '+(index+1));
+ }
+ const originalCap=CHEST_LOOT.priceCap[0];
+ try{
+  CHEST_LOOT.priceCap[0]=0;
+  const pool=chestItemPool(1);
+  if(pool.length!==1||pool[0].weight!==1||pool[0].item.price!==Math.min(...equipment.map(w=>w.price)))throw Error('legacy chest fallback');
+ }finally{CHEST_LOOT.priceCap[0]=originalCap}
+}`);
+console.log('PASS legacy chest equipment by price cap, equal weights on all floors and cheapest fallback');
 
 run(`{let oldRandom=Math.random;try{
-for(let i=0;i<10000;i++){let pool=chestItemPool(1);if(pool.some(x=>x.item.price>150||(x.item.minFloor??1)>1))throw Error('floor 1 loot cap')}
 let foundFlame=false,foundHoly=false;for(let i=0;i<10000;i++){Math.random=()=>((i*7919)%10000)/10000;let item=weightedLoot(chestItemPool(5));if(item.id==='flamesword')foundFlame=true;Math.random=()=>((i*7919+173)%10000)/10000;item=weightedLoot(chestItemPool(10));if(item.id==='holysword')foundHoly=true}if(!foundFlame||!foundHoly)throw Error('deep floor weighted loot reachability');
 for(let floor of [1,5,10]){let chance=CHEST_LOOT.itemChance[floor-1],items=0;for(let i=0;i<10000;i++){s.floor=floor;s.inventory=s.members.map(()=>[]);s.gold=0;let rolls=[(i+.5)/10000,.99,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0});if(s.inventory.some(a=>a.length))items++}if(Math.abs(items/10000-chance)>.02)throw Error('chest item chance floor '+floor+': '+items/10000)}
 }finally{Math.random=oldRandom;}}`);
-console.log('PASS legacy weighted chest loot floor gates, deep items, and 10,000-draw item chance rates');
+console.log('PASS legacy chest prices, deep items, and 10,000-draw item chance rates');
 
 run(`{
 let savedState=structuredClone(s),savedRandom=Math.random;
@@ -288,17 +300,21 @@ try{
   if(shop.includes('flamesword')||shop.includes('magichelm'))throw Error('shop:false item visible');
   let gold=s.gold,count=s.inventory[0].length;buy('flamesword',0);
   if(s.gold!==gold||s.inventory[0].length!==count)throw Error('shop:false item bought');
-  s.floor=1;let old=Math.random,available=new Set();
-  for(let n=0;n<100;n++){let rolls=[0,n/100];Math.random=()=>rolls.shift()??.99;dropMedicine();available.add(s.inventory[0].at(-1));s.inventory[0].pop()}
-  Math.random=old;
-  if(available.has('greaterPotion')||available.has('elixir')||available.has('paralysisCure'))throw Error('medicine below minFloor');
-  if(!chestItemPool(4).some(x=>x.item.id==='knightsword')||chestItemPool(1).some(x=>x.item.id==='knightsword'))throw Error('equipment minFloor pool');
+  s.floor=1;s.inventory[0]=['sword'];
+  const weights={healingPotion:70,antidote:30,paralysisCure:20,greaterPotion:35,elixir:20};
+  const total=Object.values(weights).reduce((a,b)=>a+b,0),counts={};
+  for(let n=0;n<total;n++){
+   const rolls=[.299999,(n+.5)/total];Math.random=()=>rolls.shift();
+   dropMedicine();const id=s.inventory[0].pop();counts[id]=(counts[id]||0)+1;
+  }
+  if(Object.entries(weights).some(([id,weight])=>counts[id]!==weight))throw Error('floor 1 medicine weights');
+  Math.random=()=>.30;dropMedicine();if(s.inventory[0].length!==1)throw Error('legacy medicine chance');
   s.members[0].job=0;s.members[0].level=1;s.members[0].str=10;s.inventory[0]=['flamesword'];s.equipped[0]=0;
   s.enemy={units:[{id:'slime',uid:0,row:0,hp:100,rewarded:false}]};Math.random=()=>.525;
   let result=physicalAttack(0,s.enemy.units[0]);if(result.hitsCount!==1)throw Error('weapon hitBonus not applied');
 }finally{s=savedState;Math.random=savedRandom;displayCombat=undefined;displayVitals=null;logQueue=[];clearTimeout(logTimer);logTimer=null;renderShop();}
 }`);
-console.log('PASS expanded equipment ids, shop:false gate, floor loot gates, and hitBonus');
+console.log('PASS expanded equipment ids, shop:false gate, weighted floor 1 medicines, and hitBonus');
 
 run(`{let savedChestState=structuredClone(s),savedChestRandom=Math.random;try{s=structuredClone(sixInitial);ensureProfile();s.members=s.members.slice(0,3);for(const key of PARTY_FIELDS)s[key]=s[key].slice(0,3);s.members.forEach((m,i)=>m.job=i===1?1:i===2?2:0);s.inventory=s.members.map(()=>['sword']);s.equipped=[0,0,0];s.armor=s.members.map(()=>({}));s.floor=1;s.gold=0;let dagger=WEAPONS.find(w=>w.id==='dagger'),staff=WEAPONS.find(w=>w.id==='staff');let rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0,rewardVersion:1,items:['staff']});if(s.inventory[0].at(-1)!=='unid:staff'||!logQueue.some(x=>x.text==='謎の武器を入手。'+NAMES[0]+'が受け取った。'))throw Error('unidentified chest recipient order');s.inventory[1]=Array(10).fill('staff');s.inventory[0]=Array(10).fill('sword');s.inventory[2]=['sword'];let beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0,rewardVersion:1,items:['staff']});if(s.inventory[2].at(-1)!=='unid:staff'||!logQueue.slice(beforeLog).some(x=>x.text.includes('を入手。')&&x.text.endsWith('が受け取った。')))throw Error('fallback chest recipient');s.inventory=s.members.map(()=>Array(10).fill('sword'));beforeLog=logQueue.length;rolls=[0,.5,.99];Math.random=()=>rolls.shift()??.99;rewardChest({gold:0,rewardVersion:1,items:['staff']});if(logQueue.slice(beforeLog).filter(x=>x.text==='謎の武器を見つけたが、アイテムがいっぱいだ。').length!==1)throw Error('full chest inventory');}finally{s=savedChestState;Math.random=savedChestRandom;}}`);
 console.log('PASS chest item unusable, full inventory and normal receipt logs');

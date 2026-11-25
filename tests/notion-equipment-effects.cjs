@@ -27,7 +27,6 @@ test('92 canonical item classes; nine definitions and descriptions in library/in
   for(let job=0;job<8;job++)assert.equal(g.run(`canEquipJob(weapon('${id}'),${job})`),classes.includes(job),id+' job '+job);
   if(!ids.includes(id))continue;
   assert.equal(w.name,r['名前']);assert.equal(w.sell,r['売却額']);assert.equal(w.price,w.sell*2);assert.equal(w.shop,false);assert.equal(w.drop,true);assert.equal(w.chestOnly,true);
-  assert.equal(w.minFloor,+/minFloor (\d+)/.exec(r['備考'])[1]);
   assert.equal(w.desc,r['効果'].split('特殊効果:')[1].replace(/<[^>]*>/g,''));
   assert.ok(read(g,`libraryItemDetails(weapon('${id}'))`).some(([k,v])=>k==='追加効果'&&v===w.desc));
   g.run(`s.inventory[0]=['${id}'];renderInventory()`);assert.ok(g.run("$('#inventoryslots').innerHTML").includes(w.desc));
@@ -45,9 +44,10 @@ test('enemy poison before sleep, lethal reward once and stable row targets',()=>
  assert.equal(g.run('s.enemy.units[0].hp'),98);assert.equal(g.run('s.enemy.units[0].sleep'),2);
  assert.match(g.run('logQueue[0].text'),/は毒で2ダメージ。$/);assert.match(g.run('logQueue[1].text'),/は眠っている。$/);
  g.run("s.enemy.units[0].hp=2;s.enemy.units.push({...makeEnemy('goblin',11),row:99,hp:100,sleep:2});var xp=s.members[0].xp;enemyTurn(['guard','guard','guard'])");
- assert.equal(g.run('s.enemy.units[0].hp'),0);assert.equal(g.run('s.enemy.units[0].rewarded'),true);assert.equal(g.run('s.enemy.pendingDrops'),1);
+ assert.equal(g.run('s.enemy.units[0].hp'),0);assert.equal(g.run('s.enemy.units[0].rewarded'),true);
  assert.equal(g.run('s.enemy.pendingXP'),g.run("enemyDefinition('goblin').xp"));assert.deepEqual(read(g,'s.attackRows'),[71,71,71]);
- g.run('killReward(s.enemy.units[0])');assert.equal(g.run('s.enemy.pendingDrops'),1);
+ const rewards=read(g,'[s.enemy.pendingXP,s.enemy.pendingGold]');
+ g.run('killReward(s.enemy.units[0])');assert.deepEqual(read(g,'[s.enemy.pendingXP,s.enemy.pendingGold]'),rewards);
  g.run('s.enemy.units[1].poison=true;s.enemy.units[1].hp=1;s.enemy.chestBattle=true;enemyTurn(s.commands)');
  assert.equal(g.run('s.enemy'),null);assert.ok(g.run('s.members[0].xp>xp'));assert.ok(g.run('!!currentChest()'));
 });
@@ -130,12 +130,18 @@ test('chest ignores zero damage and triggers immediately between repeated hits',
  const g=setup('sword','chestsac');g.run("s.hp[0]=10;monsterHurt(0,0,s.commands,'敵')");assert.equal(g.run('s.hp[0]'),10);assert.ok(g.run("s.inventory[0].includes('chestsac')"));
  g.run("monsterHurt(0,1,s.commands,'敵');monsterHurt(0,12,s.commands,'敵')");assert.equal(g.run('s.hp[0]'),4);assert.ok(!g.run("s.inventory[0].includes('chestsac')"));
 });
-test('new equipment appears in chests but never in shop or direct enemy drops',()=>{
+test('chest equipment is unavailable in the shop',()=>{
  const g=setup();g.run("s.area='town';s.gold=9999;s.inventory[0]=['sword'];renderShop()");
  for(const id of ids){assert.ok(!g.run("$('#shopitems').innerHTML").includes('data-buy="'+id+'"'));g.run(`buy('${id}',0)`)}
  assert.deepEqual(read(g,'s.inventory[0]'),['sword']);assert.equal(g.run('s.gold'),9999);
- g.run("s.area='dungeon';s.floor=10;Math.random=()=>0;var directPool;weightedLoot=pool=>{directPool=pool.map(x=>x.item.id);return pool[0].item};dropWeapon()");
- for(const id of ids)assert.ok(!read(g,'directPool').includes(id));
+});
+test('ordinary victory grants no equipment even with a legacy pending drop',()=>{
+ const g=setup(),before=read(g,'s.inventory');
+ g.run(`s.enemy.pendingDrops=1;s.enemy.units[0].hp=0;killReward(s.enemy.units[0]);
+  Math.random=()=>0;finishMonsterBattle()`);
+ assert.equal(g.run('s.enemy'),null);
+ assert.ok(g.run('s.members[0].xp>0'));
+ assert.deepEqual(read(g,'s.inventory'),before);
 });
 for(const route of ['stairs','elevator','pitfall'])test('headlight on saved '+route+' arrival, no premature opening around start',()=>{
  const g=setup('sword','headlight');

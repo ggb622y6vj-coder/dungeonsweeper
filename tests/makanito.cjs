@@ -31,7 +31,7 @@ for (const random of [0, .999999]) {
   assert.deepEqual(json(g, 's.enemy.units.map(e=>e.hp)'), [0,99,99,99,99,0]);
   assert.equal(g.run('s.mp[0]'), 55);
   assert.equal(g.run('s.enemy.pendingXP'), g.run("enemyDefinition('thief').xp+enemyDefinition('goblin').xp"));
-  assert.equal(g.run('s.enemy.pendingDrops'), 2);
+  assert.equal(g.run('s.enemy.units.filter(e=>e.rewarded).length'), 2);
   assert.equal(g.run('s.members[0].xp'), 0, 'XP stays pending until victory');
   const texts = json(g,'logQueue.map(e=>e.text)');
   for (const index of [0,5]) assert(texts.includes(g.run(`enemyDisplay(s.enemy.units[${index}])+'は息絶えた。'`)));

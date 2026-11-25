@@ -65,7 +65,7 @@ function libraryItemDetails(w){
   `攻撃 ${libraryDice(w.dice)} / hitBonus ${w.hitBonus>=0?'+':''}${w.hitBonus} / 最低攻撃回数 ${w.minAttacks}回`;
  return [['職業',w.classes.map(i=>CLASSES[i].name).join('・')],
   ['性能',performance],...(w.desc?[['追加効果',w.desc]]:[]),['価格',`${Number.isFinite(w.price)?w.price+' G':'購入価格なし'} / 売却 ${w.sell} G`],
-  ['入手先',`${shop?'店売り・迷宮':'迷宮限定'}（地下${w.minFloor||1}階〜）`]];
+  ['入手先',shop?'店売り・迷宮':'迷宮限定']];
 }
 function libraryElement(tag,text){const el=document.createElement(tag);el.textContent=text;return el}
 function libraryEntry(name,details,key=null,subtext=''){

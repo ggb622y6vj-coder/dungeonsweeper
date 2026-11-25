@@ -88,7 +88,7 @@ function prepareTrial(g, opt) {
 function gearParty(g, floor, gear) {
   if (!gear) return;
   g.run(`(() => {
-    const items = WEAPONS.filter(w => (w.minFloor || 1) <= ${floor} && (${gear === 'drop' ? 'true' : 'w.shop !== false'}));
+    const items = ${gear === 'drop' ? 'WEAPONS' : 'WEAPONS.filter(w => w.shop !== false)'};
     const score = w => w.dice ? w.dice[0] * (w.dice[1] + 1) / 2 + w.dice[2] + (w.hitBonus || 0) * 0.5 : 0;
     for (let i = 0; i < s.members.length; i++) {
       const job = jobOf(i), rear = i >= 3;

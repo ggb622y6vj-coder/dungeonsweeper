@@ -207,8 +207,8 @@ function selectedEnemy(i,groups=reachableEnemyGroups(i)){
  }
  return groups.find(g=>String(g.key)===String(key))?.units.find(e=>e.hp>0);
 }
-function killReward(e){if(e.rewarded)return;e.rewarded=true;let d=enemyDefinition(e.id);s.enemy.pendingXP=(s.enemy.pendingXP||0)+d.xp;s.enemy.pendingGold=(s.enemy.pendingGold||0)+Math.floor(dice(...d.gold).value/3);s.enemy.pendingDrops=(s.enemy.pendingDrops||0)+1;log('敵を倒した。')}
-function awardVictory(combat){let xp=combat.pendingXP||0,gold=combat.pendingGold||0,survivors=activeMembers().length,share=xp>0&&survivors>0?Math.max(1,Math.floor(xp/survivors)):0;for(let i=0;i<s.members.length;i++)if(activeMember(i))s.members[i].xp+=share;if(share)log(`生存者は経験値${share}を獲得。`);if(combat.chestBattle)combat.lootGold=(combat.lootGold||0)+gold;else{if(gold){s.gold+=gold;log(`金貨${gold}枚を獲得。`)}for(let n=0;n<(combat.pendingDrops||0);n++)dropWeapon()}combat.pendingXP=0;combat.pendingGold=0;combat.pendingDrops=0}
+function killReward(e){if(e.rewarded)return;e.rewarded=true;let d=enemyDefinition(e.id);s.enemy.pendingXP=(s.enemy.pendingXP||0)+d.xp;s.enemy.pendingGold=(s.enemy.pendingGold||0)+Math.floor(dice(...d.gold).value/3);log('敵を倒した。')}
+function awardVictory(combat){let xp=combat.pendingXP||0,gold=combat.pendingGold||0,survivors=activeMembers().length,share=xp>0&&survivors>0?Math.max(1,Math.floor(xp/survivors)):0;for(let i=0;i<s.members.length;i++)if(activeMember(i))s.members[i].xp+=share;if(share)log(`生存者は経験値${share}を獲得。`);if(combat.chestBattle)combat.lootGold=(combat.lootGold||0)+gold;else if(gold){s.gold+=gold;log(`金貨${gold}枚を獲得。`)}combat.pendingXP=0;combat.pendingGold=0}
 
 // Resolve each action completely before moving party slots. The round's actor
 // IDs stay fixed so a retreat cannot skip someone or make them act twice.
@@ -472,7 +472,6 @@ function finishDefeat(){
  resetPartyCommands();resetDungeon();render();
 }
 function weightedLoot(pool){let total=pool.reduce((n,x)=>n+x.weight,0),roll=Math.random()*total;for(let entry of pool){roll-=entry.weight;if(roll<0)return entry.item}return pool.at(-1).item}
-function dropWeapon(){if(Math.random()>=.05)return;let pool=chestItemPool(s.floor).filter(x=>x.item.drop&&!x.item.chestOnly);if(!pool.length)return;receiveLoot(weightedLoot(pool))}
 const SHOP_PURCHASE_NOTICE_MS=500;
 let shopTab='weapon',shopPanel='trade';
 function showShopPanel(panel){
@@ -916,7 +915,13 @@ function currentChest(){let c=s.cells[s.pos]?.chest;return c&&!c.opened?c:null}
 function triggerChestTrap(c){
  // 針のダメージ式と末尾の全滅判定・並び替えは triggerFloorTrap (traps.js) と意図的に対応。変更時は双方を確認・同期し、並び替え理由などの意図的な違いは保つ。
  if(c.trap==='none')return;log('罠だ！',{trap:true});let alive=activeMembers(),i=alive[Math.random()*alive.length|0];if(i===undefined)return;if(c.trap==='pitfall'){if(s.floor>=MAX_FLOOR){log('落とし穴の罠は不発に終わった。');return false}log('落とし穴の罠！ 一行は下の階へ落ちた。');delete s.cells[s.pos].chest;descendPitfall();return true}if(c.trap==='needle'){let damage=Math.max(1,Math.floor(dice(3,6,4).value*trapPower(s.floor)));s.hp[i]=Math.max(0,s.hp[i]-damage);markDeaths();log(`針の罠！ ${NAMES[i]}に${damage}ダメージ。`);sacrificeAfterDamage(i)}else{log((c.trap==='poison'?'毒':'麻痺')+'の罠！');afflict(i,c.trap)}if(!activeMembers().length)defeat();else autoReorderParty('chest-trap');return false}
-function chestItemPool(floor){let loot=CHEST_LOOT,cap=loot.priceCap[floor-1]??loot.priceCap.at(-1),pool=WEAPONS.filter(w=>(w.drop===true||w.part)&&w.price<=cap&&(w.minFloor??1)<=floor).map(w=>({item:w,weight:w.shop===false&&w.minFloor===floor?.5:w.minFloor!==undefined&&w.minFloor<=floor-3?.3:1}));if(!pool.length){let item=WEAPONS.filter(w=>w.drop===true||w.part).reduce((a,b)=>a.price<=b.price?a:b);return [{item,weight:1}]}return pool}
+function chestItemPool(floor){
+ const cap=CHEST_LOOT.priceCap[floor-1]??CHEST_LOOT.priceCap.at(-1);
+ const equipment=WEAPONS.filter(w=>w.drop===true||w.part);
+ const pool=equipment.filter(w=>w.price<=cap);
+ if(!pool.length)pool.push(equipment.reduce((a,b)=>a.price<=b.price?a:b));
+ return pool.map(item=>({item,weight:1}));
+}
 function rewardChest(c){
  if(c.rewarded)return;
  c.rewarded=true;c.opened=true;s.gold+=c.gold*3;

@@ -14,8 +14,8 @@ createParty(g, opt.jobs);
 assert.equal(g.run('JSON.stringify(s.members.map((m,i) => jobOf(i)))'), JSON.stringify(opt.jobs));
 assert.equal(g.run('s.reserve.length'), 0);
 assert.equal(g.run('s.inventory.every(a => a.length === 1)'), true, 'gear omitted must retain starter inventory');
-gearParty(g, 10, 'drop');
-assert.equal(g.run("s.inventory[0].map(id=>weapon(id).name).includes('聖剣')"), true, 'drop gear should consider minFloor 9 equipment');
+gearParty(g, 1, 'drop');
+assert.equal(g.run("s.inventory[0].map(id=>weapon(id).name).includes('聖剣')"), true, 'drop gear includes the holy sword even on floor 1');
 assert.equal(g.run("s.inventory[3].map(id=>weapon(id).name).some(n=>['魔弓','竜骨の弓'].includes(n))"), true, 'rear thief should receive a ranged weapon');
 const equippedDrop = g.run('JSON.stringify({inventory:s.inventory,equipped:s.equipped,armor:s.armor})');
 prepareTrial(g, {...opt, level:9, floor:4});
@@ -70,7 +70,7 @@ for (let i = 0; i < 10; i++) {
     const sides={fighter:10,mage:4,priest:8,thief:6}[c.id];
     return m.maxHP >= base.maxHP + 5 && m.maxHP <= Math.max(base.maxHP+5,6*(sides+3));
   })`), true, '099 HP stays within +1 floors and maximum reroll candidates');
-  // Mimic battle rewards, drain, gear drops and ailments before the next reset.
+  // Mimic battle rewards, drain, chest loot and ailments before the next reset.
   gBase.run("s.members[0].level=2; s.members[0].xp=999999; s.members[0].maxHP=999; s.members[0].vit=3; s.inventory[0].push('healingPotion'); s.ailments[0].poison=true");
 }
 gBase.run('levelUp=simOriginalLevelUp');

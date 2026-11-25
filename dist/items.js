@@ -1,10 +1,10 @@
 // 消耗品の正本。同じ薬はstack個まで1枠。内部形式は1個ずつのID配列。装備・MP・呪文習得は不要。
 const MEDICINES=[
- {id:'healingPotion',stack:10,name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,2,1,3,4,6,5,7],sell:8,weight:70,minFloor:1},
- {id:'antidote',stack:10,name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,2,1,3,6,4,5,7],sell:6,weight:30,minFloor:1},
- {id:'paralysisCure',stack:5,name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,2,1,3,4,6,5,7],sell:15,weight:20,minFloor:3},
- {id:'greaterPotion',stack:5,name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,2,1,3,4,6,5,7],sell:30,weight:35,minFloor:4},
- {id:'elixir',stack:3,name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,2,1,3,4,6,5,7],sell:80,weight:20,minFloor:7}
+ {id:'healingPotion',stack:10,name:'傷薬',kind:'medicine',spell:'dios',description:'味方1人のHPを1d8回復',classes:[0,2,1,3,4,6,5,7],sell:8,weight:70},
+ {id:'antidote',stack:10,name:'解毒剤',kind:'medicine',spell:'latumofis',description:'味方1人の毒を解除',classes:[0,2,1,3,6,4,5,7],sell:6,weight:30},
+ {id:'paralysisCure',stack:5,name:'気付け薬',kind:'medicine',spell:'dialko',description:'味方1人の麻痺・睡眠・沈黙・恐怖を治す',classes:[0,2,1,3,4,6,5,7],sell:15,weight:20},
+ {id:'greaterPotion',stack:5,name:'上傷薬',kind:'medicine',spell:'dial',description:'味方1人のHPを4d4回復',classes:[0,2,1,3,4,6,5,7],sell:30,weight:35},
+ {id:'elixir',stack:3,name:'霊薬',kind:'medicine',spell:'dialma',description:'味方1人のHPを8d3回復',classes:[0,2,1,3,4,6,5,7],sell:80,weight:20}
 ];
 // Only these prefixes are valid. Resolve one prefix, never a chain of prefixes.
 function unidentified(token){return typeof token==='string'&&(token.startsWith('unid:')||token.startsWith('unid-bound:'))}
@@ -58,8 +58,12 @@ function medicineSlots(i){return itemRows(s.inventory[i]).filter(x=>x.item?.kind
 function canChooseMedicine(i){return !logBusy()&&!s.done&&!s.pendingBoss&&!s.pendingStairs&&!currentChest()&&!partyIncapacitated(i)}
 function dropMedicine(){
  if(Math.random()>=.30)return;
- const pool=MEDICINES.filter(w=>(w.minFloor||1)<=(s.floor||1)),total=pool.reduce((n,w)=>n+w.weight,0);let roll=Math.random()*total,w=pool[0];for(let item of pool){roll-=item.weight;if(roll<0){w=item;break}}
- receiveLoot(w);
+ const total=MEDICINES.reduce((sum,item)=>sum+item.weight,0);
+ let roll=Math.random()*total;
+ for(const item of MEDICINES){
+  roll-=item.weight;
+  if(roll<0){receiveLoot(item);return}
+ }
 }
 function receiveLoot(w){
  const medicine=w.kind==='medicine';

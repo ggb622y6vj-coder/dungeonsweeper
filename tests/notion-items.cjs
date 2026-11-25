@@ -22,11 +22,10 @@ for(const r of rows){
  if(r['種類']==='薬'){
   eq(id+'.ランク',r['ランク'],null);
   eq(id+'.lootRank presence',Object.hasOwn(w,'lootRank'),false);
-  const m=/宝箱 (\d+)F.*重み(\d+)/.exec(unesc(r['入手']));assert.ok(m,id+' medicine source');
-  Object.assign(b,{kind:'medicine',minFloor:+m[1],weight:+m[2]});
+  const m=/宝箱.*重み(\d+)/.exec(unesc(r['入手']));assert.ok(m,id+' medicine source');
+  Object.assign(b,{kind:'medicine',weight:+m[1]});
  }else{
   b.lootRank=r['ランク'];
-  const m=/minFloor\s+(\d+)/.exec(unesc(r['備考']));assert.ok(m,id+' minFloor');b.minFloor=+m[1];
   b.part=PART[r['種類']];b.shop=!/店売りなし/.test(r['入手']);
   if(w.dice){b.range=r['種類']==='武器(遠距離)'?'ranged':'melee';b.dice=dice(effectText.match(/^\d+d\d+(?:\+\d+)?/)[0]);
    b.hitBonus=+(effectText.match(/命中\+(\d+)/)?.[1]||0);b.minAttacks=+(effectText.match(/最低(\d+)回攻撃/)?.[1]||1);b.drop=true;

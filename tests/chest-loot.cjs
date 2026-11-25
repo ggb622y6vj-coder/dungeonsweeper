@@ -112,7 +112,7 @@ for (const tier of Object.keys(tables.pools)) for (const pool of [
 }
 g.run('var savedPools=structuredClone(LOOT_TABLES.pools)');
 // Walk all medicines and every item of every positive rank in every active slot/group/floor.
-const t1Reached = new Set();
+const t1Reached = new Set(), floor1Reached = new Set();
 for (const [group, {slots}] of Object.entries(tables.groups)) {
   const monster = Object.keys(tables.monsterGroups).find(id => tables.monsterGroups[id] === +group);
   for (let floor = 1; floor <= 10; floor++) for (let chosen = 0; chosen < 3; chosen++) {
@@ -129,13 +129,14 @@ for (const [group, {slots}] of Object.entries(tables.groups)) {
       });
       const actual = roll(monster, floor, rolls);
       assert.deepEqual(actual, expected, `${monster}/${slots[chosen].pool}/${floor}/${candidate.id}`);
+      if (floor === 1) actual.forEach(id => floor1Reached.add(id));
       if (slots[chosen].pool === 'T1') actual.forEach(id => t1Reached.add(id));
     }
   }
 }
 assert.ok(t1Reached.size > 0);
 for (const id of t1Reached) assert.notEqual(byId.get(id).lootRank, 3, `T1 cannot produce rank 3: ${id}`);
-assert.ok(equipment.some(w => w.lootRank === 5 && w.minFloor > 1)); // the walk includes these on floor 1
+assert.ok(equipment.some(w => w.lootRank === 5 && floor1Reached.has(w.id)));
 // Explicit medicine/rank boundaries and zero weights, including at RNG=0.
 g.run('LOOT_TABLES.pools.T1={medicineShare:.25,medicineIds:["antidote"],rankWeights:{1:0,2:1,3:0,4:3,5:0}};validateLootTables()');
 assert.deepEqual(roll('rat', 1, [0,.25-Number.EPSILON,0,0,0]), ['antidote']);

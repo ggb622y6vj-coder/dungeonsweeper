@@ -10,19 +10,19 @@ g.run(`s.area='dungeon';s.floor=1;s.inventory=s.members.map(()=>['sword']);var r
 function loot(kind, id, inv) {
   return JSON.parse(g.run(`(()=>{${inv ? `s.inventory=${JSON.stringify(inv)};` : ''}let before=logQueue.length;
     let w=weapon('${id}');weightedLoot=()=>w;
-    let rolls=${kind === 'chest' ? '[0,.99]' : '[0,.99]'};Math.random=()=>rolls.shift()??.99;
-    ${kind === 'chest' ? `rewardChest({gold:0,rewardVersion:1,items:['${id}']})` : kind === 'legacy' ? 'rewardChest({gold:0})' : 'dropWeapon()'};Math.random=realRandom;
+    let rolls=[0,.99];Math.random=()=>rolls.shift()??.99;
+    ${kind === 'chest' ? `rewardChest({gold:0,rewardVersion:1,items:['${id}']})` : 'rewardChest({gold:0})'};Math.random=realRandom;
     return JSON.stringify({inv:s.inventory.map(a=>a.length),last:s.inventory.map(a=>a.at(-1)),logs:logQueue.slice(before).map(x=>x.text)})})()`));
 }
 const full = Array(10).fill('sword');
-for (const kind of ['chest', 'legacy', 'drop']) {
+for (const kind of ['chest', 'legacy']) {
   const names = JSON.parse(g.run('JSON.stringify(NAMES)'));
   // A mage-only weapon goes to the front fighter while unidentified.
   let r = loot(kind, 'staff', [['sword'], ['sword'], ['sword'], ['sword']]);
   assert.deepEqual(r.inv, [2, 1, 1, 1], kind);
   assert.equal(r.last[0], 'unid:staff');
   assert.ok(r.logs.includes(`謎の武器を入手。${names[0]}が受け取った。`), kind + JSON.stringify(r.logs));
-  // Mage full -> first member with room receives (drop is not discarded).
+  // Mage full -> first member with room receives.
   r = loot(kind, 'staff', [full, ['sword'], full, ['sword']]);
   assert.deepEqual(r.inv, [10, 2, 10, 1], kind);
   assert.ok(r.logs.includes(`謎の武器を入手。${names[1]}が受け取った。`), kind);
@@ -47,4 +47,4 @@ for (const kind of ['chest', 'legacy', 'drop']) {
   const r = JSON.parse(g.run(`(()=>{s.inventory=[['sword'],['sword'],['sword'],['sword']];let rolls=[0,0];Math.random=()=>rolls.shift()??0;dropMedicine();Math.random=realRandom;return JSON.stringify(s.inventory.map(a=>a.length))})()`));
   assert.deepEqual(r, [2, 1, 1, 1]);
 }
-console.log('PASS loot recipient: first vacancy, fallback to any member with room (chest and drop), all-full log, medicine front-first');
+console.log('PASS loot recipient: first vacancy, fallback to any member with room (ranked and legacy chests), all-full log, medicine front-first');

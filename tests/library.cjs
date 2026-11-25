@@ -57,11 +57,11 @@ g.run("s.gold=1000;buy('helm',0);buy('helm',0)");
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'purchase immediately registers equipment once');
 g.run("buy('staff',0);buy('holysword',0);s.gold=0;buy('longsword',0)");
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'rejected purchases do not unlock entries');
-g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;dropWeapon();dropMedicine();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']})");g.drain();
+g.run("s.inventory[0]=Array(10).fill('sword');s.gold=1000;buy('longsword',0);Math.random=()=>0;rewardChest({gold:0});rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']})");g.drain();
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true},'full inventory does not record unreceived loot');
 g.run("s.inventory[0]=['sword'];enterDungeon()");g.drain();
 // Force the loot selection, while retaining the actual acquisition paths.
-g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');Math.random=()=>0;s.inventory[0]=['sword'];dropWeapon();rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']});weightedLoot=actualLoot");g.drain();
+g.run("var actualLoot=weightedLoot;weightedLoot=()=>weapon('longsword');var legacyRolls=[0,.99];Math.random=()=>legacyRolls.shift()??.99;s.inventory[0]=['sword'];rewardChest({gold:0});rewardChest({gold:0,rewardVersion:1,items:['plate','healingPotion']});weightedLoot=actualLoot");g.drain();
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.inventory[0])')),['sword','unid:longsword','unid:plate','healingPotion']);
 assert.deepEqual(JSON.parse(g.run('JSON.stringify(s.library.items)')),{helm:true,healingPotion:true},'medicine registers on receipt and dungeon equipment awaits identification');
 g.run("enterTown();performItemService('identify',itemTarget(0,1));performItemService('identify',itemTarget(0,2))");
@@ -79,7 +79,7 @@ g.run('hurt(999)');g.drain();g=reload(g);
 assert.equal(g.run('s.library.items.longsword'),true);
 g.run("$('#resetconfirm').onclick()");
 assert.equal(g.run('Object.keys(s.library.items).length'),0,'explicit full reset clears the library');
-console.log('PASS library: purchases, drops/chests/medicine, capacity, sale, deletion, wipe, reload and explicit reset');
+console.log('PASS library: purchases, ranked and legacy chests/medicine, capacity, sale, deletion, wipe, reload and explicit reset');
 
 g=party();
 g.run('enterDungeon()');g.drain();g.run("$('#libraryopen').onclick()");
@@ -92,6 +92,9 @@ assert.equal(g.run("libraryMonsterDetails(ENEMIES.find(d=>d.name==='邪眼'),{co
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('holysword')))"),/4d8\+5.*hitBonus \+3.*2回.*6000.*迷宮限定/);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('plate')))"),/AC −5/);
 assert.match(g.run("JSON.stringify(libraryItemDetails(weapon('healingPotion')))"),/1d8.*購入価格なし.*迷宮限定/);
+for(const [id,source] of [['plate','店売り・迷宮'],['holysword','迷宮限定'],['healingPotion','迷宮限定']]){
+ assert.equal(g.run(`libraryItemDetails(weapon('${id}')).find(([label])=>label==='入手先')[1]`),source);
+}
 console.log('PASS library: town/idle guards and source-backed monster/item details');
 
 // Render all source records to check ordering, concealed details and safe text.
