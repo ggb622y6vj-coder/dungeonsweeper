@@ -59,6 +59,7 @@ def check(browser, width):
     press('[data-command-choice="hide"]')
     assert '隠れる' in page.locator('#commandreviewpopup').inner_text()
     assert tag.count() == 0
+    page.evaluate('Math.random=()=>.75')  # Hide succeeds, and the equal-strength rows hold position.
     press('#attack')
     page.wait_for_function('!logBusy()')
     assert tag.is_visible()

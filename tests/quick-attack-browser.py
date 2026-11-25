@@ -102,14 +102,15 @@ with sync_playwright() as p:
             page.keyboard.press('Tab')
         else: raise AssertionError('quick attack not reachable by keyboard')
         page.evaluate('window.__review=0;new MutationObserver(()=>{if(!document.querySelector("#commandreviewpopup").hidden)window.__review++}).observe(document.body,{subtree:true,attributes:true,childList:true})')
-        before = page.evaluate('s.enemy.units.map(e=>e.hp)')
+        hp_by_row = 'Object.fromEntries(s.enemy.units.map(e=>[e.row,e.hp]))'
+        before = page.evaluate(hp_by_row)
         if touch: press('#quickattack')
         else: page.keyboard.press('Space')
         page.wait_for_function('!logBusy()', timeout=20000)
         assert page.evaluate('window.__review') == 0, 'review popup appeared'
         assert page.evaluate('s.logs.some(t=>t.includes("ターン開始"))'), 'turn did not start'
-        after = page.evaluate('s.enemy?s.enemy.units.map(e=>e.hp):null')
-        assert after and after[0] < before[0] and after[1] == before[1], (before, after)
+        after = page.evaluate(hp_by_row)
+        assert after['7'] < before['7'] and after['23'] == before['23'], (before, after)
         assert page.evaluate('commandIndex') == 0; extras(True)
         page.screenshot(path=str(out/f'{width}-after-quick.png'))
 

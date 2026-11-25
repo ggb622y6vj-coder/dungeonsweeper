@@ -65,6 +65,37 @@ function makeEnemy(id,index){const hp=dice(...enemyDefinition(id).hp).value;retu
 function visibleCombat(){return displayCombat===undefined?s.enemy:displayCombat}
 function rowKey(e){return e.row??e.id}
 function enemyGroups(combat=s.enemy){return [...new Set(combat.units.filter(e=>!e.rewarded).map(rowKey))].map((key,index)=>{let units=combat.units.filter(e=>rowKey(e)===key);return {key,index,id:units[0].id,units}})}
+function enemyReady(e){return !e.rewarded&&e.hp>0&&!e.sleep&&!e.paralysis&&!e.stone&&!e.fear}
+function groupAdvanceStrength(group){
+ let total=0;
+ for(const e of group.units){
+  if(!enemyReady(e))continue;
+  const d=enemyDefinition(e.id);
+  total+=e.hp-3*(d.mageSpellLevel+d.priestSpellLevel);
+ }
+ return Math.max(0,total);
+}
+function advanceChance(rear,front){
+ if(front===0)return rear>0 ? 0.95 : 0.51;
+ return Math.min(0.95,0.31+0.20*(rear/front));
+}
+function advanceEnemyGroups(){
+ const groups=enemyGroups();
+ if(groups.length<2)return;
+ for(const group of groups)group.strength=groupAdvanceStrength(group);
+ for(let i=groups.length-1;i>0;i--){
+  const rear=groups[i],front=groups[i-1];
+  if(Math.random()>=advanceChance(rear.strength,front.strength))continue;
+  // A summon can be at the tail, and a rewarded unit does not set its row's display position.
+  const units=s.enemy.units.filter(e=>rowKey(e)!==rear.key);
+  const frontIndex=units.findIndex(e=>!e.rewarded&&rowKey(e)===front.key);
+  units.splice(frontIndex,0,...rear.units);
+  s.enemy.units=units;
+  groups[i-1]=rear;
+  groups[i]=front;
+  log(`${enemyDisplay(rear.units[0])}が前に出た。`);
+ }
+}
 function encounterRate(i,wasOpen,action='forward'){return (wasOpen ? .095+num(i)*.005 : .16)+(['strafeLeft','strafeRight'].includes(action) ? .01 : 0)}
 function rollInitiative(action='forward',boss=false){if(boss)return 'normal';let r=Math.random(),enemyChance=action==='back' ? .12 : .10;if(r<enemyChance)return s.watchful?'normal':'enemy';return r<enemyChance+.10?'party':'normal'}
 function encounter(i,unexplored=false,action='forward'){let boss=s.cells[i].type==='boss',formation=monsterFormation(boss),units=[];for(let [row,id] of formation.entries()){let [min,max]=enemyDefinition(id).groupSize,n=min+(Math.random()*(max-min+1)|0);for(let j=0;j<n;j++)units.push({...makeEnemy(id,units.length),row})}resetCommandEntry();s.attackRows=s.members.map(()=>0);s.dispelRows=s.members.map(()=>null);s.enemy={dataVersion:1,flagEffect:flagEffect(),weaponEffects:snapshotWeaponEffects(i),boss,chestBattle:unexplored,lootMonsterId:formation[0],lootGold:0,units,target:0,escapeTo:s.previousPos??s.start,initiative:rollInitiative(action,boss)};initEnemySpellState();recordLibraryEncounter(s.enemy);identifyEnemies();let message={normal:'敵が現れた！',enemy:'敵の奇襲！',party:'敵はまだ気づいていない！'}[s.enemy.initiative];log(message,{encounter:true});if(s.enemy.flagEffect.bad)log('誤った旗がパーティーを惑わせた！');if(s.enemy.initiative==='enemy'){s.enemy.initiative='normal';enemyTurn(s.members.map(()=>'fight'))}}
@@ -264,7 +295,11 @@ function attack(){
  else if(s.enemy?.initiative==='party')s.enemy.initiative='normal';
  tickBattleSilence();tickBattleFear();
  resetCommandEntry();resetPartyCommands();
- if(s.enemy){const next=s.enemy.units.find(e=>e.hp>0);s.attackRows=s.attackRows.map(key=>s.enemy.units.some(e=>String(rowKey(e))===String(key)&&e.hp>0)?key:rowKey(next))}
+ if(s.enemy){
+  const next=s.enemy.units.find(e=>e.hp>0);
+  s.attackRows=s.attackRows.map(key=>s.enemy.units.some(e=>String(rowKey(e))===String(key)&&e.hp>0)?key:rowKey(next));
+  advanceEnemyGroups();
+ }
  render();
 }
 function quickAttack(){if(logBusy()||!s.enemy||s.done)return;const members=commandMembers(),groups=enemyGroups().filter(g=>g.units.some(e=>e.hp>0)),front=groups[0];if(!front||!members.some(canWeaponAttack))return;for(const i of members){if(canWeaponAttack(i)){s.commands[i]='fight';s.attackRows[i]=front.key}else s.commands[i]='guard'}attack()}
@@ -719,7 +754,7 @@ let currentFloorTheme='green';
 function face(i){const p=SCENE_PALETTES[currentFloorTheme];if(i<0)return {fill:p.open,label:'外壁',symbol:'',sub:''};let c=s.cells[i],symbol=c.open&&c.type==='elevator'?'E':c.open&&c.type==='boss'?'☠':c.open&&c.chest&&!c.chest.opened?'▣':c.open&&c.type==='down'?'⇩':c.open&&c.type==='stairs'?'⇧':c.flag?'⚑':c.open?(c.spent?'×':String(num(i))):c.disarmed?'✓':c.safe?'✓':'？';return {color:c.flag?FLAG_COLORS[placedFlag(c)]:/^(?:[0-9]+|？)$/.test(symbol)?'#e8d2a2':p.faceSymbol,fill:c.open?p.current:c.safe?p.numbered:p.door,label:c.open?'探索済み':c.safe?'安全確認済み':'未探索',symbol,sub:c.disarmed?'罠を解除済み':c.spent?'作動済みの罠':c.flag?'旗あり':c.open?'周囲の罠の数':''}}
 function sceneEnemyRow(g){
  const units=g.units.filter(e=>!e.rewarded);
- const ready=units.filter(e=>e.hp>0&&!e.sleep&&!e.paralysis&&!e.stone&&!e.fear).length;
+ const ready=units.filter(enemyReady).length;
  return `<div>${g.index+1}：${enemyDisplay(g.units[0])} ×${units.length}(${ready})</div>`;
 }
 function scene(){const p=SCENE_PALETTES[currentFloorTheme];let combat=visibleCombat(),f=face(target()),l=face(target(-1)),r=face(target(1));if(combat){for(const v of [f,l,r])if(/^\d+$/.test(v.symbol))v.symbol='';}let txt=(x,y,t,size=17,color=p.symbol)=>`<text x="${x}" y="${y}" text-anchor="middle" fill="${color}" font-family="system-ui,sans-serif" font-size="${size}" font-weight="700">${t}</text>`;let panel=(v,x,y)=>txt(x,y+24,v.symbol,x===320&&hasLight()&&diagonalSight().some(i=>i>=0)?38:58,v.color);let battle=combat?drawEnemies(combat):s.pendingBoss?`<rect x="200" y="90" width="240" height="170" rx="8" fill="${p.guardian}" stroke="${p.guardianLine}"/>${txt(320,196,'☠',55)}`:'';$('#scene').innerHTML=`<svg viewBox="0 0 640 400" preserveAspectRatio="none" role="img" aria-label="正面：${f.label} ${f.symbol}、左：${l.label} ${l.symbol}、右：${r.label} ${r.symbol}"><path d="M0 0H640L440 100H200Z" fill="${p.ceiling}"/><path d="M0 400H640L440 300H200Z" fill="${p.back}"/><path d="M0 0L200 100V300L0 400Z" fill="${l.fill}"/><path d="M640 0L440 100V300L640 400Z" fill="${r.fill}"/><path d="M200 100H440V300H200Z" fill="${f.fill}"/><g fill="none" stroke="${p.corridorLine}" stroke-width="1.5"><path d="M0 0L200 100H440L640 0M0 400L200 300H440L640 400M200 100V300M440 100V300"/></g>${panel(l,96,185,'左のマス')}${panel(f,320,185,'正面のマス')}${panel(r,544,185,'右のマス')}${combat?'':txt(320,378,String(num(s.pos)),36,'#ffdf9e')}${distantSight()}${battle}</svg>${combat?`<div class="scene-enemies" aria-label="敵の列">${enemyGroups(combat).map(sceneEnemyRow).join('')}</div>`:''}${encounterNotice?`<div class="encounter-notice" role="status">${encounterNotice}</div>`:''}`}

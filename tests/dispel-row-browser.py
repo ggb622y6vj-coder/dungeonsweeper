@@ -27,7 +27,7 @@ def fixture():
     save['cells'][28]['type'] = 'boss'
     return save
 
-def hp(page): return page.evaluate('s.enemy?s.enemy.units.map(e=>e.hp):null')
+def hp(page): return page.evaluate('[1,2,3,4].map(uid=>s.enemy.units.find(e=>e.uid===uid).hp)')
 
 with sync_playwright() as p:
     opts = {'headless': True, 'args': ['--no-sandbox']}
@@ -71,7 +71,7 @@ with sync_playwright() as p:
         assert page.locator('[data-row-choice]').count() == 0, page.locator('#commandentry').inner_html()
         assert page.evaluate('choosingRow===false && s.commands[1]==="dispel" && String(s.dispelRows[1])==="7"')
         for _ in range(4): key_to('[data-command-choice="guard"]')
-        assert '呪いを解く → 1列' in page.locator('#commandreviewpopup').inner_text()
+        assert '呪いを解く → 2列' in page.locator('#commandreviewpopup').inner_text()
         key_to('#attack'); page.wait_for_function('!logBusy()')
         h = hp(page); assert h[0] == 0 and h[1] == 0 and h[2] > 0 and h[3] == 0, h
         # Turn 3: no undead left, so 呪いを解く cannot be chosen.

@@ -323,6 +323,7 @@ require('./final-boss.cjs');
 require('./encounter-adjustments.cjs');
 require('./partner-formation.cjs');
 require('./formation-chain.cjs');
+require('./enemy-group-advance.cjs');
 
 require('./death-status.cjs');
 require('./temple.cjs');

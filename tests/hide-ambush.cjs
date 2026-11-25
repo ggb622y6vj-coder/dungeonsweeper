@@ -266,9 +266,10 @@ async function persistence() {
   assert.deepEqual(read(loaded,'[commandIndex,commandConfirmed,s.commands,s.attackRows[0]]'),
     [3,[true,true,true],['ambush','guard','guard'],'23']);
   assert.deepEqual(read(loaded,'s.enemy.hiddenIds.slice().sort()'), ['p0','p1']);
-  assert(loaded.run("$('#commandreviewpopup').innerHTML.includes('奇襲 → 2列')"));
+  assert.deepEqual(read(loaded,'enemyGroups().map(g=>g.key)'), [23,71]);
+  assert(loaded.run("$('#commandreviewpopup').innerHTML.includes('奇襲 → 1列')"));
   loaded.run('Math.random=()=>.99;attack()');
-  assert(loaded.run('s.enemy.units[1].hp===990&&s.enemy.units[0].hp===1000'));
+  assert.deepEqual(read(loaded,'s.enemy.units.map(e=>[e.row,e.hp])'), [[23,990],[71,1000]]);
   assert.deepEqual(read(loaded,'s.enemy.hiddenIds'), []);
 
   for (const bad of [undefined,{},'p0',['missing','p2'],['p1','p1','missing']]) {

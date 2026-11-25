@@ -173,8 +173,8 @@ function finishMonsterBattle(){
  if(defeated.length)victoryWeaponEffects(combat);
  awardVictory(combat);
  if(combat.chestBattle&&defeated.length){
-  // A battle saved before 108 has no snapshot ID; its original first unit remains in units.
-  const monsterId=combat.lootMonsterId??combat.units[0].id,items=rollChestItems(monsterId,s.floor);
+  // In pre-108 saves the encounter's first unit keeps uid 0 even after an advance.
+  const monsterId=combat.lootMonsterId??combat.units.find(e=>e.uid===0)?.id??combat.units[0].id,items=rollChestItems(monsterId,s.floor);
   s.cells[s.pos].chest={gold:combat.lootGold,opened:false,rewardVersion:1,lootGroup:LOOT_TABLES.monsterGroups[monsterId],items};
   fixChestTrap(s.cells[s.pos].chest);log('宝箱が現れた。開けるか、放棄するか。');
  }
