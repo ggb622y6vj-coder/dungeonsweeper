@@ -37,7 +37,7 @@ const spells = (g, expression) => assert.deepEqual(read(g, 'ids()'), expression.
 {
   const g = battle();
   const assigned = {
-    mage:[1,0,50], stone:[1,0,50], shaman:[1,0,50], iron:[1,0,60], watcher:[2,0,40], evileye:[1,0,40],
+    mage:[1,0,50], stone:[1,0,50], shaman:[1,0,50], iron:[1,0,60], watcher:[2,0,30], evileye:[1,0,40],
     sorcerer:[3,0,50], highmage:[5,0,90], necromancer:[5,0,35], darkelf:[5,0,25], vampire:[5,0,20], lesserdemon:[5,0,20],
     deathmage:[7,0,50], demongeneral:[7,0,30], vampirelord:[7,0,15],
     greaterdemon:[8,0,10], lich:[8,0,50], fallenangel:[8,0,15], archmage:[13,0,50], labyrinthlord:[13,0,35],

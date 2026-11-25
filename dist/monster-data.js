@@ -1773,7 +1773,7 @@ const ENEMIES=[
     },
     "mageSpellLevel": 2,
     "priestSpellLevel": 0,
-    "spell": 0.4,
+    "spell": 0.3,
     "partnerId": null,
     "partnerRate": 0.0
   },
