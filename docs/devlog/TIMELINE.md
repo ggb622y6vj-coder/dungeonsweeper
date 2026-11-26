@@ -182,3 +182,4 @@
 | 144 | 2026-11-26 | 戦闘の前2列に階層色の種族ドット絵を表示し、戦闘中は正面と透視の斜め前の記号を隠す | `485e763` | [spec](specs/144-monster-race-sprites.md) | [実施](reports/144.md) |
 | 145 | 2026-11-26 | 探索中の呪文発動完了で呪文画面とパーティー欄を閉じ、迷宮画面に戻る | `c99f7d9` | [spec](specs/145-spell-cast-closes-stats.md) | [実施](reports/145.md) |
 | 146 | 2026-11-26 | 戦闘シーンの背景に黒い暗幕を重ね、モンスター画像の目標サイズを1.15倍にする | `8c406ba` | [spec](specs/146-combat-scene-shade-and-larger-sprites.md) | [実施](reports/146.md) |
+| 147 | 2026-11-26 | 昇降機の階層選択ダイアログにドット絵を表示 | 未コミット | [spec](specs/147-elevator-dialog-image.md) | [実施](reports/147.md) |

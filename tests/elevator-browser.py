@@ -1,4 +1,4 @@
-"""068: elevator unlock dialog, hidden E on map/3D, riding by keyboard and by mouse/tap.
+"""068/147: elevator unlock dialog, picker image, hidden E on map/3D, and riding.
 Run: python3 tests/elevator-browser.py [http://localhost:8000/]  (server serving dist/)
 """
 import os, sys
@@ -31,6 +31,7 @@ with sync_playwright() as p:
           s.cells.forEach((c,i)=>{if(!c.trap&&i!==last)c.open=true});s.cells[last].open=false;(%s)(last)""" % FACE)
         step()
         page.wait_for_selector('#elevatordialog[open]')
+        assert page.locator('#elevatordialog img').count() == 0
         assert page.locator('#elevatormessage').inner_text() == '昇降機が使えるようになった！ 昇降機（E）から解放した階へ移動できます。'
         assert '昇降機が使えるようになった' in page.locator('#log').inner_text()
         box = page.locator('#elevatordialog').bounding_box(); assert box['x'] >= 0 and box['x'] + box['width'] <= width, box
@@ -42,7 +43,17 @@ with sync_playwright() as p:
         page.evaluate("""s.elevatorFloors=[1,3];const e=%d;window.from=[e-s.size,e+s.size,e-1,e+1].find(i=>s.cells[i]&&adjacent(e,i)&&!s.cells[i].trap&&!s.cells[i].type);s.pos=from;s.cells[from].open=true;(%s)(e)""" % (e, FACE))
         step()
         page.wait_for_selector('#elevatorpick[open]')
-        assert page.locator('#elevatorpick [data-elevator-floor]').all_inner_texts() == ['地下3階']
+        floor_buttons = page.locator('#elevatorpick [data-elevator-floor]')
+        assert floor_buttons.all_inner_texts() == ['地下3階']
+        image = page.locator('#elevatorpick img')
+        image.wait_for(state='visible')
+        page.wait_for_function("""() => {
+            const image = document.querySelector('#elevatorpick img');
+            return image?.complete && image.naturalWidth === 48;
+        }""")
+        image_box = image.bounding_box()
+        floor_box = floor_buttons.bounding_box()
+        assert image_box and floor_box and image_box['y'] + image_box['height'] <= floor_box['y'], (image_box, floor_box)
         pb = page.locator('#elevatorpick').bounding_box(); assert pb['x'] >= 0 and pb['x'] + pb['width'] <= width, pb
         page.screenshot(path=str(out / f'pick-{width}.png'))
         # Cancel (Escape key / tap ×), step back off; E now visible on the map and in 3D.
@@ -79,6 +90,6 @@ with sync_playwright() as p:
         assert page.evaluate(f"s.pos==={e}&&!s.pendingElevator")
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), 'horizontal scroll'
         assert not errors, errors
-        print(f'PASS elevator Chromium {width}px: unlock dialog, hidden E, map/3D E, {"tap/keyboard" if touch else "keyboard/mouse"} rides 1F→3F→1F; no JS errors')
+        print(f'PASS elevator Chromium {width}px: unlock dialog, picker image, hidden E, map/3D E, {"tap/keyboard" if touch else "keyboard/mouse"} rides 1F→3F→1F; no JS errors')
         ctx.close()
     browser.close()
