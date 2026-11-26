@@ -19,7 +19,21 @@ def check_sprites(page, uids, centers, files):
     }""", arg=len(uids))
     scene = page.locator('#scene')
     rect = scene.bounding_box()
-    rows = scene.locator('.scene-enemies').bounding_box()
+    enemy_list = scene.locator('.scene-enemies')
+    rows = enemy_list.bounding_box()
+    assert rows['width'] > 0 and rows['height'] > 0
+    assert abs(rows['x'] - rect['x'] - 6) < .1 and abs(rows['y'] - rect['y'] - 6) < .1
+    assert rows['x'] + rows['width'] <= rect['x'] + rect['width'] + .1
+    assert rows['y'] + rows['height'] <= rect['y'] + rect['height'] + .1
+    line_boxes = enemy_list.locator(':scope > div').evaluate_all("""rows=>rows.map(row=>{
+      const text=document.createRange();
+      text.selectNodeContents(row);
+      return Array.from(text.getClientRects(), box=>({left:box.left, right:box.right}));
+    })""")
+    assert line_boxes
+    for line in line_boxes:
+        assert len(line) == 1, line
+        assert rows['x'] <= line[0]['left'] < line[0]['right'] <= rows['x'] + rows['width'] + .1, line
     dpr = page.evaluate('devicePixelRatio')
     target = min(rect['height'] * .475, rect['width'] * 150 / 640)
     rounded = math.floor(target * dpr / 48 + .5) * 48 / dpr
@@ -37,10 +51,6 @@ def check_sprites(page, uids, centers, files):
         assert abs(box['width'] - size) < .1 and abs(box['height'] - size) < .1, (box, size)
         assert abs(box['x'] + size/2 - (rect['x'] + rect['width']*x/640)) < .1
         assert abs(box['y'] + size - (rect['y'] + rect['height']*.75)) < .1
-        assert rows['width'] > 0 and rows['height'] > 0
-        assert (rows['x'] + rows['width'] <= box['x'] or
-                rows['y'] + rows['height'] <= box['y']), (box, rows)
-        assert rows['y'] + rows['height'] <= rect['y'] + rect['height'] + .1
 
 
 with sync_playwright() as p:
@@ -161,6 +171,6 @@ with sync_playwright() as p:
         page.wait_for_function("document.querySelector('#scene img')?.naturalWidth===48")
         assert 'サッキュバス' not in page.locator('#scene').inner_html()
         assert not errors, errors
-        print(f'PASS enemy sprites {width}px: snapshots, placement, resize, overlays, symbols and fallback')
+        print(f'PASS enemy sprites {width}px: snapshots, placement, single-line rows, resize, overlays, symbols and fallback')
         page.close()
     browser.close()

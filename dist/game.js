@@ -359,7 +359,7 @@ function drawEnemies(groups){
    frames+=`<g data-enemy-uid="${uid}"><rect x="${x-54}" y="140" width="108" height="121" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="224.5" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text></g>`;
   }
  }
- return {sprites,frames,firstX};
+ return {sprites,frames};
 }
 function ensureProfile(){s.itemBox??=[];s.milwaSteps??=0;s.teppeki??=false;s.flagSight??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;refreshNames();s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i));migrateAgility(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0);migrateAgility(r.members,r.members.job??0)}for(const m of [...s.members,...(s.reserve||[]).map(r=>r.members),...s.corpses.flatMap(c=>(c.records||[]).map(r=>r.members))]){if(m)m.vit??=10;ensureCareerHistory(m)}ensureMagic();ensureProgression();s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){if(!s.inventory[i].every(weapon))s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id));while(usedSlots(s.inventory[i])>10){const slot=s.inventory[i].length-1;s.inventory[i].pop();for(const part in s.armor[i])if(s.armor[i][part]===slot)delete s.armor[i][part];}if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
@@ -812,9 +812,9 @@ function scene(){
  const txt=(x,y,t,size,color=p.symbol)=>`<text x="${x}" y="${y}" text-anchor="middle" fill="${color}" font-family="system-ui,sans-serif" font-size="${size}" font-weight="700">${t}</text>`;
  const panel=(v,x,size=58)=>v.symbol?txt(x,209,v.symbol,size,v.color):'';
  const groups=combat?enemyGroups(combat):[];
- const {sprites,frames,firstX}=drawEnemies(groups);
+ const {sprites,frames}=drawEnemies(groups);
  const guardian=!combat&&s.pendingBoss?`<rect x="200" y="90" width="240" height="170" rx="8" fill="${p.guardian}" stroke="${p.guardianLine}"/>${txt(320,196,'☠',55)}`:'';
- const list=combat?`<div class="scene-enemies" aria-label="敵の列" style="--first-enemy-x:${100*firstX/640}%">${groups.map(sceneEnemyRow).join('')}</div>`:'';
+ const list=combat?`<div class="scene-enemies" aria-label="敵の列">${groups.map(sceneEnemyRow).join('')}</div>`:'';
  const notice=encounterNotice?`<div class="encounter-notice" role="status">${encounterNotice}</div>`:'';
  $('#scene').innerHTML=`<svg viewBox="0 0 640 400" preserveAspectRatio="none" role="img" aria-label="正面：${f.label} ${f.symbol}、左：${l.label} ${l.symbol}、右：${r.label} ${r.symbol}">
   <path d="M0 0H640L440 100H200Z" fill="${p.ceiling}"/>
