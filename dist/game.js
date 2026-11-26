@@ -6,6 +6,12 @@ function fresh(floor=1,{settledPosition=true}={}){let profile=s?{unknownEquipWar
   const eligible=s.cells.filter(c=>c.trap===false&&!c.type);
   for(let n=0;n<spinCount;n++)eligible.splice(Math.random()*eligible.length|0,1)[0].spin=true;
  }
+ if(floor===5){
+  const outcomes=['blind','anti',null,null];
+  s.floorZones=Array.from({length:4},()=>outcomes[Math.floor(Math.random()*4)]);
+  const eligible=s.cells.filter((c,i)=>!c.trap&&c.type===''&&num(i)===0);
+  if(eligible.length)eligible[Math.floor(Math.random()*eligible.length)].fountain=true;
+ }
  render({settledPosition})}
 // Both fresh floors and reload protect the origin's neighbors; only 1F protects a route.
 function floorTrapSafety(origin,boss,floor){
@@ -105,9 +111,41 @@ function log(t,options={}){if(displayCombat===undefined)displayCombat=structured
 function flagSightCount(){return around(s.pos).filter(j=>!!s.cells[j].flag).length}
 function num(i){return around(i).filter(j=>s.cells[j].trap).length}function save(){try{if(typeof recordLibrarySpells==='function')recordLibrarySpells();localStorage.setItem('ash-v1',JSON.stringify(rosterSaveState()))}catch{}}function markDeaths(){s.members.forEach((m,i)=>{if(s.hp[i]<=0&&m.status==='ok'){leaveHiding(i);m.status='dead'}})}
 function hurt(n){s.hp=s.hp.map((h,i)=>activeMember(i)?Math.max(0,h-n):h);markDeaths();if(!activeMembers().length){defeat()}}
-function cell(i,action='forward'){if(currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss)return;let c=s.cells[i];if(mode==='flag'){if(!c.open)c.flag=c.flag?false:(s.flagKind||'power');render();return}if(!adjacent(s.pos,i)){log('現在地の上下左右に隣接するマスを選んでください。');render();return}if(c.flag){log('旗のあるマスには移動できない。旗を外すと進めます。');render();return}tickAilments(false);if(s.done){render();return}let previous=s.pos,wasOpen=c.open;s.previousPos=previous;setPlayerPosition(i);if(s.milwaSteps>0)s.milwaSteps--;
+function cell(i,action='forward'){if(currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss||s.pendingFountain)return;let c=s.cells[i];if(mode==='flag'){if(!c.open)c.flag=c.flag?false:(s.flagKind||'power');render();return}if(!adjacent(s.pos,i)){log('現在地の上下左右に隣接するマスを選んでください。');render();return}if(c.flag){log('旗のあるマスには移動できない。旗を外すと進めます。');render();return}tickAilments(false);if(s.done){render();return}let previous=s.pos,wasOpen=c.open;s.previousPos=previous;setPlayerPosition(i);if(s.milwaSteps>0)s.milwaSteps--;
  if(c.spin===true)s.dir=Math.random()*4|0;
- if(c.type==='elevator'){c.open=true;s.pendingElevator=true;renderElevatorPick();$('#elevatorpick').showModal();render();return}if(c.type==='boss'&&!s.relic){c.open=true;s.pendingBoss={previous};log('階段の上に誰かが覆いかぶさっている。');render();return}if(!c.open){c.open=true;if(c.trap){if(triggerFloorTrap(c)){render();return}}else log(num(i)?`警告：周囲に罠が${num(i)}個。`:'静かな部屋。周囲に罠はない。')}if(!s.done){if(!wasOpen)checkElevatorUnlock();recoverCorpses(i);if(c.type==='down'){s.pendingStairs='down';log(`地下${s.floor+1}階に移動しますか？`)}else if(c.type==='stairs'){s.pendingStairs=true;log(s.floor===1?'町に移動しますか？':`地下${s.floor-1}階に移動しますか？`)}else if(Math.random()<encounterRate(i,wasOpen,action))encounter(i,!wasOpen,action)}render()}
+ if(c.type==='elevator'){c.open=true;s.pendingElevator=true;renderElevatorPick();$('#elevatorpick').showModal();render();return}if(c.type==='boss'&&!s.relic){c.open=true;s.pendingBoss={previous};log('階段の上に誰かが覆いかぶさっている。');render();return}if(!c.open){c.open=true;if(c.trap){if(triggerFloorTrap(c)){render();return}}else log(num(i)?`警告：周囲に罠が${num(i)}個。`:'静かな部屋。周囲に罠はない。')}
+ if(!s.done){
+  if(!wasOpen)checkElevatorUnlock();
+  recoverCorpses(i);
+  if(c.type==='down'){
+   s.pendingStairs='down';log(`地下${s.floor+1}階に移動しますか？`);
+  }else if(c.type==='stairs'){
+   s.pendingStairs=true;log(s.floor===1?'町に移動しますか？':`地下${s.floor-1}階に移動しますか？`);
+  }else if(c.fountain){
+   s.pendingFountain=true;
+  }else if(Math.random()<encounterRate(i,wasOpen,action))encounter(i,!wasOpen,action);
+ }
+ render();
+}
+
+function answerFountain(pool){
+ if(!s.pendingFountain)return;
+ s.pendingFountain=false;
+ if(pool==='hp'||pool==='mp'){
+  const maximum=pool==='hp'?'maxHP':'maxMP';
+  s.members.forEach((member,i)=>{if(member.status==='ok')s[pool][i]=member[maximum]});
+  s.cells[s.pos].fountain=false;
+  log(`命の泉の力で、全員の${pool.toUpperCase()}が全回復した！`);
+ }
+ $('#fountaindialog').close();
+ render();
+}
+$('#fountainhp').onclick=()=>answerFountain('hp');
+$('#fountainmp').onclick=()=>answerFountain('mp');
+$('#fountainskip').onclick=()=>answerFountain();
+$('#fountaindialog').oncancel=e=>{e.preventDefault();answerFountain()};
+$('#fountaindialog').onclose=()=>{if(!$('#fountaindialog').open&&s.pendingFountain)answerFountain()};
+
 function finish(){s.done=true;log(s.relic&&s.guardianKilledThisRun?`秘宝を持ち帰った！ 探索成功。金貨 ${s.gold}枚。`:`無事に帰還。金貨 ${s.gold}枚を持ち帰った。`)}const MAX_HP=[32,24,26],NAMES=['戦士','魔法使い','僧侶'];
 function dice(n,d,add=0){let rolls=Array.from({length:n},()=>1+(Math.random()*d|0));return {value:rolls.reduce((a,b)=>a+b,add),text:`${n}d${d}${add?'+'+add:''} [${rolls.join(', ')}]${add?' + '+add:''}`}}
 function strengthFor(job,level){return Math.min(18,([15,9,12,12,13,14,12,9][job]??10)+Math.floor((Math.max(1,level)-1)/5))}
@@ -361,10 +399,10 @@ function drawEnemies(groups){
  }
  return {sprites,frames};
 }
-function ensureProfile(){s.itemBox??=[];s.milwaSteps??=0;s.teppeki??=false;s.flagSight??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;refreshNames();s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i));migrateAgility(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0);migrateAgility(r.members,r.members.job??0)}for(const m of [...s.members,...(s.reserve||[]).map(r=>r.members),...s.corpses.flatMap(c=>(c.records||[]).map(r=>r.members))]){if(m)m.vit??=10;ensureCareerHistory(m)}ensureMagic();ensureProgression();s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){if(!s.inventory[i].every(weapon))s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id));while(usedSlots(s.inventory[i])>10){const slot=s.inventory[i].length-1;s.inventory[i].pop();for(const part in s.armor[i])if(s.armor[i][part]===slot)delete s.armor[i][part];}if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
+function ensureProfile(){s.itemBox??=[];s.milwaSteps??=0;s.teppeki??=false;s.flagSight??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;s.pendingFountain??=false;s.floorZones??=s.floor===5?Array(4).fill(null):null;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;refreshNames();s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i));migrateAgility(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0);migrateAgility(r.members,r.members.job??0)}for(const m of [...s.members,...(s.reserve||[]).map(r=>r.members),...s.corpses.flatMap(c=>(c.records||[]).map(r=>r.members))]){if(m)m.vit??=10;ensureCareerHistory(m)}ensureMagic();ensureProgression();s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){if(!s.inventory[i].every(weapon))s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id));while(usedSlots(s.inventory[i])>10){const slot=s.inventory[i].length-1;s.inventory[i].pop();for(const part in s.armor[i])if(s.armor[i][part]===slot)delete s.armor[i][part];}if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
 function diceLabel(w){if(w.kind==='medicine')return w.description;if(w.part)return `${{head:"頭",body:"胴体",feet:"足"}[w.part]} AC −${w.ac}`;return `${w.dice[0]}d${w.dice[1]}${w.dice[2]?'+'+w.dice[2]:''}`}
-function idle(){return !s.pendingElevator&&!allyTargetPick&&!currentChest()&&!logBusy()&&!s.enemy&&!s.pendingBoss&&!s.pendingStairs}
+function idle(){return !s.pendingElevator&&!allyTargetPick&&!currentChest()&&!logBusy()&&!s.enemy&&!s.pendingBoss&&!s.pendingFountain&&!s.pendingStairs}
 // File transfer keeps pending data outside the saved game state.
 let pendingSaveImport=null,saveImportRequest=0;
 function saveExportEnvelope(){return {format:'dungeonsweeper-save',formatVersion:1,exportedAt:new Date().toISOString(),data:rosterSaveState()}}
@@ -470,7 +508,7 @@ function confirmSaveImport(){
 }
 function canThiefDisarm(i){const k=target();return !!s.members[i]&&[3,6].includes(jobOf(i))&&!partyIncapacitated(i)&&idle()&&s.area==='dungeon'&&!s.members[i].disarmUsed&&k>=0&&k<s.cells.length&&!s.cells[k].open}
 function thiefDisarm(i){if(!canThiefDisarm(i))return;const t=target(),c=s.cells[t];s.members[i].disarmUsed=true;c.flag=false;if(c.trap){c.trap=false;c.disarmed=true;log(`${NAMES[i]}は目の前の罠を解除した。`)}else log(`${NAMES[i]}は目の前を調べた。罠はなかった。`);c.open=true;checkElevatorUnlock(t);render()}
-function enterTown(){if(!idle())return;const carried=s.defeatPending?[]:s.members.filter(m=>['dead','ash','lost','stone'].includes(m.status)).map(m=>({id:m.id,name:m.name||CLASSES[m.job??0].name,status:m.status}));s.area='town';const levels=s.members.map((m,i)=>m.status==='ok'?i:-1).filter(i=>i>=0);levelUp(levels);s.hp=s.members.map((m,i)=>m.status==='ok'?m.maxHP:s.hp[i]);s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);s.templeReport=carried.map(({name,status})=>({name,status}));s.ailments=s.ailments.map(()=>freshAilments());if(carried.length)removeFromParty(carried.map(x=>x.id));s.light=false;s.milwaSteps=0;s.teppeki=false;s.watchful=false;s.flagSight=false;s.dumapicUses=0;s.floodUses=0;for(const m of s.members)delete m.disarmUsed;for(const r of s.reserve||[])delete r.members.disarmUsed;s.ailments=s.ailments.map(()=>freshAilments());s.scan=5;s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.pendingElevator=false;resetDungeon();autoReorderParty('town');render();showTempleCarryReport()}
+function enterTown(){if(!idle())return;const carried=s.defeatPending?[]:s.members.filter(m=>['dead','ash','lost','stone'].includes(m.status)).map(m=>({id:m.id,name:m.name||CLASSES[m.job??0].name,status:m.status}));s.area='town';const levels=s.members.map((m,i)=>m.status==='ok'?i:-1).filter(i=>i>=0);levelUp(levels);s.hp=s.members.map((m,i)=>m.status==='ok'?m.maxHP:s.hp[i]);s.mp=s.members.map((m,i)=>m.status==='ok'?m.maxMP:s.mp[i]);s.templeReport=carried.map(({name,status})=>({name,status}));s.ailments=s.ailments.map(()=>freshAilments());if(carried.length)removeFromParty(carried.map(x=>x.id));s.light=false;s.milwaSteps=0;s.teppeki=false;s.watchful=false;s.flagSight=false;s.dumapicUses=0;s.floodUses=0;for(const m of s.members)delete m.disarmUsed;for(const r of s.reserve||[])delete r.members.disarmUsed;s.ailments=s.ailments.map(()=>freshAilments());s.scan=5;s.commands=s.members.map((m,i)=>i<3?'fight':'guard');s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;s.pendingElevator=false;s.pendingFountain=false;resetDungeon();autoReorderParty('town');render();showTempleCarryReport()}
 function resetDungeon(){let report=s.levelReport;fresh(1);s.area='town';s.floors={};s.cells.forEach(c=>c.open=false);s.logs=[];s.levelReport=report;s.dungeonCycleVersion=1;}
 function enterDungeon(){if(!s.members.length||s.area!=='town'||!idle())return;if(s.members.some(m=>m.status!=='ok')){$('#townnotice').textContent='死亡したメンバーを外してください。';render();return;}$('#townnotice').textContent='';if(s.done||s.floor!==1||!s.dungeonCycleVersion)resetDungeon();s.area='dungeon';s.pos=s.start;s.cells[s.start].open=true;revealHeadlight();log('迷宮へ入った。');render()}
 function answerStairs(yes){if(logBusy()||!s.pendingStairs)return;let down=s.pendingStairs==='down';s.pendingStairs=false;if(yes){if(down)travelFloor(s.floor+1);else if(s.floor>1)travelFloor(s.floor-1);else enterTown();}else{log('階段の前にとどまった。');render()}}
@@ -756,8 +794,8 @@ $('#itemboxopen').onclick=openItemBox;
 $('#itemboxclose').onclick=()=>$('#itemboxdialog').close();
 for(const tab of ITEM_BOX_TABS)$('#itemboxtab-'+tab).onclick=()=>{itemBoxTab=tab;renderItemBox();$('#itemboxbody').scrollTop=0};
 function target(turn=0){const d=((s.dir||0)+turn+4)%4;const dx=[0,1,0,-1][d],dy=[-1,0,1,0][d];const x=s.pos%size()+dx,y=(s.pos/size()|0)+dy;return x<0||x>=size()||y<0||y>=size()?-1:y*size()+x}
-function move(action){if(allyTargetPick||currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss)return;if(action==='left'||action==='right'){s.dir=(s.dir+(action==='left'?3:1))%4;render();return}let i=target(({back:2,strafeLeft:-1,strafeRight:1})[action]??0);if(i<0){log('外壁が行く手を塞いでいる。');render();return}mode='move';cell(i,action)}
-function flag(i){if(allyTargetPick||currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss||i<0)return;let c=s.cells[i];if(c.open){log('探索済みの部屋には旗を立てられない。');render();return}c.flag=c.flag?false:(s.flagKind||'power');render()}
+function move(action){if(allyTargetPick||currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss||s.pendingFountain)return;if(action==='left'||action==='right'){s.dir=(s.dir+(action==='left'?3:1))%4;render();return}let i=target(({back:2,strafeLeft:-1,strafeRight:1})[action]??0);if(i<0){log('外壁が行く手を塞いでいる。');render();return}mode='move';cell(i,action)}
+function flag(i){if(allyTargetPick||currentChest()||s.area!=='dungeon'||s.pendingStairs||s.pendingElevator||logBusy()||s.done||s.enemy||s.pendingBoss||s.pendingFountain||i<0)return;let c=s.cells[i];if(c.open){log('探索済みの部屋には旗を立てられない。');render();return}c.flag=c.flag?false:(s.flagKind||'power');render()}
 // Environment colors only; green preserves the existing view.
 const SCENE_PALETTES={
   green:{ceiling:'#121914',back:'#2d382d',floor:'#202722',current:'#3b493c',numbered:'#34413a',open:'#202722',door:'#151f1b',line:'#46513f',symbol:'#d6d9c9',guardian:'#231b18',guardianLine:'#b58663',faceSymbol:'#e8d2a2',corridorLine:'#829079'},
@@ -833,11 +871,17 @@ function inMapBlindZone(x,y,n){
  const dx=x-center,dy=y-center;
  return dx*dx+dy*dy<=9;
 }
+function floor5ZoneAt(i){
+ const quadrant=(i>=6*12?2:0)+(i%12>=6?1:0);
+ return s.floorZones?.[quadrant]??null;
+}
 function isMapBlind(){
+ if(s.floor===5)return floor5ZoneAt(s.pos)==='blind';
  const n=size();
  return s.floor===3&&inMapBlindZone(s.pos%n,Math.floor(s.pos/n),n);
 }
 function isAntimagicZone(){
+ if(s.floor===5)return floor5ZoneAt(s.pos)==='anti';
  const n=size();
  return s.floor===4&&inMapBlindZone(s.pos%n,Math.floor(s.pos/n),n);
 }
@@ -863,26 +907,42 @@ function mapZoneFrame(i,n,frame){
  if(!inMapBlindZone(x-1,y,n))edges+=` ${frame}-left`;
  return edges?` ${frame}${edges}`:'';
 }
+function floor5ZoneFrame(i){
+ const zone=floor5ZoneAt(i);
+ if(!zone)return '';
+ const frame=zone==='blind'?'zoneframe':'antiframe';
+ const x=i%12,y=Math.floor(i/12);
+ let edges='';
+ if(y>0&&floor5ZoneAt(i-12)!==zone)edges+=` ${frame}-top`;
+ if(x<11&&floor5ZoneAt(i+1)!==zone)edges+=` ${frame}-right`;
+ if(y<11&&floor5ZoneAt(i+12)!==zone)edges+=` ${frame}-bottom`;
+ if(x>0&&floor5ZoneAt(i-1)!==zone)edges+=` ${frame}-left`;
+ return edges?` ${frame}${edges}`:'';
+}
 function syncMapBlindNotice(mapBlind=isMapBlind()){
  $('#mapblindnotice').hidden=!$('#mapdialog').open||!mapBlind;
 }
 function render({settledPosition=true,logPrepended=false}={}){
  if(settledPosition)dispelAntimagicEffects();
+ const fountainDialog=$('#fountaindialog');
+ if(s.pendingFountain&&!fountainDialog.open)fountainDialog.showModal();
+ if(!s.pendingFountain&&fountainDialog.open)fountainDialog.close();
  currentFloorTheme=s.area==='town'||s.floor===1?'green':s.floor<=3?'blue':s.floor<=5?'yellow':s.floor<=7?'orange':s.floor<=9?'red':'purple';$('body').setAttribute('data-floor-theme',currentFloorTheme);let focusedAllyTarget=document.activeElement?.dataset?.allyTarget;ensureProfile();renderElevatorDialogs();$('#clearresult').hidden=s.area!=='dungeon'||!s.clearNotice||s.done||logBusy()||!!visibleCombat();$('#cleartown').disabled=!idle();$('#clearchestnotice').hidden=!currentChest();$('#clearedmark').hidden=!s.cleared;$('#entrance').disabled=!s.members.length;$('#blacksmith').disabled=!s.members.length;$('#emptyparty').hidden=!!s.members.length;renderFlags();$('#board').style.gridTemplateColumns=`repeat(${size()},1fr)`;$('.maplocation').textContent=`地下${s.floor}階`;$('#maptitle').textContent=`地図（地下${s.floor}階）`;let shownHP=displayVitals?.hp||s.hp,shownMP=displayVitals?.mp||s.mp;s.dir??=1;s.commands??=['fight','fight','fight'];save();$('#gametitle').hidden=s.area!=='town';$('header').classList.toggle('in-dungeon',s.area!=='town');$('#town').hidden=s.area!=='town';$('#dungeon').hidden=s.area==='town';$('#backtown').hidden=s.area==='town'||!s.done;$('#backtown').disabled=logBusy();if(escapeMapHold&&!logBusy())escapeMapHold=false;const mapCombat=!!visibleCombat()||escapeMapHold;if(mapCombat&&$('#mapdialog').open)$('#mapdialog').close();$('#maptoggle').hidden=s.area!=='dungeon'||mapCombat;if($('#statsdialog').open)renderStats();$('#status').textContent=`金貨 ${s.gold} G${s.relic&&s.guardianKilledThisRun?' / 秘宝 ✦':''}`;$('#party').innerHTML=(displayVitals?.members||s.members).map((m,i)=>{let n=m.name||CLASSES[m.job??i].name;return `<div class="card"><b>${n} <small>Lv.${shownMember(i).level}</small>${ailmentTags(i)}${(displayVitals?displayVitals.hiddenIds:s.enemy?.hiddenIds)?.includes(m.id)?'<span class="ailment-tag">潜伏</span>':''}</b><div class="hpbar ${shownHP[i]<=shownMember(i).maxHP/6?'low':''}" role="progressbar" aria-label="${n}のHP" aria-valuemin="0" aria-valuemax="${shownMember(i).maxHP}" aria-valuenow="${shownHP[i]}"><div class="hpfill" style="width:${shownHP[i]/shownMember(i).maxHP*100}%"></div><span class="hpvalue">${shownHP[i]}/${shownMember(i).maxHP}</span></div><div class="mpbar" role="progressbar" aria-label="${n}のMP" aria-valuemin="0" aria-valuemax="${shownMember(i).maxMP||1}" aria-valuenow="${shownMP[i]}"><div style="width:${shownMember(i).maxMP?shownMP[i]/shownMember(i).maxMP*100:0}%"></div><span>${shownMP[i]}/${shownMember(i).maxMP}</span></div></div>`}).join('');
  const mapBlind=isMapBlind();
  syncMapBlindNotice(mapBlind);
- const frameClass=hasLight()?({3:'zoneframe',4:'antiframe'})[s.floor]:undefined;
+ const lit=hasLight();
+ const frameClass=lit?({3:'zoneframe',4:'antiframe'})[s.floor]:undefined;
  const boardSize=size();
  const corpseCells=new Set(s.corpses.filter(c=>c.floor===s.floor).map(c=>c.cell));
  $('#board').innerHTML=s.cells.map((c,i)=>{
-  const frame=frameClass?mapZoneFrame(i,boardSize,frameClass):'';
+  const frame=lit&&s.floor===5?floor5ZoneFrame(i):frameClass?mapZoneFrame(i,boardSize,frameClass):'';
   return mapBlind
   ? `<button class="cell blind${frame}" data-i="${i}" aria-label="地図のマス"></button>`
   : `<button class="cell ${c.open?'open':''} ${s.pos===i?'here':''} ${[target(),target(-1),target(1),...diagonalSight()].includes(i)?'in-view':''} ${c.open&&c.type==='boss'?'boss-cell':''}${frame}" data-i="${i}"  aria-label="${(i/size()|0)+1}行${i%size()+1}列 ${s.pos===i?'現在地 ':''}${corpseCells.has(i)?'遺体 ':''}${c.open&&c.type==='elevator'?'昇降機 ':''}${c.open?'周囲の罠'+num(i):c.flag?FLAG_NAMES[placedFlag(c)]:'未探索'}${s.flagSight&&s.pos===i?'、周囲の旗'+flagSightCount()+'本':''}">${s.pos===i?`<svg class="direction-marker" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,3 34,35 6,35" transform="rotate(${s.dir*90} 20 20)" fill="#d7b881" fill-opacity=".12" stroke="#d7b881" stroke-width="1.5" stroke-linejoin="round"/></svg>`:''}<span class="cell-number" style="${c.flag?'color:'+FLAG_COLORS[placedFlag(c)]:''}">${corpseCells.has(i)?'🦴':s.pos===i?num(i):c.open?(c.type==='elevator'?'E':c.type==='boss'?'☠':c.chest&&!c.chest.opened?'▣':c.type==='down'?'⇩':c.type==='stairs'?'⇧':c.spent?'×':num(i)):c.flag?'⚑':c.safe?'✓':''}</span>${s.flagSight&&s.pos===i?`<span class="flag-sight-count">${flagSightCount()}</span>`:''}</button>`;
  }).join('');
  $('#log').replaceChildren(...s.logs.map(t=>{let d=document.createElement('div');d.innerHTML=coloredLog(t);return d}));
  if($('#logdialog').open)syncLogDialog({logPrepended});
- $('#bosschoice').hidden=!s.pendingBoss&&!s.pendingStairs;$('#bossyes').textContent=s.pendingBoss?'戦う':'はい';$('#bossno').textContent=s.pendingBoss?'戻る':'いいえ';$('#bossyes').disabled=logBusy();$('#bossno').disabled=logBusy();let combat=visibleCombat();$('.controls').hidden=!!combat||!!s.enemy;$('#battle').hidden=!combat;$('#commandreviewpopup').hidden=true;if(combat){$('#battle').innerHTML=`<div id="commandentry"></div>`;renderCommandEntry()}$('#frontflag').disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss||target()<0;document.querySelectorAll('[data-action]').forEach(b=>b.disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss);$('#chestactions').hidden=!currentChest()||!!s.enemy||!!visibleCombat()||logBusy()||s.done;const chestOpener=thiefMember();$('#chestthief').hidden=chestOpener<0;if(chestOpener>=0)$('#chestthief').textContent=memberClass(chestOpener).name+'が調べて開ける';$('#chestthief').disabled=logBusy();$('#chestcalfo').hidden=calfoCaster()<0;$('#chestcalfo').disabled=logBusy();$('#chestopen').disabled=logBusy();$('#chestabandon').disabled=logBusy();$('#statsopen').disabled=!!allyTargetPick;$('#maptoggle').disabled=!!allyTargetPick;renderAllyTargetPick(focusedAllyTarget);scene()}
+ $('#bosschoice').hidden=!s.pendingBoss&&!s.pendingStairs;$('#bossyes').textContent=s.pendingBoss?'戦う':'はい';$('#bossno').textContent=s.pendingBoss?'戻る':'いいえ';$('#bossyes').disabled=logBusy();$('#bossno').disabled=logBusy();let combat=visibleCombat();$('.controls').hidden=!!combat||!!s.enemy;$('#battle').hidden=!combat;$('#commandreviewpopup').hidden=true;if(combat){$('#battle').innerHTML=`<div id="commandentry"></div>`;renderCommandEntry()}$('#frontflag').disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss||s.pendingFountain||target()<0;document.querySelectorAll('[data-action]').forEach(b=>b.disabled=!!allyTargetPick||!!currentChest()||s.area!=='dungeon'||!!s.pendingStairs||s.pendingElevator||logBusy()||s.done||!!s.enemy||!!s.pendingBoss||s.pendingFountain);$('#chestactions').hidden=!currentChest()||!!s.enemy||!!visibleCombat()||logBusy()||s.done;const chestOpener=thiefMember();$('#chestthief').hidden=chestOpener<0;if(chestOpener>=0)$('#chestthief').textContent=memberClass(chestOpener).name+'が調べて開ける';$('#chestthief').disabled=logBusy();$('#chestcalfo').hidden=calfoCaster()<0;$('#chestcalfo').disabled=logBusy();$('#chestopen').disabled=logBusy();$('#chestabandon').disabled=logBusy();$('#statsopen').disabled=!!allyTargetPick;$('#maptoggle').disabled=!!allyTargetPick;renderAllyTargetPick(focusedAllyTarget);scene()}
 function syncLogDialog({showLatest=false,logPrepended=false}={}){
  const body=$('#logdialogbody'),scrollTop=body.scrollTop;
  const rows=Array.from($('#log').children,row=>row.cloneNode(true));
@@ -1010,15 +1070,15 @@ $('#chestcalfo').onclick=()=>{let i=calfoCaster();if(i>=0&&!logBusy()){castMagic
 $('#chestopen').onclick=()=>openChest(false);
 
 function rememberFloor(){
- // 保存項目は floor, size, cells, start, boss, relic, guardianKilledThisRun の7項目。追加時は tests/travel-characterization.cjs の保存項目の期待値も更新する。
- s.floors??={};s.floors[s.floor]={floor:s.floor,size:s.size,cells:structuredClone(s.cells),start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun};}
+ // 保存項目は floor, size, cells, start, boss, relic, guardianKilledThisRun, floorZones の8項目。追加時は tests/travel-characterization.cjs の保存項目の期待値も更新する。
+ s.floors??={};s.floors[s.floor]={floor:s.floor,size:s.size,cells:structuredClone(s.cells),floorZones:s.floor===5?structuredClone(s.floorZones):null,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun};}
 // enterFloor: 現在階を保存し、移動先の階を復元または新規生成する。戻り値は新規生成なら true、保存済みの階の復元なら false。
 function enterFloor(next,{keepLog}={}){
  rememberFloor();
  const floors=s.floors,scan=s.scan,saved=floors[next];
  if(saved){
-  Object.assign(s,structuredClone(saved));
-  s.area='dungeon';s.done=false;s.enemy=null;s.pendingBoss=null;s.pendingStairs=false;
+  Object.assign(s,{floorZones:next===5?Array(4).fill(null):null},structuredClone(saved));
+  s.area='dungeon';s.done=false;s.enemy=null;s.pendingBoss=null;s.pendingFountain=false;s.pendingStairs=false;
   return false;
  }
  const pending=keepLog?logQueue.slice():[];
@@ -1027,7 +1087,7 @@ function enterFloor(next,{keepLog}={}){
  if(pending.length){logQueue.push(...pending);if(logTimer===null)logTimer=setTimeout(pumpLog,0)}
  return true;
 }
-function placeElevator(exclude=-1){if(!s.elevatorFloors.includes(s.floor))return;const eligible=i=>{const c=s.cells[i];return c&&c.type===''&&!c.trap&&!c.chest&&!s.corpses.some(x=>x.floor===s.floor&&x.cell===i)&&i!==s.pos&&i!==s.start&&i!==s.boss};let pool=s.cells.map((_,i)=>i).filter(i=>eligible(i));if(s.floor===1)pool=pool.filter(i=>Math.max(Math.abs(i%size()-s.start%size()),Math.abs((i/size()|0)-(s.start/size()|0)))<=2);// If exclusion leaves no candidate after the floor distance limit, keep the legacy pool so the elevator is not lost.
+function placeElevator(exclude=-1){if(!s.elevatorFloors.includes(s.floor))return;const eligible=i=>{const c=s.cells[i];return c&&c.type===''&&!c.trap&&!c.chest&&!c.fountain&&!s.corpses.some(x=>x.floor===s.floor&&x.cell===i)&&i!==s.pos&&i!==s.start&&i!==s.boss};let pool=s.cells.map((_,i)=>i).filter(i=>eligible(i));if(s.floor===1)pool=pool.filter(i=>Math.max(Math.abs(i%size()-s.start%size()),Math.abs((i/size()|0)-(s.start/size()|0)))<=2);// If exclusion leaves no candidate after the floor distance limit, keep the legacy pool so the elevator is not lost.
 const filtered=pool.filter(i=>i!==exclude);if(filtered.length)pool=filtered;if(!pool.length)return;const i=pool[Math.random()*pool.length|0];s.cells[i].type='elevator';s.cells[i].open=false;}
 function checkElevatorUnlock(exclude=-1){if(s.elevatorFloors.includes(s.floor)||!s.cells.every(c=>c.trap||c.open))return;s.elevatorFloors.push(s.floor);s.elevatorFloors.sort((a,b)=>a-b);placeElevator(exclude);const msg=s.floor===1?'昇降機が使えるようになった！ 昇降機（E）から解放した階へ移動できます。':`地下${s.floor}階に昇降機が止まるようになった。`;log(msg);s.elevatorNotice=msg;}
 function travelElevator(n){
@@ -1122,7 +1182,7 @@ inventoryPartyUI();
 $('#levelclose').onclick=()=>$('#leveldialog').close();
 $('#templecarryok').onclick=()=>$('#templecarrydialog').close();$('#templecarrydialog').addEventListener('close',()=>{s.templeReport=[];save();if(s.templeReportFromLoad){delete s.templeReportFromLoad;save()}else showLevelReport()});
 
-function renderElevatorDialogs(){if(s.area!=='dungeon'){s.pendingElevator=false;s.elevatorNotice=null;return}if(s.elevatorNotice&&!logBusy()&&!s.enemy&&!visibleCombat()&&!s.done&&!$('#elevatordialog').open){$('#elevatormessage').textContent=s.elevatorNotice;s.elevatorNotice=null;$('#elevatordialog').showModal()}if(s.pendingElevator&&!$('#elevatorpick').open&&!$('#elevatordialog').open){renderElevatorPick();$('#elevatorpick').showModal()}}
+function renderElevatorDialogs(){if(s.area!=='dungeon'){s.pendingElevator=false;s.elevatorNotice=null;return}if(s.elevatorNotice&&!s.pendingFountain&&!logBusy()&&!s.enemy&&!visibleCombat()&&!s.done&&!$('#elevatordialog').open){$('#elevatormessage').textContent=s.elevatorNotice;s.elevatorNotice=null;$('#elevatordialog').showModal()}if(s.pendingElevator&&!$('#elevatorpick').open&&!$('#elevatordialog').open){renderElevatorPick();$('#elevatorpick').showModal()}}
 function renderElevatorPick(){const root=$('#elevatorchoices');root.replaceChildren();for(const n of s.elevatorFloors.filter(n=>n!==s.floor)){const b=document.createElement('button');b.textContent=`地下${n}階`;b.setAttribute('data-elevator-floor',n);if(!root.children.length)b.setAttribute('data-key-default','');b.onclick=()=>{ $('#elevatorpick').close();travelElevator(n)};root.append(b)}if(!root.children.length){const p=document.createElement('p');p.textContent='移動できる階はありません。';root.append(p)} }
 $('#elevatorok').onclick=()=>$('#elevatordialog').close();$('#elevatorcancel').onclick=()=>$('#elevatorpick').close();$('#elevatorpick').addEventListener('click',e=>{if(e.target===$('#elevatorpick'))$('#elevatorpick').close()});$('#elevatorpick').addEventListener('close',()=>{if(s.pendingElevator){s.pendingElevator=false;render()}});
 

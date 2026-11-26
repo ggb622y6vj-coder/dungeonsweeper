@@ -183,3 +183,4 @@
 | 145 | 2026-11-26 | 探索中の呪文発動完了で呪文画面とパーティー欄を閉じ、迷宮画面に戻る | `c99f7d9` | [spec](specs/145-spell-cast-closes-stats.md) | [実施](reports/145.md) |
 | 146 | 2026-11-26 | 戦闘シーンの背景に黒い暗幕を重ね、モンスター画像の目標サイズを1.15倍にする | `8c406ba` | [spec](specs/146-combat-scene-shade-and-larger-sprites.md) | [実施](reports/146.md) |
 | 147 | 2026-11-26 | 昇降機の階層選択ダイアログにドット絵を表示 | `62f96ab` | [spec](specs/147-elevator-dialog-image.md) | [実施](reports/147.md) |
+| 148 | 2026-11-26 | 5Fの各象限に地図無効・反呪文の結界を抽選し、HPかMPを一度だけ全回復できる命の泉を追加 | 未コミット | [spec](specs/148-floor5-quadrant-zones-and-fountain.md) | [実施](reports/148.md) |

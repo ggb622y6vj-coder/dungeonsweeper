@@ -407,3 +407,4 @@ require('./css-structure.cjs');
 require('./item-identification.cjs');
 
 require('./monster-sprites.cjs');
+require('./floor5-zones.cjs');

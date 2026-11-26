@@ -270,6 +270,7 @@ with sync_playwright() as p:
 
         page.evaluate(f'''() => {{
             fresh(5);
+            s.floorZones = [null, null, null, null];
             s.pos = 65;
             s.cells[s.pos].open = true;
             s.ailments = s.members.map(() => freshAilments());

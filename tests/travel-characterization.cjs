@@ -32,7 +32,7 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
 
 // rememberFloor saves exactly this field set (a missing field breaks all 3 routes at once).
 {const g=setup(90);g.run('fresh(2);rememberFloor()');
- assert.deepEqual(J(g,'Object.keys(s.floors[2]).sort()'),['boss','cells','floor','guardianKilledThisRun','relic','size','start']);}
+ assert.deepEqual(J(g,'Object.keys(s.floors[2]).sort()'),['boss','cells','floor','floorZones','guardianKilledThisRun','relic','size','start']);}
 
 // travelFloor down to a FRESH floor: fresh() runs, so its render and log reset are part of the count.
 // Note the asymmetry pinned here and in the next block: on the fresh path fresh() clears
@@ -192,13 +192,13 @@ const ARRIVAL='迷宮に到着。守護者のいる部屋を探そう。';
 // (Added on ChatGPT's recommendation: the skeleton refactor must not break this.)
 {const g=setup(205);
  g.run("var mark=s.cells.findIndex(c=>!c.type&&!c.trap);s.cells[mark].open=true;s.relic=true;s.guardianKilledThisRun=true");
- const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
+ const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,floorZones:null,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
  g.run('s.elevatorFloors=[1,2];travelElevator(2)');
  assert.deepEqual(J(g,'s.floors[1]'),before,'the departure floor is saved verbatim');
  g.drain();}
 {const g=setup(206);
  g.run('var mark=s.cells.findIndex(c=>!c.type&&!c.trap);s.cells[mark].open=true');
- const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
+ const before=J(g,'({floor:s.floor,size:s.size,cells:s.cells,floorZones:null,start:s.start,boss:s.boss,relic:s.relic,guardianKilledThisRun:s.guardianKilledThisRun})');
  g.run('rememberFloor()');
  assert.deepEqual(J(g,'s.floors[s.floor]'),before,'rememberFloor itself stores the current state verbatim');}
 
