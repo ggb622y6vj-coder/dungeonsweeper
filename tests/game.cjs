@@ -58,7 +58,8 @@ if(ENEMIES.length!==114)throw Error('CSV count');for(let f=1;f<=10;f++){s.floor=
 var thresholds=s.members.map(m=>JSON.stringify(m.xpTargets));Math.random=()=>{throw Error('unexpected reroll')};ensureProgression();if(s.members.some((m,i)=>JSON.stringify(m.xpTargets)!==thresholds[i]))throw Error('persistent thresholds');
 var previousMembers=s.members;s.members=CLASSES.map(c=>({level:1,xp:0}));Math.random=()=>.5;ensureProgression();if(requiredXP(2,0)!==92||requiredXP(2,2)!==115||requiredXP(2,1)!==138)throw Error('class thresholds');for(let i=0;i<3;i++)for(let lv=2;lv<=30;lv++)if(requiredXP(lv,i)<=requiredXP(lv-1,i))throw Error('nonmonotonic');
 s.members=[{level:8,xp:2900},{level:8,xp:2900},{level:8,xp:2900}];ensureProgression();if(s.members.some(m=>m.level!==8||m.xp!==2900||m.xpTargets[8]!==2800))throw Error('legacy migration');s.members=previousMembers;
-for(let r of [0,.999]){Math.random=()=>r;s.cells[s.pos].type='';encounter(s.pos);if(new Set(s.enemy.units.map(e=>e.uid)).size!==s.enemy.units.length)throw Error('uids');for(let g of enemyGroups()){let range=enemyDefinition(g.id).groupSize;if(g.units.length!==range[r===0?0:1])throw Error('group bound');}if(!drawEnemies().includes('<rect'))throw Error('group drawing');}
+function enemySceneMarkup(){scene();return $('#scene').innerHTML}
+for(let r of [0,.999]){Math.random=()=>r;s.cells[s.pos].type='';encounter(s.pos);if(new Set(s.enemy.units.map(e=>e.uid)).size!==s.enemy.units.length)throw Error('uids');for(let g of enemyGroups()){let range=enemyDefinition(g.id).groupSize;if(g.units.length!==range[r===0?0:1])throw Error('group bound');}if(!enemySceneMarkup().includes('<img class="enemy-sprite"'))throw Error('group drawing');}
 s.cells[s.pos].type='boss';var formationRolls=[0,.99,0];Math.random=()=>formationRolls.shift()??.99;encounter(s.pos);if(s.enemy.units.map(e=>e.id).join()!=='guardian,slime,slime,slime'||s.enemy.units.map(e=>e.row).join()!=='0,1,1,1')throw Error('guardian escort formation');
 s.enemy=null;s.cells[s.pos].type='';s.members.forEach((m,i)=>{m.level=1;m.xp=m.xpTargets[2]});var beforeGrowth=s.members.map(m=>m.maxMP);levelUp();if(s.members.some((m,i)=>m.maxMP-beforeGrowth[i]!== (i===0?0:2)))throw Error('MP growth');
 `);drain();console.log('PASS fixed CSV XP on all floors, persistent random thresholds, class order, migration, group bounds and unique IDs, floor guardian, slow MP growth');
@@ -67,11 +68,11 @@ run(`{const succ=enemyDefinition('succubus'),dai=enemyDefinition('daidaraboti');
 drain();run(`
 s.floor=1;s.area='dungeon';s.done=false;s.pendingStairs=false;s.pendingBoss=null;s.hp=s.members.map(m=>m.maxHP);s.ailments.forEach(a=>{a.poison=false;a.paralysis=0});s.enemy={boss:false,units:[{id:'slime',uid:0,hp:1,rewarded:false},{id:'slime',uid:1,hp:999,rewarded:false}],target:0};s.commands=['fight','guard','guard'];Math.random=()=>.99;attack();
 if(s.commands.some(c=>c!=='fight'))throw Error('guard reset');
-if(!drawEnemies().includes('data-enemy-uid="0"'))throw Error('early removal');
+if(!enemySceneMarkup().includes('data-enemy-uid="0"'))throw Error('early removal');
 `);
-while(timers.length){timers.shift()();run(`if(s.logs[0]==='敵を倒した。'){if(drawEnemies().includes('data-enemy-uid="0"')||!drawEnemies().includes('data-enemy-uid="1"'))throw Error('kill sync')}else if(s.logs[0].includes('ダメージ')&&!s.logs.some(t=>t==='敵を倒した。')){if(!drawEnemies().includes('data-enemy-uid="0"'))throw Error('damage early removal')}`)}
+while(timers.length){timers.shift()();run(`if(s.logs[0]==='敵を倒した。'){if(enemySceneMarkup().includes('data-enemy-uid="0"')||!enemySceneMarkup().includes('data-enemy-uid="1"'))throw Error('kill sync')}else if(s.logs[0].includes('ダメージ')&&!s.logs.some(t=>t==='敵を倒した。')){if(!enemySceneMarkup().includes('data-enemy-uid="0"'))throw Error('damage early removal')}`)}
 run(`
-s.enemy={boss:false,chestBattle:true,lootGold:0,units:[{id:'slime',uid:0,hp:1,rewarded:false},{id:'slime',uid:1,hp:1,rewarded:false}],target:0};s.members[1].known.push('mahalito');s.mp[1]=100;s.magicPlans[1]={id:'mahalito',target:0};s.commands=['guard','spell','guard'];attack();if(s.enemy!==null||s.commands.some(c=>c!=='fight')||s.magicPlans.some(Boolean))throw Error('spell reset');if(!drawEnemies().includes('data-enemy-uid="0"')||drawEnemies().includes('data-enemy-uid="1"'))throw Error('last battle representative before kill');
+s.enemy={boss:false,chestBattle:true,lootGold:0,units:[{id:'slime',uid:0,hp:1,rewarded:false},{id:'slime',uid:1,hp:1,rewarded:false}],target:0};s.members[1].known.push('mahalito');s.mp[1]=100;s.magicPlans[1]={id:'mahalito',target:0};s.commands=['guard','spell','guard'];attack();if(s.enemy!==null||s.commands.some(c=>c!=='fight')||s.magicPlans.some(Boolean))throw Error('spell reset');if(!enemySceneMarkup().includes('data-enemy-uid="0"')||enemySceneMarkup().includes('data-enemy-uid="1"'))throw Error('last battle representative before kill');
 `);
 let killsShown=0;
 while(timers.length){
@@ -79,13 +80,13 @@ while(timers.length){
  if(run("s.logs[0]==='敵を倒した。'")){
   killsShown++;
   const expected=killsShown===1 ? ['1'] : [];
-  const icons=[...run('drawEnemies()').matchAll(/data-enemy-uid="(\d+)"/g)].map(m=>m[1]);
+  const icons=[...run('enemySceneMarkup()').matchAll(/data-enemy-uid="(\d+)"/g)].map(m=>m[1]);
   require('node:assert/strict').deepEqual(icons,expected,'group kill sequence');
  }
 }
 if(killsShown!==2)throw Error('missing kill log');
 run(`
-if(drawEnemies()!=='')throw Error('battle icons remain');
+if(enemySceneMarkup().includes('data-enemy-uid'))throw Error('battle icons remain');
 var antidoteLog=coloredLog('○○は解毒剤を使った。');
 if(antidoteLog.includes('log-spell')||!antidoteLog.includes('解毒剤'))throw Error('item name must remain plain and unbroken');
 if(!coloredLog('○○は解毒を唱えた。').includes('class="log-spell">解毒</span>'))throw Error('standalone antidote spell color');
@@ -216,7 +217,7 @@ function resetMonstersTest(id){s=structuredClone(savedMonstersState);s.area='dun
 for(let f=1;f<=11;f++){s.floor=f;for(let r of [0,.2,.5,.999]){Math.random=()=>r;let formation=monsterFormation(false);if(formation.length<1||formation.length>Math.min(4,f+1)||formation.some(id=>!enemyDefinition(id).floors.includes(Math.min(10,f))||enemyDefinition(id).boss))throw Error('floor pool');if(monsterFormation(true)[0]!==['guardian','general','watcher','minogate','necromancer','vampire','ettin','demongeneral','ancientdragon','labyrinthlord'][Math.min(10,f)-1])throw Error('guardian floor')}}
 resetMonstersTest('goblin');Math.random=()=>.01;let xp=s.members[0].xp,gold=s.gold;s.enemy.chestBattle=true;enemyTurn(s.commands);if(s.enemy||s.gold!==gold||s.members[0].xp!==xp||s.cells[s.pos].chest)throw Error('flee rewards');
 resetMonstersTest('goblin');s.enemy.chestBattle=true;s.enemy.units.push({id:'slime',uid:1,row:1,hp:0,rewarded:false});Math.random=()=>.01;killReward(s.enemy.units[1]);enemyTurn(s.commands);if(s.enemy||!s.cells[s.pos].chest||s.members[0].xp!==xp+Math.max(1,Math.floor(6/s.members.length)))throw Error('mixed escape victory');
-resetMonstersTest('rat');Math.random=()=>.01;enemyTurn(s.commands);if(s.enemy.units.length!==2||s.hp.some(h=>h!==1000))throw Error('summon acts same turn');for(let n=0;n<10;n++)monsterAction(s.enemy.units[0],s.commands);if(s.enemy.units.length!==5||s.enemy.summoned!==4||new Set(s.enemy.units.map(e=>e.uid)).size!==5||!logQueue.some(x=>x.text.includes('仲間を呼んだが、現れなかった。')))throw Error('battle summon cap');displayCombat=undefined;let svg=drawEnemies();if((svg.match(/data-enemy-uid/g)||[]).length!==1||!svg.includes('data-enemy-uid="0"'))throw Error('summoned row representative');
+resetMonstersTest('rat');Math.random=()=>.01;enemyTurn(s.commands);if(s.enemy.units.length!==2||s.hp.some(h=>h!==1000))throw Error('summon acts same turn');for(let n=0;n<10;n++)monsterAction(s.enemy.units[0],s.commands);if(s.enemy.units.length!==5||s.enemy.summoned!==4||new Set(s.enemy.units.map(e=>e.uid)).size!==5||!logQueue.some(x=>x.text.includes('仲間を呼んだが、現れなかった。')))throw Error('battle summon cap');displayCombat=undefined;let svg=enemySceneMarkup();if((svg.match(/data-enemy-uid/g)||[]).length!==1||!svg.includes('data-enemy-uid="0"'))throw Error('summoned row representative');
 resetMonstersTest('firefly');Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands);if(s.hp.some(h=>h!==998))throw Error('breath all targets');
 resetMonstersTest('mage');Math.random=()=>0;monsterAction(s.enemy.units[0],s.commands);if(s.hp[0]!==999||s.hp.slice(1).some(h=>h!==1000))throw Error('single spell');
 resetMonstersTest('highmage');s.enemy.units[0].identified=true;Math.random=()=>.15;let oldDice=dice;dice=()=>({value:16,text:''});monsterAction(s.enemy.units[0],s.commands);dice=oldDice;if(s.hp.length<3||logQueue.length<4||s.hp.slice(0,3).some(h=>h!==984)||s.hp.slice(3).some(h=>h!==1000)||!logQueue.some(x=>x.text.includes('大火炎')))throw Error('group spell targets one living row');
@@ -404,3 +405,5 @@ require('./legacy-save.cjs');
 require('./css-structure.cjs');
 
 require('./item-identification.cjs');
+
+require('./monster-sprites.cjs');

@@ -35,6 +35,7 @@ with sync_playwright() as p:
           for(const i of [target(),target(-1),target(1)])Object.assign(s.cells[i],{open:false,safe:false,flag:false,type:'',chest:null});
           s.cells[target()].open=true;s.cells[target(-1)].safe=true;s.pendingBoss=true;render();
         }""")
+        sprite_filters = set()
         for floor, band, colors, button, deep in bands:
             page.evaluate('(floor)=>{s.floor=floor;render()}', floor)
             assert page.locator('body').get_attribute('data-floor-theme') == band
@@ -53,6 +54,18 @@ with sync_playwright() as p:
                 actual = page.locator('#statsbody .statcard button').evaluate_all('(els)=>els.map(e=>getComputedStyle(e).backgroundColor)')
                 assert actual and all(c == rgb(button) for c in actual), (band, actual)
             page.locator('#statsclose').click()
+            page.evaluate("""s.enemy={units:[{id:'slime',uid:8,row:0,hp:5}]};scene()""")
+            img = page.locator('#scene img.enemy-sprite')
+            page.wait_for_function("document.querySelector('#scene img')?.naturalWidth===48")
+            applied = img.evaluate('e=>getComputedStyle(e).filter')
+            assert f'#enemy-{band}' in applied, (band, applied)
+            transfer = page.locator(f'#enemy-{band} feComponentTransfer')
+            assert transfer.count() == 1
+            for channel in ('R', 'G', 'B'):
+                assert transfer.locator(f'feFunc{channel}[type="table"]').count() == 1
+            sprite_filters.add(applied)
+            page.evaluate('s.enemy=null;scene()')
+        assert len(sprite_filters) == len(bands)
         page.evaluate("s.area='town';render()")
         assert page.locator('body').get_attribute('data-floor-theme') == 'green'
         assert '#121914' in page.locator('#scene').inner_html()

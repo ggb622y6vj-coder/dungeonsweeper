@@ -335,13 +335,31 @@ function showLevelReport(){if(!s.levelReport?.length)return;$('#levelreport').te
 function showTempleCarryReport(){if(!s.templeReport?.length){showLevelReport();return}const lines=[],normal=s.templeReport.filter(r=>r.status==='dead'||r.status==='ash'),lost=s.templeReport.filter(r=>r.status==='lost'),stone=s.templeReport.filter(r=>r.status==='stone');if(normal.length)lines.push(`${normal.map(r=>`${r.name}（${r.status==='dead'?'死亡':'灰'}）`).join('、')}を寺院に運んだ。寺院で蘇生できます。`);if(stone.length)lines.push(`${stone.map(r=>`${r.name}（石化）`).join('、')}を寺院に運んだ。寺院で石化を解除できます。`);for(const r of lost)lines.push(`${r.name}（ロスト）はパーティーから外れた。ロストは蘇生できません。`);$('#templecarrylist').textContent=lines.join('\n');$('#templecarrydialog').showModal()}
 function canWeaponAttack(i){return !(s.ailments[i].fear>0)&&(i<3||equippedWeapon(i)?.range==='ranged')}
 function itemDescription(w){if(w.unknown)return '';return diceLabel(w)+(w.dice?' · '+(w.range==='ranged'?'遠距離':'近距離'):'')+(w.desc?' · '+w.desc:'')}
-function drawEnemies(combat=visibleCombat()){
- if(!combat)return '';
- const groups=enemyGroups(combat).slice(0,2),y=140,height=130;
- return groups.map((g,row)=>{
-  const e=g.units.find(unit=>!unit.rewarded),x=groups.length===1?320:240+row*160;
-  return `<g data-enemy-uid="${e.uid}"><rect x="${x-54}" y="${y}" width="108" height="${height-9}" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="${y+height*.65}" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text></g>`;
- }).join('');
+const RACE_SPRITES=new Map([
+ ['不定形','futeikei.png'],['不死','fushi.png'],['獣','kemono.png'],['人型','hitogata.png'],
+ ['虫','mushi.png'],['構造体','kouzoutai.png'],['悪魔','akuma.png'],['魔獣','majuu.png'],
+ ['竜','ryuu.png'],['植物','shokubutu.png']
+]);
+const MONSTER_SPRITES=new Set();
+const failedEnemySprites=new Set();
+function enemySpritePath(unit){
+ if(unit.identified&&MONSTER_SPRITES.has(unit.id))return `assets/monsters/${unit.id}.png`;
+ const file=RACE_SPRITES.get(enemyDefinition(unit.id).race);
+ return file?`assets/monsters/unknown/${file}`:'';
+}
+function drawEnemies(groups){
+ let sprites='',frames='';
+ const firstX=groups.length===1?320:240;
+ for(const [row,group] of groups.slice(0,2).entries()){
+  const e=group.units.find(unit=>!unit.rewarded),x=firstX+row*160,src=enemySpritePath(e);
+  const uid=Number(e.uid);
+  if(src&&!failedEnemySprites.has(src)){
+   sprites+=`<img class="enemy-sprite" data-enemy-uid="${uid}" src="${src}" alt="" style="left:${100*x/640}%;filter:url(#enemy-${currentFloorTheme})">`;
+  }else{
+   frames+=`<g data-enemy-uid="${uid}"><rect x="${x-54}" y="140" width="108" height="121" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="224.5" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text></g>`;
+  }
+ }
+ return {sprites,frames,firstX};
 }
 function ensureProfile(){s.itemBox??=[];s.milwaSteps??=0;s.teppeki??=false;s.flagSight??=false;s.elevatorFloors??=[];s.elevatorFloors=[...new Set(s.elevatorFloors.filter(Number.isInteger))].sort((a,b)=>a-b);s.pendingElevator??=false;ensureLibrary();s.templeReport??=[];s.corpses??=[];s.cleared??=false;s.clearNotice??=false;refreshNames();s.floor??=1;s.size??=8;s.floors??={};for(const f of [s,...Object.values(s.floors)])if(f.floor>=MAX_FLOOR)for(const c of f.cells||[])if(c.type==='down')c.type='';if(s.floor>=MAX_FLOOR&&s.pendingStairs==='down')s.pendingStairs=false;s.ailments??=s.members.map(()=>freshAilments());s.ailments=s.ailments.map(normalizeAilments);for(const r of s.reserve||[])if(r.ailments)r.ailments=normalizeAilments(r.ailments);s.members.forEach((m,i)=>{m.status??=s.hp[i]<=0&&s.area!=='town'?'dead':'ok';m.ac=memberClass(i).ac;migrateStrength(m,jobOf(i));migrateAgility(m,jobOf(i))});for(const r of s.reserve||[])if(r.members){r.members.status??='ok';migrateStrength(r.members,r.members.job??0);migrateAgility(r.members,r.members.job??0)}for(const m of [...s.members,...(s.reserve||[]).map(r=>r.members),...s.corpses.flatMap(c=>(c.records||[]).map(r=>r.members))]){if(m)m.vit??=10;ensureCareerHistory(m)}ensureMagic();ensureProgression();s.area??='dungeon';s.pendingStairs??=false;for(let key of ['commands','magicPlans','itemPlans','attackRows','dispelRows'])s[key]=s.members.map((m,i)=>s[key]?.[i]??(key==='commands'?(i<3?'fight':'guard'):null));for(let i=0;i<s.members.length;i++){if(!s.inventory[i].every(weapon))s.inventory[i]=s.inventory[i].filter(id=>!!weapon(id));while(usedSlots(s.inventory[i])>10){const slot=s.inventory[i].length-1;s.inventory[i].pop();for(const part in s.armor[i])if(s.armor[i][part]===slot)delete s.armor[i][part];}if(!s.inventory[i].length)s.inventory[i]=[starterWeapon(i)];if(!s.inventory[i][s.equipped[i]])s.equipped[i]=0}}
 function equippedWeapon(i){return weapon(s.inventory[i][s.equipped[i]])}
@@ -756,7 +774,59 @@ function sceneEnemyRow(g){
  const ready=units.filter(enemyReady).length;
  return `<div>${g.index+1}：${enemyDisplay(g.units[0])} ×${units.length}(${ready})</div>`;
 }
-function scene(){const p=SCENE_PALETTES[currentFloorTheme];let combat=visibleCombat(),f=face(target()),l=face(target(-1)),r=face(target(1));if(combat){for(const v of [f,l,r])if(/^\d+$/.test(v.symbol))v.symbol='';}let txt=(x,y,t,size=17,color=p.symbol)=>`<text x="${x}" y="${y}" text-anchor="middle" fill="${color}" font-family="system-ui,sans-serif" font-size="${size}" font-weight="700">${t}</text>`;let panel=(v,x,y)=>txt(x,y+24,v.symbol,x===320&&hasLight()&&diagonalSight().some(i=>i>=0)?38:58,v.color);let battle=combat?drawEnemies(combat):s.pendingBoss?`<rect x="200" y="90" width="240" height="170" rx="8" fill="${p.guardian}" stroke="${p.guardianLine}"/>${txt(320,196,'☠',55)}`:'';$('#scene').innerHTML=`<svg viewBox="0 0 640 400" preserveAspectRatio="none" role="img" aria-label="正面：${f.label} ${f.symbol}、左：${l.label} ${l.symbol}、右：${r.label} ${r.symbol}"><path d="M0 0H640L440 100H200Z" fill="${p.ceiling}"/><path d="M0 400H640L440 300H200Z" fill="${p.back}"/><path d="M0 0L200 100V300L0 400Z" fill="${l.fill}"/><path d="M640 0L440 100V300L640 400Z" fill="${r.fill}"/><path d="M200 100H440V300H200Z" fill="${f.fill}"/><g fill="none" stroke="${p.corridorLine}" stroke-width="1.5"><path d="M0 0L200 100H440L640 0M0 400L200 300H440L640 400M200 100V300M440 100V300"/></g>${panel(l,96,185,'左のマス')}${panel(f,320,185,'正面のマス')}${panel(r,544,185,'右のマス')}${combat?'':txt(320,378,String(num(s.pos)),36,'#ffdf9e')}${distantSight()}${battle}</svg>${combat?`<div class="scene-enemies" aria-label="敵の列">${enemyGroups(combat).map(sceneEnemyRow).join('')}</div>`:''}${encounterNotice?`<div class="encounter-notice" role="status">${encounterNotice}</div>`:''}`}
+function enemySpriteSize(width,height,dpr){
+ const target=Math.min(width*150/640,height*200/400*.95);
+ const snapped=Math.round(target*dpr/48)*48/dpr;
+ return Math.abs(snapped-target)<=target*.15?snapped:target;
+}
+function updateEnemySpriteSize(){
+ const el=$('#scene'),{width,height}=el.getBoundingClientRect();
+ el.style.setProperty('--enemy-sprite-size',enemySpriteSize(width,height,globalThis.devicePixelRatio||1)+'px');
+}
+if(typeof ResizeObserver!=='undefined'){
+ new ResizeObserver(updateEnemySpriteSize).observe($('#scene'));
+ globalThis.addEventListener('resize',updateEnemySpriteSize);
+}
+$('#scene').addEventListener('error',event=>{
+ if(!event.target.matches('img.enemy-sprite'))return;
+ failedEnemySprites.add(event.target.getAttribute('src'));
+ scene();
+},true);
+
+// The four input grays are uniformly spaced in sRGB.
+$('#enemy-sprite-filters').innerHTML=Object.entries(SCENE_PALETTES).map(([theme,p])=>{
+ const mid=theme==='green'?p.corridorLine:p.guardianLine;
+ const channels=['R','G','B'].map((channel,i)=>{
+  const value=parseInt(mid.slice(1+2*i,3+2*i),16)/255;
+  return `<feFunc${channel} type="table" tableValues="${value*.1} ${value*.45} ${value} ${value*.4+.6}"/>`;
+ }).join('');
+ return `<filter id="enemy-${theme}" color-interpolation-filters="sRGB"><feComponentTransfer>${channels}</feComponentTransfer></filter>`;
+}).join('');
+function scene(){
+ const p=SCENE_PALETTES[currentFloorTheme],combat=visibleCombat();
+ const f=face(target()),l=face(target(-1)),r=face(target(1));
+ if(combat){
+  f.symbol='';
+  for(const side of [l,r])if(/^\d+$/.test(side.symbol))side.symbol='';
+ }
+ const txt=(x,y,t,size,color=p.symbol)=>`<text x="${x}" y="${y}" text-anchor="middle" fill="${color}" font-family="system-ui,sans-serif" font-size="${size}" font-weight="700">${t}</text>`;
+ const panel=(v,x,size=58)=>v.symbol?txt(x,209,v.symbol,size,v.color):'';
+ const groups=combat?enemyGroups(combat):[];
+ const {sprites,frames,firstX}=drawEnemies(groups);
+ const guardian=!combat&&s.pendingBoss?`<rect x="200" y="90" width="240" height="170" rx="8" fill="${p.guardian}" stroke="${p.guardianLine}"/>${txt(320,196,'☠',55)}`:'';
+ const list=combat?`<div class="scene-enemies" aria-label="敵の列" style="--first-enemy-x:${100*firstX/640}%">${groups.map(sceneEnemyRow).join('')}</div>`:'';
+ const notice=encounterNotice?`<div class="encounter-notice" role="status">${encounterNotice}</div>`:'';
+ $('#scene').innerHTML=`<svg viewBox="0 0 640 400" preserveAspectRatio="none" role="img" aria-label="正面：${f.label} ${f.symbol}、左：${l.label} ${l.symbol}、右：${r.label} ${r.symbol}">
+  <path d="M0 0H640L440 100H200Z" fill="${p.ceiling}"/>
+  <path d="M0 400H640L440 300H200Z" fill="${p.back}"/>
+  <path d="M0 0L200 100V300L0 400Z" fill="${l.fill}"/>
+  <path d="M640 0L440 100V300L640 400Z" fill="${r.fill}"/>
+  <path d="M200 100H440V300H200Z" fill="${f.fill}"/>
+  <g fill="none" stroke="${p.corridorLine}" stroke-width="1.5"><path d="M0 0L200 100H440L640 0M0 400L200 300H440L640 400M200 100V300M440 100V300"/></g>
+  ${panel(l,96)}${panel(f,320,diagonalSight().some(i=>i>=0)?38:58)}${panel(r,544)}
+  ${combat?'':txt(320,378,String(num(s.pos)),36,'#ffdf9e')}${distantSight(!!combat)}${frames}${guardian}
+ </svg>${sprites}${list}${notice}`;
+}
 function inMapBlindZone(x,y,n){
  const center=(n-1)/2;
  const dx=x-center,dy=y-center;

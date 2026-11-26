@@ -194,4 +194,14 @@ function magicUI(){
 function calfoCaster(){return currentChest()?s.members.findIndex((m,i)=>!spellReason(i,magic('calfo'))):-1}
 function hasLight(){return !!s.light||s.milwaSteps>0}
 function diagonalSight(){if(!hasLight())return [];let dx=[0,1,0,-1][s.dir],dy=[-1,0,1,0][s.dir];return [-1,1].map(side=>{let x=s.pos%size()+dx-dy*side,y=(s.pos/size()|0)+dy+dx*side;return x<0||x>=size()||y<0||y>=size()?-1:y*size()+x})}
-function distantSight(){let cells=diagonalSight();if(!cells.some(i=>i>=0))return '';return `<g fill="none" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"><path d="M200 100L260 150H380L440 100M200 300L260 250H380L440 300M260 150V250M380 150V250"/></g>`+cells.map((i,k)=>{if(i<0)return '';let v=face(i),x=k?411:229;return `<g class="透視" aria-label="${k?'右':'左'}前方：${v.label} ${v.symbol}"><path d="${k?'M440 100L380 150V250L440 300Z':'M200 100L260 150V250L200 300Z'}" fill="${v.fill}" fill-opacity=".35" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"/><text x="${x}" y="210" text-anchor="middle" fill="${v.color||'#e8d2a2'}" font-family="system-ui,sans-serif" font-size="30" font-weight="700">${v.symbol}</text></g>`}).join('')}
+function distantSight(hideSymbols=false){
+ const cells=diagonalSight();
+ if(!cells.some(i=>i>=0))return '';
+ const sides=cells.map((i,k)=>{
+  if(i<0)return '';
+  const v=face(i),symbol=hideSymbols?'':v.symbol;
+  const text=symbol?`<text x="${k?411:229}" y="210" text-anchor="middle" fill="${v.color||'#e8d2a2'}" font-family="system-ui,sans-serif" font-size="30" font-weight="700">${symbol}</text>`:'';
+  return `<g class="透視" aria-label="${k?'右':'左'}前方：${v.label} ${symbol}"><path d="${k?'M440 100L380 150V250L440 300Z':'M200 100L260 150V250L200 300Z'}" fill="${v.fill}" fill-opacity=".35" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"/>${text}</g>`;
+ }).join('');
+ return `<g fill="none" stroke="#c6b5ef" stroke-opacity=".3" stroke-width="1.5"><path d="M200 100L260 150H380L440 100M200 300L260 250H380L440 300M260 150V250M380 150V250"/></g>`+sides;
+}

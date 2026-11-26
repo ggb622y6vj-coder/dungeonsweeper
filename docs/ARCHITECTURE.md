@@ -22,7 +22,7 @@
 | dist/monsters.js | 敵特殊行動、戦闘終了、解呪 |
 | tests/game.cjs | Node vm＋簡易DOM＋タイマーによる回帰テスト |
 
-ビルド不要、classic scriptのグローバル共有。index.htmlのscript順を維持。外部画像・フォント・CDN依存・バックエンドAPIなし。図形はSVGと文字。単独でdistフォルダを配信すれば動作する。
+ビルド不要、classic scriptのグローバル共有。index.htmlのscript順を維持。迷宮はSVG、戦闘中の敵はシーンに重ねるHTMLの img で描く。種族画像は dist/assets/monsters/unknown/ に同梱し、階層ごとのSVGフィルターで着色する。画像読込エラーは表示側で扱い、同じログ時点の代表個体をSVGの枠と文字で描き直す。フォント・CDN・バックエンドAPIへの依存はなく、distフォルダ単独で配信できる。
 
 ## 状態と保存
 
