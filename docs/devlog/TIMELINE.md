@@ -184,4 +184,4 @@
 | 146 | 2026-11-26 | 戦闘シーンの背景に黒い暗幕を重ね、モンスター画像の目標サイズを1.15倍にする | `8c406ba` | [spec](specs/146-combat-scene-shade-and-larger-sprites.md) | [実施](reports/146.md) |
 | 147 | 2026-11-26 | 昇降機の階層選択ダイアログにドット絵を表示 | `62f96ab` | [spec](specs/147-elevator-dialog-image.md) | [実施](reports/147.md) |
 | 148 | 2026-11-26 | 5Fの各象限に地図無効・反呪文の結界を抽選し、HPかMPを一度だけ全回復できる命の泉を追加 | `269c117` | [spec](specs/148-floor5-quadrant-zones-and-fountain.md) | [実施](reports/148.md) |
-| 149 | 2026-11-27 | 戦闘中のモンスター画像と代替表示を下げ、クイック攻撃で後衛の近距離武器装備の盗賊・忍者が潜伏・奇襲 | 未コミット | [spec](specs/149-sprite-position-and-quick-stealth.md) | [実施](reports/149.md) |
+| 149 | 2026-11-27 | 戦闘中のモンスター画像と代替表示を下げ、クイック攻撃で後衛の近距離武器装備の盗賊・忍者が潜伏・奇襲 | 2a4bff1 | [spec](specs/149-sprite-position-and-quick-stealth.md) | [実施](reports/149.md) |
