@@ -180,4 +180,4 @@
 | 142 | 2026-11-26 | 敵からの直接装備ドロップとアイテムの最浅階を廃止。旧宝箱は価格上限内の装備を等確率で、薬は全5種から重み付きで抽選 | 002d058 | [spec](specs/142-remove-minfloor-and-direct-drops.md) | [実施](reports/142.md) |
 | 143 | 2026-11-26 | 探索中に薬の対象選択をキャンセルすると、開いていたパーティー欄とアイテム画面が薬ダイアログの下に復帰 | `c3678c9` | [spec](specs/143-medicine-target-cancel-restore.md) | [実施](reports/143.md) |
 | 144 | 2026-11-26 | 戦闘の前2列に階層色の種族ドット絵を表示し、戦闘中は正面と透視の斜め前の記号を隠す | `485e763` | [spec](specs/144-monster-race-sprites.md) | [実施](reports/144.md) |
-| 145 | 2026-11-26 | 探索中の呪文発動完了で呪文画面とパーティー欄を閉じ、迷宮画面に戻る | 未コミット | [spec](specs/145-spell-cast-closes-stats.md) | [実施](reports/145.md) |
+| 145 | 2026-11-26 | 探索中の呪文発動完了で呪文画面とパーティー欄を閉じ、迷宮画面に戻る | `c99f7d9` | [spec](specs/145-spell-cast-closes-stats.md) | [実施](reports/145.md) |
