@@ -114,10 +114,12 @@ with sync_playwright() as p:
                 page.locator('[data-spell="dumapic"]').click()
                 page.locator('#magiccast').click()
                 settled(page)
+                assert page.locator('dialog[open]').count() == 0
                 assert page.evaluate('s.dumapicUses') == 1
                 # Gain XP, then run the real level-up routine to learn priest spells.
                 page.evaluate('s.members[0].xp=s.members[0].xpTargets[2];Math.random=()=>0;levelUp();s.hp[0]=1;render()')
                 assert page.evaluate("s.members[0].known.includes('dios')")
+                page.locator('#party').click()
                 assert page.locator('#statsdialog').is_visible()
                 page.locator('[data-stat-cast="0"]').click()
                 assert page.locator('#magictab-1').get_attribute('aria-selected') == 'true'

@@ -157,7 +157,12 @@ function commitMagicChoice(i,x,t){
  const inBattle=!!s.enemy;
  if(inBattle){s.magicPlans[i]={id:x.id,target:t};s.commands[i]='spell'}
  else{displayVitals=snapshotVitals();castMagic(i,x.id,t)}
- $('#magicdialog').close();inBattle?confirmCommand(i):render();
+ $('#magicdialog').close();
+ if(inBattle)confirmCommand(i);
+ else{
+  $('#statsdialog').close();
+  render();
+ }
 }
 function pickFieldSpell(){
  const i=spellMember,x=magic(spellSelected);

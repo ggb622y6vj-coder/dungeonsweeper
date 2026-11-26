@@ -144,10 +144,12 @@ with sync_playwright() as p:
         page.locator('[data-spell="dumapic"]').click()
         page.locator('#magiccast').click()
         settled(page)
+        assert page.locator('dialog[open]').count() == 0
         assert page.evaluate('s.dumapicUses') == 1
         assert page.evaluate('s.mp[0]') == mp - 2
         # Healing uses the ordinary party-card target flow after selecting priest tab.
         page.evaluate('s.hp[0]=1;render()')
+        page.locator('#party').click()
         assert page.locator('#statsdialog').is_visible()
         page.locator('[data-stat-cast="0"]').click()
         page.locator('#magictab-2').click()

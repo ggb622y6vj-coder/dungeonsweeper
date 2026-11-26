@@ -62,8 +62,9 @@ def check_return(page, tap):
     tap(magic.locator('[data-spell="milwa"]'))
     tap(magic.locator('#magiccast'))
     expect(magic).to_be_hidden()
-    expect(stats).to_be_visible()
+    expect(stats).to_be_hidden()
     page.wait_for_function('!logBusy()')
+    tap(page.locator('#party .card').first)
     expect(mp_value).to_have_text('9/10')
     assert page.evaluate('s.milwaSteps') == 30
 
