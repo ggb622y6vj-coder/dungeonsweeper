@@ -178,4 +178,4 @@
 | 140 | 2026-11-25 | 味方はラウンド終了時、敵は自分の行動順にレベルに応じて睡眠から回復。目覚めた敵はその手番で行動 | `861dd85` | [spec](specs/140-sleep-recuperation.md) | [実施](reports/140.md) |
 | 141 | 2026-11-25 | 祈祷者3種を追加し、亡霊を「霧の幽霊」に改名。随伴69種、術者29種に更新し、能力値・モンスターLvを調整 | 5649920 | [spec](specs/141-notion-monsters-update.md) | [実施](reports/141.md) |
 | 142 | 2026-11-26 | 敵からの直接装備ドロップとアイテムの最浅階を廃止。旧宝箱は価格上限内の装備を等確率で、薬は全5種から重み付きで抽選 | 002d058 | [spec](specs/142-remove-minfloor-and-direct-drops.md) | [実施](reports/142.md) |
-| 143 | 2026-11-26 | 探索中に薬の対象選択をキャンセルすると、開いていたパーティー欄とアイテム画面が薬ダイアログの下に復帰 | 未コミット | [spec](specs/143-medicine-target-cancel-restore.md) | [実施](reports/143.md) |
+| 143 | 2026-11-26 | 探索中に薬の対象選択をキャンセルすると、開いていたパーティー欄とアイテム画面が薬ダイアログの下に復帰 | `c3678c9` | [spec](specs/143-medicine-target-cancel-restore.md) | [実施](reports/143.md) |
