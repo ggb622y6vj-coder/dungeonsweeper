@@ -78,7 +78,7 @@ Object.values(races).forEach(checkPixels);
 console.log('PASS all 10 sprite PNGs decode to transparent 48x48 images with four grayscale levels');
 
 for (const [width,height,dpr,want] of [
-  [640,400,1,144], [640,200,2,96], [320,200,1,75], [320,200,2,72], [40,100,1,9.375]
+  [640,400,1,192], [640,200,2,120], [280,200,1,75.46875], [280,200,2,72], [40,100,1,10.78125]
 ]) {
   assert.equal(g.run(`enemySpriteSize(${width},${height},${dpr})`), want);
 }
@@ -104,6 +104,7 @@ g.run(`s.area='dungeon';s.pos=3*size()+3;s.dir=0;s.light=true;
   s.cells[target(-1)].flag='power';s.cells[target(1)].open=true;
   s.enemy=null;displayCombat={units:[{id:'slime',uid:7,hp:0}]};scene()`);
 const battle = g.run("$('#scene').innerHTML");
+assert.match(battle, /<\/svg><div class="combat-shade" aria-hidden="true"><\/div><img class="enemy-sprite"/);
 assert.match(battle, /data-enemy-uid="7"/);
 assert.match(battle, /<text x="96"[^>]*>⚑</);
 assert.doesNotMatch(battle, /<text x="(?:320|544|229|411)"/);
@@ -112,4 +113,5 @@ const after = g.run("displayCombat=undefined;scene();$('#scene').innerHTML");
 for (const x of [320,229,411]) assert.match(after, new RegExp(`<text x="${x}"[^>]*>？</text>`));
 assert.match(after, /<text x="544"[^>]*>\d+<\/text>/);
 assert.doesNotMatch(after, /data-enemy-uid/);
-console.log('PASS front and distant symbols follow combat snapshots through the last log, side flags remain');
+assert.doesNotMatch(after, /class="combat-shade"/);
+console.log('PASS combat snapshots control shade and wall symbols through the last log, side flags remain');

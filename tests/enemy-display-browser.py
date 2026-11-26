@@ -1,4 +1,4 @@
-"""Combat sprites, snapshot order, wall symbols and image failure at both viewport sizes."""
+"""Combat sprites, background shading, snapshots, wall symbols and image failure at both viewport sizes."""
 import math
 import os
 import sys
@@ -12,6 +12,23 @@ chrome = os.environ.get('CHROME_PATH') or next((p for p in (
     '/opt/google/chrome/chrome', '/opt/ungoogled-chromium/chrome',
 ) if Path(p).exists()), None)
 
+def assert_paints_above(front, back_selector):
+    assert front.evaluate("""(front, backSelector)=>{
+      const back=document.querySelector(backSelector);
+      const oldFront=front.style.pointerEvents, oldBack=back.style.pointerEvents;
+      front.style.pointerEvents=back.style.pointerEvents='auto';
+      try {
+        const b=front.getBoundingClientRect();
+        const hits=document.elementsFromPoint(b.x+b.width/2,b.y+b.height/2);
+        const frontIndex=hits.indexOf(front), backIndex=hits.findIndex(e=>back.contains(e));
+        return frontIndex>=0 && backIndex>frontIndex;
+      } finally {
+        front.style.pointerEvents=oldFront;
+        back.style.pointerEvents=oldBack;
+      }
+    }""", back_selector), back_selector
+
+
 def check_sprites(page, uids, centers, files):
     page.wait_for_function("""count=>{
       const imgs=[...document.querySelectorAll('#scene img.enemy-sprite')];
@@ -19,12 +36,21 @@ def check_sprites(page, uids, centers, files):
     }""", arg=len(uids))
     scene = page.locator('#scene')
     rect = scene.bounding_box()
+    shade = scene.locator('.combat-shade')
+    assert shade.count() == 1 and shade.get_attribute('aria-hidden') == 'true'
+    assert shade.bounding_box() == rect
+    assert shade.evaluate("""e=>{
+      const style=getComputedStyle(e);
+      return style.backgroundColor==='rgb(0, 0, 0)' && style.opacity==='0.2' && style.pointerEvents==='none';
+    }""")
+    assert_paints_above(shade, '#scene > svg')
     enemy_list = scene.locator('.scene-enemies')
     rows = enemy_list.bounding_box()
     assert rows['width'] > 0 and rows['height'] > 0
     assert abs(rows['x'] - rect['x'] - 6) < .1 and abs(rows['y'] - rect['y'] - 6) < .1
     assert rows['x'] + rows['width'] <= rect['x'] + rect['width'] + .1
     assert rows['y'] + rows['height'] <= rect['y'] + rect['height'] + .1
+    assert_paints_above(enemy_list, '#scene > .combat-shade')
     line_boxes = enemy_list.locator(':scope > div').evaluate_all("""rows=>rows.map(row=>{
       const text=document.createRange();
       text.selectNodeContents(row);
@@ -35,7 +61,7 @@ def check_sprites(page, uids, centers, files):
         assert len(line) == 1, line
         assert rows['x'] <= line[0]['left'] < line[0]['right'] <= rows['x'] + rows['width'] + .1, line
     dpr = page.evaluate('devicePixelRatio')
-    target = min(rect['height'] * .475, rect['width'] * 150 / 640)
+    target = min(rect['height'] * .475, rect['width'] * 150 / 640) * 1.15
     rounded = math.floor(target * dpr / 48 + .5) * 48 / dpr
     size = rounded if abs(rounded - target) <= target * .15 else target
     imgs = scene.locator('img.enemy-sprite')
@@ -51,6 +77,7 @@ def check_sprites(page, uids, centers, files):
         assert abs(box['width'] - size) < .1 and abs(box['height'] - size) < .1, (box, size)
         assert abs(box['x'] + size/2 - (rect['x'] + rect['width']*x/640)) < .1
         assert abs(box['y'] + size - (rect['y'] + rect['height']*.75)) < .1
+        assert_paints_above(img, '#scene > .combat-shade')
 
 
 with sync_playwright() as p:
@@ -61,6 +88,8 @@ with sync_playwright() as p:
         errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.goto(url)
+        shade = page.locator('#scene > .combat-shade')
+        assert shade.count() == 0
         first = page.evaluate("""()=>{
           const recruit=generateRecruit('冒険者',0);
           registerRecruit(recruit);changeRecruitParty(recruit.members.id,true);
@@ -82,6 +111,7 @@ with sync_playwright() as p:
             const icons=[...document.querySelectorAll('#scene [data-enemy-uid]')];
             return {
               ids:icons.map(e=>e.dataset.enemyUid),
+              shades:document.querySelectorAll('#scene > .combat-shade').length,
               zzzIds:icons.filter(e=>e.textContent.includes('Zzz')).map(e=>e.dataset.enemyUid),
               paths:icons.map(e=>e.getAttribute('src')),
               rows:[...document.querySelectorAll('.scene-enemies > div')].map(e=>e.textContent)
@@ -90,6 +120,7 @@ with sync_playwright() as p:
           return readEnemyScene();
         }""")
         assert first['ids'] == ['11', '20'], first
+        assert first['shades'] == 1, first
         assert first['zzzIds'] == [], first
         assert first['paths'] == ['assets/monsters/unknown/hitogata.png', 'assets/monsters/unknown/futeikei.png'], first
         assert first['rows'] == ['1：ゴブリン ×4(2)', '2：スライム ×2(2)', '3：ハイウルフ ×3(0)'], first
@@ -118,11 +149,13 @@ with sync_playwright() as p:
         # Resize just the scene, with no render call or viewport resize event.
         page.locator('#scene').evaluate("e=>{e.style.width='280px';e.style.height='200px'}")
         page.wait_for_function("w=>Math.abs(document.querySelector('.enemy-sprite').getBoundingClientRect().width-w)<.1",
-                               arg=72 if dpr == 2 else 65.625)
+                               arg=72 if dpr == 2 else 75.46875)
         check_sprites(page, [40, 41], [240, 400], ['mushi.png', 'ryuu.png'])
         page.locator('#scene').evaluate("e=>{e.style.width='';e.style.height=''}")
 
         page.evaluate("encounterNotice='敵の奇襲！';scene()")
+        notice = page.locator('#scene > .encounter-notice')
+        assert_paints_above(notice, '#scene > .combat-shade')
         assert page.evaluate("""()=>{
           const img=document.querySelector('.enemy-sprite'), notice=document.querySelector('.encounter-notice');
           img.style.pointerEvents=notice.style.pointerEvents='auto';
@@ -152,8 +185,15 @@ with sync_playwright() as p:
             assert front.count() == diagonal.count() == right.count() == 0
             assert left.text_content() == '⚑'
             page.evaluate("s.enemy=null;scene()")
+            assert shade.count() == 0
             assert front.text_content() == symbol and diagonal.all_text_contents() == ['？', '？']
             assert right.text_content().isdigit() and left.text_content() == '⚑'
+
+        page.evaluate("encounterNotice='敵の奇襲！';scene()")
+        assert notice.is_visible() and shade.count() == 0
+        page.evaluate("encounterNotice='';s.pendingBoss=true;scene()")
+        assert page.locator('#scene > svg > rect').is_visible() and shade.count() == 0
+        page.evaluate("s.pendingBoss=null")
 
         # This race has not been requested in this context. Only its group falls back.
         page.route('**/unknown/akuma.png', lambda route: route.abort())
@@ -171,6 +211,6 @@ with sync_playwright() as p:
         page.wait_for_function("document.querySelector('#scene img')?.naturalWidth===48")
         assert 'サッキュバス' not in page.locator('#scene').inner_html()
         assert not errors, errors
-        print(f'PASS enemy sprites {width}px: snapshots, placement, single-line rows, resize, overlays, symbols and fallback')
+        print(f'PASS enemy sprites {width}px: snapshots, placement, single-line rows, resize, shade, overlays, symbols and fallback')
         page.close()
     browser.close()

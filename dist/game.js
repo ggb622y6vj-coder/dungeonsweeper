@@ -775,7 +775,7 @@ function sceneEnemyRow(g){
  return `<div>${g.index+1}：${enemyDisplay(g.units[0])} ×${units.length}(${ready})</div>`;
 }
 function enemySpriteSize(width,height,dpr){
- const target=Math.min(width*150/640,height*200/400*.95);
+ const target=Math.min(width*150/640,height*200/400*.95)*1.15;
  const snapped=Math.round(target*dpr/48)*48/dpr;
  return Math.abs(snapped-target)<=target*.15?snapped:target;
 }
@@ -813,6 +813,7 @@ function scene(){
  const panel=(v,x,size=58)=>v.symbol?txt(x,209,v.symbol,size,v.color):'';
  const groups=combat?enemyGroups(combat):[];
  const {sprites,frames}=drawEnemies(groups);
+ const shade=combat?'<div class="combat-shade" aria-hidden="true"></div>':'';
  const guardian=!combat&&s.pendingBoss?`<rect x="200" y="90" width="240" height="170" rx="8" fill="${p.guardian}" stroke="${p.guardianLine}"/>${txt(320,196,'☠',55)}`:'';
  const list=combat?`<div class="scene-enemies" aria-label="敵の列">${groups.map(sceneEnemyRow).join('')}</div>`:'';
  const notice=encounterNotice?`<div class="encounter-notice" role="status">${encounterNotice}</div>`:'';
@@ -825,7 +826,7 @@ function scene(){
   <g fill="none" stroke="${p.corridorLine}" stroke-width="1.5"><path d="M0 0L200 100H440L640 0M0 400L200 300H440L640 400M200 100V300M440 100V300"/></g>
   ${panel(l,96)}${panel(f,320,diagonalSight().some(i=>i>=0)?38:58)}${panel(r,544)}
   ${combat?'':txt(320,378,String(num(s.pos)),36,'#ffdf9e')}${distantSight(!!combat)}${frames}${guardian}
- </svg>${sprites}${list}${notice}`;
+ </svg>${shade}${sprites}${list}${notice}`;
 }
 function inMapBlindZone(x,y,n){
  const center=(n-1)/2;
