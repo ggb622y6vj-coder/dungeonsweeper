@@ -43,13 +43,16 @@ def spell(page, battle=False):
     assert page.locator('#allytargetprompt').inner_text() == '対象を選んでください：回復'
 
 
-def medicine(page, battle=False):
+def medicine(page, battle=False, *, from_stats=True):
     if battle:
         page.locator('[data-command-choice="item"]').click()
         page.locator('#medicinepick').click()
     else:
-        page.locator('#party .card').nth(1).click()
-        page.locator('[data-stat-inventory="1"]').click()
+        if from_stats:
+            page.locator('#party .card').nth(1).click()
+            page.locator('[data-stat-inventory="1"]').click()
+        else:
+            page.evaluate('openInventory(1)')
         page.locator('[data-use-medicine="0"]').click()
     assert not page.locator('#medicinedialog').is_visible()
     assert not page.locator('#inventorydialog').is_visible()
@@ -57,13 +60,14 @@ def medicine(page, battle=False):
     assert page.locator('#allytargetprompt').inner_text() == '対象を選んでください：傷薬'
 
 
-def finished(page, *, stats_restored=False):
+def finished(page, *, stats_restored=False, inventory_restored=False):
     assert page.evaluate('allyTargetPick===null && pendingSpell===null')
     assert page.locator('#party [data-ally-target]').count() == 0
     assert page.locator('#party .targetable,#party .untargetable').count() == 0
     assert page.locator('#allytargetbar').is_hidden()
     assert page.locator('#allytargetbattlebar').is_hidden()
     assert page.locator('#statsdialog').is_visible() == stats_restored
+    assert page.locator('#inventorydialog').is_visible() == inventory_restored
     assert page.locator('#party').get_attribute('role') == 'button'
 
 
@@ -180,15 +184,32 @@ with sync_playwright() as p:
         medicine(page)
         assert page.locator('#medicinetarget,#medicineuse,#medicinechoice').count() == 0
         page.locator('#allytargetfieldcancel').click()
-        finished(page)
+        finished(page, stats_restored=True, inventory_restored=True)
         assert page.locator('#medicinedialog').is_visible()
         assert page.locator('#medicinedialog select').count() == 1  # item choice only
         page.locator('#medicinepick').click()
         assert page.locator('#allytargetbar select').count() == 0
         tap_target()
         finished(page)
+        assert page.locator('dialog[open]').count() == 0
         page.wait_for_function('!logBusy()')
         assert page.evaluate('s.hp[2]') == 6
+
+        # A directly opened inventory returns without opening party details.
+        reset(page)
+        before = snapshot(page)
+        medicine(page, from_stats=False)
+        page.locator('#allytargetfieldcancel').click()
+        finished(page, inventory_restored=True)
+        assert snapshot(page) == before
+        assert page.locator('#medicinedialog').is_visible()
+        assert page.locator('#medicinepick').evaluate('(el)=>document.activeElement===el')
+        assert page.locator('#inventorytitle').inner_text() == '冒険者2のアイテム 2/10'
+        page.locator('#medicineclose').click()
+        assert page.locator('#medicinedialog').is_hidden()
+        assert page.locator('#inventorydialog').is_visible()
+        page.locator('#inventoryclose').click()
+        assert page.locator('dialog[open]').count() == 0
 
         # Battle picks reserve actions, leave resources intact, and advance once.
         for begin, plan in ((spell, 'magicPlans'), (medicine, 'itemPlans')):
@@ -254,7 +275,7 @@ with sync_playwright() as p:
                     else:
                         page.locator('#commandentry #allytargetcancel' if battle else '#allytargetfieldcancel').click()
                     assert_layout(before_layout, layout(page), battle=battle)
-                    finished(page, stats_restored=not battle and begin == spell)
+                    finished(page, stats_restored=not battle, inventory_restored=not battle and begin == medicine)
                     assert snapshot(page) == before
                     if battle:
                         back_again = page.locator('#commandentry > [data-command-back]').bounding_box()
@@ -268,9 +289,20 @@ with sync_playwright() as p:
                             page.locator('#magicpick').click()
                         else:
                             assert page.locator('#medicineitem').input_value() == '0'
+                            assert page.locator('#medicinepick').evaluate('(el)=>document.activeElement===el')
+                            assert page.locator('#inventorytitle').inner_text() == '冒険者2のアイテム 2/10'
                             page.locator('#medicinepick').click()
                         assert page.locator('#party .targetable').count() == 2
                         page.locator('#allytargetfieldcancel').click()
+                        if begin == medicine:
+                            finished(page, stats_restored=True, inventory_restored=True)
+                            page.locator('#medicineclose').click()
+                            assert page.locator('#medicinedialog').is_hidden()
+                            page.locator('#inventoryclose').click()
+                            assert page.locator('#inventorydialog').is_hidden()
+                            assert page.locator('#statsdialog').is_visible()
+                            page.locator('#statsclose').click()
+                            assert page.locator('dialog[open]').count() == 0
 
         # Medicine changes preserve the selected slot when cancelled.
         reset(page, True)

@@ -114,10 +114,20 @@ function commitMedicineChoice(i,slot,target,id){
 function pickMedicineTarget(){
  const i=medicineMember,slot=+$('#medicineitem').value,w=weapon(s.inventory[i]?.[slot]),battle=!!s.enemy;
  if(!canChooseMedicine(i)||w?.kind!=='medicine'||s.area!=='dungeon')return;
+ const statsDialog=$('#statsdialog'),restoreStats=statsDialog.open;
+ const inventoryDialog=$('#inventorydialog'),restoreInventory=inventoryDialog.open;
  beginAllyTargetPick({candidates:allyTargetCandidates,keyboardCandidates:()=>allyTargetCandidates().filter(t=>s.members[t].status!=='stone'),canWork:t=>s.members[t].status!=='stone',prompt:w.name,
   onPick:t=>commitMedicineChoice(i,slot,t,w.id),onCancel:()=>{
    if(battle)$('#commandentry [data-command-choice="item"]')?.focus();
-   else{$('#medicinedialog').showModal();$('#medicinepick').focus()}
+   else{
+    if(restoreStats){
+     renderStats();
+     statsDialog.showModal();
+    }
+    if(restoreInventory)inventoryDialog.showModal();
+    $('#medicinedialog').showModal();
+    $('#medicinepick').focus();
+   }
   }});
 }
 function medicineUI(){
