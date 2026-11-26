@@ -76,7 +76,7 @@ def check_sprites(page, uids, centers, files):
         box = img.bounding_box()
         assert abs(box['width'] - size) < .1 and abs(box['height'] - size) < .1, (box, size)
         assert abs(box['x'] + size/2 - (rect['x'] + rect['width']*x/640)) < .1
-        assert abs(box['y'] + size - (rect['y'] + rect['height']*.75)) < .1
+        assert abs(box['y'] + size - (rect['y'] + rect['height']*.80)) < .1
         assert_paints_above(img, '#scene > .combat-shade')
 
 
@@ -204,7 +204,8 @@ with sync_playwright() as p:
         }""")
         fallback = page.locator('#scene svg g[data-enemy-uid="40"]')
         fallback.wait_for(state='visible')
-        assert [fallback.locator('rect').get_attribute(a) for a in ('x','y','width','height')] == ['186','140','108','121']
+        assert [fallback.locator('rect').get_attribute(a) for a in ('x','y','width','height')] == ['186','160','108','121']
+        assert fallback.locator('text').get_attribute('y') == '244.5'
         assert fallback.locator('text').text_content() == page.evaluate("enemyDefinition('succubus').icon")
         assert page.locator('#scene img').count() == 1
         assert page.locator('#scene img').get_attribute('data-enemy-uid') == '41'

@@ -26,7 +26,8 @@ assert.equal(g.run("enemySpritePath({id:'slime',identified:true})"), 'assets/mon
 g.run("enemyDefinition('wolf').race='未登録'");
 const fallback = g.run("drawEnemies([{units:[{id:'wolf',uid:9}]}])");
 assert.equal(fallback.sprites, '');
-assert.match(fallback.frames, /data-enemy-uid="9"><rect/);
+assert.match(fallback.frames, /data-enemy-uid="9"><rect x="266" y="160" width="108" height="121"/);
+assert.match(fallback.frames, /<text x="320" y="244\.5"/);
 assert.ok(fallback.frames.includes('>'+g.run("enemyDefinition('wolf').icon")+'</text>'));
 console.log('PASS all monster race mappings, identified-only unique sprites and unknown race fallback');
 

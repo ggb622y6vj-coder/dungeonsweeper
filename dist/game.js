@@ -340,7 +340,21 @@ function attack(){
  }
  render();
 }
-function quickAttack(){if(logBusy()||!s.enemy||s.done)return;const members=commandMembers(),groups=enemyGroups().filter(g=>g.units.some(e=>e.hp>0)),front=groups[0];if(!front||!members.some(canWeaponAttack))return;for(const i of members){if(canWeaponAttack(i)){s.commands[i]='fight';s.attackRows[i]=front.key}else s.commands[i]='guard'}attack()}
+function canQuickStealth(i){return i>=3&&canUseStealth(i)&&equippedWeapon(i)?.range!=='ranged'}
+function canQuickAttack(members){return members.some(i=>canWeaponAttack(i)||canQuickStealth(i))}
+function quickAttack(){
+ if(logBusy()||!s.enemy||s.done)return;
+ const members=commandMembers();
+ if(!canQuickAttack(members))return;
+ const front=enemyGroups().find(g=>g.units.some(e=>e.hp>0));
+ if(!front)return;
+ for(const i of members){
+  if(canQuickStealth(i))s.commands[i]=isHidden(i)?'ambush':'hide';
+  else s.commands[i]=canWeaponAttack(i)?'fight':'guard';
+  if(s.commands[i]==='fight'||s.commands[i]==='ambush')s.attackRows[i]=front.key;
+ }
+ attack();
+}
 
 function shownMember(i){return displayVitals?.members?.[i]||s.members[i]}
 function maxHP(i){return s.members[i].maxHP}
@@ -394,7 +408,7 @@ function drawEnemies(groups){
   if(src&&!failedEnemySprites.has(src)){
    sprites+=`<img class="enemy-sprite" data-enemy-uid="${uid}" src="${src}" alt="" style="left:${100*x/640}%;filter:url(#enemy-${currentFloorTheme})">`;
   }else{
-   frames+=`<g data-enemy-uid="${uid}"><rect x="${x-54}" y="140" width="108" height="121" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="224.5" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text></g>`;
+   frames+=`<g data-enemy-uid="${uid}"><rect x="${x-54}" y="160" width="108" height="121" rx="6" fill="#20271f" stroke="#66725d"/><text x="${x}" y="244.5" text-anchor="middle" fill="#dac595" font-size="52">${enemyDefinition(e.id).icon}</text></g>`;
   }
  }
  return {sprites,frames};

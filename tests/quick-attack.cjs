@@ -39,4 +39,27 @@ setup(`s.ailments.forEach(a=>a.fear=2)`);assert.ok(hasQuick());assert.equal(g.ru
 g.run('quickAttack()');assert.ok(!logs().some(t=>t.includes('ターン開始')),'disabled quick attack does nothing');
 // Boss: quick attack usable, flee disabled.
 setup(`s.enemy.boss=true`);assert.equal(g.run("$('#quickattack').disabled"),false);assert.equal(g.run("$('#flee').disabled"),true);assert.equal(g.run("$('#flee').title"),'守護者からは逃げられない');
+
+// Only the rear thief can initiate a quick attack. Sleep and fear exclude the other rear stealth users.
+setup(`s.ailments.forEach(a=>a.fear=3);s.members[3].job=3;s.ailments[3].fear=0;
+ s.members[4].job=6;s.ailments[4].fear=0;s.ailments[4].sleep=1;s.members[5].job=3;
+ for(const i of [3,4,5]){s.inventory[i]=['dagger'];s.equipped[i]=0}`);
+assert.equal(g.run("$('#quickattack').disabled"),false);
+assert.equal(g.run("$('#quickattack').title"),'');
+g.run('quickAttack()');
+assert.deepEqual(J('seen.c'),['guard','guard','guard','hide','guard','guard']);
+assert.equal(g.run('isHidden(3)'),false,'failed hide must leave the thief exposed');
+g.drain();
+g.run('s.enemy.initiative="party";Math.random=()=>.75;quickAttack()');
+assert.equal(g.run('seen.c[3]'),'hide','failed hide is retried');
+assert.equal(g.run('isHidden(3)'),true);
+g.drain();
+g.run('s.enemy.initiative="party";Math.random=()=>.99;quickAttack()');
+assert.equal(g.run('seen.c[3]'),'ambush');
+assert.equal(g.run('seen.r[3]'),7);
+assert.equal(g.run('isHidden(3)'),false,'ambush ends hiding');
+g.drain();
+g.run('s.enemy.initiative="party";quickAttack()');
+assert.equal(g.run('seen.c[3]'),'hide','next round starts the cycle again');
 g.drain();console.log('PASS quick attack: fight/guard split, fear/incapacitated, wiped row 1, first actionable member only, disabled, boss');
+console.log('PASS quick attack: rear stealth enables button, excludes sleeping or afraid members, retries hide and cycles through ambush');

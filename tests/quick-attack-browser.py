@@ -1,5 +1,6 @@
 """070: 戻る stays at one y for every member / row choice / review; クイック攻撃 and 逃げる only on the first
 actionable member; quick attack starts the turn with no review; distinct styling; keyboard reachable; no overflow.
+149: quick attack selects rear melee stealth and retains normal attacks for front melee and rear ranged users.
 Run: python3 tests/quick-attack-browser.py [http://localhost:8000/]
 """
 import json, os, sys
@@ -120,7 +121,61 @@ with sync_playwright() as p:
         page.screenshot(path=str(out/f'{width}-disabled.png'))
         page.evaluate('s.ailments.forEach(a=>a.fear=0);s.enemy.boss=true;render()')
         assert page.locator('#quickattack').is_enabled() and page.locator('#flee').is_disabled()
+
+        # Front and rear each have a thief and a ninja with melee weapons.
+        page.reload(); page.wait_for_function('s&&s.enemy&&!logBusy()')
+        page.evaluate('''() => {
+            for (const [i, job] of [[0,3], [1,6], [4,6], [5,3]]) {
+                s.members[i].job=job;
+                s.inventory[i]=['dagger'];
+                s.equipped[i]=0;
+            }
+            const runAttack=attack;
+            attack=()=>{
+                window.quickPlan={commands:s.commands.slice(), rows:s.attackRows.slice()};
+                runAttack();
+            };
+            Math.random=()=>.75;
+            render();
+        }''')
+        press('#quickattack')
+        page.wait_for_function('!logBusy()', timeout=20000)
+        plan = page.evaluate('window.quickPlan')
+        assert plan['commands'] == ['fight', 'fight', 'fight', 'guard', 'hide', 'hide'], plan
+        assert plan['rows'][:3] == [7, 7, 7], plan
+        assert page.evaluate('[4,5].every(i=>isHidden(i))'), 'both rear members successfully hide'
+        assert page.locator('#party').get_by_text('潜伏', exact=True).count() == 2
+
+        # With no normal weapon attack available, the hidden pair can still ambush.
+        page.evaluate('''() => {
+            s.ailments.slice(0,3).forEach(a=>a.fear=3);
+            s.enemy.initiative='party';
+            Math.random=()=>.99;
+            render();
+        }''')
+        assert page.evaluate('!commandMembers().some(canWeaponAttack)')
+        assert page.locator('#quickattack').is_enabled() and page.locator('#quickattack').get_attribute('title') == ''
+        before = page.evaluate(hp_by_row)
+        press('#quickattack')
+        page.wait_for_function('!logBusy()', timeout=20000)
+        plan = page.evaluate('window.quickPlan')
+        assert plan['commands'] == ['guard', 'guard', 'guard', 'guard', 'ambush', 'ambush'], plan
+        assert plan['rows'][4:] == [7, 7], plan
+        after = page.evaluate(hp_by_row)
+        assert after['7'] < before['7'] and after['23'] == before['23'], (before, after)
+        assert page.locator('#party').get_by_text('潜伏', exact=True).count() == 0
+
+        # The same rear thief and ninja use normal attacks when equipped with bows.
+        page.evaluate('''() => {
+            for (const i of [4,5]) s.inventory[i]=['shortbow'];
+            s.enemy.initiative='party';
+            render();
+        }''')
+        press('#quickattack')
+        page.wait_for_function('!logBusy()', timeout=20000)
+        plan = page.evaluate('window.quickPlan')
+        assert plan['commands'][4:] == ['fight', 'fight'] and plan['rows'][4:] == [7, 7], plan
         assert not errors, errors
-        print(f'PASS quick-attack Chromium {width}px: one-line heading button, shorter extras, fixed 戻る y across {sorted(seen)} buttons/row choice/review, first-member-only extras, keyboard, no review, disabled/boss, no overflow')
+        print(f'PASS quick-attack Chromium {width}px: one-line heading button, shorter extras, fixed 戻る y across {sorted(seen)} buttons/row choice/review, first-member-only extras, keyboard, no review, disabled/boss, no overflow, rear stealth and normal attack eligibility')
         ctx.close()
     browser.close()
