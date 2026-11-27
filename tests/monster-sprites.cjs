@@ -147,3 +147,29 @@ assert.match(after, /<text x="544"[^>]*>\d+<\/text>/);
 assert.doesNotMatch(after, /data-enemy-uid/);
 assert.doesNotMatch(after, /class="combat-shade"/);
 console.log('PASS combat snapshots control shade and wall symbols through the last log, side flags remain');
+
+// Replay through log()/pumpLog(): the live unit is already identified, but the frame
+// for the earlier unidentified snapshot must not leak the unique sprite or name.
+const replay = game();
+replay.run(`s.area='dungeon';s.pos=3*size()+3;s.dir=0;s.light=true;
+  s.enemy={units:[{id:'slime',uid:21,row:0,hp:5,maxHp:5,identified:false}]};
+  displayCombat=undefined;logQueue=[];logTimer=null;
+  log('未識別のフレーム');s.enemy.units[0].identified=true;log('識別済みのフレーム')`);
+assert.deepEqual([...replay.run('logQueue.map(e=>e.enemy.units[0].identified)')], [false, true]);
+assert.equal(replay.run('s.enemy.units[0].identified'), true);
+replay.run('pumpLog()');
+assert.equal(replay.run('visibleCombat().units[0].identified'), false);
+const hiddenFrame = replay.run("$('#scene').innerHTML");
+assert.match(hiddenFrame, /data-enemy-uid="21" src="assets\/monsters\/unknown\/futeikei\.png"/);
+assert.doesNotMatch(hiddenFrame, /assets\/monsters\/slime\.png/);
+assert.doesNotMatch(hiddenFrame, /slime/);
+assert.ok(!hiddenFrame.includes(replay.run("enemyDefinition('slime').name")));
+assert.ok(hiddenFrame.includes('1：'+replay.run('UNKNOWN_NAMES.slime')+' ×1(1)'));
+replay.run('pumpLog()');
+const knownFrame = replay.run("$('#scene').innerHTML");
+assert.match(knownFrame, /data-enemy-uid="21" src="assets\/monsters\/slime\.png"/);
+assert.ok(knownFrame.includes('1：'+replay.run("enemyDefinition('slime').name")+' ×1(1)'));
+replay.run('pumpLog()');
+assert.equal(replay.run('displayCombat'), undefined);
+assert.match(replay.run("$('#scene').innerHTML"), /data-enemy-uid="21" src="assets\/monsters\/slime\.png"/);
+console.log('PASS log replay shows the race sprite and unknown name until the identified snapshot');

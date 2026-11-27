@@ -18,4 +18,4 @@
 - 敵が全ていなくなってから、倒した敵の報酬を配分。全員が逃げた場合は宝箱なし。死亡・逃走・召喚・ダメージ・Lv変化はログの表示タイミングに合わせて描画します。
 - 旧セーブのパーティー・地図・所持品は維持。進行中の旧戦闘は新IDへ一度だけ移行し、残HPは新データの最大値以内に補正します。
 
-`notion-monsters.json`（114種）・`notion-spells.json`（42種）は同期スナップショットです。`node tests/notion-sync.cjs` でゲームデータと照合します。敵の呪文ID・習得Lv・対象・効果の参照元は `dist/spells.js` の `MAGIC`、敵使用可の集合とダイスの上書きは `dist/monsters.js` にあります。
+`notion-monsters.json`（114種）・`notion-spells.json`（45種）は同期スナップショットです。`node tests/notion-sync.cjs` でゲームデータと照合します。敵の呪文ID・習得Lv・対象・効果の参照元は `dist/spells.js` の `MAGIC`、敵使用可の集合とダイスの上書きは `dist/monsters.js` にあります。
