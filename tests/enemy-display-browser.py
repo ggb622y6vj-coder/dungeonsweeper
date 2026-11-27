@@ -1,4 +1,4 @@
-"""Combat sprites, background shading, snapshots, wall symbols and image failure at both viewport sizes."""
+"""Combat sprites (race and identified unique), background shading, snapshots, wall symbols and image failure at both viewport sizes."""
 import math
 import os
 import sys
@@ -70,7 +70,7 @@ def check_sprites(page, uids, centers, files):
     for i, (uid, x, filename) in enumerate(zip(uids, centers, files)):
         img = imgs.nth(i)
         assert img.is_visible() and img.get_attribute('data-enemy-uid') == str(uid)
-        assert img.get_attribute('src') == 'assets/monsters/unknown/' + filename
+        assert img.get_attribute('src') == 'assets/monsters/' + filename
         assert img.get_attribute('alt') == '' and img.get_attribute('title') is None
         assert img.evaluate("e=>getComputedStyle(e).imageRendering==='pixelated' && getComputedStyle(e).pointerEvents==='none'")
         box = img.bounding_box()
@@ -122,18 +122,22 @@ with sync_playwright() as p:
         assert first['ids'] == ['11', '20'], first
         assert first['shades'] == 1, first
         assert first['zzzIds'] == [], first
-        assert first['paths'] == ['assets/monsters/unknown/hitogata.png', 'assets/monsters/unknown/futeikei.png'], first
+        assert first['paths'] == ['assets/monsters/goblin.png', 'assets/monsters/slime.png'], first
         assert first['rows'] == ['1：ゴブリン ×4(2)', '2：スライム ×2(2)', '3：ハイウルフ ×3(0)'], first
         page.wait_for_function('!logBusy()')
         last = page.evaluate('readEnemyScene()')
         assert last['ids'] == ['20', '30'] and last['zzzIds'] == [], last
         assert last['rows'] == ['1：スライム ×2(1)', '2：ハイウルフ ×3(0)'], last
-        check_sprites(page, [20, 30], [240, 400], ['futeikei.png', 'kemono.png'])
+        check_sprites(page, [20, 30], [240, 400], ['slime.png', 'wolf.png'])
         page.evaluate("""()=>{
           for(const e of s.enemy.units.filter(e=>e.row===28)){e.hp=0;e.rewarded=true}
           render();
         }""")
-        check_sprites(page, [30], [320], ['kemono.png'])
+        check_sprites(page, [30], [320], ['wolf.png'])
+        # Once a group is no longer identified, the same unit goes back to its race sprite.
+        page.evaluate("for(const e of s.enemy.units.filter(e=>e.row===39))e.identified=false;render()")
+        check_sprites(page, [30], [320], ['unknown/kemono.png'])
+        assert 'wolf.png' not in page.locator('#scene').inner_html()
 
         page.evaluate("""()=>{
           s.floor=3;
@@ -144,13 +148,14 @@ with sync_playwright() as p:
           render();
         }""")
         assert page.locator('.scene-enemies > div').count() == 4
-        check_sprites(page, [40, 41], [240, 400], ['mushi.png', 'ryuu.png'])
+        check_sprites(page, [40, 41], [240, 400], ['firefly.png', 'unknown/ryuu.png'])
         assert '炎竜' not in page.locator('#scene').inner_html()
+        assert 'dragon' not in page.locator('#scene').inner_html()
         # Resize just the scene, with no render call or viewport resize event.
         page.locator('#scene').evaluate("e=>{e.style.width='280px';e.style.height='200px'}")
         page.wait_for_function("w=>Math.abs(document.querySelector('.enemy-sprite').getBoundingClientRect().width-w)<.1",
                                arg=72 if dpr == 2 else 75.46875)
-        check_sprites(page, [40, 41], [240, 400], ['mushi.png', 'ryuu.png'])
+        check_sprites(page, [40, 41], [240, 400], ['firefly.png', 'unknown/ryuu.png'])
         page.locator('#scene').evaluate("e=>{e.style.width='';e.style.height=''}")
 
         page.evaluate("encounterNotice='敵の奇襲！';scene()")
@@ -211,6 +216,19 @@ with sync_playwright() as p:
         assert page.locator('#scene img').get_attribute('data-enemy-uid') == '41'
         page.wait_for_function("document.querySelector('#scene img')?.naturalWidth===48")
         assert 'サッキュバス' not in page.locator('#scene').inner_html()
+        assert 'succubus' not in page.locator('#scene').inner_html()
+
+        # A unique image that has not been requested yet also falls back to its own frame.
+        page.route('**/monsters/dragon.png', lambda route: route.abort())
+        page.evaluate("s.enemy.units[1].identified=true;scene()")
+        unique_fallback = page.locator('#scene svg g[data-enemy-uid="41"]')
+        unique_fallback.wait_for(state='visible')
+        assert [unique_fallback.locator('rect').get_attribute(a) for a in ('x','y','width','height')] == ['346','160','108','121']
+        assert unique_fallback.locator('text').text_content() == page.evaluate("enemyDefinition('dragon').icon")
+        assert page.evaluate("failedEnemySprites.has('assets/monsters/dragon.png')")
+        assert not page.evaluate("failedEnemySprites.has('assets/monsters/unknown/ryuu.png')")
+        assert page.locator('#scene img').count() == 0
+        assert fallback.is_visible()
         assert not errors, errors
         print(f'PASS enemy sprites {width}px: snapshots, placement, single-line rows, resize, shade, overlays, symbols and fallback')
         page.close()

@@ -392,7 +392,22 @@ const RACE_SPRITES=new Map([
  ['虫','mushi.png'],['構造体','kouzoutai.png'],['悪魔','akuma.png'],['魔獣','majuu.png'],
  ['竜','ryuu.png'],['植物','shokubutu.png']
 ]);
-const MONSTER_SPRITES=new Set();
+const MONSTER_SPRITES=new Set([
+ 'slime','gas','skeleton','wolf','goblin','bat','rat','spider','scout','apprentice','guardian',
+ 'poisonslime','ghostknight','firefly','orc','bigspider','mage','bandit','ghoul','stone','general',
+ 'acidslime','archer','blackwolf','shaman','venomspider','thief','dragon','rabbit','iron','terror',
+ 'watcher','ogre','zombie','harpy','viper','armorant','darkpriest','sorcerer','gargoyle','minogate',
+ 'wight','troll','werewolf','scorpion','ninja','highmage','salamander','blob','necromancer',
+ 'wraith','stonegiant','chimera','darkknight','fungus','darkelf','vampbat','vampire','gasdragon',
+ 'minotaur','fleshgolem','ninjachief','deathmage','hellhound','crawler','ettin','lesserdemon',
+ 'bluedragon','deathknight','witch','hydra','assassin','evileye','demongeneral','greaterdemon',
+ 'frostgiant','vampirelord','reddragon','masterninja','lich','fiendhound','ancientdragon',
+ 'royalguard','fallenangel','reaper','chaosdragon','chaosspawn','archmage','succubus','daidaraboti',
+ 'kashadokuro','labyrinthlord','takenoko','kinoko','sirakaba','insectivore','dendenko',
+ 'dynamotuboro','akumaikire','poisongiant','ameba','rafflesia','virusbat','cathuman','cathuman2',
+ 'cathuman3','poltergeist','namakubi','ganyu','namakubi2','warbear','kitousha','kitousha2',
+ 'kitousha3'
+]);
 const failedEnemySprites=new Set();
 function enemySpritePath(unit){
  if(unit.identified&&MONSTER_SPRITES.has(unit.id))return `assets/monsters/${unit.id}.png`;

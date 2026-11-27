@@ -1,8 +1,8 @@
 # モンスター設定
 
-`monsters.csv` は108種類のモンスター設定の正本です。値は旧方式の階層倍率を適用せず使用します。
+`monsters.csv` は114種類のモンスター設定の正本です。値は旧方式の階層倍率を適用せず使用します。
 
-変更後は `python scripts/compile-monsters.py` で `dist/monster-data.js` を生成し、`python scripts/compile-monsters.py --check` と `node tests/game.cjs` で検証してください。確定名を変更・追加する場合、生成スクリプトの名前→固定ID対応も更新します。行の並べ替えは自由です。
+変更後は `python scripts/compile-monsters.py` で `dist/monster-data.js` を生成し、`python scripts/compile-monsters.py --check` と `node tests/game.cjs` で検証してください。確定名を変更・追加する場合、生成スクリプトの名前→固定ID対応も更新します。行の並べ替えは自由です。モンスターを追加する場合は、48×48・グレー4値の固有画像を `dist/assets/monsters/<ID>.png`（原画は `art-src/monster-sprites-v3/`）に置き、`dist/game.js` の `MONSTER_SPRITES` にIDを登録します（`node tests/monster-sprites.cjs` が漏れを検出します）。
 
 - 通常遭遇は該当階層の守護者以外から1〜3列を抽選。各列の頭数は「群れの数」。守護者は各階の下り階段のマスに1体。
 - 1〜10Fに固有の敵と各階1種の守護者を設定しています。出現階層は「1F・2F」のように複数指定できます。
@@ -18,4 +18,4 @@
 - 敵が全ていなくなってから、倒した敵の報酬を配分。全員が逃げた場合は宝箱なし。死亡・逃走・召喚・ダメージ・Lv変化はログの表示タイミングに合わせて描画します。
 - 旧セーブのパーティー・地図・所持品は維持。進行中の旧戦闘は新IDへ一度だけ移行し、残HPは新データの最大値以内に補正します。
 
-`notion-monsters.json`（108種）・`notion-spells.json`（42種）は同期スナップショットです。`node tests/notion-sync.cjs` でゲームデータと照合します。敵の呪文ID・習得Lv・対象・効果の参照元は `dist/spells.js` の `MAGIC`、敵使用可の集合とダイスの上書きは `dist/monsters.js` にあります。
+`notion-monsters.json`（114種）・`notion-spells.json`（42種）は同期スナップショットです。`node tests/notion-sync.cjs` でゲームデータと照合します。敵の呪文ID・習得Lv・対象・効果の参照元は `dist/spells.js` の `MAGIC`、敵使用可の集合とダイスの上書きは `dist/monsters.js` にあります。

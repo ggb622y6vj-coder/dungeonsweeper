@@ -12,24 +12,50 @@ const expected = {
   竜: 'ryuu.png', 植物: 'shokubutu.png',
 };
 assert.deepEqual(races, expected);
-for (const { id, race } of g.run('ENEMIES')) {
+const enemies = g.run('ENEMIES');
+const ids = [...enemies].map(e => e.id);
+const registered = g.run('Array.from(MONSTER_SPRITES)');
+assert.equal(ids.length, 114);
+assert.equal(new Set(ids).size, ids.length);
+assert.equal(registered.length, new Set(registered).size);
+assert.deepEqual([...registered].sort(), [...ids].sort());
+assert.equal(g.run('MONSTER_SPRITES.size'), 114);
+const uniqueDir = path.join(__dirname, '../dist/assets/monsters');
+assert.deepEqual(fs.readdirSync(uniqueDir).filter(f => f.endsWith('.png')).sort(), ids.map(id => id+'.png').sort());
+for (const { id, race } of enemies) {
   assert.ok(Object.hasOwn(races, race), id);
-  for (const identified of [false, true]) {
-    assert.equal(g.run(`enemySpritePath({id:${JSON.stringify(id)},identified:${identified}})`),
-      'assets/monsters/unknown/' + expected[race], id);
-  }
+  assert.equal(g.run(`enemySpritePath({id:${JSON.stringify(id)},identified:false})`),
+    'assets/monsters/unknown/' + expected[race], id);
+  assert.equal(g.run(`enemySpritePath({id:${JSON.stringify(id)}})`),
+    'assets/monsters/unknown/' + expected[race], id);
+  assert.equal(g.run(`enemySpritePath({id:${JSON.stringify(id)},identified:true})`),
+    'assets/monsters/' + id + '.png', id);
 }
-assert.equal(g.run('MONSTER_SPRITES.size'), 0);
+// An unregistered monster keeps its race sprite even after identification.
+g.run("MONSTER_SPRITES.delete('slime')");
+assert.equal(g.run("enemySpritePath({id:'slime',identified:true})"), 'assets/monsters/unknown/futeikei.png');
 g.run("MONSTER_SPRITES.add('slime')");
-assert.equal(g.run("enemySpritePath({id:'slime',identified:false})"), 'assets/monsters/unknown/futeikei.png');
 assert.equal(g.run("enemySpritePath({id:'slime',identified:true})"), 'assets/monsters/slime.png');
+// Unidentified groups never put the monster ID into the scene markup.
+const hidden = g.run("drawEnemies([{units:[{id:'succubus',uid:5}]},{units:[{id:'dragon',uid:6,identified:true}]}])");
+assert.match(hidden.sprites, /data-enemy-uid="5" src="assets\/monsters\/unknown\/akuma\.png"/);
+assert.match(hidden.sprites, /data-enemy-uid="6" src="assets\/monsters\/dragon\.png"/);
+assert.doesNotMatch(hidden.sprites, /succubus/);
+// A failed unique image falls back to the frame and icon, like a failed race image.
+g.run("failedEnemySprites.add('assets/monsters/dragon.png')");
+const failed = g.run("drawEnemies([{units:[{id:'dragon',uid:8,identified:true}]}])");
+assert.equal(failed.sprites, '');
+assert.match(failed.frames, /data-enemy-uid="8"><rect x="266" y="160" width="108" height="121"/);
+assert.ok(failed.frames.includes('>'+g.run("enemyDefinition('dragon').icon")+'</text>'));
+assert.match(g.run("drawEnemies([{units:[{id:'dragon',uid:8}]}])").sprites, /src="assets\/monsters\/unknown\/ryuu\.png"/);
+g.run("failedEnemySprites.clear()");
 g.run("enemyDefinition('wolf').race='未登録'");
 const fallback = g.run("drawEnemies([{units:[{id:'wolf',uid:9}]}])");
 assert.equal(fallback.sprites, '');
 assert.match(fallback.frames, /data-enemy-uid="9"><rect x="266" y="160" width="108" height="121"/);
 assert.match(fallback.frames, /<text x="320" y="244\.5"/);
 assert.ok(fallback.frames.includes('>'+g.run("enemyDefinition('wolf').icon")+'</text>'));
-console.log('PASS all monster race mappings, identified-only unique sprites and unknown race fallback');
+console.log('PASS all 114 unique sprites registered with PNGs, identified-only unique paths, failure and unknown race fallback');
 
 // Reverse the PNG row filters for the bundled non-interlaced, 8-bit RGBA sprites.
 function paeth(a, b, c) {
@@ -37,8 +63,8 @@ function paeth(a, b, c) {
   if (da <= db && da <= dc) return a;
   return db <= dc ? b : c;
 }
-function checkPixels(file) {
-  const png = fs.readFileSync(path.join(__dirname, '../dist/assets/monsters/unknown', file));
+function checkPixels(file, dir = 'unknown') {
+  const png = fs.readFileSync(path.join(__dirname, '../dist/assets/monsters', dir, file));
   assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', file);
   assert.equal(png.toString('ascii', 12, 16), 'IHDR', file);
   assert.equal(png.readUInt32BE(16), 48, file);
@@ -75,8 +101,13 @@ function checkPixels(file) {
   assert.ok(transparent, file);
   assert.ok(grays.size > 0, file);
 }
-Object.values(races).forEach(checkPixels);
-console.log('PASS all 10 sprite PNGs decode to transparent 48x48 images with four grayscale levels');
+Object.values(races).forEach(file => checkPixels(file));
+ids.forEach(id => checkPixels(id+'.png', ''));
+for (const id of ids) {
+  assert.ok(fs.readFileSync(path.join(uniqueDir, id+'.png'))
+    .equals(fs.readFileSync(path.join(__dirname, '../art-src/monster-sprites-v3', id+'.png'))), id);
+}
+console.log('PASS all 10 race and 114 unique sprite PNGs decode to transparent 48x48 images with four grayscale levels');
 
 for (const [width,height,dpr,want] of [
   [640,400,1,192], [640,200,2,120], [280,200,1,75.46875], [280,200,2,72], [40,100,1,10.78125]
